@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CX Value Chain Simulator — MISA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:ital,wght@0,400;0,600;0,700;1,500&family=Outfit:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap&subset=vietnamese" rel="stylesheet">
+<style>
+  :root{
+    --bg0:#080b14; --bg1:#121a2e;
+    --ink:#0D1B2A; --navy:#1A2E4A; --steel:#2C4A6E;
+    --gold:#d4af6a; --teal:#4fd1c5; --rose:#e08a9e;
+    --text:#e8ecf4; --text-dim:#9aa7bd; --text-faint:#5f6b82;
+    --line:rgba(255,255,255,.09);
+    --card:rgba(26,46,74,.45);
+    --good:#4fd1c5; --bad:#e08a9e;
+    --stage-acquire:#d4af6a;
+    --stage-adopt:#4fd1c5;
+    --stage-support:#8fb3e8;
+    --stage-renew:#b48fe8;
+    --stage-advocate:#e08a9e;
+    --header-bg:rgba(8,11,20,.6);
+    --thumb-ring:var(--gold);
+    --node-fill:rgba(26,46,74,.55);
+    --edge:rgba(255,255,255,.13);
+    --track-bg:rgba(255,255,255,.07);
+    --font-display:'Noto Serif Display', serif;
+    --font-body:'Outfit', sans-serif;
+    --font-mono:'DM Mono', monospace;
+  }
+  /* ===== LIGHT THEME (projector-safe, high contrast) ===== */
+  html[data-theme='light']{
+    --bg0:#f4f6f4; --bg1:#e9ede9;
+    --ink:#14181D; --navy:#dfe5e2; --steel:#c4cec9;
+    --gold:#9a6b12; --teal:#0d7d70; --rose:#c1476a;
+    --text:#161c20; --text-dim:#4a555c; --text-faint:#7b858c;
+    --line:rgba(20,24,29,.16);
+    --card:#ffffff;
+    --good:#0d7d70; --bad:#c1476a;
+    --stage-acquire:#9a6b12;
+    --stage-adopt:#0d7d70;
+    --stage-support:#2f5fa8;
+    --stage-renew:#6a3fb0;
+    --stage-advocate:#c1476a;
+    --header-bg:rgba(255,255,255,.85);
+    --thumb-ring:#9a6b12;
+    --node-fill:#ffffff;
+    --edge:rgba(20,24,29,.28);
+    --track-bg:rgba(20,24,29,.10);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;overflow:hidden;
+    background:linear-gradient(160deg,var(--bg0) 0%,var(--bg1) 100%);
+    font-family:var(--font-body); color:var(--text); font-size:14px;}
+
+  /* ============ HEADER ============ */
+  header{
+    height:56px; display:flex; align-items:center; gap:16px;
+    padding:0 18px; border-bottom:1px solid var(--line);
+    background:var(--header-bg); backdrop-filter:blur(6px);
+  }
+  .h-title{font-family:var(--font-display); font-size:17px; font-weight:600; letter-spacing:.01em;}
+  .h-title em{font-style:italic; color:var(--gold);}
+  .h-sub{font-family:var(--font-mono); font-size:10px; color:var(--text-faint); letter-spacing:.12em; text-transform:uppercase;}
+  .h-spacer{flex:1;}
+  .status-pill{
+    font-family:var(--font-mono); font-size:11px; padding:5px 12px; border-radius:14px;
+    border:1px solid var(--line); color:var(--text-dim); opacity:0; transition:opacity .25s;
+    max-width:340px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .status-pill.show{opacity:1;}
+  .status-pill.ok{border-color:rgba(79,209,197,.5); color:var(--teal);}
+  .status-pill.warn{border-color:rgba(212,175,106,.5); color:var(--gold);}
+  .btn{
+    font-family:var(--font-body); font-size:12.5px; font-weight:500;
+    background:transparent; color:var(--text-dim); border:1px solid var(--line);
+    border-radius:6px; padding:7px 14px; cursor:pointer; transition:all .18s;
+  }
+  .btn:hover{color:var(--text); border-color:rgba(255,255,255,.25);}
+  .btn:focus-visible{outline:none; border-color:var(--teal); box-shadow:0 0 0 3px rgba(79,209,197,.22);}
+  .btn.primary{background:var(--gold); color:var(--ink); border-color:var(--gold); font-weight:600;}
+  .btn.primary:hover{background:#e2c184;}
+  .theme-btn{min-width:78px;}
+  .release{font-family:var(--font-mono); font-size:10px; color:var(--text-faint);}
+  .sens-ctl{display:flex; align-items:center; gap:8px; padding:5px 12px; border:1px solid var(--line); border-radius:8px; background:rgba(26,46,74,.35);}
+  .sens-ctl label{font-family:var(--font-mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim);}
+  .sens-ctl input[type=range]{width:96px; height:14px;}
+  .sens-val{font-family:var(--font-mono); font-size:12px; color:var(--gold); min-width:34px; text-align:right;}
+
+  /* ============ LAYOUT 3 PANEL ============ */
+  .workspace{display:flex; height:calc(100vh - 56px); width:100vw;}
+  .panel{overflow-y:auto; overflow-x:hidden; min-width:200px;}
+  #panelLeft{flex:0 0 24%; border-right:none; padding:14px 14px 40px;}
+  #panelMid{flex:1 1 auto; display:flex; flex-direction:column; min-width:320px;}
+  #panelRight{flex:0 0 26%; padding:14px 14px 40px;}
+  .divider{
+    flex:0 0 7px; cursor:col-resize; position:relative; z-index:5;
+    background:transparent; transition:background .15s;
+  }
+  .divider::after{
+    content:''; position:absolute; top:0; bottom:0; left:3px; width:1px;
+    background:var(--line);
+  }
+  .divider:hover, .divider.dragging{background:rgba(212,175,106,.15);}
+  .divider:hover::after, .divider.dragging::after{background:var(--gold);}
+
+  /* ============ LEFT: LEVERS ============ */
+  .panel-title{
+    font-family:var(--font-mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--text-faint); margin:4px 0 12px;
+  }
+  .stage-group{margin-bottom:18px; border:1px solid var(--line); border-radius:10px; background:var(--card); overflow:hidden;}
+  .stage-head{
+    display:flex; align-items:center; gap:8px; padding:10px 12px;
+    border-bottom:1px solid var(--line);
+  }
+  .stage-dot{width:9px; height:9px; border-radius:50%; flex:0 0 auto;}
+  .stage-name{font-family:var(--font-display); font-size:14px; font-weight:600; letter-spacing:.01em;}
+  .stage-tag{margin-left:auto; font-family:var(--font-mono); font-size:9px; color:var(--text-faint); letter-spacing:.1em;}
+  .lever{padding:11px 12px 13px; border-bottom:1px solid rgba(255,255,255,.05);}
+  .lever:last-child{border-bottom:none;}
+  .lever-top{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:7px; gap:8px;}
+  .lever-name{font-size:12.5px; color:var(--text); line-height:1.3;}
+  .lever-val{font-family:var(--font-mono); font-size:13px; color:var(--gold); white-space:nowrap;}
+  .lever-val .base{color:var(--text-faint); font-size:10px;}
+  input[type=range]{
+    -webkit-appearance:none; appearance:none; width:100%; height:14px; border-radius:2px;
+    background:transparent; outline:none; cursor:pointer;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:16px; height:16px; border-radius:50%;
+    background:var(--text); border:2px solid var(--bg0); box-shadow:0 0 0 2px var(--gold);
+    cursor:grab; transition:transform .12s; margin-top:-1px;
+  }
+  input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15);}
+  input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 4px rgba(212,175,106,.4);}
+  input[type=range]::-moz-range-thumb{
+    width:14px; height:14px; border-radius:50%; background:var(--text);
+    border:2px solid var(--bg0); box-shadow:0 0 0 2px var(--gold); cursor:grab;
+  }
+  .presets{margin-bottom:16px;}
+  .preset-row{display:flex; flex-wrap:wrap; gap:6px;}
+  .chip{
+    font-size:11px; padding:5px 10px; border-radius:14px; cursor:pointer;
+    border:1px solid var(--line); background:transparent; color:var(--text-dim);
+    font-family:var(--font-body); transition:all .15s;
+  }
+  .chip:hover{border-color:var(--gold); color:var(--gold);}
+  .chip:focus-visible{outline:none; box-shadow:0 0 0 3px rgba(212,175,106,.25);}
+  .chip.active{background:var(--gold); color:var(--ink); border-color:var(--gold); font-weight:600;}
+  .chip.new{border-color:var(--teal); color:var(--teal); font-weight:600;}
+  .chip.new:hover{background:rgba(79,209,197,.12);}
+  .chip.new.active{background:var(--teal); color:var(--ink); border-color:var(--teal);}
+  .chip.dirty::after{content:' •'; color:var(--rose);}
+
+  /* action bar dưới hàng chip */
+  .preset-action{margin-top:10px;}
+  .path-hint{font-size:10.5px; color:var(--text-dim); line-height:1.5; margin-bottom:8px;}
+  .path-hint b{color:var(--teal); font-weight:500;}
+  .path-hint.free{color:var(--text-faint); font-style:italic;}
+  .action-btns{display:flex; gap:6px; flex-wrap:wrap;}
+  .mini-btn{
+    font-family:var(--font-body); font-size:11px; padding:5px 10px; border-radius:6px; cursor:pointer;
+    border:1px solid var(--line); background:transparent; color:var(--text-dim); transition:all .15s;
+    display:inline-flex; align-items:center; gap:4px;
+  }
+  .mini-btn:hover{color:var(--text); border-color:rgba(255,255,255,.28);}
+  .mini-btn.load{border-color:rgba(79,209,197,.45); color:var(--teal);}
+  .mini-btn.load:hover{background:rgba(79,209,197,.1);}
+  .mini-btn:focus-visible{outline:none; box-shadow:0 0 0 3px rgba(212,175,106,.25);}
+
+  /* lever threshold band + grade dot */
+  .grade-dot{display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:6px; vertical-align:middle; background:var(--text-faint);}
+  .grade-dot.good{background:var(--teal);}
+  .grade-dot.ok{background:var(--gold);}
+  .grade-dot.bad{background:var(--rose);}
+  .slider-wrap{position:relative; padding-top:3px;}
+  .band{position:absolute; left:0; right:0; top:8px; height:5px; border-radius:3px; pointer-events:none;}
+  .slider-wrap input[type=range]{position:relative; z-index:2; background:transparent;}
+  .slider-wrap input[type=range]::-webkit-slider-runnable-track{background:transparent;}
+  .lever.offpath{opacity:.4; transition:opacity .2s;}
+  .lever.offpath .band{filter:grayscale(.7);}
+
+  /* strategy node highlights trên mindmap */
+  .node.keyhl rect{stroke:var(--gold); stroke-width:2; fill:rgba(212,175,106,.14);}
+  .edge.keyhl{stroke:rgba(212,175,106,.85); stroke-width:2.2;}
+  .node.result-good rect{stroke:var(--teal); stroke-width:2.4; fill:rgba(79,209,197,.16);}
+  .node.result-warn rect{stroke:var(--gold); stroke-width:2.4; fill:rgba(212,175,106,.16);}
+
+  /* ============ MID: MINDMAP ============ */
+  .mid-head{
+    display:flex; align-items:center; gap:14px; padding:10px 16px;
+    border-bottom:1px solid var(--line); flex:0 0 auto;
+  }
+  .legend{display:flex; gap:12px; flex-wrap:wrap;}
+  .legend span{display:flex; align-items:center; gap:5px; font-size:10.5px; color:var(--text-dim);}
+  .legend i{width:8px; height:8px; border-radius:50%; display:inline-block;}
+  .col-labels{
+    display:grid; grid-template-columns:repeat(5,1fr); padding:8px 16px 2px;
+    font-family:var(--font-mono); font-size:9.5px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--text-faint); flex:0 0 auto;
+  }
+  .col-labels div:nth-child(3){color:var(--teal);}
+  .col-labels div:last-child{color:var(--gold);}
+  #mapWrap{flex:1 1 auto; overflow:auto; padding:4px 8px 20px;}
+  #mindmap{display:block; width:100%; min-width:780px;}
+  .node rect{fill:var(--node-fill); stroke:var(--line); stroke-width:1; rx:7; transition:stroke .2s, fill .2s;}
+  .node text{fill:var(--text); font-family:var(--font-body); font-size:10.5px;}
+  .node text .nsub{fill:var(--text-dim);}
+  .node .nval{fill:var(--gold); font-family:var(--font-mono); font-size:11px; font-weight:500;}
+  .node.result rect{stroke:rgba(212,175,106,.45);}
+  .node.parent rect{stroke:rgba(79,209,197,.55); fill:rgba(79,209,197,.08);}
+  .node.parent .nval{fill:var(--teal);}
+  .node.flash rect{stroke:var(--teal); stroke-width:2;}
+  .node.pathhl rect{stroke:var(--gold); stroke-width:2; fill:rgba(212,175,106,.12);}
+  .node{cursor:pointer;}
+  .edge{stroke:var(--edge); stroke-width:1.3; fill:none; transition:stroke .25s;}
+  .edge.flash{stroke:rgba(79,209,197,.75); stroke-width:2;}
+  .edge.pathhl{stroke:rgba(212,175,106,.8); stroke-width:2;}
+  .stage-band{opacity:.06;}
+
+  /* ============ RIGHT: RESULTS ============ */
+  .kpi-hero{
+    border:1px solid rgba(212,175,106,.4); border-radius:12px;
+    background:var(--card); padding:16px; margin-bottom:12px;
+    box-shadow:0 10px 30px -18px rgba(0,0,0,.35);
+  }
+  .kpi-hero .k{font-family:var(--font-mono); font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--text-dim);}
+  .kpi-hero .v{font-family:var(--font-display); font-size:32px; font-weight:700; color:var(--gold); line-height:1.15; margin:4px 0 2px;}
+  .kpi-hero .d{font-family:var(--font-mono); font-size:12px;}
+  .kpi-grid{display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:14px;}
+  .kpi{
+    border:1px solid var(--line); border-radius:10px; background:var(--card);
+    padding:11px 12px;
+  }
+  .kpi .k{font-size:10.5px; color:var(--text-dim); margin-bottom:4px; line-height:1.25; min-height:26px;}
+  .kpi .v{font-family:var(--font-mono); font-size:17px; color:var(--text); font-weight:500;}
+  .kpi .d{font-family:var(--font-mono); font-size:10.5px; margin-top:3px;}
+  .up{color:var(--good);} .down{color:var(--bad);} .flat{color:var(--text-faint);}
+  .bars{border:1px solid var(--line); border-radius:10px; background:var(--card); padding:12px;}
+  .bars h4{margin:0 0 10px; font-family:var(--font-mono); font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--text-dim); font-weight:400;}
+  .bar-row{margin-bottom:10px;}
+  .bar-row .lbl{display:flex; justify-content:space-between; font-size:11px; color:var(--text-dim); margin-bottom:4px;}
+  .bar-row .lbl b{font-family:var(--font-mono); color:var(--text); font-weight:500;}
+  .bar-track{height:7px; border-radius:4px; background:rgba(255,255,255,.07); position:relative; overflow:hidden;}
+  .bar-fill{position:absolute; top:0; left:0; bottom:0; border-radius:4px; transition:width .35s ease;}
+  .bar-base{position:absolute; top:-2px; bottom:-2px; width:2px; background:var(--text-dim); opacity:.8;}
+  .assump-note{
+    margin-top:14px; font-size:10.5px; color:var(--text-faint); line-height:1.5;
+    border-left:2px solid var(--gold); padding-left:10px;
+  }
+  /* projection block */
+  .proj-block{border:1px solid var(--line); border-radius:10px; background:var(--card); padding:12px; margin-bottom:12px;}
+  .proj-head{display:flex; align-items:center; justify-content:flex-start; margin-bottom:6px;}
+  .proj-legend{display:flex; gap:10px; font-size:9px; color:var(--text-dim); flex-wrap:wrap;}
+  .proj-legend span{display:flex; align-items:center; gap:4px;}
+  .proj-legend i.sw{width:9px; height:9px; border-radius:2px; display:inline-block;}
+  .proj-legend i.sw.gold{background:var(--gold);}
+  .proj-legend i.sw.teal{background:var(--teal);}
+  .proj-legend i.ln{width:14px; height:0; border-top:2px solid; display:inline-block;}
+  .proj-legend i.ln.purple{border-color:var(--stage-renew);}
+  .proj-legend i.ln.base{border-color:var(--text-dim); border-top-style:dashed;}
+  .proj-legend i.tick{width:10px; height:0; border-top:1.5px dashed var(--text-faint); display:inline-block;}
+  .proj-svg{width:100%; height:auto; display:block;}
+  .pg-xlab{fill:var(--text-faint); font-family:var(--font-mono); font-size:8px; text-anchor:middle;}
+  .pg-zero{stroke:var(--edge); stroke-width:1;}
+  .bar-rev{fill:var(--gold); opacity:.9;}
+  .bar-pro{fill:var(--teal); opacity:.9;}
+  .bar-pro.neg{fill:var(--rose); opacity:.9;}
+  .bl-tick{stroke:var(--text-faint); stroke-width:1.4; stroke-dasharray:2 1.5;}
+  .cust-line{fill:none; stroke-width:2.4;}
+  .cust-line.sim{stroke:var(--stage-renew);}
+  .cust-line.base{stroke:var(--text-dim); stroke-width:1.6; stroke-dasharray:4 3; opacity:.65;}
+  .cust-dot circle{fill:var(--stage-renew);}
+  /* year selector */
+  .year-bar{display:flex; align-items:center; gap:8px; margin-bottom:9px;}
+  .year-lbl{font-family:var(--font-mono); font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-faint);}
+  .year-tabs{display:flex; gap:4px;}
+  .year-tab{
+    font-family:var(--font-mono); font-size:11px; width:32px; padding:5px 0; border-radius:6px; cursor:pointer;
+    border:1px solid var(--line); background:transparent; color:var(--text-dim); transition:all .15s;
+  }
+  .year-tab:hover{color:var(--text); border-color:rgba(255,255,255,.28);}
+  .year-tab.active{background:var(--gold); color:var(--ink); border-color:var(--gold); font-weight:600;}
+  .year-tab:focus-visible{outline:none; box-shadow:0 0 0 3px rgba(212,175,106,.25);}
+  .kpi .yoy{font-size:10px;}
+
+  /* ============ MODAL ============ */
+  .modal-veil{
+    position:fixed; inset:0; background:rgba(8,11,20,.7); backdrop-filter:blur(3px);
+    display:none; align-items:center; justify-content:center; z-index:50;
+  }
+  .modal-veil.show{display:flex;}
+  .modal{
+    width:min(420px, 90vw); background:var(--bg1); border:1px solid rgba(212,175,106,.35);
+    border-radius:12px; padding:20px; box-shadow:0 24px 60px -20px rgba(0,0,0,.8);
+  }
+  .modal h3{margin:0 0 8px; font-family:var(--font-display); font-size:17px; font-weight:600;}
+  .modal p{margin:0 0 16px; font-size:13px; color:var(--text-dim); line-height:1.5;}
+  .modal-actions{display:flex; justify-content:flex-end; gap:8px;}
+
+  @media (max-width:900px){
+    html,body{overflow:auto;}
+    .workspace{flex-direction:column; height:auto;}
+    #panelLeft,#panelRight{flex:0 0 auto; width:100%!important;}
+    #panelMid{min-height:60vh; width:100%!important;}
+    .divider{display:none;}
+    header{flex-wrap:wrap; height:auto; padding:10px 14px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="h-title">CX <em>Value Chain</em> Simulator — MISA</div>
+    <div class="h-sub">Operational → CX → Behavior → Business Results</div>
+  </div>
+  <div class="h-spacer"></div>
+  <button class="btn theme-btn" id="themeBtn" aria-label="Chuyển theme">☀ Sáng</button>
+  <div class="sens-ctl">
+    <label for="sensSlider">Độ nhạy</label>
+    <input type="range" id="sensSlider" min="0.5" max="2" step="0.1" value="1">
+    <span class="sens-val" id="sensVal">1.0×</span>
+  </div>
+  <div class="status-pill" id="statusPill"></div>
+  <button class="btn" id="resetBtn">Reset baseline</button>
+  <div class="release" id="releaseStamp"></div>
+</header>
+
+<div class="workspace" id="workspace">
+
+  <!-- LEFT -->
+  <div class="panel" id="panelLeft">
+    <div class="panel-title">Kịch bản chiến lược</div>
+    <div class="presets">
+      <div class="preset-row" id="presetRow"></div>
+      <div class="preset-action" id="presetAction"></div>
+    </div>
+    <div class="panel-title">Đòn bẩy vận hành — theo chặng hành trình</div>
+    <div id="leverGroups"></div>
+  </div>
+
+  <div class="divider" id="div1"></div>
+
+  <!-- MID -->
+  <div class="panel" id="panelMid">
+    <div class="mid-head">
+      <div class="legend" id="legend"></div>
+    </div>
+    <div class="col-labels">
+      <div>Operational (leading)</div><div>CX Drivers (thành phần)</div><div>CX Mẹ — CES · CSAT · NPS</div><div>Customer Behavior</div><div>Business Results</div>
+    </div>
+    <div id="mapWrap"><svg id="mindmap" xmlns="http://www.w3.org/2000/svg"></svg></div>
+  </div>
+
+  <div class="divider" id="div2"></div>
+
+  <!-- RIGHT -->
+  <div class="panel" id="panelRight">
+    <div class="panel-title">Kết quả dài hạn — chiếu 5 năm</div>
+    <div class="kpi-hero">
+      <div class="k" id="heroLabel">Số khách hàng sau 5 năm</div>
+      <div class="v" id="heroVal">—</div>
+      <div class="d" id="heroDelta"></div>
+    </div>
+
+    <div class="proj-block">
+      <div class="proj-head">
+        <div class="proj-legend" id="projLegend"></div>
+      </div>
+      <div id="projChart"></div>
+    </div>
+
+    <div class="year-bar">
+      <span class="year-lbl">Soi chỉ số năm:</span>
+      <div class="year-tabs" id="yearTabs"></div>
+    </div>
+    <div class="kpi-grid" id="kpiGrid"></div>
+
+    <div class="assump-note">
+      <b style="color:var(--gold)">Giả định minh họa</b> — projection cuộn khối khách qua 5 năm: KH cuối năm = KH đầu năm × renewal + KH mới (giữ cố định mỗi năm). ARPU &amp; renewal cố định. Số baseline là best-guess để demo cơ chế, <u>không phải số thực của MISA</u>.
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal confirm -->
+<div class="modal-veil" id="modalVeil">
+  <div class="modal">
+    <h3 id="modalTitle">Reset về baseline?</h3>
+    <p id="modalBody">Toàn bộ 7 đòn bẩy sẽ quay về giá trị baseline. Kịch bản đang chọn sẽ bỏ chọn. (Không có dữ liệu nào bị mất — tool không lưu trạng thái.)</p>
+    <div class="modal-actions">
+      <button class="btn" id="modalCancel">Hủy</button>
+      <button class="btn primary" id="modalOk">Reset</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* =====================================================
+   CX VALUE CHAIN SIMULATOR — MISA
+   Deterministic core, config-driven [A8].
+   Baselines are labeled illustrative assumptions [A7].
+===================================================== */
+const APP_VERSION = 'v1.6';
+const RELEASE_SCOPE = 'Theme sáng/tối (máy chiếu) · combo chart 5 năm · chọn năm + YoY';
+
+/* ---------- STAGES ---------- */
+const STAGES = [
+  {id:'acquire', name:'Thu hút & Onboard', color:'var(--stage-acquire)', hex:'#d4af6a'},
+  {id:'adopt',   name:'Sử dụng & Liên thông', color:'var(--stage-adopt)', hex:'#4fd1c5'},
+  {id:'support', name:'Hỗ trợ & Tin cậy', color:'var(--stage-support)', hex:'#8fb3e8'},
+  {id:'renew',   name:'Gia hạn & Mở rộng', color:'var(--stage-renew)', hex:'#b48fe8'},
+  {id:'advocate',name:'Giới thiệu', color:'var(--stage-advocate)', hex:'#e08a9e'}
+];
+
+/* ---------- LEVERS (Operational, leading) ----------
+   good/ok = ngưỡng cố định. Với invert:true, giá trị THẤP là tốt (good là cận trên của vùng tốt).
+   Không invert: giá trị CAO là tốt (good là cận dưới của vùng tốt). */
+const LEVERS = [
+  {id:'onboardH', stage:'acquire', name:'Thời gian onboarding tự phục vụ', unit:'giờ', min:1, max:48, step:1, base:24, invert:true, good:6, ok:16},
+  {id:'salesCost',stage:'acquire', name:'Chi phí sale / khách mới', unit:'triệu', min:0.5, max:12, step:0.5, base:3, invert:true, good:2, ok:5},
+  {id:'mktBn',    stage:'acquire', name:'Ngân sách marketing / năm', unit:'tỷ', min:50, max:300, step:10, base:150, good:200, ok:120},
+  {id:'autoPct',  stage:'adopt',   name:'% giao dịch liên thông tự động (eShop→meInvoice→AMIS)', unit:'%', min:20, max:95, step:5, base:40, good:75, ok:50},
+  {id:'avaPct',   stage:'support', name:'% câu hỏi AVA tự trả lời', unit:'%', min:10, max:90, step:5, base:30, good:70, ok:45},
+  {id:'compDays', stage:'support', name:'Số ngày cập nhật compliance sau thông tư', unit:'ngày', min:1, max:30, step:1, base:10, invert:true, good:3, ok:8},
+  {id:'csmPct',   stage:'renew',   name:'% khách được CSM chăm chủ động', unit:'%', min:0, max:100, step:5, base:20, good:60, ok:35},
+  {id:'partners', stage:'advocate',name:'Đối tác kế toán / đại lý thuế active', unit:'', min:500, max:10000, step:500, base:2000, good:6000, ok:3000}
+];
+// Đánh giá 1 lever đang ở vùng nào: 'good' | 'ok' | 'bad'
+function leverGrade(l, v){
+  if(l.invert){ return v<=l.good ? 'good' : (v<=l.ok ? 'ok' : 'bad'); }
+  return v>=l.good ? 'good' : (v>=l.ok ? 'ok' : 'bad');
+}
+
+/* ---------- CONSTANTS (baseline assumptions, illustrative) ---------- */
+const K = {
+  custBase: 200,        // nghìn khách hàng hiện hữu
+  trialsBase: 194,      // nghìn trial/năm ở mức MKT baseline — đặt để newCust baseline ≈ churn (khối khách baseline đứng yên, CAGR~0)
+  convBase: 0.10,       // trial → paid
+  renewBase: 0.85,
+  pricePerModule: 2.0,  // triệu VND / module / năm
+  attachBase: 1.6,      // module / khách
+  ticketsPerCust: 4,    // ticket / khách / năm
+  costHumanTicket: 0.04,// triệu VND / ticket có người
+  grossMargin: 0.75
+};
+
+/* ---------- ELASTICITIES (chỉnh tại đây) ----------
+   Các hệ số "response" (conv/renew/attach/ref) đã nâng ~2.5× so với v1.2 để tăng
+   cảm nhận sư phạm. SENS = multiplier toàn cục (0.5–2×) áp ĐỒNG ĐỀU lên toàn bộ
+   hệ số response — giữ nguyên tương quan giữa các biến, không bias riêng CX. */
+let SENS = 1.0;  // độ nhạy toàn cục, chỉnh trên UI
+const E = {
+  // --- hệ số cấu tạo CX (không nhân SENS: đây là định nghĩa thang đo, không phải elasticity) ---
+  effortPerHour: 60/47,
+  cxValuePerAuto: 0.6,
+  cxSupportPerAva: 0.55,
+  trustPerDay: 2,
+  // --- hệ số response (nhân SENS) ---
+  convPerCes: 0.028,
+  renewPerCsat: 0.0030, renewPerNps: 0.0020, renewPerCsm: 0.0015,
+  attachPerCsat: 0.055, attachPerCsm: 0.010,
+  refPerNps: 0.035, refPerPartner: 4,
+  mktDiminish: 0.6
+};
+// hệ số response sau khi áp SENS
+const R = (key)=> E[key]*SENS;
+
+const clamp = (x,a,b)=>Math.min(b,Math.max(a,x));
+
+/* ---------- CX driver sub-formulas (dùng chung cho model & anchor) ---------- */
+function cxDrivers(L){
+  const cxEffortOn = clamp(100 - (L.onboardH-1)*E.effortPerHour, 30, 100);
+  const cxValue    = clamp(40 + L.autoPct*E.cxValuePerAuto, 0, 100);
+  const cxSupport  = clamp(40 + L.avaPct*E.cxSupportPerAva, 0, 100);
+  const cxTrust    = clamp(100 - L.compDays*E.trustPerDay, 30, 100);
+  const ces  = clamp(.5*cxEffortOn + .5*cxSupport, 0, 100);
+  const csat = clamp(.55*cxValue + .45*cxTrust, 0, 100);
+  const nps  = clamp(-30 + .5*csat + .5*ces, -100, 100);
+  return {cxEffortOn,cxValue,cxSupport,cxTrust,ces,csat,nps};
+}
+
+/* ---------- ANCHOR: tự tính từ base levers — self-reconciling [A6], không hardcode ---------- */
+const _baseLeverVals = Object.fromEntries(LEVERS.map(l=>[l.id,l.base]));
+const ANCHOR = cxDrivers(_baseLeverVals);
+ANCHOR.csm = _baseLeverVals.csmPct;
+
+/* ---------- MODEL ---------- */
+function computeModel(L){
+  const d = cxDrivers(L);
+  const {cxEffortOn,cxValue,cxSupport,cxTrust,ces,csat,nps} = d;
+
+  // Behavior layer — dẫn động bởi chỉ số mẹ, anchor tại baseline (delta = 0 → giữ nguyên base rate)
+  // Hệ số response nhân SENS qua R() — áp đồng đều, giữ tương quan giữa các biến.
+  const conv    = clamp(K.convBase*(1+(ces-ANCHOR.ces)*R('convPerCes')), .03, .30);
+  const renew   = clamp(K.renewBase + (csat-ANCHOR.csat)*R('renewPerCsat') + (nps-ANCHOR.nps)*R('renewPerNps') + (L.csmPct-ANCHOR.csm)*R('renewPerCsm'), .55, .98);
+  const attach  = clamp(K.attachBase + (csat-ANCHOR.csat)*R('attachPerCsat') + (L.csmPct-ANCHOR.csm)*R('attachPerCsm'), 1, 4.5);
+  const deflect = L.avaPct/100;
+  const trials  = K.trialsBase*Math.pow(L.mktBn/150, E.mktDiminish);           // nghìn
+  const refCust = clamp(K.custBase*(Math.max(nps,0)/100)*R('refPerNps') + L.partners*E.refPerPartner/1000, 0, 200); // nghìn
+
+  // Results layer
+  // Churn ăn thẳng vào khối cũ: retained = 200k × renewal → renewal rớt = mất khách thật,
+  // mất luôn doanh thu định kỳ của họ. Đây là đòn bẩy mạnh nhất tới revenue/profit.
+  const newCust  = trials*conv + refCust;                     // nghìn
+  const retained = K.custBase*renew;                          // nghìn
+  const endCust  = retained + newCust;                        // nghìn
+  const arpu     = K.pricePerModule*attach;                   // triệu/năm
+  const revenue  = (retained + newCust*0.5)*arpu;             // tỷ (nghìn KH × triệu = tỷ)
+  const cac      = L.mktBn*1000/(newCust*1000);               // triệu / KH mới (blended)
+  const ltv      = arpu*K.grossMargin/(1-renew);              // triệu
+  const ltvCac   = ltv/cac;
+  const serveBn  = endCust*K.ticketsPerCust*(1-deflect)*K.costHumanTicket; // tỷ (giữ cho mindmap Self-service)
+  // Chi phí sale = chi phí sale/khách × số KH mới (nghìn KH × triệu = tỷ)
+  const salesBn  = L.salesCost * newCust;                      // tỷ
+  // LN gộp sau Sale & Marketing (KHÔNG trừ cost-to-serve — theo yêu cầu v1.4)
+  const profitSM = revenue*K.grossMargin - L.mktBn - salesBn; // tỷ
+  const profit   = profitSM;                                  // alias: hero/KPI dùng chỉ tiêu này
+
+  return {cxEffortOn,cxValue,cxSupport,cxTrust,ces,csat,nps,conv,renew,attach,deflect,trials,refCust,
+          newCust,retained,endCust,arpu,revenue,cac,serveBn,salesBn,ltv,ltvCac,profitSM,profit};
+}
+
+/* ---------- PROJECTION 5 NĂM ----------
+   Động học: KH đầu năm t = KH cuối năm (t-1). KH cuối năm t = đầu năm × renewal + newCust.
+   newCust, renewal, arpu, salesCost/khách GIỮ CỐ ĐỊNH cả 5 năm (cùng một chiến lược).
+   Retention compound qua khối khách cuộn lên; acquire chỉ cộng lượng cố định mỗi năm. */
+const YEARS = 5;
+function project(L){
+  const m = computeModel(L);
+  const rows = [];
+  let startCust = K.custBase;   // đầu năm 1 = nền hiện hữu
+  let cumRevenue = 0, cumProfit = 0;
+  for(let y=1; y<=YEARS; y++){
+    const retained = startCust * m.renew;
+    const endCust  = retained + m.newCust;
+    const revenue  = (retained + m.newCust*0.5) * m.arpu;      // tỷ
+    const salesBn  = L.salesCost * m.newCust;                  // tỷ
+    const profitSM = revenue*K.grossMargin - L.mktBn - salesBn;
+    cumRevenue += revenue; cumProfit += profitSM;
+    rows.push({y, startCust, endCust, revenue, profitSM, cumRevenue, cumProfit});
+    startCust = endCust;   // cuộn sang năm sau
+  }
+  const cagr = Math.pow(rows[YEARS-1].endCust / K.custBase, 1/YEARS) - 1;
+  return {rows, cumRevenue, cumProfit, endCust5:rows[YEARS-1].endCust, cagr, m};
+}
+
+const baselineLevers = Object.fromEntries(LEVERS.map(l=>[l.id,l.base]));
+const BASE = computeModel(baselineLevers);
+const BASE_PROJ = project(baselineLevers);
+let state = {...baselineLevers};
+let activePreset = null;   // id preset đang active, hoặc null khi ở chế độ Chiến lược mới
+let mode = 'free';         // 'preset' | 'free'
+let freeLevers = {...baselineLevers}; // giá trị của Chiến lược mới, giữ riêng
+
+/* ---------- PRESETS (5 chiến lược Module 3) ----------
+   seed  = giá trị mặc định của preset (nút ↺ hoàn về đây)
+   keyPath = [leverId, cxNodeId, behaviorNodeId, resultNodeId] — mạch chính của chiến lược
+   heroKey = KPI nổi bật bên phải khi chọn preset này */
+const PRESETS = [
+  {id:'p1', name:'Acquire diện rộng',
+   seed:{onboardH:4, salesCost:8, mktBn:260, autoPct:40, avaPct:30, compDays:10, csmPct:10, partners:2000},
+   keyPath:['onboardH','ces','conv','newCust'], heroKey:'newCust'},
+  {id:'p2', name:'Retain & Loyalty',
+   seed:{onboardH:24, salesCost:3, mktBn:120, autoPct:50, avaPct:40, compDays:2, csmPct:70, partners:2000},
+   keyPath:['compDays','csat','renew','revenue'], heroKey:'cumRevenue'},
+  {id:'p3', name:'Khai thác sâu — LTV',
+   seed:{onboardH:24, salesCost:3, mktBn:120, autoPct:90, avaPct:40, compDays:8, csmPct:60, partners:2000},
+   keyPath:['autoPct','csat','attach','arpu'], heroKey:'cumRevenue'},
+  {id:'p4', name:'Advocacy',
+   seed:{onboardH:16, salesCost:2, mktBn:100, autoPct:60, avaPct:50, compDays:5, csmPct:40, partners:9000},
+   keyPath:['partners','nps','refCust','newCust'], heroKey:'cumProfit'},
+  {id:'p5', name:'Self-service (AVA)',
+   seed:{onboardH:8, salesCost:3, mktBn:130, autoPct:60, avaPct:85, compDays:6, csmPct:20, partners:2000},
+   keyPath:['avaPct','cxSupport','deflect','serveBn'], heroKey:'cumProfit'}
+];
+const presetById = id => PRESETS.find(p=>p.id===id);
+
+/* ---------- NODE GRAPH cho mindmap ---------- */
+// col: 0 operational, 1 CX drivers, 2 CX mẹ, 3 behavior, 4 result
+const NODES = [
+  ...LEVERS.map(l=>({id:l.id, col:0, stage:l.stage, name:l.name, fmt:m=>fmtLever(l)})),
+  {id:'cxEffortOn', col:1, stage:'acquire',  name:'Effort đăng ký (score)', fmt:m=>m.cxEffortOn.toFixed(0)},
+  {id:'cxValue',    col:1, stage:'adopt',    name:'Giá trị "không nhập 2 lần"', fmt:m=>m.cxValue.toFixed(0)},
+  {id:'cxSupport',  col:1, stage:'support',  name:'Effort hỗ trợ (score)', fmt:m=>m.cxSupport.toFixed(0)},
+  {id:'cxTrust',    col:1, stage:'support',  name:'Tin cậy compliance', fmt:m=>m.cxTrust.toFixed(0)},
+  {id:'ces',        col:2, stage:'parent',   name:'CES — nỗ lực của khách', fmt:m=>m.ces.toFixed(0), parent:true},
+  {id:'csat',       col:2, stage:'parent',   name:'CSAT — mức độ hài lòng', fmt:m=>m.csat.toFixed(0), parent:true},
+  {id:'nps',        col:2, stage:'parent',   name:'NPS — sẵn lòng giới thiệu', fmt:m=>m.nps.toFixed(0), parent:true},
+  {id:'conv',       col:3, stage:'acquire',  name:'Trial → Paid', fmt:m=>(m.conv*100).toFixed(1)+'%'},
+  {id:'attach',     col:3, stage:'adopt',    name:'Module attach / KH', fmt:m=>m.attach.toFixed(2)},
+  {id:'deflect',    col:3, stage:'support',  name:'Ticket deflection', fmt:m=>(m.deflect*100).toFixed(0)+'%'},
+  {id:'renew',      col:3, stage:'renew',    name:'Renewal rate', fmt:m=>(m.renew*100).toFixed(1)+'%'},
+  {id:'refCust',    col:3, stage:'advocate', name:'KH từ giới thiệu (nghìn)', fmt:m=>m.refCust.toFixed(1)},
+  {id:'newCust',    col:4, stage:'acquire',  name:'KH mới (nghìn)', fmt:m=>m.newCust.toFixed(1), result:true},
+  {id:'cac',        col:4, stage:'acquire',  name:'CAC blended (triệu)', fmt:m=>m.cac.toFixed(2), result:true},
+  {id:'arpu',       col:4, stage:'adopt',    name:'ARPU (triệu/năm)', fmt:m=>m.arpu.toFixed(2), result:true},
+  {id:'serveBn',    col:4, stage:'support',  name:'Cost-to-serve (tỷ)', fmt:m=>m.serveBn.toFixed(0), result:true},
+  {id:'revenue',    col:4, stage:'renew',    name:'Doanh thu (tỷ)', fmt:m=>m.revenue.toFixed(0), result:true},
+  {id:'ltvCac',     col:4, stage:'advocate', name:'LTV / CAC', fmt:m=>m.ltvCac.toFixed(1)+'×', result:true}
+];
+const EDGES = [
+  // Operational → CX drivers
+  ['onboardH','cxEffortOn'], ['autoPct','cxValue'], ['avaPct','cxSupport'], ['compDays','cxTrust'],
+  // CX drivers → CX mẹ
+  ['cxEffortOn','ces'], ['cxSupport','ces'],
+  ['cxValue','csat'], ['cxTrust','csat'],
+  ['csat','nps'], ['ces','nps'], ['partners','nps'],
+  // CX mẹ → Behavior
+  ['ces','conv'],
+  ['csat','attach'], ['csmPct','attach'],
+  ['csat','renew'], ['nps','renew'], ['csmPct','renew'],
+  ['nps','refCust'], ['partners','refCust'],
+  ['avaPct','deflect'], ['cxSupport','deflect'],
+  // Behavior + Operational → Results
+  ['conv','newCust'], ['refCust','newCust'], ['mktBn','newCust'],
+  ['mktBn','cac'], ['newCust','cac'],
+  ['attach','arpu'],
+  ['deflect','serveBn'],
+  ['renew','revenue'], ['newCust','revenue'], ['arpu','revenue'],
+  ['renew','ltvCac'], ['arpu','ltvCac'], ['cac','ltvCac']
+];
+
+function fmtLever(l){
+  const v = state[l.id];
+  return v.toLocaleString('vi-VN') + (l.unit ? ' '+l.unit : '');
+}
+
+/* ---------- STATUS PILL ---------- */
+let pillTimer = null;
+function pill(msg, kind){
+  const p = document.getElementById('statusPill');
+  p.textContent = msg;
+  p.className = 'status-pill show ' + (kind||'ok');
+  clearTimeout(pillTimer);
+  pillTimer = setTimeout(()=>{ p.className='status-pill'; }, 4000);
+}
+
+/* ---------- BUILD LEFT PANEL ---------- */
+// vị trí % của 1 giá trị trên track
+function pctOf(l, v){ return clamp((v-l.min)/(l.max-l.min)*100, 0, 100); }
+// vẽ dải nền tốt/TB/xấu cho 1 lever (gradient theo hướng invert)
+function bandStyle(l){
+  const gp = pctOf(l, l.good), op = pctOf(l, l.ok);
+  const good='rgba(79,209,197,.30)', ok='rgba(212,175,106,.22)', bad='rgba(224,138,158,.20)';
+  if(l.invert){
+    // thấp = tốt → tốt bên trái
+    return 'linear-gradient(90deg,'+good+' 0%,'+good+' '+gp+'%,'+ok+' '+gp+'%,'+ok+' '+op+'%,'+bad+' '+op+'%,'+bad+' 100%)';
+  }
+  // cao = tốt → tốt bên phải
+  return 'linear-gradient(90deg,'+bad+' 0%,'+bad+' '+op+'%,'+ok+' '+op+'%,'+ok+' '+gp+'%,'+good+' '+gp+'%,'+good+' 100%)';
+}
+function buildLevers(){
+  const wrap = document.getElementById('leverGroups');
+  wrap.innerHTML = '';
+  STAGES.forEach(st=>{
+    const levers = LEVERS.filter(l=>l.stage===st.id);
+    if(!levers.length) return;
+    const g = document.createElement('div');
+    g.className = 'stage-group';
+    g.innerHTML = '<div class="stage-head"><span class="stage-dot" style="background:'+st.color+'"></span><span class="stage-name">'+st.name+'</span><span class="stage-tag">'+levers.length+' lever</span></div>';
+    levers.forEach(l=>{
+      const d = document.createElement('div');
+      d.className = 'lever';
+      d.id = 'lever-'+l.id;
+      d.innerHTML =
+        '<div class="lever-top"><span class="lever-name"><span class="grade-dot" id="gd-'+l.id+'"></span>'+l.name+'</span>'+
+        '<span class="lever-val"><span id="val-'+l.id+'"></span> <span class="base">/ base '+l.base.toLocaleString('vi-VN')+'</span></span></div>'+
+        '<div class="slider-wrap"><div class="band" style="background:'+bandStyle(l)+'"></div>'+
+        '<input type="range" id="sl-'+l.id+'" min="'+l.min+'" max="'+l.max+'" step="'+l.step+'" value="'+state[l.id]+'" aria-label="'+l.name+'"></div>';
+      g.appendChild(d);
+      d.querySelector('input').addEventListener('input', e=>{
+        const v = Number(e.target.value);
+        state[l.id] = v;
+        if(mode==='free') freeLevers[l.id] = v;
+        // (a) chỉnh tay KHÔNG rớt preset — giữ activePreset, chỉ đánh dấu "đã chỉnh"
+        if(mode==='preset') markDirty();
+        update([l.id]);
+      });
+    });
+    wrap.appendChild(g);
+  });
+}
+// preset đã chỉnh khác seed?
+function isDirty(){
+  if(mode!=='preset' || !activePreset) return false;
+  const seed = presetById(activePreset).seed;
+  return LEVERS.some(l=>state[l.id]!==seed[l.id]);
+}
+function markDirty(){
+  const chip = document.getElementById('chip-'+activePreset);
+  if(chip) chip.classList.toggle('dirty', isDirty());
+  const rb = document.getElementById('resetPresetBtn');
+  if(rb) rb.style.display = isDirty() ? 'inline-flex' : 'none';
+}
+function syncSliders(){
+  LEVERS.forEach(l=>{
+    const sl = document.getElementById('sl-'+l.id);
+    if(!sl) return;
+    sl.value = state[l.id];
+    sl.style.setProperty('--fill', pctOf(l, state[l.id])+'%');
+    document.getElementById('val-'+l.id).textContent = fmtLever(l);
+    // grade dot màu
+    const grade = leverGrade(l, state[l.id]);
+    const gd = document.getElementById('gd-'+l.id);
+    if(gd) gd.className = 'grade-dot '+grade;
+    // lever trong keyPath của preset → sáng; ngoài path → mờ (chỉ ở chế độ preset)
+    const lv = document.getElementById('lever-'+l.id);
+    if(lv){
+      let inPath = true;
+      if(mode==='preset' && activePreset){
+        inPath = presetById(activePreset).keyPath.includes(l.id);
+      }
+      lv.classList.toggle('offpath', mode==='preset' && !inPath);
+    }
+  });
+}
+
+/* ---------- PRESETS UI ---------- */
+function buildPresets(){
+  const row = document.getElementById('presetRow');
+  row.innerHTML = '';
+  PRESETS.forEach(p=>{
+    const b = document.createElement('button');
+    b.className = 'chip'; b.id = 'chip-'+p.id; b.textContent = p.name;
+    b.addEventListener('click', ()=>applyPreset(p.id));
+    row.appendChild(b);
+  });
+  // nút Chiến lược mới (highlight)
+  const nb = document.createElement('button');
+  nb.className = 'chip new'; nb.id = 'chip-free';
+  nb.innerHTML = '＋ Chiến lược mới';
+  nb.addEventListener('click', ()=>enterFreeMode(true));
+  row.appendChild(nb);
+}
+
+function applyPreset(id){
+  const p = presetById(id);
+  mode = 'preset';
+  activePreset = id;
+  state = {...p.seed};
+  refreshChips();
+  syncActionBar();
+  update(Object.keys(state));
+  pill('Đã áp chiến lược: '+p.name+' — mạch chính: '+p.keyPath.map(nodeName).join(' → '), 'ok');
+}
+
+// Vào chế độ Chiến lược mới. carry=true → nạp thông số hiện tại; false → giữ freeLevers cũ
+function enterFreeMode(carry){
+  if(carry){ freeLevers = {...state}; }
+  mode = 'free';
+  activePreset = null;
+  state = {...freeLevers};
+  refreshChips();
+  syncActionBar();
+  update(Object.keys(state));
+  pill(carry ? 'Đã nạp thông số hiện tại vào Chiến lược mới (generic, không keyPath)' : 'Chế độ Chiến lược mới — sửa tự do', 'ok');
+}
+
+function refreshChips(){
+  PRESETS.forEach(p=>{
+    const c = document.getElementById('chip-'+p.id);
+    c.classList.toggle('active', mode==='preset' && p.id===activePreset);
+    c.classList.remove('dirty');
+  });
+  document.getElementById('chip-free').classList.toggle('active', mode==='free');
+  if(mode==='preset') markDirty();
+}
+
+// Thanh action dưới hàng chip: đổi theo mode
+function syncActionBar(){
+  const bar = document.getElementById('presetAction');
+  if(mode==='preset'){
+    const p = presetById(activePreset);
+    bar.innerHTML =
+      '<div class="path-hint">Mạch chính: <b>'+p.keyPath.map(nodeName).join(' → ')+'</b></div>'+
+      '<div class="action-btns">'+
+        '<button class="mini-btn" id="resetPresetBtn" style="display:none">↺ Về mặc định preset</button>'+
+        '<button class="mini-btn load" id="loadBtn">⇧ Nạp vào Chiến lược mới</button>'+
+      '</div>';
+    document.getElementById('resetPresetBtn').addEventListener('click', ()=>{
+      state = {...presetById(activePreset).seed};
+      markDirty(); update(Object.keys(state));
+      pill('Đã hoàn preset về mặc định', 'warn');
+    });
+    document.getElementById('loadBtn').addEventListener('click', ()=>enterFreeMode(true));
+    markDirty();
+  } else {
+    bar.innerHTML =
+      '<div class="path-hint free">Chế độ generic — không gắn keyPath. Kéo tự do mọi lever.</div>'+
+      '<div class="action-btns"><button class="mini-btn" id="freeResetBtn">↺ Về baseline trung tính</button></div>';
+    document.getElementById('freeResetBtn').addEventListener('click', ()=>{
+      state = {...baselineLevers}; freeLevers = {...baselineLevers};
+      update(Object.keys(state));
+      pill('Chiến lược mới đã về baseline', 'warn');
+    });
+  }
+}
+function nodeName(id){
+  const n = NODES.find(x=>x.id===id);
+  return n ? n.name.split('(')[0].split('—')[0].trim() : id;
+}
+
+/* ---------- MINDMAP ---------- */
+const NODE_W = 134, NODE_H = 44, COL_GAP = 44, PAD = 14;
+let nodePos = {};
+function buildMap(){
+  const svg = document.getElementById('mindmap');
+  const cols = [0,1,2,3,4].map(c=>NODES.filter(n=>n.col===c));
+  const maxRows = Math.max(...cols.map(c=>c.length));
+  const rowGap = 14;
+  const H = PAD*2 + maxRows*(NODE_H+rowGap);
+  const W = PAD*2 + 5*NODE_W + 4*COL_GAP;
+  svg.setAttribute('viewBox', '0 0 '+W+' '+H);
+  nodePos = {};
+  cols.forEach((colNodes,c)=>{
+    const totalH = colNodes.length*(NODE_H+rowGap)-rowGap;
+    let y = (H-totalH)/2;
+    colNodes.forEach(n=>{
+      nodePos[n.id] = {x: PAD + c*(NODE_W+COL_GAP), y};
+      y += NODE_H+rowGap;
+    });
+  });
+  let edgesSvg = '';
+  EDGES.forEach(([a,b],i)=>{
+    const pa = nodePos[a], pb = nodePos[b];
+    const x1 = pa.x+NODE_W, y1 = pa.y+NODE_H/2, x2 = pb.x, y2 = pb.y+NODE_H/2;
+    const mx = (x1+x2)/2;
+    edgesSvg += '<path class="edge" id="e-'+i+'" d="M'+x1+' '+y1+' C'+mx+' '+y1+', '+mx+' '+y2+', '+x2+' '+y2+'"/>';
+  });
+  let nodesSvg = '';
+  NODES.forEach(n=>{
+    const p = nodePos[n.id];
+    const st = STAGES.find(s=>s.id===n.stage);
+    const dotColor = st ? st.color : 'var(--teal)';
+    nodesSvg += '<g class="node'+(n.result?' result':'')+(n.parent?' parent':'')+'" id="n-'+n.id+'" transform="translate('+p.x+','+p.y+')">'+
+      '<rect width="'+NODE_W+'" height="'+NODE_H+'" rx="7"/>'+
+      '<circle cx="11" cy="12" r="3.5" fill="'+dotColor+'"/>'+
+      '<text x="21" y="16">'+wrapLabel(n.name)+'</text>'+
+      '<text class="nval" x="21" y="34" id="nv-'+n.id+'">—</text>'+
+      '</g>';
+  });
+  svg.innerHTML = edgesSvg + nodesSvg;
+  NODES.forEach(n=>{
+    document.getElementById('n-'+n.id).addEventListener('click', ()=>highlightPath(n.id));
+  });
+}
+function wrapLabel(s){
+  if(s.length<=26) return esc(s);
+  // cắt thành 1 dòng ngắn — tspan dòng 2 nhỏ
+  const cut = s.lastIndexOf(' ', 26);
+  return esc(s.slice(0,cut)) + '<tspan x="21" dy="9" font-size="8" class="nsub">'+esc(s.slice(cut+1))+'</tspan>';
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+
+function downstream(id, acc){
+  acc = acc || {nodes:new Set([id]), edges:new Set()};
+  EDGES.forEach(([a,b],i)=>{
+    if(a===id && !acc.nodes.has(b)){ acc.edges.add(i); acc.nodes.add(b); downstream(b, acc); }
+    else if(a===id){ acc.edges.add(i); }
+  });
+  return acc;
+}
+let pathTimer = null;
+function highlightPath(id){
+  clearHighlights('pathhl');
+  const {nodes, edges} = downstream(id);
+  nodes.forEach(n=>{ const el=document.getElementById('n-'+n); if(el) el.classList.add('pathhl'); });
+  edges.forEach(i=>{ const el=document.getElementById('e-'+i); if(el) el.classList.add('pathhl'); });
+  clearTimeout(pathTimer);
+  pathTimer = setTimeout(()=>clearHighlights('pathhl'), 3500);
+}
+function clearHighlights(cls){
+  document.querySelectorAll('.'+cls).forEach(el=>el.classList.remove(cls));
+}
+let flashTimer = null;
+function flashDownstream(ids){
+  clearHighlights('flash');
+  ids.forEach(id=>{
+    const {nodes, edges} = downstream(id);
+    nodes.forEach(n=>{ const el=document.getElementById('n-'+n); if(el) el.classList.add('flash'); });
+    edges.forEach(i=>{ const el=document.getElementById('e-'+i); if(el) el.classList.add('flash'); });
+  });
+  clearTimeout(flashTimer);
+  flashTimer = setTimeout(()=>clearHighlights('flash'), 900);
+}
+
+/* ---------- HERO: cố định = Số KH sau 5 năm (không đổi theo nút năm) ---------- */
+const HERO = {label:'Số khách hàng sau 5 năm', get:pj=>pj.endCust5, base:BASE_PROJ.endCust5, fmt:v=>v.toFixed(0)+' nghìn', goodUp:true};
+
+/* ---------- YEAR SELECTOR ---------- */
+let activeYear = 1;   // 1..YEARS
+function buildYearTabs(){
+  document.getElementById('yearTabs').innerHTML = '';
+  for(let y=1;y<=YEARS;y++){
+    const b=document.createElement('button');
+    b.className='year-tab'+(y===activeYear?' active':''); b.id='yt-'+y; b.textContent='N'+y;
+    b.addEventListener('click', ()=>{ activeYear=y; refreshYearTabs(); renderKpis(); });
+    document.getElementById('yearTabs').appendChild(b);
+  }
+}
+function refreshYearTabs(){
+  for(let y=1;y<=YEARS;y++) document.getElementById('yt-'+y).classList.toggle('active', y===activeYear);
+}
+
+/* ---------- KPI grid: chỉ tiêu CỦA NĂM ĐANG CHỌN + YoY (không lũy kế) ---------- */
+const KPI_DEFS = [
+  {id:'endCust',  name:'Số khách hàng (nghìn)', get:r=>r.endCust,  fmt:v=>v.toFixed(0), goodUp:true},
+  {id:'revenue',  name:'Doanh thu (tỷ)',        get:r=>r.revenue,  fmt:v=>v.toFixed(0), goodUp:true},
+  {id:'profitSM', name:'LN gộp sau S&M (tỷ)',    get:r=>r.profitSM, fmt:v=>v.toFixed(0), goodUp:true}
+];
+function buildKpis(){
+  const grid = document.getElementById('kpiGrid');
+  grid.innerHTML = KPI_DEFS.map(k=>
+    '<div class="kpi"><div class="k">'+k.name+'</div><div class="v" id="kv-'+k.id+'">—</div>'+
+    '<div class="d"><span id="kd-'+k.id+'"></span> <span class="yoy" id="ky-'+k.id+'"></span></div></div>'
+  ).join('');
+  buildYearTabs();
+}
+function renderKpis(){
+  const pj = project(state);
+  const row = pj.rows[activeYear-1];
+  const baseRow = BASE_PROJ.rows[activeYear-1];
+  const prev = activeYear>1 ? pj.rows[activeYear-2] : null;
+  KPI_DEFS.forEach(k=>{
+    const cur = k.get(row);
+    document.getElementById('kv-'+k.id).textContent = k.fmt(cur);
+    document.getElementById('kd-'+k.id).innerHTML = deltaHtml(cur, k.get(baseRow), true, k.goodUp);
+    // YoY
+    const yEl = document.getElementById('ky-'+k.id);
+    if(prev){
+      const pv = k.get(prev);
+      const yoy = pv!==0 ? (cur-pv)/Math.abs(pv)*100 : 0;
+      const good = k.goodUp ? yoy>=0 : yoy<0;
+      yEl.innerHTML = '<span class="'+(good?'up':'down')+'">YoY '+(yoy>=0?'+':'')+yoy.toFixed(0)+'%</span>';
+    } else {
+      yEl.innerHTML = '<span class="flat">năm gốc</span>';
+    }
+  });
+}
+
+/* ---------- PROJECTION CHART: combo cột (DT, LN) + đường (KH), có baseline ---------- */
+function buildProjLegend(){
+  document.getElementById('projLegend').innerHTML =
+    '<span><i class="sw gold"></i>Doanh thu</span>'+
+    '<span><i class="sw teal"></i>LN sau S&M</span>'+
+    '<span><i class="ln purple"></i>Số KH</span>'+
+    '<span><i class="ln base"></i>Baseline KH</span>'+
+    '<span><i class="tick"></i>vạch = baseline</span>';
+}
+function drawProjChart(){
+  const pj = project(state);
+  const rows = pj.rows, brows = BASE_PROJ.rows;
+  // trục tiền tệ trái (DT + LN, gồm cả baseline & âm), trục KH phải
+  const money = [], cust = [];
+  rows.forEach((r,i)=>{ money.push(r.revenue, r.profitSM, brows[i].revenue, brows[i].profitSM); cust.push(r.endCust, brows[i].endCust); });
+  const mMax = Math.max(...money)*1.1, mMin = Math.min(0, ...money);
+  const cMax = Math.max(...cust)*1.12, cMin = 0;
+  const W=320, H=190, PADL=6, PADR=6, PADT=12, PADB=24;
+  const plotW=W-PADL-PADR, plotH=H-PADT-PADB;
+  const y0 = PADT+plotH;
+  const bandW = plotW/YEARS;
+  const yM = v => PADT + plotH*(1-(v-mMin)/(mMax-mMin));   // tiền
+  const yC = v => PADT + plotH*(1-(v-cMin)/(cMax-cMin));   // khách
+  const xCenter = i => PADL + bandW*(i+0.5);
+  const zeroY = yM(0);
+
+  let bars='', ticks='', xlab='';
+  const bw = bandW*0.26;   // bề rộng 1 cột
+  rows.forEach((r,i)=>{
+    const cx = PADL + bandW*i + bandW*0.5;
+    const xRev = cx - bw - 2, xPro = cx + 2;
+    // cột doanh thu
+    const rTop=yM(r.revenue), rH=Math.abs(rTop-zeroY);
+    bars += '<rect x="'+xRev.toFixed(1)+'" y="'+Math.min(rTop,zeroY).toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+rH.toFixed(1)+'" class="bar-rev"/>';
+    // cột LN (có thể âm → xuống dưới zero)
+    const pTop=yM(r.profitSM), pH=Math.abs(pTop-zeroY);
+    bars += '<rect x="'+xPro.toFixed(1)+'" y="'+Math.min(pTop,zeroY).toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+pH.toFixed(1)+'" class="bar-pro'+(r.profitSM<0?' neg':'')+'"/>';
+    // vạch baseline cho từng cột (mảnh, nằm ngang tại mức baseline)
+    ticks += '<line x1="'+xRev.toFixed(1)+'" x2="'+(xRev+bw).toFixed(1)+'" y1="'+yM(brows[i].revenue).toFixed(1)+'" y2="'+yM(brows[i].revenue).toFixed(1)+'" class="bl-tick"/>';
+    ticks += '<line x1="'+xPro.toFixed(1)+'" x2="'+(xPro+bw).toFixed(1)+'" y1="'+yM(brows[i].profitSM).toFixed(1)+'" y2="'+yM(brows[i].profitSM).toFixed(1)+'" class="bl-tick"/>';
+    xlab += '<text x="'+cx.toFixed(1)+'" y="'+(H-8)+'" class="pg-xlab">N'+(i+1)+'</text>';
+  });
+  // đường số KH (chiến lược + baseline)
+  const linePath = (vals,fx,fy)=>vals.map((v,i)=>(i?'L':'M')+fx(i).toFixed(1)+' '+fy(v).toFixed(1)).join(' ');
+  const custSim  = rows.map(r=>r.endCust);
+  const custBase = brows.map(r=>r.endCust);
+  const xC = i => PADL + bandW*i + bandW*0.5;
+  const custLine = linePath(custSim, xC, yC);
+  const custBaseLine = linePath(custBase, xC, yC);
+  const custDots = custSim.map((v,i)=>'<circle cx="'+xC(i).toFixed(1)+'" cy="'+yC(v).toFixed(1)+'" r="3"/>').join('');
+  // đường zero nếu có giá trị âm
+  const zeroLine = mMin<0 ? '<line x1="'+PADL+'" x2="'+(W-PADR)+'" y1="'+zeroY.toFixed(1)+'" y2="'+zeroY.toFixed(1)+'" class="pg-zero"/>' : '';
+
+  const svg =
+    '<svg viewBox="0 0 '+W+' '+H+'" class="proj-svg">'+
+    zeroLine + bars + ticks +
+    '<path d="'+custBaseLine+'" class="cust-line base"/>'+
+    '<path d="'+custLine+'" class="cust-line sim"/>'+
+    '<g class="cust-dot">'+custDots+'</g>'+
+    xlab+
+    '</svg>';
+  document.getElementById('projChart').innerHTML = svg;
+}
+
+function deltaHtml(cur, base, fmtPct, goodUp){
+  const d = cur-base;
+  if(Math.abs(d) < 1e-9) return '<span class="flat">— baseline</span>';
+  const rel = base!==0 ? (d/Math.abs(base)*100) : 0;
+  const good = goodUp ? d>0 : d<0;
+  const arrow = d>0 ? '▲' : '▼';
+  return '<span class="'+(good?'up':'down')+'">'+arrow+' '+Math.abs(rel).toFixed(1)+'% <span style="color:var(--text-faint)">vs base</span></span>';
+}
+
+/* ---------- UPDATE CYCLE ---------- */
+function update(changedIds){
+  syncSliders();
+  const m = computeModel(state);
+  const pj = project(state);
+  // mindmap values (năm 1)
+  NODES.forEach(n=>{
+    const el = document.getElementById('nv-'+n.id);
+    if(el) el.textContent = n.fmt(m);
+  });
+  if(changedIds && changedIds.length) flashDownstream(changedIds);
+  // hero cố định (KH sau 5 năm)
+  const heroCur = HERO.get(pj);
+  document.getElementById('heroLabel').textContent = HERO.label;
+  document.getElementById('heroVal').textContent = HERO.fmt(heroCur);
+  document.getElementById('heroDelta').innerHTML =
+    deltaHtml(heroCur, HERO.base, true, HERO.goodUp) +
+    ' <span style="color:var(--text-faint)">vs baseline '+HERO.fmt(HERO.base)+'</span>';
+  renderKpis();
+  drawProjChart();
+  applyStrategyHighlight();
+}
+
+/* ---------- STRATEGY HIGHLIGHT (keyPath — chỉ preset, không áp cho Chiến lược mới) ---------- */
+function applyStrategyHighlight(){
+  // xoá highlight strategy cũ
+  document.querySelectorAll('.node.keyhl, .node.result-good, .node.result-warn, .edge.keyhl')
+    .forEach(el=>el.classList.remove('keyhl','result-good','result-warn'));
+  if(mode!=='preset' || !activePreset) return;
+  const p = presetById(activePreset);
+  if(!p) return;
+  // tô sáng path 4 node + các edge nối chúng
+  const path = p.keyPath;
+  path.forEach(nid=>{ const el=document.getElementById('n-'+nid); if(el) el.classList.add('keyhl'); });
+  EDGES.forEach(([a,b],i)=>{
+    if(path.includes(a) && path.includes(b)){
+      const el=document.getElementById('e-'+i); if(el) el.classList.add('keyhl');
+    }
+  });
+  // result node: xanh nếu lever leading của path ở vùng tốt, cam nếu chưa
+  const leverId = path[0];
+  const lever = LEVERS.find(l=>l.id===leverId);
+  const resultId = path[path.length-1];
+  const rEl = document.getElementById('n-'+resultId);
+  if(lever && rEl){
+    const grade = leverGrade(lever, state[leverId]);
+    rEl.classList.add(grade==='good' ? 'result-good' : (grade==='bad' ? 'result-warn' : 'keyhl'));
+  }
+}
+
+/* ---------- RESET (in-UI modal, không dùng confirm() native) ---------- */
+const veil = document.getElementById('modalVeil');
+document.getElementById('resetBtn').addEventListener('click', ()=>veil.classList.add('show'));
+document.getElementById('modalCancel').addEventListener('click', ()=>veil.classList.remove('show'));
+document.getElementById('modalOk').addEventListener('click', ()=>{
+  state = {...baselineLevers};
+  freeLevers = {...baselineLevers};
+  mode = 'free'; activePreset = null;
+  refreshChips(); syncActionBar();
+  veil.classList.remove('show');
+  update(Object.keys(state));
+  pill('Đã reset toàn tool về baseline', 'warn');
+});
+veil.addEventListener('click', e=>{ if(e.target===veil) veil.classList.remove('show'); });
+
+/* ---------- RESIZABLE DIVIDERS ---------- */
+function makeResizable(divider, panel, isLeft){
+  let dragging = false, startX = 0, startW = 0;
+  divider.addEventListener('mousedown', e=>{
+    dragging = true; startX = e.clientX; startW = panel.getBoundingClientRect().width;
+    divider.classList.add('dragging');
+    document.body.style.userSelect = 'none';
+  });
+  window.addEventListener('mousemove', e=>{
+    if(!dragging) return;
+    const dx = e.clientX - startX;
+    const w = clamp(isLeft ? startW+dx : startW-dx, 220, window.innerWidth*0.45);
+    panel.style.flex = '0 0 '+w+'px';
+  });
+  window.addEventListener('mouseup', ()=>{
+    if(dragging){ dragging=false; divider.classList.remove('dragging'); document.body.style.userSelect=''; }
+  });
+}
+
+/* ---------- LEGEND ---------- */
+function buildLegend(){
+  document.getElementById('legend').innerHTML = STAGES.map(s=>
+    '<span><i style="background:'+s.color+'"></i>'+s.name+'</span>'
+  ).join('') + '<span><i style="background:var(--teal)"></i>Chỉ số mẹ CX (CES · CSAT · NPS)</span>';
+}
+
+/* ---------- INIT ---------- */
+document.getElementById('releaseStamp').textContent =
+  APP_VERSION+' · '+new Date().toLocaleDateString('vi-VN')+' · '+RELEASE_SCOPE;
+document.title = 'CX Value Chain Simulator '+APP_VERSION+' — MISA';
+buildPresets();
+buildLevers();
+buildLegend();
+buildMap();
+buildKpis();
+buildProjLegend();
+makeResizable(document.getElementById('div1'), document.getElementById('panelLeft'), true);
+makeResizable(document.getElementById('div2'), document.getElementById('panelRight'), false);
+refreshChips();
+syncActionBar();
+
+/* ---------- THEME TOGGLE ---------- */
+const themeBtn = document.getElementById('themeBtn');
+let theme = 'dark';
+themeBtn.addEventListener('click', ()=>{
+  theme = (theme==='dark') ? 'light' : 'dark';
+  if(theme==='light'){ document.documentElement.setAttribute('data-theme','light'); themeBtn.textContent='🌙 Tối'; }
+  else { document.documentElement.removeAttribute('data-theme'); themeBtn.textContent='☀ Sáng'; }
+  pill('Theme: '+(theme==='light'?'Sáng (máy chiếu)':'Tối'), 'ok');
+});
+
+/* ---------- SENSITIVITY SLIDER ---------- */
+const sensSlider = document.getElementById('sensSlider');
+const sensVal = document.getElementById('sensVal');
+sensSlider.addEventListener('input', e=>{
+  SENS = Number(e.target.value);
+  sensVal.textContent = SENS.toFixed(1)+'×';
+  update();
+  pill('Độ nhạy mô hình: '+SENS.toFixed(1)+'× ' + (SENS>1?'(khuếch đại — dễ thấy aha)':SENS<1?'(giảm — sát thực tế hơn)':'(mặc định)'), SENS===1?'ok':'warn');
+});
+
+update();
+pill('Sẵn sàng — chọn chiến lược để xem mạch chính, hoặc ＋ Chiến lược mới để kéo tự do', 'ok');
+</script>
+</body>
+</html>
