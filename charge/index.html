@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:ital,wght@0,500;0,600;1,500&family=Outfit:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap&subset=latin,latin-ext,vietnamese" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
-:root{
+:root, [data-theme="dark"]{
   --bg:#0a0e1a; --bg2:#10151f; --panel:#151b22; --panel2:#1a222c; --panel3:#202b37;
   --border:#28323f; --border2:#334252;
   --txt:#e7edf3; --muted:#8b98a6; --muted2:#6b7684;
@@ -19,26 +19,47 @@
   --amber:#e0a850; --ambersoft:#38290f;
   --blue:#6fb0d6; --bluesoft:#16303f;
   --purple:#9d7bea;
-  --serif:'Noto Serif Display',Georgia,serif;
-  --sans:'Outfit',system-ui,sans-serif;
-  --mono:'DM Mono','SF Mono',monospace;
+  --headtop:#11161c;
+  --tint-blue:rgba(111,176,214,.08);
+  --tint-red:rgba(224,120,120,.08);
+}
+[data-theme="light"]{
+  --bg:#eef1f6; --bg2:#e3e8f0; --panel:#ffffff; --panel2:#f4f6fa; --panel3:#e9edf4;
+  --border:#d3dae4; --border2:#c2cbd8;
+  --txt:#1a2230; --muted:#5c6879; --muted2:#8996a6;
+  --gold:#a67c1e; --gold2:#7E5C0D; --goldsoft:#f2e9d2;
+  --green:#1d8a63; --greensoft:#dcf1e8;
+  --red:#c0473f; --redsoft:#fae0de;
+  --amber:#b07d18; --ambersoft:#f6ecd6;
+  --blue:#2f7ba6; --bluesoft:#dceaf3;
+  --purple:#6b4fbf;
+  --headtop:#e4e9f1;
+  --tint-blue:rgba(47,123,166,.10);
+  --tint-red:rgba(192,71,63,.09);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--txt);font-family:var(--sans);font-weight:300;line-height:1.5;-webkit-font-smoothing:antialiased;padding-bottom:70px}
+body{background:var(--bg);color:var(--txt);font-family:'Outfit',system-ui,sans-serif;font-weight:300;line-height:1.5;-webkit-font-smoothing:antialiased;padding-bottom:70px;transition:background .25s,color .25s}
 .wrap{max-width:1180px;margin:0 auto;padding:0 22px}
-h1,h2,h3,h4{font-family:var(--serif);font-weight:500;letter-spacing:.2px}
-.mono{font-family:var(--mono)}
+h1,h2,h3,h4{font-family:'Noto Serif Display',Georgia,serif;font-weight:500;letter-spacing:.2px}
+.mono{font-family:'DM Mono',monospace}
 
 /* Header */
-header{border-bottom:1px solid var(--border);padding:28px 0 22px;margin-bottom:26px;background:linear-gradient(180deg,#11161c 0%,var(--bg) 100%)}
-.eyebrow{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);font-weight:500;margin-bottom:8px}
+header{border-bottom:1px solid var(--border);padding:28px 0 22px;margin-bottom:26px;background:linear-gradient(180deg,var(--headtop) 0%,var(--bg) 100%)}
+.hrow{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
+.eyebrow{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:8px}
 header h1{font-size:30px;line-height:1.15}
 header h1 .ac{color:var(--gold)}
 header .sub{color:var(--muted);font-size:14px;margin-top:9px;max-width:820px;line-height:1.6}
+header .sub b{color:var(--gold2)}
+
+/* theme toggle */
+.theme-btn{flex:0 0 auto;display:flex;align-items:center;gap:9px;background:var(--panel);border:1px solid var(--border2);color:var(--muted);font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:500;padding:9px 14px;border-radius:10px;cursor:pointer;transition:.15s}
+.theme-btn:hover{color:var(--txt);border-color:var(--gold)}
+.theme-btn .ic{font-size:15px}
 
 /* Tabs */
 .tabs{display:flex;gap:6px;border-bottom:1px solid var(--border);margin-bottom:26px}
-.tab{background:none;border:none;color:var(--muted);font-family:var(--sans);font-size:15px;font-weight:500;padding:12px 20px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:.15s}
+.tab{background:none;border:none;color:var(--muted);font-family:'Outfit',sans-serif;font-size:15px;font-weight:500;padding:12px 20px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:.15s}
 .tab:hover{color:var(--txt)}
 .tab.active{color:var(--gold2);border-bottom-color:var(--gold)}
 .view{display:none}
@@ -50,6 +71,7 @@ header .sub{color:var(--muted);font-size:14px;margin-top:9px;max-width:820px;lin
 .card h3{font-size:18px;color:var(--txt);margin-bottom:6px}
 .card h3 .ac{color:var(--gold2)}
 .card .lead{color:var(--muted);font-size:13.5px;line-height:1.65;margin-bottom:14px;max-width:840px}
+.card .lead b{color:var(--gold2)}
 .sect-lbl{font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:var(--gold);font-weight:600;margin:0 0 12px}
 
 /* fact grid */
@@ -59,7 +81,7 @@ header .sub{color:var(--muted);font-size:14px;margin-top:9px;max-width:820px;lin
 .ftile .ft{font-size:12.5px;font-weight:600;color:var(--gold2);margin-bottom:5px;letter-spacing:.3px}
 .ftile .fd{font-size:12.5px;color:var(--muted);line-height:1.55}
 
-/* vs table (neutral vs closed) */
+/* vs table */
 .vtbl{width:100%;border-collapse:collapse;margin-top:6px}
 .vtbl th,.vtbl td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:top}
 .vtbl th{font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:600;background:var(--panel2)}
@@ -68,13 +90,13 @@ header .sub{color:var(--muted);font-size:14px;margin-top:9px;max-width:820px;lin
 .vtbl .vg{color:var(--muted)}
 
 /* segment strength bars */
-.seg-row{display:grid;grid-template-columns:210px 1fr 54px;gap:14px;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)}
+.seg-row{display:grid;grid-template-columns:230px 1fr 78px;gap:14px;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)}
 .seg-row:last-child{border-bottom:none}
 .seg-row .sn{font-size:13px}
 .seg-row .sn small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
 .bar{height:9px;background:var(--bg2);border-radius:6px;overflow:hidden}
 .bar > span{display:block;height:100%;border-radius:6px}
-.sv{font-family:var(--mono);font-size:13px;text-align:right;color:var(--gold2)}
+.sv{font-family:'DM Mono',monospace;font-size:12.5px;text-align:right;color:var(--gold2)}
 .b-hi > span{background:linear-gradient(90deg,var(--gold),var(--gold2))}
 .b-mid > span{background:linear-gradient(90deg,var(--amber),#f0c882)}
 .b-lo > span{background:linear-gradient(90deg,var(--muted2),var(--muted))}
@@ -94,25 +116,25 @@ header .sub{color:var(--muted);font-size:14px;margin-top:9px;max-width:820px;lin
 .gbar .grow{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px}
 .gctrl{display:flex;flex-direction:column;gap:7px}
 .gctrl .gl{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.9px;font-weight:600;display:flex;justify-content:space-between;align-items:baseline}
-.gctrl .gl .v{color:var(--gold2);font-family:var(--mono);font-size:14px;letter-spacing:0}
+.gctrl .gl .v{color:var(--gold2);font-family:'DM Mono',monospace;font-size:14px;letter-spacing:0}
 .gctrl input[type=range]{width:100%;-webkit-appearance:none;height:5px;border-radius:3px;background:var(--bg2);outline:none;margin:2px 0}
 .gctrl input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--gold);cursor:pointer;border:2px solid var(--bg)}
 .gctrl input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--gold);cursor:pointer;border:2px solid var(--bg)}
 .gctrl .note{font-size:10.5px;color:var(--muted2);line-height:1.45}
 .gctrl.wide{grid-column:1/-1}
 .gbar .seg{display:flex;background:var(--panel3);border:1px solid var(--border2);border-radius:8px;overflow:hidden;width:fit-content}
-.gbar .seg button{background:none;border:none;color:var(--muted);font-family:var(--sans);font-weight:500;font-size:12.5px;padding:8px 14px;cursor:pointer;transition:.15s}
-.gbar .seg button.on{background:var(--gold);color:#1a1206}
+.gbar .seg button{background:none;border:none;color:var(--muted);font-family:'Outfit',sans-serif;font-weight:500;font-size:12.5px;padding:8px 14px;cursor:pointer;transition:.15s}
+.gbar .seg button.on{background:var(--gold);color:var(--bg)}
 
-.formula-box{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center;line-height:1.7}
+.formula-box{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);text-align:center;line-height:1.7}
 .formula-box .hl{color:var(--gold2)}
 
 /* result strip */
 .rstrip{background:linear-gradient(135deg,var(--panel2),var(--panel));border:1px solid var(--gold);border-radius:14px;padding:20px 24px;margin-bottom:22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
-.rstrip .rl{font-family:var(--serif);font-size:15px;font-weight:500;max-width:560px;line-height:1.55}
+.rstrip .rl{font-family:'Noto Serif Display',serif;font-size:15px;font-weight:500;max-width:560px;line-height:1.55}
 .rstrip .rl .hl{color:var(--gold2)}
 .rstrip .rv{text-align:right}
-.rstrip .rv .big{font-family:var(--mono);font-size:32px;font-weight:500}
+.rstrip .rv .big{font-family:'DM Mono',monospace;font-size:32px;font-weight:500}
 .rstrip .rv .big.pos{color:var(--green)}
 .rstrip .rv .big.neg{color:var(--red)}
 .rstrip .rv .lbl{font-size:11px;color:var(--muted);margin-top:3px}
@@ -120,7 +142,7 @@ header .sub{color:var(--muted);font-size:14px;margin-top:9px;max-width:820px;lin
 /* chart card */
 .chartcard{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px 20px}
 .chartcard .ch-t{font-size:13px;color:var(--muted);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
-.chartcard .ch-t b{color:var(--gold2);font-family:var(--serif);font-weight:500;font-size:15px}
+.chartcard .ch-t b{color:var(--gold2);font-family:'Noto Serif Display',serif;font-weight:500;font-size:15px}
 .ch-wrap{position:relative;height:300px}
 
 /* side result panel */
@@ -131,7 +153,7 @@ header .sub{color:var(--muted);font-size:14px;margin-top:9px;max-width:820px;lin
 .cmp-row:last-child{border-bottom:none}
 .cmp-row .cn{font-size:12.5px}
 .cmp-row .cn small{display:block;color:var(--muted);font-size:10.5px;margin-top:1px}
-.cmp-row .cv{font-family:var(--mono);font-size:15px;font-weight:500;text-align:right}
+.cmp-row .cv{font-family:'DM Mono',monospace;font-size:15px;font-weight:500;text-align:right}
 .cmp-row .cv small{font-size:11px;color:var(--muted);display:block}
 .dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:6px}
 .d-ice{background:var(--red)}
@@ -141,16 +163,17 @@ header .sub{color:var(--muted);font-size:14px;margin-top:9px;max-width:820px;lin
 .d-mix{background:var(--blue)}
 
 .verdict{border-radius:10px;padding:13px 15px;font-size:12.5px;line-height:1.55}
-.verdict.ev{background:var(--greensoft);border:1px solid #245144;color:var(--green)}
-.verdict.ice{background:var(--redsoft);border:1px solid #5a2a2a;color:#f0b8b8}
+.verdict.ev{background:var(--greensoft);border:1px solid var(--green);color:var(--green)}
+.verdict.ice{background:var(--redsoft);border:1px solid var(--red);color:var(--red)}
 .verdict b{font-weight:600}
 
-.be-card{background:var(--bluesoft);border:1px solid #245066;border-radius:10px;padding:13px 15px}
+.be-card{background:var(--bluesoft);border:1px solid var(--blue);border-radius:10px;padding:13px 15px}
 .be-card .bl{font-size:10.5px;text-transform:uppercase;letter-spacing:1px;color:var(--blue);font-weight:600;margin-bottom:6px}
-.be-card .bv{font-family:var(--mono);font-size:15px;color:var(--txt);line-height:1.5}
+.be-card .bv{font-family:'DM Mono',monospace;font-size:15px;color:var(--txt);line-height:1.5}
 .be-card .bv b{color:var(--blue)}
 
 .mini-note{font-size:11px;color:var(--muted2);line-height:1.5;margin-top:2px}
+.mini-note b{color:var(--muted)}
 
 .foot{text-align:center;color:var(--muted2);font-size:11px;margin-top:30px;line-height:1.7}
 .foot b{color:var(--muted)}
@@ -160,77 +183,82 @@ header .sub{color:var(--muted);font-size:14px;margin-top:9px;max-width:820px;lin
 
 <header>
   <div class="wrap">
-    <div class="eyebrow">Charge+ · Ecosystem Brief & TCO Simulator</div>
-    <h1>Charge+ vs. <span class="ac">Xe xăng phân khúc C/D</span></h1>
-    <p class="sub">Bức tranh tổng quan hệ sinh thái Charge+, định vị thế mạnh cạnh tranh theo phân khúc, và mô phỏng cán cân chi phí nhiên liệu — với slider giá xăng để test độ nhạy. Đối thủ thực sự không phải các mạng sạc khác, mà là <b style="color:var(--gold2)">xe động cơ đốt trong (ICE) hạng C/D</b>.</p>
+    <div class="hrow">
+      <div>
+        <div class="eyebrow">Charge+ · Ecosystem Brief & TCO Simulator</div>
+        <h1>Charge+ vs. <span class="ac">Segment C/D Petrol Cars</span></h1>
+        <p class="sub">An overview of the Charge+ ecosystem, its competitive strengths by segment, and a fuel-cost balance simulator with a petrol-price slider for sensitivity testing. The real competitor is not other charging networks — it is the <b>internal-combustion (ICE) car in segments C and D</b>.</p>
+      </div>
+      <button class="theme-btn" id="themeBtn"><span class="ic">☀️</span><span id="themeLbl">Light mode</span></button>
+    </div>
   </div>
 </header>
 
 <div class="wrap">
   <div class="tabs">
-    <button class="tab active" data-v="brief">① Tổng quan & Cạnh tranh</button>
-    <button class="tab" data-v="sim">② Simulator — Chi phí nhiên liệu</button>
+    <button class="tab active" data-v="brief">① Overview & Competition</button>
+    <button class="tab" data-v="sim">② Simulator — Fuel Cost</button>
   </div>
 
   <!-- ============ TAB 1: BRIEF ============ -->
   <div class="view active" id="v-brief">
 
     <div class="card">
-      <div class="sect-lbl">Charge+ là gì</div>
-      <h3>Một <span class="ac">MSP sạc trung lập</span> đa quốc gia — không phải chỉ một nhà vận hành trạm</h3>
-      <p class="lead">Charge+ vận hành theo mô hình <b style="color:var(--gold2)">Neutral Network</b> (mạng lưới mở): phục vụ mọi thương hiệu xe điện — Porsche, BMW, BYD, Hyundai, Kia... — trái ngược với mạng đóng như V-Green (chỉ VinFast). Định vị là Managed Service Provider, không đơn thuần bán điện.</p>
+      <div class="sect-lbl">What Charge+ is</div>
+      <h3>A <span class="ac">neutral charging MSP</span> operating across borders — not merely a station operator</h3>
+      <p class="lead">Charge+ runs a <b>Neutral Network</b> (open model): it serves every EV brand — Porsche, BMW, BYD, Hyundai, Kia — unlike closed networks such as V-Green (VinFast only). It positions itself as a Managed Service Provider, not simply a seller of electricity.</p>
       <div class="fgrid">
-        <div class="ftile"><div class="ic">🔌</div><div class="ft">Mạng trung lập</div><div class="fd">Mở cho tất cả hãng xe, không khoá vào một brand duy nhất.</div></div>
-        <div class="ftile"><div class="ic">📍</div><div class="ft">Vị trí Grade A</div><div class="fd">Toà văn phòng hạng A, chung cư cao cấp, khách sạn 5 sao (CapitaLand, Ascott).</div></div>
-        <div class="ftile"><div class="ic">🛣️</div><div class="ft">Hành lang xuyên biên giới</div><div class="fd">Tuyến sạc ~5.000 km từ Singapore đến Hà Nội.</div></div>
-        <div class="ftile"><div class="ic">⚡</div><div class="ft">Trụ Ultra-slim</div><div class="fd">Thiết kế siêu mỏng, tiết kiệm không gian đô thị; 1 app thanh toán đa quốc gia.</div></div>
-        <div class="ftile"><div class="ic">🤝</div><div class="ft">B2B sâu</div><div class="fd">Đối tác OEM (Porsche, BYD) và nền tảng gọi xe (Grab).</div></div>
-        <div class="ftile"><div class="ic">🏙️</div><div class="ft">B2C cao cấp</div><div class="fd">Chủ EV cao cấp & cư dân dự án BĐS hạng sang.</div></div>
+        <div class="ftile"><div class="ic">🔌</div><div class="ft">Neutral network</div><div class="fd">Open to all car brands, not locked to a single OEM.</div></div>
+        <div class="ftile"><div class="ic">📍</div><div class="ft">Grade-A locations</div><div class="fd">Grade-A offices, premium residences, 5-star hotels (CapitaLand, Ascott).</div></div>
+        <div class="ftile"><div class="ic">🛣️</div><div class="ft">Cross-border corridor</div><div class="fd">A ~5,000 km charging route from Singapore to Hanoi.</div></div>
+        <div class="ftile"><div class="ic">⚡</div><div class="ft">Ultra-slim units</div><div class="fd">Space-saving design for dense urban sites; one multi-country payment app.</div></div>
+        <div class="ftile"><div class="ic">🤝</div><div class="ft">Deep B2B</div><div class="fd">OEM partnerships (Porsche, BYD) and ride-hailing (Grab).</div></div>
+        <div class="ftile"><div class="ic">🏙️</div><div class="ft">Premium B2C</div><div class="fd">Premium EV owners and residents of luxury real-estate projects.</div></div>
       </div>
     </div>
 
     <div class="card">
-      <div class="sect-lbl">Định vị so với mạng đóng</div>
+      <div class="sect-lbl">Positioning vs. closed networks</div>
       <table class="vtbl">
-        <thead><tr><th>Tiêu chí</th><th>Charge+ (mở)</th><th>V-Green / mạng đóng</th></tr></thead>
+        <thead><tr><th>Dimension</th><th>Charge+ (open)</th><th>V-Green / closed</th></tr></thead>
         <tbody>
-          <tr><td>Phạm vi phục vụ</td><td class="cp">Đa hãng — mọi EV</td><td class="vg">Khoá theo 1 thương hiệu</td></tr>
-          <tr><td>Chiến lược vị trí</td><td class="cp">Chọn lọc Grade A, cao cấp</td><td class="vg">Phủ rộng theo tập khách brand</td></tr>
-          <tr><td>Nguồn doanh thu</td><td class="cp">B2C + B2B (OEM, ride-hailing)</td><td class="vg">Chủ yếu hệ sinh thái nội bộ</td></tr>
-          <tr><td>Trải nghiệm</td><td class="cp">1 app đa quốc gia, trụ slim</td><td class="vg">Trong hệ sinh thái brand</td></tr>
+          <tr><td>Coverage</td><td class="cp">Multi-brand — every EV</td><td class="vg">Locked to one brand</td></tr>
+          <tr><td>Location strategy</td><td class="cp">Selective Grade-A / premium</td><td class="vg">Broad reach for the brand's base</td></tr>
+          <tr><td>Revenue base</td><td class="cp">B2C + B2B (OEM, ride-hailing)</td><td class="vg">Mainly the internal ecosystem</td></tr>
+          <tr><td>Experience</td><td class="cp">One cross-border app, slim units</td><td class="vg">Within the brand ecosystem</td></tr>
         </tbody>
       </table>
     </div>
 
     <div class="card">
-      <div class="sect-lbl">Thế mạnh cạnh tranh theo phân khúc</div>
-      <h3>Charge+ mạnh nhất ở đâu?</h3>
-      <p class="lead">Điểm số dưới đây phản ánh mức độ ăn khớp giữa mô hình Charge+ (vị trí cao cấp, trung lập, B2B, trải nghiệm) với từng phân khúc. Đây là <b style="color:var(--gold2)">đánh giá định tính</b> — best-guess gắn nhãn, không phải số đo thị phần.</p>
-      <div class="seg-row"><div class="sn">EV cao cấp đô thị<small>Porsche, BMW, BYD cao cấp — cư dân dự án hạng sang</small></div><div class="bar b-hi"><span style="width:92%"></span></div><div class="sv">Rất cao</div></div>
-      <div class="seg-row"><div class="sn">B2B — OEM & fleet<small>Đối tác hãng xe, Grab, doanh nghiệp</small></div><div class="bar b-hi"><span style="width:85%"></span></div><div class="sv">Cao</div></div>
-      <div class="seg-row"><div class="sn">Sạc điểm đến (destination)<small>Văn phòng Grade A, khách sạn 5 sao, TTTM</small></div><div class="bar b-hi"><span style="width:88%"></span></div><div class="sv">Rất cao</div></div>
-      <div class="seg-row"><div class="sn">Sạc hành lang liên tỉnh<small>Tuyến SG–HN, đường dài</small></div><div class="bar b-mid"><span style="width:60%"></span></div><div class="sv">Trung bình</div></div>
-      <div class="seg-row"><div class="sn">EV phổ thông / mass-market<small>Xe điện giá rẻ, khách nhạy giá</small></div><div class="bar b-lo"><span style="width:34%"></span></div><div class="sv">Thấp</div></div>
-      <div class="seg-row"><div class="sn">Sạc tại nhà (home charging)<small>Wallbox riêng, giá điện sinh hoạt</small></div><div class="bar b-lo"><span style="width:22%"></span></div><div class="sv">Rất thấp</div></div>
+      <div class="sect-lbl">Competitive strength by segment</div>
+      <h3>Where is Charge+ strongest?</h3>
+      <p class="lead">The scores below reflect how well the Charge+ model (premium locations, neutrality, B2B, experience) fits each segment. This is a <b>qualitative, labelled best-guess</b> — not measured market share.</p>
+      <div class="seg-row"><div class="sn">Premium urban EVs<small>Porsche, BMW, premium BYD — luxury-project residents</small></div><div class="bar b-hi"><span style="width:92%"></span></div><div class="sv">Very high</div></div>
+      <div class="seg-row"><div class="sn">B2B — OEM & fleet<small>Car-brand partners, Grab, enterprises</small></div><div class="bar b-hi"><span style="width:85%"></span></div><div class="sv">High</div></div>
+      <div class="seg-row"><div class="sn">Destination charging<small>Grade-A offices, 5-star hotels, malls</small></div><div class="bar b-hi"><span style="width:88%"></span></div><div class="sv">Very high</div></div>
+      <div class="seg-row"><div class="sn">Highway / inter-city corridor<small>SG–HN route, long distance</small></div><div class="bar b-mid"><span style="width:60%"></span></div><div class="sv">Medium</div></div>
+      <div class="seg-row"><div class="sn">Mass-market EVs<small>Budget EVs, price-sensitive buyers</small></div><div class="bar b-lo"><span style="width:34%"></span></div><div class="sv">Low</div></div>
+      <div class="seg-row"><div class="sn">Home charging<small>Private wallbox, residential tariff</small></div><div class="bar b-lo"><span style="width:22%"></span></div><div class="sv">Very low</div></div>
 
       <div class="callout">
-        <h4>Nhận định thẳng</h4>
-        Thế mạnh Charge+ <b>không nằm ở giá năng lượng</b>. Như tab Simulator sẽ cho thấy, nếu khách phụ thuộc 100% trạm sạc cao cấp thì lợi ích kinh tế so với xe xăng chỉ <b>~2% TCO</b> — quá mỏng để là luận điểm bán hàng. Lợi thế thật là <b>vị trí đắc địa + mạng trung lập + trải nghiệm B2B/B2C cao cấp</b>: khách trả tiền cho sự tiện lợi và định vị, không phải cho mỗi kWh rẻ. Sân chơi của Charge+ là <b>convenience/destination charging cho phân khúc cao cấp</b>, không phải cuộc đua giá với sạc tại nhà.
+        <h4>The blunt read</h4>
+        Charge+'s strength is <b>not energy price</b>. As the Simulator tab shows, a driver relying 100% on premium stations saves only <b>~2% of TCO</b> versus a petrol car — too thin to be a sales argument. The real edge is <b>premium locations + a neutral network + a high-end B2B/B2C experience</b>: customers pay for convenience and positioning, not for the cheapest kWh. Charge+'s arena is <b>convenience/destination charging for the premium segment</b>, not a price war against home charging.
       </div>
     </div>
 
     <div class="card">
-      <div class="sect-lbl">Đối thủ chính — xác định rõ</div>
-      <h3>Đối thủ là <span class="ac">xe xăng hạng C/D</span>, không phải mạng sạc khác</h3>
-      <p class="lead">Với một MSP sạc, "chuyển đổi từ xăng sang điện" mới là thị trường cần mở. Các mạng sạc khác chia lại chiếc bánh EV hiện có; xe xăng C/D là chiếc bánh chưa cắt. Do đó cán cân TCO EV-vs-ICE chính là chiến trường — và biến số nhạy nhất là <b style="color:var(--gold2)">giá xăng</b>.</p>
+      <div class="sect-lbl">The main competitor — clearly defined</div>
+      <h3>The rival is the <span class="ac">segment C/D petrol car</span>, not another network</h3>
+      <p class="lead">For a charging MSP, the market to open is the switch from petrol to electric. Other charging networks re-slice the existing EV pie; segment C/D petrol cars are the pie not yet cut. So the EV-vs-ICE TCO balance is the battlefield — and its most sensitive variable is the <b>petrol price</b>.</p>
       <div class="fgrid">
-        <div class="ftile"><div class="ic">🚙</div><div class="ft">Hạng C — SUV/Sedan</div><div class="fd">Mazda CX-5, tương đương ~8.5 L/100km. Đối trọng của BYD Seal, VF7...</div></div>
-        <div class="ftile"><div class="ic">🚗</div><div class="ft">Hạng D</div><div class="fd">Tiêu thụ cao hơn (~9–10 L/100km) → cán cân nghiêng về EV nhanh hơn khi xăng tăng.</div></div>
-        <div class="ftile"><div class="ic">⛽</div><div class="ft">Biến số then chốt</div><div class="fd">Giá xăng RON 95. Mỗi 1.000đ/lít dịch chuyển đáng kể điểm hoà vốn.</div></div>
+        <div class="ftile"><div class="ic">🚙</div><div class="ft">Segment C — SUV/Sedan</div><div class="fd">Mazda CX-5 class, ~8.5 L/100km. The counterpart to a BYD Seal, VF7, etc.</div></div>
+        <div class="ftile"><div class="ic">🚗</div><div class="ft">Segment D</div><div class="fd">Higher consumption (~9.8 L/100km) → the balance tips toward EV faster as petrol rises.</div></div>
+        <div class="ftile"><div class="ic">⛽</div><div class="ft">The pivotal variable</div><div class="fd">RON 95 petrol price. Each 1,000 đ/L shifts the break-even point materially.</div></div>
       </div>
       <div class="callout blue">
-        <h4>Vì sao slide giá xăng?</h4>
-        Chi phí điện tương đối ổn định; <b>giá xăng biến động mạnh</b> và là đòn bẩy cảm xúc lớn nhất với khách. Tab Simulator cho phép kéo giá xăng để xem cán cân chi phí nhiên liệu lật chiều ở ngưỡng nào — đó là kịch bản bán hàng cụ thể.
+        <h4>Why a petrol-price slider?</h4>
+        Electricity prices are relatively stable; <b>petrol prices swing hard</b> and are the biggest emotional lever for buyers. The Simulator tab lets you drag the petrol price to see the threshold at which the fuel-cost balance flips — a concrete sales scenario.
       </div>
     </div>
   </div>
@@ -241,102 +269,102 @@ header .sub{color:var(--muted);font-size:14px;margin-top:9px;max-width:820px;lin
     <div class="gbar">
       <div class="grow">
         <div class="gctrl wide">
-          <div class="gl"><span>⛽ Giá xăng RON 95</span><span class="v" id="lbl-petrol">20.003 đ/L</span></div>
+          <div class="gl"><span>⛽ RON 95 petrol price</span><span class="v" id="lbl-petrol">20,003 đ/L</span></div>
           <input type="range" id="s-petrol" min="15000" max="35000" step="200" value="20003">
-          <div class="note">Kéo để test cán cân. Dự phóng 2026 nền: 20.003 đ/L. Bước 200đ.</div>
+          <div class="note">Drag to test the balance. 2026 baseline: 20,003 đ/L. Step 200 đ.</div>
         </div>
 
         <div class="gctrl">
-          <div class="gl"><span>Phân khúc so sánh</span></div>
+          <div class="gl"><span>Comparison segment</span></div>
           <div class="seg" id="seg-seg">
-            <button data-seg="C" class="on">Hạng C</button>
-            <button data-seg="D">Hạng D</button>
+            <button data-seg="C" class="on">Segment C</button>
+            <button data-seg="D">Segment D</button>
           </div>
-          <div class="note" id="note-seg">C: 8.5 L/100km · pin 82.5 kWh (BYD Seal ~ CX-5)</div>
+          <div class="note" id="note-seg">C: 8.5 L/100km · 82.5 kWh pack (BYD Seal ~ CX-5)</div>
         </div>
 
         <div class="gctrl">
-          <div class="gl"><span>Tỉ lệ sạc tại nhà</span><span class="v" id="lbl-home">80%</span></div>
+          <div class="gl"><span>Home-charging share</span><span class="v" id="lbl-home">80%</span></div>
           <input type="range" id="s-home" min="0" max="100" step="5" value="80">
-          <div class="note">Phần còn lại sạc tại trạm (mix DC/AC bên dưới).</div>
+          <div class="note">The remainder is charged at stations (DC/AC mix below).</div>
         </div>
 
         <div class="gctrl">
-          <div class="gl"><span>Trong phần sạc trạm: % dùng DC nhanh</span><span class="v" id="lbl-dc">50%</span></div>
+          <div class="gl"><span>Within station charging: fast-DC share</span><span class="v" id="lbl-dc">50%</span></div>
           <input type="range" id="s-dc" min="0" max="100" step="5" value="50">
-          <div class="note">DC 8.000đ/kWh · AC 6.000đ/kWh · Nhà 3.200đ/kWh.</div>
+          <div class="note">DC 8,000 đ/kWh · AC 6,000 đ/kWh · Home 3,200 đ/kWh.</div>
         </div>
 
         <div class="gctrl">
-          <div class="gl"><span>Quãng đường đánh giá</span><span class="v" id="lbl-dist">350.000 km</span></div>
+          <div class="gl"><span>Distance evaluated</span><span class="v" id="lbl-dist">350,000 km</span></div>
           <input type="range" id="s-dist" min="50000" max="350000" step="10000" value="350000">
-          <div class="note">Mặc định = 1 vòng đời pin (~1.000 chu kỳ).</div>
+          <div class="note">Default = one battery lifecycle (~1,000 cycles).</div>
         </div>
       </div>
     </div>
 
     <div class="formula-box">
-      Chi phí năng lượng = <span class="hl">(Quãng đường / 100)</span> × <span class="hl">mức tiêu thụ</span> × <span class="hl">đơn giá</span>　·　
-      EV blend: <span class="hl">%nhà × 3.200</span> + <span class="hl">%trạm × (%DC×8.000 + %AC×6.000)</span> đ/kWh
+      Energy cost = <span class="hl">(distance / 100)</span> × <span class="hl">consumption</span> × <span class="hl">unit price</span>　·　
+      EV blend: <span class="hl">home% × 3,200</span> + <span class="hl">station% × (DC%×8,000 + AC%×6,000)</span> đ/kWh
     </div>
 
     <div class="rstrip">
-      <div class="rl" id="strip-txt">Ở giá xăng hiện tại, xe điện <span class="hl">tiết kiệm</span> chi phí nhiên liệu so với xe xăng hạng C.</div>
+      <div class="rl" id="strip-txt">At the current petrol price, the EV <span class="hl">saves</span> on fuel versus a segment C petrol car.</div>
       <div class="rv">
-        <div class="big pos" id="strip-val">–154 tr</div>
-        <div class="lbl">Chênh lệch chi phí nhiên liệu (EV − ICE), toàn quãng đường</div>
+        <div class="big pos" id="strip-val">–154 M</div>
+        <div class="lbl">Fuel-cost difference (EV − ICE), full distance</div>
       </div>
     </div>
 
     <div class="sim-grid">
       <div>
         <div class="chartcard">
-          <div class="ch-t"><b>Chi phí nhiên liệu tích luỹ theo quãng đường</b><span>Triệu VNĐ</span></div>
+          <div class="ch-t"><b>Cumulative fuel cost by distance</b><span>million VND</span></div>
           <div class="ch-wrap"><canvas id="chartCum"></canvas></div>
         </div>
         <div style="height:20px"></div>
         <div class="chartcard">
-          <div class="ch-t"><b>Chi phí nhiên liệu / 100km theo giá xăng</b><span>Nghìn VNĐ / 100km</span></div>
+          <div class="ch-t"><b>Fuel cost per 100km vs. petrol price</b><span>thousand VND / 100km</span></div>
           <div class="ch-wrap"><canvas id="chartSens"></canvas></div>
         </div>
       </div>
 
       <div class="rpanel">
         <div class="rcard">
-          <div class="lbl">Chi phí / 100km</div>
-          <div class="cmp-row"><div class="cn"><span class="dot d-ice"></span>Xe xăng (ICE)<small id="sub-ice">8.5 L × giá xăng</small></div><div class="cv" id="v-ice">170.0<small>nghìn đ</small></div></div>
-          <div class="cmp-row"><div class="cn"><span class="dot d-mix"></span>EV — blend hiện tại<small id="sub-evmix">theo mix sạc đã chọn</small></div><div class="cv" id="v-evmix">—<small>nghìn đ</small></div></div>
-          <div class="cmp-row"><div class="cn"><span class="dot d-home"></span>EV — 100% sạc nhà<small>3.200 đ/kWh</small></div><div class="cv" id="v-home">57.6<small>nghìn đ</small></div></div>
-          <div class="cmp-row"><div class="cn"><span class="dot d-dc"></span>EV — 100% DC trạm<small>8.000 đ/kWh</small></div><div class="cv" id="v-dc">144.0<small>nghìn đ</small></div></div>
+          <div class="lbl">Cost per 100km</div>
+          <div class="cmp-row"><div class="cn"><span class="dot d-ice"></span>Petrol (ICE)<small id="sub-ice">8.5 L × petrol price</small></div><div class="cv" id="v-ice">170.0<small>thousand đ</small></div></div>
+          <div class="cmp-row"><div class="cn"><span class="dot d-mix"></span>EV — current blend<small id="sub-evmix">per selected charging mix</small></div><div class="cv" id="v-evmix">—<small>thousand đ</small></div></div>
+          <div class="cmp-row"><div class="cn"><span class="dot d-home"></span>EV — 100% home<small>3,200 đ/kWh</small></div><div class="cv" id="v-home">57.6<small>thousand đ</small></div></div>
+          <div class="cmp-row"><div class="cn"><span class="dot d-dc"></span>EV — 100% station DC<small>8,000 đ/kWh</small></div><div class="cv" id="v-dc">144.0<small>thousand đ</small></div></div>
         </div>
 
         <div class="rcard">
-          <div class="lbl">Toàn quãng đường</div>
-          <div class="cmp-row"><div class="cn">Xăng — tổng nhiên liệu</div><div class="cv" id="tot-ice">—<small>triệu đ</small></div></div>
-          <div class="cmp-row"><div class="cn">EV — tổng nhiên liệu (blend)</div><div class="cv" id="tot-ev">—<small>triệu đ</small></div></div>
-          <div class="cmp-row"><div class="cn" style="color:var(--gold2)">Tiết kiệm nhiên liệu</div><div class="cv" id="tot-save" style="color:var(--green)">—<small>triệu đ</small></div></div>
+          <div class="lbl">Over the full distance</div>
+          <div class="cmp-row"><div class="cn">Petrol — total fuel</div><div class="cv" id="tot-ice">—<small>million đ</small></div></div>
+          <div class="cmp-row"><div class="cn">EV — total energy (blend)</div><div class="cv" id="tot-ev">—<small>million đ</small></div></div>
+          <div class="cmp-row"><div class="cn" style="color:var(--gold2)">Fuel savings</div><div class="cv" id="tot-save" style="color:var(--green)">—<small>million đ</small></div></div>
         </div>
 
         <div class="be-card">
-          <div class="bl">Điểm hoà vốn giá xăng</div>
-          <div class="bv" id="be-txt">Xăng cần <b>≥ … đ/L</b> để EV rẻ hơn về nhiên liệu.</div>
+          <div class="bl">Petrol break-even price</div>
+          <div class="bv" id="be-txt">Petrol must be <b>≥ … đ/L</b> for the EV to be cheaper on fuel.</div>
         </div>
 
-        <div class="verdict ev" id="verdict">EV đang lợi hơn về chi phí nhiên liệu.</div>
+        <div class="verdict ev" id="verdict">The EV is ahead on fuel cost.</div>
 
-        <div class="mini-note">Lưu ý: đây là <b>chỉ chi phí nhiên liệu</b>. TCO đầy đủ (bảo trì, thay pin, chi phí cơ hội thời gian sạc) làm cán cân sát hơn nhiều — theo case study, TCO EV sạc 100% trạm chỉ hơn xăng ~2%, nhưng lên tới >30% khi tận dụng sạc nhà.</div>
+        <div class="mini-note">Note: this is <b>fuel cost only</b>. A full TCO (maintenance, battery replacement, charging-time opportunity cost) brings the balance much closer — per the case study, an EV charged 100% at stations beats petrol by only ~2% on TCO, but by &gt;30% when home charging is leveraged.</div>
       </div>
     </div>
 
     <div class="callout" style="margin-top:24px">
-      <h4>Đọc kết quả thế nào</h4>
-      Slider giá xăng cho thấy <b>cán cân nhiên liệu rất nhạy với giá xăng</b>. Khi phần lớn sạc là tại nhà (3.200đ/kWh), EV thắng áp đảo ở mọi mức giá xăng thực tế. Khi phụ thuộc trạm DC (8.000đ/kWh), khoảng cách thu hẹp — và ở giá xăng thấp, ICE thậm chí có thể rẻ ngang. <b>Bài học bán hàng:</b> câu chuyện tiết kiệm của EV phụ thuộc mạnh vào hành vi sạc, không chỉ vào giá xăng — đúng như định vị Charge+ nên tập trung vào tiện lợi/định vị hơn là đua giá kWh.
+      <h4>How to read the result</h4>
+      The petrol-price slider shows that the <b>fuel balance is highly sensitive to the petrol price</b>. When most charging is at home (3,200 đ/kWh), the EV wins decisively at any realistic petrol price. When reliant on station DC (8,000 đ/kWh), the gap narrows — and at low petrol prices the ICE can even match it. <b>The sales lesson:</b> the EV savings story depends heavily on charging behaviour, not just petrol price — which is exactly why Charge+ should lean on convenience and positioning rather than a per-kWh price war.
     </div>
   </div>
 
   <div class="foot">
-    Charge+ Competitive Brief & Fuel Cost Simulator　·　Midnight Executive<br>
-    <b>Chỉ mô phỏng chi phí nhiên liệu</b> — không bao gồm giá xe, bảo trì, thay pin, chi phí cơ hội. Số nền theo case study dự phóng 2026.
+    Charge+ Competitive Brief & Fuel Cost Simulator　·　Midnight Executive / Executive Mist<br>
+    <b>Fuel cost only</b> — excludes vehicle price, maintenance, battery replacement, and opportunity cost. Baseline figures per the 2026-projection case study.
   </div>
 </div>
 
@@ -344,72 +372,81 @@ header .sub{color:var(--muted);font-size:14px;margin-top:9px;max-width:820px;lin
 // ---------- constants ----------
 const P_HOME=3200, P_AC=6000, P_DC=8000;   // đ/kWh
 const SEG={
-  C:{cons:8.5, kwh:19.6, label:'Hạng C', note:'C: 8.5 L/100km · pin 82.5 kWh (BYD Seal ~ CX-5)'},
-  D:{cons:9.8, kwh:21.5, label:'Hạng D', note:'D: 9.8 L/100km · tiêu thụ điện ~21.5 kWh/100km'}
+  C:{cons:8.5, kwh:19.6, label:'Segment C', note:'C: 8.5 L/100km · 82.5 kWh pack (BYD Seal ~ CX-5)'},
+  D:{cons:9.8, kwh:21.5, label:'Segment D', note:'D: 9.8 L/100km · EV energy ~21.5 kWh/100km'}
 };
-// EV energy consumption kWh/100km per segment (from pin/range assumptions)
 
 let state={petrol:20003, seg:'C', home:80, dc:50, dist:350000};
 
 // ---------- helpers ----------
-const fmt=(n,d=0)=>n.toLocaleString('vi-VN',{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmt=(n,d=0)=>n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
 const $=id=>document.getElementById(id);
 
-// EV blended đ/kWh given home% and dc%(within station part)
 function evPricePerKwh(){
   const home=state.home/100, stn=1-home;
   const dcp=state.dc/100, acp=1-dcp;
   const stationPrice = dcp*P_DC + acp*P_AC;
   return home*P_HOME + stn*stationPrice;
 }
-// cost per 100km
-function icePer100(petrol){ return SEG[state.seg].cons * petrol; }          // đ
-function evPer100(){ return SEG[state.seg].kwh * evPricePerKwh(); }          // đ
+function icePer100(petrol){ return SEG[state.seg].cons * petrol; }
+function evPer100(){ return SEG[state.seg].kwh * evPricePerKwh(); }
 
 // ---------- charts ----------
 let chartCum, chartSens;
+function themeColors(){
+  const cs=getComputedStyle(document.documentElement);
+  return {grid:cs.getPropertyValue('--border').trim(), tick:cs.getPropertyValue('--muted').trim()};
+}
 function initCharts(){
-  const gridC='#28323f', tick='#8b98a6';
+  const {grid,tick}=themeColors();
   Chart.defaults.font.family="'Outfit',sans-serif";
   Chart.defaults.color=tick;
 
   chartCum=new Chart($('chartCum'),{
     type:'line',
     data:{labels:[],datasets:[
-      {label:'Xe xăng (ICE)',data:[],borderColor:'#e07878',backgroundColor:'rgba(224,120,120,.08)',fill:true,tension:.15,pointRadius:0,borderWidth:2},
+      {label:'Petrol (ICE)',data:[],borderColor:'#e07878',backgroundColor:'rgba(224,120,120,.08)',fill:true,tension:.15,pointRadius:0,borderWidth:2},
       {label:'EV — blend',data:[],borderColor:'#6fb0d6',backgroundColor:'rgba(111,176,214,.08)',fill:true,tension:.15,pointRadius:0,borderWidth:2}
     ]},
     options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
       plugins:{legend:{labels:{boxWidth:12,font:{size:12}}},
-        tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmt(c.parsed.y)+' tr'}}},
+        tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmt(c.parsed.y)+' M'}}},
       scales:{
-        x:{grid:{color:gridC},ticks:{callback:(v,i)=>chartCum.data.labels[i],maxTicksLimit:8},title:{display:true,text:'km',color:tick,font:{size:11}}},
-        y:{grid:{color:gridC},ticks:{callback:v=>fmt(v)}}
+        x:{grid:{color:grid},ticks:{maxTicksLimit:8},title:{display:true,text:'km',font:{size:11}}},
+        y:{grid:{color:grid},ticks:{callback:v=>fmt(v)}}
       }}
   });
 
   chartSens=new Chart($('chartSens'),{
     type:'line',
-    data:{labels:[],datasets:[
-      {label:'Xe xăng (ICE)',data:[],borderColor:'#e07878',tension:0,pointRadius:0,borderWidth:2},
-      {label:'EV — blend hiện tại',data:[],borderColor:'#6fb0d6',tension:0,pointRadius:0,borderWidth:2},
-      {label:'EV — 100% sạc nhà',data:[],borderColor:'#5ec9a0',borderDash:[5,4],tension:0,pointRadius:0,borderWidth:1.5},
-      {label:'EV — 100% DC trạm',data:[],borderColor:'#e0a850',borderDash:[5,4],tension:0,pointRadius:0,borderWidth:1.5}
+    data:{datasets:[
+      {label:'Petrol (ICE)',data:[],borderColor:'#e07878',tension:0,pointRadius:0,borderWidth:2},
+      {label:'EV — current blend',data:[],borderColor:'#6fb0d6',tension:0,pointRadius:0,borderWidth:2},
+      {label:'EV — 100% home',data:[],borderColor:'#5ec9a0',borderDash:[5,4],tension:0,pointRadius:0,borderWidth:1.5},
+      {label:'EV — 100% station DC',data:[],borderColor:'#e0a850',borderDash:[5,4],tension:0,pointRadius:0,borderWidth:1.5}
     ]},
     options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
       plugins:{legend:{labels:{boxWidth:12,font:{size:11}}},
         tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmt(c.parsed.y,1)+'k đ/100km',
-          title:items=>'Xăng '+fmt(items[0].parsed.x||0)+' đ/L'}}},
+          title:items=>'Petrol '+fmt(items[0].parsed.x||0)+' đ/L'}}},
       scales:{
-        x:{type:'linear',grid:{color:gridC},min:15000,max:35000,ticks:{callback:v=>fmt(v/1000)+'k',stepSize:5000},title:{display:true,text:'Giá xăng (đ/L)',color:tick,font:{size:11}}},
-        y:{grid:{color:gridC},ticks:{callback:v=>fmt(v,0)}}
+        x:{type:'linear',grid:{color:grid},min:15000,max:35000,ticks:{callback:v=>fmt(v/1000)+'k',stepSize:5000},title:{display:true,text:'Petrol price (đ/L)',font:{size:11}}},
+        y:{grid:{color:grid},ticks:{callback:v=>fmt(v,0)}}
       }}
+  });
+}
+function recolorCharts(){
+  const {grid,tick}=themeColors();
+  Chart.defaults.color=tick;
+  [chartCum,chartSens].forEach(ch=>{
+    ch.options.scales.x.grid.color=grid;
+    ch.options.scales.y.grid.color=grid;
+    ch.update('none');
   });
 }
 
 function render(){
   const s=state, seg=SEG[s.seg];
-  // labels
   $('lbl-petrol').textContent=fmt(s.petrol)+' đ/L';
   $('lbl-home').textContent=s.home+'%';
   $('lbl-dc').textContent=s.dc+'%';
@@ -417,59 +454,52 @@ function render(){
   $('note-seg').textContent=seg.note;
 
   const evKwh=evPricePerKwh();
-  const icE=icePer100(s.petrol);           // đ/100km
-  const evE=evPer100();                     // đ/100km blend
+  const icE=icePer100(s.petrol);
+  const evE=evPer100();
   const evHome=seg.kwh*P_HOME, evDC=seg.kwh*P_DC;
 
-  // side card /100km (nghìn đ)
-  $('v-ice').innerHTML=fmt(icE/1000,1)+'<small>nghìn đ</small>';
-  $('v-evmix').innerHTML=fmt(evE/1000,1)+'<small>nghìn đ</small>';
-  $('v-home').innerHTML=fmt(evHome/1000,1)+'<small>nghìn đ</small>';
-  $('v-dc').innerHTML=fmt(evDC/1000,1)+'<small>nghìn đ</small>';
+  $('v-ice').innerHTML=fmt(icE/1000,1)+'<small>thousand đ</small>';
+  $('v-evmix').innerHTML=fmt(evE/1000,1)+'<small>thousand đ</small>';
+  $('v-home').innerHTML=fmt(evHome/1000,1)+'<small>thousand đ</small>';
+  $('v-dc').innerHTML=fmt(evDC/1000,1)+'<small>thousand đ</small>';
   $('sub-ice').textContent=seg.cons+' L × '+fmt(s.petrol)+' đ';
   $('sub-evmix').textContent=fmt(evKwh)+' đ/kWh · '+seg.kwh+' kWh/100km';
 
-  // totals (triệu đ)
   const unit=s.dist/100;
   const totIce=icE*unit/1e6, totEv=evE*unit/1e6, save=totIce-totEv;
-  $('tot-ice').innerHTML=fmt(totIce)+'<small>triệu đ</small>';
-  $('tot-ev').innerHTML=fmt(totEv)+'<small>triệu đ</small>';
-  $('tot-save').innerHTML=fmt(save)+'<small>triệu đ</small>';
+  $('tot-ice').innerHTML=fmt(totIce)+'<small>million đ</small>';
+  $('tot-ev').innerHTML=fmt(totEv)+'<small>million đ</small>';
+  $('tot-save').innerHTML=fmt(save)+'<small>million đ</small>';
   $('tot-save').style.color = save>=0?'var(--green)':'var(--red)';
 
-  // result strip: diff EV - ICE (negative = EV cheaper)
   const diff=totEv-totIce;
   const evWins=diff<0;
-  $('strip-val').textContent=(diff>=0?'+':'–')+fmt(Math.abs(diff))+' tr';
+  $('strip-val').textContent=(diff>=0?'+':'–')+fmt(Math.abs(diff))+' M';
   $('strip-val').className='big '+(evWins?'pos':'neg');
   $('strip-txt').innerHTML= evWins
-    ? 'Ở giá xăng hiện tại, xe điện <span class="hl">tiết kiệm</span> chi phí nhiên liệu so với xe xăng '+seg.label.toLowerCase()+'.'
-    : 'Ở giá xăng này, xe điện <span class="hl">đắt hơn</span> về nhiên liệu so với xe xăng '+seg.label.toLowerCase()+' — do phụ thuộc sạc trạm giá cao.';
+    ? 'At the current petrol price, the EV <span class="hl">saves</span> on fuel versus a '+seg.label.toLowerCase()+' petrol car.'
+    : 'At this petrol price, the EV is <span class="hl">more expensive</span> on fuel than a '+seg.label.toLowerCase()+' petrol car — due to reliance on costly station charging.';
 
-  // verdict
   const vd=$('verdict');
-  if(evWins){ vd.className='verdict ev'; vd.innerHTML='<b>EV lợi hơn</b> về chi phí nhiên liệu — chênh '+fmt(Math.abs(diff))+' tr trên '+fmt(s.dist)+' km.'; }
-  else { vd.className='verdict ice'; vd.innerHTML='<b>Xe xăng lợi hơn</b> về nhiên liệu ở mức giá này — EV cần tăng tỉ lệ sạc nhà hoặc xăng phải cao hơn.'; }
+  if(evWins){ vd.className='verdict ev'; vd.innerHTML='<b>EV is ahead</b> on fuel cost — a gap of '+fmt(Math.abs(diff))+' M đ over '+fmt(s.dist)+' km.'; }
+  else { vd.className='verdict ice'; vd.innerHTML='<b>Petrol is ahead</b> on fuel at this price — the EV needs a higher home-charging share or a higher petrol price.'; }
 
-  // breakeven petrol price: icePer100 = evPer100  → petrol = evE / cons
   const bePetrol = evE / seg.cons;
   $('be-txt').innerHTML= bePetrol<=35000 && bePetrol>=0
-    ? 'Xăng cần <b>≥ '+fmt(bePetrol)+' đ/L</b> để EV rẻ hơn về nhiên liệu (với mix sạc hiện tại).'
-    : 'Với mix sạc hiện tại, EV luôn rẻ hơn xăng về nhiên liệu trong dải giá thực tế.';
+    ? 'Petrol must be <b>≥ '+fmt(bePetrol)+' đ/L</b> for the EV to be cheaper on fuel (at the current charging mix).'
+    : 'At the current charging mix, the EV is always cheaper on fuel across the realistic price range.';
 
-  // ---- chart cum ----
+  // cumulative chart
   const N=8, labels=[], dIce=[], dEv=[];
   for(let i=1;i<=N;i++){ const km=s.dist*i/N; labels.push(fmt(Math.round(km/1000))+'k'); dIce.push(icE*km/100/1e6); dEv.push(evE*km/100/1e6); }
   chartCum.data.labels=labels; chartCum.data.datasets[0].data=dIce; chartCum.data.datasets[1].data=dEv; chartCum.update('none');
 
-  // ---- chart sensitivity: cost/100km vs petrol ----
+  // sensitivity chart
   const xs=[]; for(let p=15000;p<=35000;p+=1000) xs.push(p);
-  const iceLine=xs.map(p=>({x:p,y:seg.cons*p/1000}));
-  const evMixY=evE/1000, evHomeY=evHome/1000, evDCY=evDC/1000;
-  chartSens.data.datasets[0].data=iceLine;
-  chartSens.data.datasets[1].data=xs.map(p=>({x:p,y:evMixY}));
-  chartSens.data.datasets[2].data=xs.map(p=>({x:p,y:evHomeY}));
-  chartSens.data.datasets[3].data=xs.map(p=>({x:p,y:evDCY}));
+  chartSens.data.datasets[0].data=xs.map(p=>({x:p,y:seg.cons*p/1000}));
+  chartSens.data.datasets[1].data=xs.map(p=>({x:p,y:evE/1000}));
+  chartSens.data.datasets[2].data=xs.map(p=>({x:p,y:evHome/1000}));
+  chartSens.data.datasets[3].data=xs.map(p=>({x:p,y:evDC/1000}));
   chartSens.update('none');
 }
 
@@ -483,12 +513,20 @@ function bind(){
     document.querySelectorAll('#seg-seg button').forEach(x=>x.classList.remove('on'));
     b.classList.add('on'); state.seg=b.dataset.seg; render();
   });
-  // tabs
   document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
     document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
     document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
     t.classList.add('active'); $('v-'+t.dataset.v).classList.add('active');
   });
+  // theme toggle
+  $('themeBtn').onclick=()=>{
+    const cur=document.documentElement.getAttribute('data-theme');
+    const nxt=cur==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',nxt);
+    $('themeBtn').querySelector('.ic').textContent = nxt==='dark'?'☀️':'🌙';
+    $('themeLbl').textContent = nxt==='dark'?'Light mode':'Dark mode';
+    recolorCharts();
+  };
 }
 
 initCharts(); bind(); render();
