@@ -1,0 +1,2213 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bộ phân tích chuỗi F&B — Demo Idealab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap&subset=latin,latin-ext,vietnamese" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1c2321;
+    --muted:#6b7773;
+    --line:#e4e8e6;
+    --bg:#f6f7f6;
+    --card:#ffffff;
+    --accent:#c0392b;
+    --good:#1f8a5b;
+    --good-soft:#e7f4ee;
+    --warn:#d98a1a;
+    --header:#fdf0dd;
+    --sub:#f9f5ee;
+    --navy:#2b4a68;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Outfit',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:13.5px;line-height:1.5;padding:0 0 40px}
+  .wrap{max-width:1600px;margin:0 auto;padding:0 32px}
+  .num{font-family:'DM Mono',monospace;font-variant-numeric:tabular-nums}
+
+  /* TOP NAV */
+  .topbar{background:var(--card);border-bottom:1px solid var(--line);margin-bottom:18px;position:sticky;top:0;z-index:50}
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;flex-wrap:nowrap;gap:16px;padding-top:12px;padding-bottom:0}
+  .brand{font-size:14px;font-weight:800;letter-spacing:-.3px;white-space:nowrap;flex-shrink:0}
+  .brand .demo-tag{display:inline-block;background:var(--ink);color:#fff;font-size:9px;font-weight:600;letter-spacing:1px;padding:2px 7px;border-radius:4px;text-transform:uppercase;margin-left:8px;vertical-align:middle}
+  .langswitch{display:inline-flex;gap:0;margin-left:10px;border:1px solid var(--line);border-radius:5px;overflow:hidden;vertical-align:middle}
+  .langbtn{border:none;background:#fff;color:var(--muted);font-size:10px;font-weight:700;padding:3px 8px;cursor:pointer;font-family:inherit}
+  .langbtn.on{background:#0B5D4B;color:#fff}
+  .tabs{display:flex;gap:0;flex-wrap:nowrap;overflow-x:auto}
+  .tab-btn{padding:10px 12px 12px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border:none;background:none;border-bottom:2.5px solid transparent;transition:all .15s;font-family:inherit;white-space:nowrap}
+  .tab-btn:hover{color:var(--ink)}
+  .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+  .tab-btn.t0.active{color:#0B5D4B;border-bottom-color:#0B5D4B}
+
+  /* map matrix */
+  .maprow{cursor:pointer;transition:background .12s}
+  .maprow:hover{background:#eef4f1!important}
+  .maptable td{vertical-align:top;padding:7px 10px;font-size:11px;line-height:1.4}
+  .maptable th{background:#16403a;color:#cfe5dd;font-size:9.5px;padding:7px 10px;border:none}
+  .mapnum{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:5px;background:#0B5D4B;color:#fff;font-weight:700;font-size:10px;flex-shrink:0}
+  .mapname{font-weight:700;font-size:11.5px;color:#16403a;margin-bottom:1px;line-height:1.25}
+  .mapval{font-family:'DM Mono',monospace;font-weight:700;color:#0B5D4B;font-size:11.5px}
+  .mapgo{font-size:9px;color:#0B5D4B;font-weight:600;white-space:nowrap}
+  .maptable ul{margin:2px 0 0;padding-left:14px}
+  .maptable li{margin-bottom:1px}
+  .tab-btn.t2.active{color:var(--navy);border-bottom-color:var(--navy)}
+  .tab-btn.t3.active{color:#7a5c1e;border-bottom-color:#c8962a}
+  .tab-btn.t4.active{color:#1f5a4a;border-bottom-color:#0B5D4B}
+  .tab-btn.t5.active{color:#b5561f;border-bottom-color:#e07a3a}
+  .tab-btn.t6.active{color:#1b4a6b;border-bottom-color:#2b6ca3}
+  .tab-btn.t7.active{color:#1552c0;border-bottom-color:#2b6ce0}
+  .tab-btn.t8.active{color:#7a3d1e;border-bottom-color:#c85a2a}
+  .tab-btn.t9.active{color:#4a3a8a;border-bottom-color:#6a54c4}
+
+  .flow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:8px}
+  .flowstep{background:#f4f2fb;border:1px solid #d9d2f0;border-radius:8px;padding:12px}
+  .flowstep .fn{font-size:10px;font-weight:700;color:#6a54c4;letter-spacing:.5px}
+  .flowstep .ft{font-size:12.5px;font-weight:600;margin:4px 0 3px}
+  .flowstep .fd{font-size:10.5px;color:var(--muted);line-height:1.4}
+  .flowarrow{text-align:center;color:#a89ad0;font-size:18px}
+  .tgt-good{background:#d7f0e0;color:#12503a;font-weight:600;padding:1px 6px;border-radius:3px}
+  .tgt-bad{background:#f8d7d7;color:#a5382a;font-weight:600;padding:1px 6px;border-radius:3px}
+
+  .thr-over{color:#c0392b;font-weight:600}
+  .thr-save{color:#1f8a5b;font-weight:600}
+  .thr-warn{color:#d98a1a;font-weight:600}
+  .gmbar{display:inline-block;padding:1px 6px;border-radius:3px;font-family:'DM Mono',monospace;font-weight:600}
+
+  /* segment cards */
+  .segcards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+  .segc{border-radius:10px;padding:14px;border:1.5px solid;background:#fff}
+  .segc .sh{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+  .segc .sv{font-size:18px;font-weight:800;font-family:'DM Mono',monospace}
+  .segc .sv .sv2{font-size:13px;color:var(--muted);margin-left:6px}
+  .segc .ss{font-size:10px;color:var(--muted);margin-top:3px}
+  .segc .schips{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
+  .segc .chip{font-size:9px;font-weight:600;color:#fff;padding:2px 6px;border-radius:20px}
+  .segc.new{border-color:#2b6ce0} .segc.new .sh{color:#1552c0} .segc.new .chip{background:#2b6ce0}
+  .segc.rep{border-color:#2fb5c4} .segc.rep .sh{color:#1a8794} .segc.rep .chip{background:#2fb5c4}
+  .segc.react{border-color:#e0a83a} .segc.react .sh{color:#a6791e} .segc.react .chip{background:#e0a83a}
+  .segc.non{border-color:#3aae7a} .segc.non .sh{color:#1f7a52} .segc.non .chip{background:#3aae7a}
+  /* h-bar */
+  .hbar-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:11px}
+  .hbar-name{width:135px;flex-shrink:0;text-align:right;color:#4a5652}
+  .hbar-track{flex:1;background:#eef2f6;border-radius:3px;height:16px;position:relative}
+  .hbar-fill{height:100%;background:#2b6ce0;border-radius:3px}
+  .hbar-val{width:44px;font-family:'DM Mono',monospace;font-weight:600;color:#1552c0}
+  /* funnel */
+  .funnel-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:12px}
+  .funnel-lbl{width:120px;flex-shrink:0;color:#4a5652}
+  .funnel-bar{background:#2b6ce0;color:#fff;font-weight:700;font-family:'DM Mono',monospace;height:30px;display:flex;align-items:center;justify-content:center;border-radius:4px;font-size:11px}
+
+  /* behavior overview table with heat cells */
+  .ov-title{background:#2b6ca3;color:#fff;font-size:12px;font-weight:700;padding:8px 12px;border-radius:6px 6px 0 0;text-align:center}
+  .heatnum{font-family:'DM Mono',monospace;font-weight:600;border-radius:3px}
+
+  /* store 100% stacked mix */
+  .smix-row{display:flex;align-items:center;gap:10px;margin-bottom:5px;font-size:11.5px}
+  .smix-name{width:130px;flex-shrink:0;font-weight:600;text-align:right;color:#4a5652}
+  .smix-bar{display:flex;flex:1;height:20px;border-radius:3px;overflow:hidden;font-size:9px;font-weight:600;color:#fff}
+  .smix-bar span{display:flex;align-items:center;justify-content:center;overflow:hidden}
+  /* pareto */
+  .pareto-wrap{overflow-x:auto;padding-bottom:8px}
+  .pareto{display:flex;align-items:flex-end;gap:2px;height:200px;min-width:900px;position:relative;border-bottom:1px solid var(--line);padding-top:20px}
+  .pbar{flex:1;min-width:9px;background:#f0b088;border-radius:2px 2px 0 0;position:relative}
+  .pbar:hover{background:#e07a3a}
+  .pline{position:absolute;top:0;left:0;right:0;height:100%;pointer-events:none}
+
+  /* P&L table */
+  .pnl{font-size:12px}
+  .pnl td,.pnl th{padding:5px 12px;border-bottom:1px solid #f0f2f1}
+  .pnl th{background:#22384f;color:#cfe0d9;font-size:10px;border-bottom:none}
+  .pnl .lv0{font-weight:700;background:#eaf2ef}
+  .pnl .lv1{font-weight:600;background:#f4f8f6}
+  .pnl .lv2 td.l{padding-left:28px;color:#4a5652}
+  .pnl .lv3 td.l{padding-left:44px;color:#6b7773;font-size:11.5px}
+  .pnl .key{background:#dcefe8!important;font-weight:700}
+  .pnl .key td.l{color:#0B5D4B}
+  .pnl td.num{text-align:right}
+  .viewtoggle{display:inline-flex;gap:2px;background:#eef2f0;border-radius:6px;padding:3px}
+  .viewtoggle button{border:none;background:none;padding:6px 16px;font-size:12px;font-weight:600;color:var(--muted);border-radius:4px;cursor:pointer;font-family:inherit}
+  .viewtoggle button.on{background:#0B5D4B;color:#fff}
+  .neg-uc{color:var(--accent);font-weight:600}
+
+  /* diverging variance bars */
+  .vbar-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;font-size:11.5px}
+  .vbar-lbl{width:180px;flex-shrink:0;text-align:right;color:#4a5652;font-weight:500}
+  .vbar-track{flex:1;position:relative;height:22px;background:linear-gradient(90deg,#f4faf7 0%,#f4faf7 50%,#fdf4f2 50%,#fdf4f2 100%);border-radius:3px}
+  .vbar-mid{position:absolute;left:50%;top:0;bottom:0;width:1px;background:#c7d0cc}
+  .vbar-fill{position:absolute;top:3px;bottom:3px;border-radius:2px}
+  .vbar-fill.good{background:#1f8a5b;right:50%}
+  .vbar-fill.bad{background:#c0392b;left:50%}
+  .vbar-val{width:52px;flex-shrink:0;font-family:'DM Mono',monospace;font-weight:600;font-size:11px}
+  .vbar-val.good{color:#1f8a5b} .vbar-val.bad{color:#c0392b}
+
+  /* Menu engineering quadrant */
+  .quad{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .qcell{border-radius:8px;padding:14px;border:1.5px solid}
+  .qcell .qh{font-size:12px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+  .qcell .qmain{font-size:20px;font-weight:800;font-family:'DM Mono',monospace}
+  .qcell .qmain .qn{font-size:15px;color:var(--muted);margin-left:6px}
+  .qcell .qsub{font-size:10.5px;color:#555;margin-top:5px;display:flex;justify-content:space-between}
+  .qcell.stars{background:#e7f4ee;border-color:#a9d9b3}
+  .qcell.puzzles{background:#eaf1fb;border-color:#b6cdec}
+  .qcell.dogs{background:#fbeae7;border-color:#e8b3a6}
+  .qcell.horses{background:#fdf3d8;border-color:#edd79a}
+  .cls-pill{display:inline-block;padding:1px 7px;border-radius:20px;font-size:10.5px;font-weight:600}
+  .cls-stars{background:#d9f0dd;color:#1f7a45}
+  .cls-horses{background:#fdeec4;color:#8a6d1e}
+  .cls-puzzles{background:#dbe9f8;color:#2557a7}
+  .cls-dogs{background:#f6d9d2;color:#a5382a}
+  .hl-hi{background:#e7f4ee;color:#1f7a45;font-weight:600}
+  .hl-lo{background:#fbeae7;color:#a5382a;font-weight:600}
+  .metabar{width:60px;height:6px;background:#eef0ef;border-radius:3px;display:inline-block;vertical-align:middle;overflow:hidden}
+  .metabar i{display:block;height:100%;background:#8fb0cb}
+  .var-neg{color:var(--accent);font-weight:600}
+
+  .panel{display:none}
+  .panel.active{display:block}
+
+  /* HEADER inside panel */
+  .top{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:6px}
+  h1{font-size:25px;font-weight:800;letter-spacing:-.4px}
+  h1.red{color:var(--accent)} h1.navy{color:var(--navy)}
+  .subtitle{color:var(--muted);font-size:13px;margin-top:2px}
+  .filters{display:flex;gap:10px;flex-wrap:wrap}
+  .filter{background:var(--header);border:1px solid #f0dcc0;border-radius:6px;padding:6px 12px;font-size:12px;min-width:110px}
+  .filter.b{background:#eaf1f8;border-color:#cfe0f0}
+  .filter .flabel{color:var(--warn);font-size:9.5px;text-transform:uppercase;letter-spacing:1px;font-weight:600}
+  .filter.b .flabel{color:var(--navy)}
+  .filter .fval{font-weight:600;font-size:12.5px}
+
+  /* KPI ROW */
+  .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:14px 0 18px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px}
+  .kpi .klabel{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-weight:600;margin-bottom:8px;min-height:24px}
+  .kpi .kval{font-size:23px;font-weight:800;letter-spacing:-.5px;font-family:'DM Mono',monospace}
+  .kpi .knote{font-size:10.5px;color:var(--muted);margin-top:3px}
+  .kpi.hl .kval{color:var(--accent)}
+  .dot{width:7px;height:7px;border-radius:50%;display:inline-block;vertical-align:middle;margin-right:4px}
+  .dot.r{background:var(--accent)} .dot.g{background:var(--good)}
+
+  /* KPI CARDS tab2 (colored category cards) */
+  .catcards{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin:14px 0 18px}
+  .cat{border-radius:var(--radius);padding:13px 12px;border:1.5px solid}
+  .cat .clabel{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;min-height:22px}
+  .cat .cval{font-size:20px;font-weight:800;font-family:'DM Mono',monospace;letter-spacing:-.5px;margin-top:2px}
+  .cat .csub{font-size:10px;color:#555;margin-top:4px;line-height:1.4}
+  .cat.ta{background:#dbe9f5;border-color:#a9cae7}
+  .cat.core{background:#d9f0dd;border-color:#a9d9b3}
+  .cat.drink{background:#fbeecb;border-color:#f0d99a}
+  .cat.appet{background:#e7e1f5;border-color:#c9bce8}
+  .cat.dessert{background:#f6d9d2;border-color:#e8b3a6}
+  .cat.ala{background:#eceeef;border-color:#cfd4d6}
+  .cat.other{background:#eceeef;border-color:#cfd4d6}
+  .cat .up{color:var(--good);font-weight:700;font-size:11px}
+
+  /* SECTION */
+  .sec{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 20px;margin-bottom:16px}
+  .sec-head{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+  .sec-num{font-size:12px;font-weight:700;color:var(--accent)}
+  .t2 .sec-num{color:var(--navy)}
+  .sec-title{font-size:15px;font-weight:700}
+  .sec-sub{font-size:11.5px;color:var(--muted);margin-bottom:14px}
+  .legend{display:flex;gap:16px;font-size:11px;color:var(--muted);margin-bottom:12px;flex-wrap:wrap}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .grid3{display:grid;grid-template-columns:0.9fr 1.1fr 1fr;gap:20px}
+
+  /* TABLE */
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th{text-align:right;padding:8px 10px;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:600;border-bottom:1.5px solid var(--line);white-space:nowrap}
+  th.l,td.l{text-align:left}
+  td{padding:7px 10px;border-bottom:1px solid #f0f2f1;text-align:right;white-space:nowrap}
+  tbody tr:hover{background:#fafbfa}
+  .code{color:var(--muted);font-family:'DM Mono',monospace;font-size:11px}
+  .store{font-weight:600}
+  .pos{color:var(--accent);font-weight:600}
+  .neg{color:var(--good);font-weight:600}
+  .totalrow td{border-top:2px solid var(--line);font-weight:700;background:var(--sub)}
+  .t2 .totalrow td{background:#eef3f8}
+
+  /* HEATMAP */
+  .hm-wrap{overflow-x:auto}
+  .hm{font-size:11.5px;min-width:760px}
+  .hm th{text-align:center;padding:8px 6px}
+  .hm td{text-align:center;padding:6px 6px;font-family:'DM Mono',monospace;font-weight:600;border-bottom:1px solid #fff}
+  .hm td.l{text-align:left;font-family:'Outfit';font-weight:600}
+  .hm td.tot{background:var(--sub)!important;color:var(--ink)}
+
+  .pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:600}
+  .pill.core{background:#eaf1fb;color:#2557a7}
+  .foot{font-size:11px;color:var(--muted);margin-top:14px;line-height:1.7}
+  .foot b{color:var(--ink)}
+  .callout{border-left:3px solid var(--good);padding:10px 14px;border-radius:0 6px 6px 0;font-size:12px;margin-top:14px;background:var(--good-soft)}
+  .callout.b{border-color:var(--navy);background:#eef3f8}
+
+  /* DONUT */
+  .donut-wrap{display:flex;align-items:center;gap:18px}
+  .donut{flex-shrink:0}
+  .dlegend{font-size:11.5px}
+  .dlegend div{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+  .dlegend .sw{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+
+  /* STACKED BAR */
+  .sbar-row{margin-bottom:12px}
+  .sbar-label{font-size:11.5px;font-weight:600;margin-bottom:4px;color:var(--ink)}
+  .sbar{display:flex;height:22px;border-radius:4px;overflow:hidden;font-size:9.5px;font-weight:600;color:#fff}
+  .sbar span{display:flex;align-items:center;justify-content:center;min-width:0;overflow:hidden}
+
+  @media(max-width:1280px){
+    .wrap{max-width:100%;padding:0 20px}
+    .catcards{grid-template-columns:repeat(4,1fr)}
+  }
+  @media(max-width:900px){
+    .kpis{grid-template-columns:repeat(3,1fr)}
+    .catcards{grid-template-columns:repeat(3,1fr)}
+    .grid2,.grid3{grid-template-columns:1fr}
+    h1{font-size:21px}
+    .topbar .wrap{flex-wrap:wrap}
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<div class="topbar">
+  <div class="wrap">
+    <div class="brand">Idealab<span class="demo-tag">Demo F&B</span>
+      <span class="langswitch"><button class="langbtn on" data-lang="vn">VN</button><button class="langbtn" data-lang="en">EN</button></span>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active t0" data-panel="p0">◈ Bản đồ</button>
+      <button class="tab-btn" data-panel="p1">① Hiệu suất NVL</button>
+      <button class="tab-btn t2" data-panel="p2">② Chi tiêu/HĐ</button>
+      <button class="tab-btn t3" data-panel="p3">③ Menu Engineering</button>
+      <button class="tab-btn t4" data-panel="p4">④ P&L</button>
+      <button class="tab-btn t5" data-panel="p5">⑤ Cơ cấu món</button>
+      <button class="tab-btn t6" data-panel="p6">⑥ Hành vi khách</button>
+      <button class="tab-btn t7" data-panel="p7">⑦ Tệp khách</button>
+      <button class="tab-btn t8" data-panel="p8">⑧ Gói Buffet</button>
+      <button class="tab-btn t9" data-panel="p9">⑨ Forecast</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ============ PANEL 0: ANALYSIS MAP ============ -->
+<div class="panel active" id="p0">
+  <div class="top" style="margin-bottom:4px">
+    <div>
+      <h1 style="color:#0B5D4B;font-size:22px">Bản đồ phân tích — chuỗi F&B làm được gì với data</h1>
+      <div class="subtitle" style="font-size:12px">9 loại phân tích · mỗi cái giải một nỗi đau, cho một hành động, tạo giá trị đo được. Bấm từng dòng để xem demo. <b>Giá trị tính trên chuỗi giả định DT 1,000 tỷ/năm.</b></div>
+    </div>
+  </div>
+
+  <div class="sec" style="padding:0;overflow:hidden;margin-bottom:12px">
+    <div class="hm-wrap">
+    <table class="maptable" style="width:100%;min-width:960px">
+      <thead><tr>
+        <th class="l" style="width:16%">Dashboard</th>
+        <th class="l" style="width:24%">Giải quyết painpoint gì</th>
+        <th class="l" style="width:34%">Insight → Action</th>
+        <th class="l" style="width:26%">Giá trị ước tính (DT 1,000 tỷ)</th>
+      </tr></thead>
+      <tbody id="mapBody"></tbody>
+    </table>
+    </div>
+  </div>
+
+  <div class="sec" style="background:#16403a;color:#dfeae6;padding:14px 20px;margin-bottom:0">
+    <div style="font-size:12.5px;line-height:1.6">
+      <b style="color:#fff">Tổng đòn bẩy tiềm năng:</b> chỉ cần <b style="color:#7fd4b0">cải thiện food cost 1% + giảm 0.5% nhân sự lãng phí + nâng repeat rate vài điểm</b> đã là <b style="color:#7fd4b0">15–25 tỷ/năm</b> vào lợi nhuận — lớn hơn nhiều lần chi phí xây hệ phân tích. Không phải "báo cáo đẹp", là công cụ tìm tiền đang rò. <span style="color:#9db4ac;font-style:italic">Bắt đầu từ nơi rò rõ nhất, quick-win trong tuần.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PANEL 1: MATERIAL EFFICIENCY ============ -->
+<div class="panel" id="p1">
+  <div class="top">
+    <div>
+      <h1 class="red">Hiệu suất Nguyên vật liệu</h1>
+      <div class="subtitle">Chi phí NVL thực tế vs định mức BOM — soi hao phí theo cửa hàng · nhóm món · từng NVL</div>
+    </div>
+    <div class="filters">
+      <div class="filter"><div class="flabel">Kỳ</div><div class="fval num">01/04 – 30/04</div></div>
+      <div class="filter"><div class="flabel">Khu vực</div><div class="fval">Tất cả</div></div>
+      <div class="filter"><div class="flabel">Cửa hàng</div><div class="fval">Tất cả</div></div>
+    </div>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi hl"><div class="klabel">% COS thực tế</div><div class="kval">32.8%</div><div class="knote">so với doanh thu món</div></div>
+    <div class="kpi"><div class="klabel">% COS định mức</div><div class="kval">31.3%</div><div class="knote">chuẩn công thức (BOM)</div></div>
+    <div class="kpi hl"><div class="klabel">Chênh %COS</div><div class="kval">+1.5%</div><div class="knote"><span class="dot r"></span>hao phí</div></div>
+    <div class="kpi"><div class="klabel">COS thực tế (NVL)</div><div class="kval">5.04 tỷ</div><div class="knote">chi phí nguyên vật liệu</div></div>
+    <div class="kpi"><div class="klabel">Doanh thu</div><div class="kval">15.39 tỷ</div><div class="knote">doanh thu món bán</div></div>
+    <div class="kpi"><div class="klabel">Hệ số TT/ĐM</div><div class="kval">1.05</div><div class="knote">thực tế ÷ định mức</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num">01</span><span class="sec-title">Từng cửa hàng — Doanh thu · %COS (TT/ĐM/CL) · Chi phí NVL · Số khách · AOV</span></div>
+    <div class="legend"><span><span class="dot r"></span> hao phí (CL dương)</span><span><span class="dot g"></span> tiết kiệm (CL âm)</span></div>
+    <table>
+      <thead><tr>
+        <th class="l">Mã</th><th class="l">Cửa hàng</th><th>Doanh thu</th>
+        <th>%COS TT</th><th>%COS ĐM</th><th>CL</th>
+        <th>NVL TT</th><th>NVL ĐM</th><th>CL (đ)</th><th>Số khách</th><th>AOV</th>
+      </tr></thead>
+      <tbody id="storeBody"></tbody>
+      <tfoot><tr class="totalrow" id="storeTotal"></tr></tfoot>
+    </table>
+    <div class="callout">Đọc nhanh: cửa hàng có <b>CL dương lớn</b> (đỏ) đang hao phí NVL vượt định mức — mỗi 1% chênh trên doanh thu 800tr ≈ <b>8tr/tháng</b> rò khỏi lợi nhuận. Đây là danh sách ưu tiên đi kiểm tra bếp.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num">02</span><span class="sec-title">Heatmap: Cửa hàng (hàng) × Nhóm món (cột)</span></div>
+    <div class="sec-sub">Ô = % chênh %COS so với định mức. Đỏ đậm = hao phí nặng · Xanh = tiết kiệm. Tìm nhanh "ổ hao phí" nằm ở giao điểm nào.</div>
+    <div class="hm-wrap"><table class="hm"><thead><tr id="hmHead"></tr></thead><tbody id="hmBody"></tbody></table></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num">03</span><span class="sec-title">Điều tra 1 món — chi tiết NVL: TT − ĐM = CL</span></div>
+    <div class="sec-sub">Chọn món chi phí cao nhất để mổ xẻ. Món demo: <span class="pill core">Món chính A · 180g</span> — xem từng nguyên liệu lệch định mức bao nhiêu.</div>
+    <table>
+      <thead><tr><th class="l">Nguyên vật liệu</th><th class="l">ĐVT</th><th>SL dùng (TT)</th><th>Chi phí TT</th><th>Chi phí ĐM</th><th>CL (đ)</th><th>CL %</th></tr></thead>
+      <tbody id="nvlBody"></tbody>
+      <tfoot><tr class="totalrow" id="nvlTotal"></tr></tfoot>
+    </table>
+    <div class="foot"><b>Cách đọc drill-down:</b> Với một món, hệ thống bung ra từng NVL trong công thức. NVL <b>CL dương</b> (đỏ) là nơi bếp dùng vượt định mức — do định lượng thực tế cao hơn BOM hoặc giá nhập tăng. NVL <b>CL âm</b> (xanh) dùng ít hơn định mức. Tổng CL mọi NVL trong món = phần hao phí của món đó → cộng lên thành +1.5% toàn chuỗi ở KPI trên cùng.</div>
+  </div>
+</div>
+
+<!-- ============ PANEL 2: TICKET AVERAGE MIX ============ -->
+<div class="panel t2" id="p2">
+  <div class="top">
+    <div>
+      <h1 class="navy">Cơ cấu chi tiêu trung bình / hóa đơn</h1>
+      <div class="subtitle">Khách gọi gì, chi bao nhiêu mỗi hóa đơn — cơ cấu theo nhóm món, buổi ăn, lượng khách</div>
+    </div>
+    <div class="filters">
+      <div class="filter b"><div class="flabel">Kỳ (SOM)</div><div class="fval num">02/2026</div></div>
+      <div class="filter b"><div class="flabel">Cửa hàng</div><div class="fval">Tất cả</div></div>
+      <div class="filter b"><div class="flabel">Nhóm khách</div><div class="fval">Tất cả</div></div>
+    </div>
+  </div>
+
+  <div class="catcards">
+    <div class="cat ta"><div class="clabel">Avg Ticket (TA)</div><div class="cval">5.65tr</div><div class="csub"><span class="up">▲ 306.7%</span> vs tháng trước</div></div>
+    <div class="cat core"><div class="clabel">Đồ ăn chính</div><div class="cval">1.02tr</div><div class="csub">16.8% of TA · 949K/ticket</div></div>
+    <div class="cat drink"><div class="clabel">Đồ uống</div><div class="cval">563K</div><div class="csub">7.6% of TA · 430K/ticket</div></div>
+    <div class="cat appet"><div class="clabel">Khai vị</div><div class="cval">209K</div><div class="csub">3.4% of TA · 190K/ticket</div></div>
+    <div class="cat dessert"><div class="clabel">Tráng miệng</div><div class="cval">218K</div><div class="csub">1.0% of TA · 56K/ticket</div></div>
+    <div class="cat ala"><div class="clabel">Alacarte Add</div><div class="cval">4.74tr</div><div class="csub">68.0% of TA · 3,842K/ticket</div></div>
+    <div class="cat other"><div class="clabel">Khác</div><div class="cval">1.47tr</div><div class="csub">3.2% of TA · 180K/ticket</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="grid3">
+      <!-- DONUT -->
+      <div>
+        <div class="sec-head"><span class="sec-num">A</span><span class="sec-title" style="font-size:14px">Cơ cấu chi tiêu TB</span></div>
+        <div class="sec-sub">mỗi 100đ hóa đơn đến từ đâu</div>
+        <div class="donut-wrap">
+          <svg class="donut" width="150" height="150" viewBox="0 0 42 42" id="donut"></svg>
+          <div class="dlegend" id="donutLegend"></div>
+        </div>
+      </div>
+      <!-- BY DAYPART -->
+      <div>
+        <div class="sec-head"><span class="sec-num">B</span><span class="sec-title" style="font-size:14px">Theo buổi ăn</span></div>
+        <div class="sec-sub">cơ cấu chi tiêu theo dinner / lunch / khác</div>
+        <div id="daypartBars"></div>
+      </div>
+      <!-- BY GROUP SIZE -->
+      <div>
+        <div class="sec-head"><span class="sec-num">C</span><span class="sec-title" style="font-size:14px">Theo lượng khách</span></div>
+        <div class="sec-sub">nhóm 1-2 / 3-5 / 5-10 / trên 10 người</div>
+        <div id="groupsizeBars"></div>
+      </div>
+    </div>
+    <div class="legend" style="margin-top:16px" id="tab2Legend"></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num">D</span><span class="sec-title">Bảng chi tiết theo nhóm món</span></div>
+    <div class="sec-sub">SL/hóa đơn · #TA đóng góp · %mix · doanh thu · %revenue · số hóa đơn có nhóm đó</div>
+    <table>
+      <thead><tr>
+        <th class="l">Nhóm món</th><th>Qty / hóa đơn</th><th>#TA (đ)</th><th>% Mix</th>
+        <th>Doanh thu</th><th>% Revenue</th><th>Số hóa đơn</th>
+      </tr></thead>
+      <tbody id="catBody"></tbody>
+      <tfoot><tr class="totalrow" id="catTotal"></tr></tfoot>
+    </table>
+    <div class="callout b">Đọc nhanh: nhóm chiếm <b>%mix cao nhưng %revenue thấp hơn</b> (hoặc ngược lại) là tín hiệu định giá lệch. Nhóm có mặt trong ít hóa đơn nhưng #TA cao = cơ hội <b>up-sell mở rộng</b> sang các hóa đơn còn lại. Đây là bản đồ để thiết kế combo và gợi món.</div>
+  </div>
+</div>
+
+<!-- ============ PANEL 3: MENU ENGINEERING ============ -->
+<div class="panel t3" id="p3">
+  <div class="top">
+    <div>
+      <h1 style="color:#7a5c1e">Ma trận Menu Engineering</h1>
+      <div class="subtitle">Phân loại từng món theo Lợi nhuận (GM) × Độ phổ biến (Popularity) → Stars / Horses / Puzzles / Dogs</div>
+    </div>
+    <div class="filters">
+      <div class="filter"><div class="flabel">Kỳ</div><div class="fval num">05/2026</div></div>
+      <div class="filter"><div class="flabel">Khu vực</div><div class="fval">Tất cả</div></div>
+      <div class="filter"><div class="flabel">Cửa hàng</div><div class="fval">Tất cả</div></div>
+    </div>
+  </div>
+
+  <div class="kpis" style="grid-template-columns:repeat(5,1fr)">
+    <div class="kpi"><div class="klabel">Doanh thu (GS)</div><div class="kval">31.6 tỷ</div><div class="knote"><span style="color:var(--good)">▲ 26.0%</span> vs kỳ trước</div></div>
+    <div class="kpi"><div class="klabel">Tổng ticket</div><div class="kval">25,779</div><div class="knote"><span style="color:var(--good)">▲ 16.8%</span> vs kỳ trước</div></div>
+    <div class="kpi"><div class="klabel">AOV — DThu/bill</div><div class="kval">1,225K</div><div class="knote"><span style="color:var(--good)">▲ 7.8%</span> vs kỳ trước</div></div>
+    <div class="kpi"><div class="klabel">Tổng khách</div><div class="kval">81,865</div><div class="knote"><span style="color:var(--good)">▲ 27.0%</span> vs kỳ trước</div></div>
+    <div class="kpi"><div class="klabel">Avg khách/bill</div><div class="kval">3.18</div><div class="knote"><span style="color:var(--good)">▲ 0.26</span> vs kỳ trước</div></div>
+  </div>
+
+  <div class="grid2">
+    <!-- QUADRANT -->
+    <div class="sec">
+      <div class="sec-head"><span class="sec-num" style="color:#c8962a">A</span><span class="sec-title">Phân bổ Menu Engineering</span></div>
+      <div class="sec-sub">Cao ↑ Lợi nhuận · Phải → Phổ biến. Số tiền = doanh thu (GS), số items = số món trong ô.</div>
+      <div class="quad">
+        <div class="qcell puzzles"><div class="qh">🧩 PUZZLES</div><div class="qmain">2.1 tỷ<span class="qn">128</span></div><div class="qsub"><span>7% GS</span><span>39% items</span></div></div>
+        <div class="qcell stars"><div class="qh">⭐ STARS</div><div class="qmain">21.6 tỷ<span class="qn">121</span></div><div class="qsub"><span>68% GS</span><span>37% items</span></div></div>
+        <div class="qcell dogs"><div class="qh">🐾 DOGS</div><div class="qmain">0.8 tỷ<span class="qn">35</span></div><div class="qsub"><span>3% GS</span><span>11% items</span></div></div>
+        <div class="qcell horses"><div class="qh">🐴 HORSES</div><div class="qmain">7.1 tỷ<span class="qn">43</span></div><div class="qsub"><span>23% GS</span><span>13% items</span></div></div>
+      </div>
+      <div style="text-align:center;font-size:10.5px;color:var(--muted);margin-top:8px">POPULARITY (MENU MIX) →</div>
+    </div>
+
+    <!-- CLASS VS PREV -->
+    <div class="sec">
+      <div class="sec-head"><span class="sec-num" style="color:#c8962a">B</span><span class="sec-title">Số lượng items theo class vs kỳ trước</span></div>
+      <div class="sec-sub">So Q2 với Q1 — class nào đang co lại (VAR âm) cần chú ý</div>
+      <table>
+        <thead><tr><th class="l">Class</th><th>Hiện tại</th><th>Kỳ trước</th><th>VAR</th><th>% change</th></tr></thead>
+        <tbody>
+          <tr><td class="l"><span class="cls-pill cls-stars">⭐ Stars</span></td><td class="num">121</td><td class="num code">128</td><td class="num var-neg">−7 ↓</td><td class="num var-neg">−5.5%</td></tr>
+          <tr><td class="l"><span class="cls-pill cls-horses">🐴 Horses</span></td><td class="num">43</td><td class="num code">44</td><td class="num var-neg">−1 ↓</td><td class="num var-neg">−2.3%</td></tr>
+          <tr><td class="l"><span class="cls-pill cls-puzzles">🧩 Puzzles</span></td><td class="num">128</td><td class="num code">157</td><td class="num var-neg">−29 ↓</td><td class="num var-neg">−18.5%</td></tr>
+          <tr><td class="l"><span class="cls-pill cls-dogs">🐾 Dogs</span></td><td class="num">35</td><td class="num code">52</td><td class="num var-neg">−17 ↓</td><td class="num var-neg">−32.7%</td></tr>
+        </tbody>
+      </table>
+      <div class="callout" style="border-color:#c8962a;background:#fdf6e6">Dogs giảm 32.7% là tín hiệu <b>tốt</b> — menu đang tự lọc bớt món vừa ế vừa lãi thấp. Nhưng Puzzles giảm 18.5% cần soi: món lãi cao mà bớt đi thì mất cơ hội. Đây là bảng theo dõi "sức khỏe menu" qua từng kỳ.</div>
+    </div>
+  </div>
+
+  <!-- DETAIL TABLE -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num" style="color:#c8962a">C</span><span class="sec-title">Dữ liệu chi tiết theo món</span></div>
+    <div class="sec-sub">Mỗi món: doanh số, %mix, giá vốn, GM/món, class (Stars/Horses/Puzzles/Dogs), tần suất, profitability, popularity</div>
+    <div class="hm-wrap">
+    <table style="min-width:900px">
+      <thead><tr>
+        <th class="l">Phân loại / Món</th><th>#Items</th><th>GS</th><th>%Sales Mix</th>
+        <th>Ave Price</th><th>Cost/Item</th><th>GM/Item</th><th>Menu Mix</th>
+        <th class="l">Item class</th><th>Freq</th><th class="l">Profitability</th><th class="l">Popularity</th>
+      </tr></thead>
+      <tbody id="menuBody"></tbody>
+      <tfoot><tr class="totalrow" id="menuTotal"></tr></tfoot>
+    </table>
+    </div>
+    <div class="foot">
+      <b>Cách đọc ma trận:</b> <span class="cls-pill cls-stars">Stars</span> lãi cao + bán chạy → giữ nguyên, đặt vị trí đẹp trên menu. <span class="cls-pill cls-horses">Horses</span> bán chạy nhưng lãi thấp → tìm cách giảm giá vốn hoặc tăng giá nhẹ. <span class="cls-pill cls-puzzles">Puzzles</span> lãi cao nhưng ít người gọi → đẩy marketing, gợi món, đổi vị trí. <span class="cls-pill cls-dogs">Dogs</span> vừa ế vừa lãi thấp → cân nhắc bỏ khỏi menu.
+    </div>
+  </div>
+
+  <!-- GLOSSARY -->
+  <div class="sec" style="background:#22384f;color:#dfe7ef">
+    <div class="sec-head"><span class="sec-title" style="color:#fff">Bảng chú giải — công thức chỉ số</span></div>
+    <table style="color:#dfe7ef;margin-top:8px">
+      <thead><tr><th class="l" style="color:#9db4cc;border-color:#3a5470">Chỉ số</th><th class="l" style="color:#9db4cc;border-color:#3a5470">Định nghĩa</th><th class="l" style="color:#9db4cc;border-color:#3a5470">Công thức</th></tr></thead>
+      <tbody>
+        <tr><td class="l" style="border-color:#33465c;font-weight:600">GS (Doanh thu)</td><td class="l" style="border-color:#33465c">Tổng doanh thu gross trong kỳ</td><td class="l code" style="border-color:#33465c;color:#9fd0b5">SUM(gross_sale)</td></tr>
+        <tr><td class="l" style="border-color:#33465c;font-weight:600">Gross Profit</td><td class="l" style="border-color:#33465c">Lợi nhuận gộp = Doanh thu thuần − Giá vốn</td><td class="l code" style="border-color:#33465c;color:#9fd0b5">SUM(net_sale) − SUM(cost)</td></tr>
+        <tr><td class="l" style="border-color:#33465c;font-weight:600">GM / Item</td><td class="l" style="border-color:#33465c">Lợi nhuận gộp trên 1 sản phẩm (sum-based)</td><td class="l code" style="border-color:#33465c;color:#9fd0b5">DIVIDE(GP, SUM(quantity))</td></tr>
+        <tr><td class="l" style="border-color:#33465c;font-weight:600">Menu Mix</td><td class="l" style="border-color:#33465c">Tỷ trọng số lượng bán của món trong nhóm</td><td class="l code" style="border-color:#33465c;color:#9fd0b5">item_qty / group_qty</td></tr>
+        <tr><td class="l" style="border-color:#33465c;font-weight:600">Item Class</td><td class="l" style="border-color:#33465c">Phân loại theo GM cao/thấp × Popularity cao/thấp</td><td class="l code" style="border-color:#33465c;color:#9fd0b5">Stars / Horses / Puzzles / Dogs</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============ PANEL 4: P&L ============ -->
+<div class="panel t4" id="p4">
+  <div class="top">
+    <div>
+      <h1 style="color:#0B5D4B">Báo cáo Kết quả Kinh doanh (P&L)</h1>
+      <div class="subtitle">P&L phân tầng theo cửa hàng — từ Gross Sales xuống Contribution Margin, Unit Contribution, EBITDA</div>
+    </div>
+    <div class="filters">
+      <div class="filter"><div class="flabel">Kỳ</div><div class="fval num">Q2/2026 · Tháng 6</div></div>
+      <div class="filter"><div class="flabel">Phạm vi</div><div class="fval">Toàn chuỗi</div></div>
+    </div>
+  </div>
+
+  <div class="kpis" style="grid-template-columns:repeat(5,1fr)">
+    <div class="kpi"><div class="klabel">Gross Sales</div><div class="kval">59.17 tỷ</div><div class="knote">doanh thu gộp</div></div>
+    <div class="kpi hl" style="--accent:#0B5D4B"><div class="klabel">Unit Contribution</div><div class="kval" style="color:#0B5D4B">9.59 tỷ</div><div class="knote">đóng góp sau chi phí trực tiếp</div></div>
+    <div class="kpi"><div class="klabel">AOV</div><div class="kval">835K</div><div class="knote">doanh thu / hóa đơn</div></div>
+    <div class="kpi"><div class="klabel">#T (Ticket)</div><div class="kval">70,843</div><div class="knote">tổng hóa đơn</div></div>
+    <div class="kpi"><div class="klabel">Tổng cửa hàng</div><div class="kval">54</div><div class="knote">store trong kỳ</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num" style="color:#0B5D4B">01</span><span class="sec-title">Bảng P&L phân tầng — Actual vs Target vs Tháng trước</span></div>
+    <div class="sec-sub">So sánh 3 chiều: thực tế (Actual) · mục tiêu (TG) · tháng trước (LM), kèm chênh lệch %GS. Đỏ = xấu đi, xanh = cải thiện.</div>
+    <div class="hm-wrap">
+    <table class="pnl" style="min-width:920px;font-size:11px">
+      <thead><tr>
+        <th class="l">Chỉ tiêu</th>
+        <th>Actual</th><th>Per#T</th><th>%GS</th>
+        <th>%GS Target</th><th>Δ vs Target</th>
+        <th>%GS LM</th><th>Δ vs LM</th>
+      </tr></thead>
+      <tbody id="pnlFullBody"></tbody>
+    </table>
+    </div>
+    <div class="callout" style="border-color:#0B5D4B;background:#e7f2ee">
+      <b>Điểm kiểm soát = Contribution Margin (40.64%).</b> Trên CM là chi phí trực tiếp gắn với vận hành cửa hàng; dưới CM là chi phí không kiểm soát ở cấp cửa hàng. Cột <b>Δ%GS vs TG</b> cho biết dòng nào lệch mục tiêu — dấu dương ở doanh thu là tốt, ở chi phí là xấu.
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num" style="color:#0B5D4B">02</span><span class="sec-title">Profit variance — chênh lệch so mục tiêu (theo %GS)</span></div>
+    <div class="sec-sub">Mỗi dòng chi phí lệch mục tiêu bao nhiêu điểm % doanh thu. Bên phải (đỏ) = tốn hơn dự kiến → bào mòn lợi nhuận. Bên trái (xanh) = tiết kiệm.</div>
+    <div id="varChartTG"></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num" style="color:#0B5D4B">03</span><span class="sec-title">Xu hướng vs tháng trước (Δ%GS vs LM)</span></div>
+    <div class="sec-sub">Dòng nào đang cải thiện, dòng nào xấu đi so tháng trước — bắt sớm xu hướng trước khi thành vấn đề lớn.</div>
+    <div id="varChartLM"></div>
+  </div>
+</div>
+
+
+<!-- ============ PANEL 5: COVER CẤU MÓN BÁN ============ -->
+<div class="panel t5" id="p5">
+  <div class="top">
+    <div>
+      <h1 style="color:#b5561f">Cơ cấu món bán</h1>
+      <div class="subtitle">Khách gọi gì, hóa đơn được xây từ đâu — cơ cấu theo loại món, khu vực, cửa hàng, và món gánh doanh thu</div>
+    </div>
+    <div class="filters">
+      <div class="filter"><div class="flabel">Kỳ</div><div class="fval num">01/05 – 31/05</div></div>
+      <div class="filter"><div class="flabel">Khu vực</div><div class="fval">Tất cả</div></div>
+      <div class="filter"><div class="flabel">Cửa hàng</div><div class="fval">Tất cả</div></div>
+    </div>
+  </div>
+
+  <div class="callout" style="border-color:#e07a3a;background:#fdefe4;margin-bottom:20px">
+    🍽️ <b>Món chính (Core) gánh 72.6% doanh thu</b> — đúng DNA nhà hàng steak. Đồ uống chỉ 8.9% · Gọi thêm 1.7% → 2 nhóm còn nhiều dư địa up-sell. Mỗi hóa đơn trung bình 11.9 món · 2.1 khách.
+  </div>
+
+  <div class="kpis" style="grid-template-columns:repeat(5,1fr)">
+    <div class="kpi"><div class="klabel">Số hóa đơn (#T)</div><div class="kval">25,258</div><div class="knote">tổng hóa đơn</div></div>
+    <div class="kpi"><div class="klabel">Số khách (TC)</div><div class="kval">52,316</div><div class="knote">2.1 khách/hóa đơn</div></div>
+    <div class="kpi"><div class="klabel">AOV / hóa đơn</div><div class="kval">685K</div><div class="knote">doanh thu ÷ hóa đơn</div></div>
+    <div class="kpi"><div class="klabel">Chi tiêu / khách</div><div class="kval">331K</div><div class="knote">doanh thu ÷ khách</div></div>
+    <div class="kpi"><div class="klabel">Món / hóa đơn</div><div class="kval">11.9</div><div class="knote">số phần ÷ hóa đơn</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="grid2">
+      <div>
+        <div class="sec-head"><span class="sec-num" style="color:#e07a3a">A</span><span class="sec-title" style="font-size:14px">Khách gọi gì?</span></div>
+        <div class="sec-sub">mỗi 100đ doanh thu đến từ đâu</div>
+        <div class="donut-wrap">
+          <svg class="donut" width="150" height="150" viewBox="0 0 42 42" id="donut2"></svg>
+          <div class="dlegend" id="donut2Legend"></div>
+        </div>
+      </div>
+      <div>
+        <div class="sec-head"><span class="sec-num" style="color:#e07a3a">B</span><span class="sec-title" style="font-size:14px">Giải phẫu 1 hóa đơn trung bình</span></div>
+        <div class="sec-sub">cơ cấu % + chỉ số mỗi loại / hóa đơn</div>
+        <table style="font-size:12px">
+          <thead><tr><th class="l">Loại món</th><th>Doanh thu</th><th>% DT</th><th>AOV</th><th>Món/HĐ</th></tr></thead>
+          <tbody id="anatBody"></tbody>
+          <tfoot><tr class="totalrow" id="anatTotal"></tr></tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num" style="color:#e07a3a">C</span><span class="sec-title">Khu vực A vs Khu vực B — khách ăn có khác nhau?</span></div>
+    <div class="sec-sub">% cơ cấu doanh thu + chỉ số hành vi theo khu vực</div>
+    <table style="font-size:12px">
+      <thead><tr><th class="l">Khu vực</th><th>AOV</th><th>Chi tiêu/khách</th><th>Khách/HĐ</th><th>Món/HĐ</th><th>% Đồ uống</th><th>% Gọi thêm</th></tr></thead>
+      <tbody>
+        <tr><td class="l store">Khu vực A</td><td class="num">685,939</td><td class="num">333,509</td><td class="num">2.1</td><td class="num">12.0</td><td class="num">8.8%</td><td class="num">1.8%</td></tr>
+        <tr><td class="l store">Khu vực B</td><td class="num">683,639</td><td class="num">324,692</td><td class="num">2.1</td><td class="num">11.5</td><td class="num">9.2%</td><td class="num">1.6%</td></tr>
+      </tbody>
+      <tfoot><tr class="totalrow"><td class="l">Total</td><td class="num">685,254</td><td class="num">330,838</td><td class="num">2.1</td><td class="num">11.9</td><td class="num">8.9%</td><td class="num">1.7%</td></tr></tfoot>
+    </table>
+    <div class="callout" style="border-color:#e07a3a;background:#fdefe4">Hai khu vực gần như giống hệt về hành vi ăn — chênh lệch nhỏ (KV B nhỉnh đồ uống 9.2% vs 8.8%). Có thể áp một playbook menu/combo thống nhất, không cần tách chiến lược theo vùng.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num" style="color:#e07a3a">D</span><span class="sec-title">Cửa hàng nào lệch mix? — Cơ cấu 100% theo cửa hàng</span></div>
+    <div class="sec-sub">Mỗi thanh = 100% doanh thu cửa hàng, chia theo loại món. Tìm cửa hàng lệch chuẩn (Core quá cao/thấp).</div>
+    <div class="legend" id="smixLegend" style="margin-bottom:10px"></div>
+    <div id="smixBars"></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num" style="color:#e07a3a">E</span><span class="sec-title">Món nào gánh doanh thu? — Pareto top món</span></div>
+    <div class="sec-sub">15 món đầu theo doanh thu + đường % tích lũy. Quy tắc 80/20: bao nhiêu món tạo 80% doanh thu?</div>
+    <div class="pareto-wrap"><div class="pareto" id="paretoChart"></div></div>
+    <div class="grid2" style="margin-top:20px">
+      <div>
+        <div class="sec-head"><span class="sec-title" style="font-size:13px">Top 10 theo DOANH THU</span></div>
+        <table style="font-size:11.5px">
+          <thead><tr><th class="l">Món</th><th class="l">Loại</th><th>Doanh thu</th><th>%</th></tr></thead>
+          <tbody id="topRevBody"></tbody>
+        </table>
+      </div>
+      <div>
+        <div class="sec-head"><span class="sec-title" style="font-size:13px">Top 10 theo SỐ LƯỢNG</span></div>
+        <table style="font-size:11.5px">
+          <thead><tr><th class="l">Món</th><th class="l">Loại</th><th>SL bán</th></tr></thead>
+          <tbody id="topQtyBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="callout" style="border-color:#e07a3a;background:#fdefe4">Đối chiếu 2 bảng: món <b>gánh doanh thu</b> (Core, giá cao) khác hẳn món <b>bán nhiều nhất</b> (Add-on, giá thấp — bánh mì, khăn lạnh, sốt). Món bán chạy số lượng chính là "cửa ngõ up-sell" — gợi kèm để nâng giá trị hóa đơn.</div>
+  </div>
+</div>
+
+<!-- ============ PANEL 6: CUSTOMER BEHAVIOR ============ -->
+<div class="panel t6" id="p6">
+  <div class="top">
+    <div>
+      <h1 style="color:#2b6ca3">Hành vi khách hàng</h1>
+      <div class="subtitle">Khách ăn theo nhóm mấy người, buổi nào, là khách mới hay quay lại — và chi tiêu khác nhau ra sao</div>
+    </div>
+    <div class="filters">
+      <div class="filter"><div class="flabel">Kỳ</div><div class="fval num">Tháng gần nhất</div></div>
+      <div class="filter"><div class="flabel">Cửa hàng</div><div class="fval">Tất cả</div></div>
+    </div>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="klabel">AOV</div><div class="kval">682K</div><div class="knote">doanh thu / hóa đơn</div></div>
+    <div class="kpi"><div class="klabel">TA</div><div class="kval">321K</div><div class="knote"><span style="color:var(--accent)">▼ 2.0%</span> vs tháng trước</div></div>
+    <div class="kpi"><div class="klabel">Món / ticket</div><div class="kval">9.36</div><div class="knote">số món trung bình</div></div>
+    <div class="kpi"><div class="klabel">Gross Profit / khách</div><div class="kval">163K</div><div class="knote">Profit/TA 50.7%</div></div>
+    <div class="kpi"><div class="klabel">Giá TB / món</div><div class="kval">55,643</div><div class="knote"><span style="color:var(--accent)">▼ 9.1%</span> vs kỳ trước</div></div>
+    <div class="kpi"><div class="klabel">TC / hóa đơn</div><div class="kval">2.1</div><div class="knote">số khách/hóa đơn</div></div>
+  </div>
+
+  <!-- BLOCK 1: GROUP SIZE -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num" style="color:#2b6ca3">A</span><span class="sec-title">Phân tích theo nhóm khách</span></div>
+    <div class="sec-sub">Khách đi mấy người — nhóm nào chi nhiều, gọi nhiều món, biên lợi nhuận ra sao</div>
+    <div class="grid2">
+      <div class="donut-wrap">
+        <svg class="donut" width="150" height="150" viewBox="0 0 42 42" id="gsDonut"></svg>
+        <div class="dlegend" id="gsLegend"></div>
+      </div>
+      <div>
+        <div class="ov-title">Group size Overview</div>
+        <table style="font-size:11.5px">
+          <thead><tr><th class="l">Nhóm</th><th>AOV</th><th>Món/HĐ</th><th>TA</th><th>GM/khách</th><th>%GM</th><th>%Food Cost</th></tr></thead>
+          <tbody id="gsBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="callout b" style="margin-top:14px">Nhóm <b>trên 5 người</b> có AOV cao nhất (1,969K) và gọi nhiều món nhất (16.7 món) — nhưng %Food Cost thấp nhất (41.7%) nghĩa là biên lợi nhuận tốt nhất. Đây là phân khúc đáng thiết kế combo nhóm / ưu đãi đặt bàn lớn.</div>
+  </div>
+
+  <!-- BLOCK 2: DAYPART -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num" style="color:#2b6ca3">B</span><span class="sec-title">Phân tích theo buổi ăn</span></div>
+    <div class="sec-sub">Lunch / dinner / late lunch — buổi nào đông, buổi nào lời</div>
+    <div class="grid2">
+      <div class="donut-wrap">
+        <svg class="donut" width="150" height="150" viewBox="0 0 42 42" id="dpDonut"></svg>
+        <div class="dlegend" id="dpLegend"></div>
+      </div>
+      <div>
+        <div class="ov-title">Daypart Overview</div>
+        <table style="font-size:11.5px">
+          <thead><tr><th class="l">Buổi</th><th>AOV</th><th>Món/HĐ</th><th>TA</th><th>GM/khách</th><th>%GM</th><th>%Food Cost</th></tr></thead>
+          <tbody id="dpBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="callout b" style="margin-top:14px">Dinner chiếm 58.4% doanh thu và AOV cao nhất (712K) — giờ vàng của nhà hàng. Lunch %Food Cost cao hơn (44.3%) → biên mỏng hơn, cân nhắc set-menu trưa tối ưu giá vốn.</div>
+  </div>
+
+  <!-- BLOCK 3: CUSTOMER TYPE -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num" style="color:#2b6ca3">C</span><span class="sec-title">Phân tích theo loại khách</span></div>
+    <div class="sec-sub">Khách mới / quay lại / kích hoạt lại / vãng lai — ai giá trị nhất theo thời gian</div>
+    <div class="grid2">
+      <div class="donut-wrap">
+        <svg class="donut" width="150" height="150" viewBox="0 0 42 42" id="ctDonut"></svg>
+        <div class="dlegend" id="ctLegend"></div>
+      </div>
+      <div>
+        <div class="ov-title">Customer type Overview</div>
+        <table style="font-size:11.5px">
+          <thead><tr><th class="l">Loại khách</th><th>AOV</th><th>Món/HĐ</th><th>TA</th><th>GM/khách</th><th>%GM</th><th>%Food Cost</th></tr></thead>
+          <tbody id="ctBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="callout b" style="margin-top:14px">Khách <b>vãng lai (Non)</b> có %GM cao bất thường (64.4%) do gọi ít món giá cao — nhưng khách <b>quay lại (Repeat)</b> chiếm 46.9% doanh thu, là xương sống. Cân đối: giữ Repeat bằng loyalty, khai thác Non bằng combo giá trị. Đây là cầu nối sang bài toán CLV/RFM.</div>
+  </div>
+</div>
+
+<!-- ============ PANEL 7: CUSTOMER BASE ============ -->
+<div class="panel t7" id="p7">
+  <div class="top">
+    <div>
+      <h1 style="color:#1552c0">Phân tích tệp khách hàng</h1>
+      <div class="subtitle">Khách mới → quay lại → trung thành: tệp khách được nuôi ra sao, giữ chân hiệu quả đến đâu (nền tảng CLV)</div>
+    </div>
+    <div class="filters">
+      <div class="filter"><div class="flabel">Kỳ</div><div class="fval num">12 tháng gần nhất</div></div>
+      <div class="filter"><div class="flabel">Phạm vi</div><div class="fval">Toàn chuỗi</div></div>
+    </div>
+  </div>
+
+  <div style="font-size:11px;font-weight:700;color:#1552c0;letter-spacing:1px;margin-bottom:10px">OVERVIEW — 4 PHÂN KHÚC KHÁCH</div>
+  <div class="segcards">
+    <div class="segc new"><div class="sh">New (khách mới)</div><div class="sv">182.6 tỷ<span class="sv2">180.0K</span></div><div class="ss">30% GS · 26% #T</div><div class="schips"><span class="chip">AOV 1,015K</span><span class="chip">TA 340K</span></div></div>
+    <div class="segc rep"><div class="sh">Repeat (quay lại &lt;1 năm)</div><div class="sv">202.0 tỷ<span class="sv2">224.9K</span></div><div class="ss">33% GS · 32% #T</div><div class="schips"><span class="chip">AOV 898K</span><span class="chip">TA 341K</span></div></div>
+    <div class="segc react"><div class="sh">Reactive (quay lại &gt;1 năm)</div><div class="sv">29.7 tỷ<span class="sv2">30.0K</span></div><div class="ss">5% GS · 4% #T</div><div class="schips"><span class="chip">AOV 991K</span><span class="chip">TA 347K</span></div></div>
+    <div class="segc non"><div class="sh">Non-member (vãng lai)</div><div class="sv">201.5 tỷ<span class="sv2">268.6K</span></div><div class="ss">33% GS · 38% #T</div><div class="schips"><span class="chip">AOV 750K</span><span class="chip">TA 347K</span></div></div>
+  </div>
+
+  <!-- FUNNEL: NEW -> REPEAT -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num" style="color:#2b6ce0">A</span><span class="sec-title">Khách mới → quay lại: phễu chuyển đổi</span></div>
+    <div class="sec-sub">Tỉ lệ khách ăn lần đầu và quay lại là bao nhiêu? Đây là "van" quan trọng nhất của tăng trưởng bền vững.</div>
+    <div class="grid2">
+      <div>
+        <div class="funnel-row"><div class="funnel-lbl">Tổng khách</div><div class="funnel-bar" style="width:100%">100.00%</div></div>
+        <div class="funnel-row"><div class="funnel-lbl">Tỷ lệ khách mới</div><div class="funnel-bar" style="width:25.58%;background:#5a8ce8">25.58%</div></div>
+        <div class="funnel-row"><div class="funnel-lbl">New → Repeat</div><div class="funnel-bar" style="width:4.75%;background:#a8c4f0;color:#1552c0;min-width:44px">4.75%</div></div>
+        <div class="callout b" style="margin-top:10px">Chỉ <b>4.75%</b> khách mới quay lại — đây là <b>"xô thủng"</b>. Doanh thu tăng nhờ liên tục kéo khách mới (chi phí acquisition đắt dần) thay vì giữ khách cũ. Bịt van này = đòn bẩy lợi nhuận lớn nhất.</div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:600;margin-bottom:8px">Nhà hàng nào giữ chân khách mới tốt nhất?</div>
+        <div id="newRepStore"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COHORT RETENTION TRIANGLE -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num" style="color:#2b6ce0">B</span><span class="sec-title">Cohort giữ chân theo tháng (retention triangle)</span></div>
+    <div class="sec-sub">Trong số khách mới của tháng X, bao nhiêu % quay lại ở tháng X+1, X+2...? Mỗi hàng là một nhóm khách theo tháng bắt đầu.</div>
+    <div class="hm-wrap">
+      <table class="hm" style="min-width:640px;font-size:11px">
+        <thead><tr id="cohortHead"></tr></thead>
+        <tbody id="cohortBody"></tbody>
+      </table>
+    </div>
+    <div class="foot">Màu nhạt dần sang phải = tỉ lệ quay lại rớt nhanh theo thời gian. Nhóm nào giữ được đường màu lâu hơn = chương trình giữ chân hiệu quả hơn. Đây là công cụ đo "sức khỏe retention" chuẩn của ngành.</div>
+  </div>
+
+  <!-- REPEAT BEHAVIOR BY VISIT -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num" style="color:#2b6ce0">C</span><span class="sec-title">Hành vi khách quay lại — theo số lần quay lại</span></div>
+    <div class="sec-sub">Khách quay lại nhiều lần có chi tiêu nhiều hơn không? Tần suất dùng voucher? Số ngày giữa các lần?</div>
+    <table style="font-size:11.5px">
+      <thead><tr>
+        <th class="l">Lần quay lại</th><th>#T</th><th>%T có voucher</th><th>AOV</th><th>TA</th><th>Group Size</th><th>TB ngày từ lần trước</th>
+      </tr></thead>
+      <tbody id="repeatBody"></tbody>
+      <tfoot><tr class="totalrow" id="repeatTotal"></tr></tfoot>
+    </table>
+    <div class="callout b">Đọc theo cột: AOV <b>giảm dần</b> theo số lần quay lại (770K → 609K) nhưng <b>% dùng voucher tăng vọt</b> (12% → 44%). Khách trung thành chi ít hơn/lần nhưng đến thường xuyên hơn (số ngày giữa các lần rút ngắn). Bài toán: voucher đang "mua" lượt quay lại — cần đo ROI của voucher, đừng để nó ăn mòn AOV vô tội vạ.</div>
+  </div>
+
+  <!-- REACTIVE FUNNEL -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num" style="color:#2b6ce0">D</span><span class="sec-title">Khách kích hoạt lại → quay lại</span></div>
+    <div class="sec-sub">Khách quay lại sau hơn 1 năm có tiếp tục duy trì hành vi mua lặp lại không?</div>
+    <div class="grid2">
+      <div>
+        <div class="funnel-row"><div class="funnel-lbl">Tổng</div><div class="funnel-bar" style="width:100%">100.00%</div></div>
+        <div class="funnel-row"><div class="funnel-lbl">Reactive Rate</div><div class="funnel-bar" style="width:20%;background:#5a8ce8;min-width:44px">4.26%</div></div>
+        <div class="funnel-row"><div class="funnel-lbl">Reactive → Repeat</div><div class="funnel-bar" style="width:8%;background:#a8c4f0;color:#1552c0;min-width:44px">1.02%</div></div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:600;margin-bottom:8px">Nhà hàng giữ chân khách tái kích hoạt tốt nhất?</div>
+        <div id="reactStore"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PANEL 8: BUFFET PERFORMANCE (PRODUCT DEV) ============ -->
+<div class="panel t8" id="p8">
+  <div class="top">
+    <div>
+      <h1 style="color:#c85a2a">Hiệu suất gói Buffet & Chi phí thực phẩm</h1>
+      <div class="subtitle">Góc nhìn Product Development: từng gói buffet/combo lãi bao nhiêu, food cost vượt/tiết kiệm định mức, hao hụt ở đâu</div>
+    </div>
+    <div class="filters">
+      <div class="filter"><div class="flabel">Kỳ</div><div class="fval num">01/05 – 31/05</div></div>
+      <div class="filter"><div class="flabel">Cửa hàng</div><div class="fval">Tất cả</div></div>
+    </div>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="klabel">Doanh thu (GS)</div><div class="kval">31.58 tỷ</div><div class="knote"><span style="color:var(--good)">▲ 26.0%</span> vs tháng trước</div></div>
+    <div class="kpi hl" style="--accent:#c85a2a"><div class="klabel">Gross Margin</div><div class="kval" style="color:#c85a2a">18.17 tỷ</div><div class="knote">57.5% vs GS</div></div>
+    <div class="kpi"><div class="klabel">Số hóa đơn (#T)</div><div class="kval">25,778</div><div class="knote">tổng hóa đơn</div></div>
+    <div class="kpi"><div class="klabel">Số khách (#TC)</div><div class="kval">81,914</div><div class="knote">tổng lượt khách</div></div>
+    <div class="kpi"><div class="klabel">AOV</div><div class="kval">1,225K</div><div class="knote"><span style="color:var(--good)">▲ 7.8%</span> vs kỳ trước</div></div>
+    <div class="kpi"><div class="klabel">Gram / khách</div><div class="kval">933</div><div class="knote"><span class="thr-over">vượt 1.4%</span> định mức</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num" style="color:#c85a2a">A</span><span class="sec-title">Hiệu suất từng gói Buffet / Combo</span></div>
+    <div class="sec-sub">Mỗi gói: doanh thu, GM, %GM, food cost thực tế vs định mức, và hao hụt (gram). Đỏ = vượt ngưỡng food cost.</div>
+    <div class="hm-wrap">
+    <table style="min-width:820px;font-size:11.5px">
+      <thead><tr>
+        <th class="l">Gói sản phẩm</th><th>#T</th><th>#GS</th><th>Net sale</th><th>Cost NVL</th><th>GM</th>
+        <th>%GM</th><th>%Cost</th><th>%Cost ĐM</th><th class="l">Vs ĐM</th><th>Hao hụt</th>
+      </tr></thead>
+      <tbody id="buffetBody"></tbody>
+      <tfoot><tr class="totalrow" id="buffetTotal"></tr></tfoot>
+    </table>
+    </div>
+    <div class="callout" style="border-color:#c85a2a;background:#fbeee4">Cột <b>Vs ĐM</b> là tim của báo cáo: gói "Vượt ngưỡng" (đỏ) đang ăn mòn margin — combo nướng vượt 30.9%, buffet trẻ em vượt 28%. Gói "Tiết kiệm" (xanh) đang dùng ít NVL hơn định mức, có thể do định mức đặt lỏng hoặc portion bị cắt (rủi ro chất lượng). Cả hai đều cần Product team rà lại công thức.</div>
+  </div>
+
+  <div class="sec">
+    <div class="grid2">
+      <div>
+        <div class="sec-head"><span class="sec-num" style="color:#c85a2a">B</span><span class="sec-title" style="font-size:14px">Hiệu quả chi phí theo danh mục</span></div>
+        <div class="sec-sub">Nhóm NVL nào chiếm nhiều cost, thâm nhập bao nhiêu % hóa đơn</div>
+        <table style="font-size:11.5px">
+          <thead><tr><th class="l">Danh mục</th><th>Cost NVL</th><th>%Cost NVL</th><th>%Cost ĐM</th><th>Item Penetration</th></tr></thead>
+          <tbody id="catEffBody"></tbody>
+        </table>
+      </div>
+      <div>
+        <div class="sec-head"><span class="sec-num" style="color:#c85a2a">C</span><span class="sec-title" style="font-size:14px">Phân bổ Cost theo danh mục NVL</span></div>
+        <div class="sec-sub">Cơ cấu chi phí nguyên liệu — nhóm nào "ăn" nhiều tiền nhất</div>
+        <div class="donut-wrap">
+          <svg class="donut" width="150" height="150" viewBox="0 0 42 42" id="costDonut"></svg>
+          <div class="dlegend" id="costLegend"></div>
+        </div>
+      </div>
+    </div>
+    <div class="callout" style="border-color:#c85a2a;background:#fbeee4">🟢 <b>Ổn định: Food Cost 36.8%</b> — nhưng so định mức là 127% (vượt ~90%!). Nghĩa là %food cost tổng nhìn "đẹp" nhưng cấu trúc bên trong lệch nặng so công thức chuẩn. Thịt bò chiếm 24% cost — đòn bẩy lớn nhất để tối ưu. Đây là lý do phải soi tới tầng danh mục NVL, không dừng ở con số tổng.</div>
+  </div>
+</div>
+
+<!-- ============ PANEL 9: FORECASTING FOUNDATION ============ -->
+<div class="panel t9" id="p9">
+  <div class="top">
+    <div>
+      <h1 style="color:#6a54c4">Nền tảng dự báo doanh thu</h1>
+      <div class="subtitle">Chuỗi báo cáo tạo tiền đề forecast: năng lực bàn → dư địa tăng trưởng → hiệu quả khuyến mãi → dự báo → khớp P&L có target</div>
+    </div>
+    <div class="filters">
+      <div class="filter"><div class="flabel">Kỳ dự báo</div><div class="fval num">Tháng tới</div></div>
+      <div class="filter"><div class="flabel">Phạm vi</div><div class="fval">Toàn chuỗi</div></div>
+    </div>
+  </div>
+
+  <div class="callout" style="border-color:#6a54c4;background:#f0edfa;margin-bottom:20px">
+    <b>Forecast không phải một con số — là một chuỗi lập luận.</b> Mỗi khối dưới đây trả lời một câu, và câu sau dựa trên câu trước. Con số cuối cùng chỉ đáng tin khi mọi mắt xích được kiểm chứng — đúng nguyên tắc "reconciliation là chuỗi, không phải điểm".
+  </div>
+
+  <div class="flow">
+    <div class="flowstep"><div class="fn">BƯỚC 1</div><div class="ft">Năng lực hiện tại</div><div class="fd">Bàn quay mấy vòng, fill rate bao nhiêu — trần công suất đang ở đâu</div></div>
+    <div class="flowstep"><div class="fn">BƯỚC 2</div><div class="ft">Dư địa tăng trưởng</div><div class="fd">Nếu nâng fill rate, thêm được bao nhiêu #T và doanh thu</div></div>
+    <div class="flowstep"><div class="fn">BƯỚC 3</div><div class="ft">Dự báo doanh số</div><div class="fd">Actual năm ngoái → forecast theo ngày/tháng/cửa hàng</div></div>
+    <div class="flowstep"><div class="fn">BƯỚC 4</div><div class="ft">Khớp P&L target</div><div class="fd">Forecast so với LM/Target — biết ngay lệch chỗ nào</div></div>
+  </div>
+
+  <!-- STEP 1: BASELINE CAPACITY -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num" style="color:#6a54c4">1</span><span class="sec-title">Baseline — năng lực bàn theo buổi</span></div>
+    <div class="sec-sub">Table turn (số vòng quay bàn), fill rate, table productivity — nền tảng để biết còn bao nhiêu dư địa</div>
+    <table style="font-size:12px">
+      <thead><tr><th class="l">Buổi</th><th class="l">Ngày</th><th>Table turn</th><th>Serving time</th><th>Table productivity</th><th>Fill rate</th><th>#T</th><th>GS</th><th>AOV</th></tr></thead>
+      <tbody id="baselineBody"></tbody>
+    </table>
+  </div>
+
+  <!-- STEP 2: GROWTH IMPACT -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num" style="color:#6a54c4">2</span><span class="sec-title">Growth Impact — dư địa nếu nâng fill rate</span></div>
+    <div class="sec-sub">Nếu tăng fill rate lên mức mục tiêu, mỗi buổi thêm được bao nhiêu hóa đơn (#T uplift) và doanh thu (GS uplift)</div>
+    <table style="font-size:12px">
+      <thead><tr><th class="l">Buổi</th><th class="l">Ngày</th><th>#T Baseline</th><th>#T New</th><th>#T Uplift</th><th>GS Basecase</th><th>GS New</th><th>GS Uplift</th></tr></thead>
+      <tbody id="growthBody"></tbody>
+    </table>
+    <div class="callout" style="border-color:#6a54c4;background:#f0edfa">Dinner Weekdays có dư địa lớn nhất: +19,009 hóa đơn tiềm năng nếu lấp đầy bàn. Đây là uplift <b>có cơ sở vật lý</b> (số bàn × vòng quay), không phải wishful target — khác hẳn kiểu "cứ đặt tăng 20%".</div>
+  </div>
+
+  <!-- STEP 3: FORECAST -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num" style="color:#6a54c4">3</span><span class="sec-title">Forecast — dự báo theo tháng</span></div>
+    <div class="sec-sub">Actual năm ngoái (LY) làm nền → forecast năm nay (TY). Horizon ngắn (tháng tới) dùng time-series, độ tin cậy cao nhất.</div>
+    <table style="font-size:11.5px">
+      <thead><tr id="fcHead"></tr></thead>
+      <tbody id="fcBody"></tbody>
+    </table>
+    <div class="foot">Đây là horizon 0–12 tháng — data quá khứ còn dùng trực tiếp được, forecast ra con số cụ thể. Xa hơn 1-3 năm phải chuyển sang range + kịch bản, xa nữa là scenario planning. Không cố ép một con số chính xác cho mọi horizon.</div>
+  </div>
+
+  <!-- STEP 4: P&L RECONCILE -->
+  <div class="sec">
+    <div class="sec-head"><span class="sec-num" style="color:#6a54c4">4</span><span class="sec-title">Khớp P&L — Tháng này vs Tháng trước vs Target vs Forecast</span></div>
+    <div class="sec-sub">P&L đối chiếu 4 cột: đỏ = dưới mục tiêu, xanh = đạt/vượt. Biết ngay dòng nào kéo tụt lợi nhuận.</div>
+    <div class="hm-wrap">
+    <table style="min-width:720px;font-size:11.5px">
+      <thead><tr><th class="l">Chỉ tiêu</th><th>Tháng này</th><th>Tháng trước</th><th>% LM</th><th>Target</th><th>% Target</th><th>Forecast</th></tr></thead>
+      <tbody id="reconBody"></tbody>
+    </table>
+    </div>
+    <div class="callout" style="border-color:#6a54c4;background:#f0edfa">Nhìn cột <b>% Target</b>: chi phí nhân công đang ở 20.5% target (tốt — tiết kiệm), nhưng doanh số tổng chỉ đạt 91.9% target (cần chú ý). Đây là bảng để BLĐ ra quyết định hàng tháng — mỗi dòng lệch là một câu hỏi "tại sao" và "ai xử lý".</div>
+  </div>
+
+  <!-- METHODOLOGY NOTE -->
+  <div class="sec" style="background:#2a2440;color:#e0daf5">
+    <div class="sec-head"><span class="sec-title" style="color:#fff">Nguyên tắc dự báo — điều đối tác nên hỏi trước khi tin bất kỳ con số nào</span></div>
+    <div style="font-size:12px;line-height:1.7;margin-top:8px">
+      Một forecast đẹp không có nghĩa là một forecast đúng. Ba câu hỏi luôn phải trả lời được: <b style="color:#c4b5f0">(1)</b> Ai dùng con số này, ra quyết định gì khác đi? <b style="color:#c4b5f0">(2)</b> Trước khi có forecast, quyết định đó ra sao — baseline là gì? <b style="color:#c4b5f0">(3)</b> Sai 10% thì hậu quả gì, ai chịu? Giá trị của dự báo không đến từ độ chính xác tuyệt đối, mà từ đúng người + đúng lúc + đúng câu hỏi. Đây là thứ Idealab xây cùng khách — không phải bán một model "chính xác 95%", mà dựng một hệ ra quyết định.
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+/* ============ TAB 1 DATA ============ */
+const fmtVND = v => v.toLocaleString('vi-VN');
+const stores = [
+  ['01','Cửa hàng 01',620,33.5,32.5,208.2,201.9,1992,697],
+  ['02','Cửa hàng 02',654,34.2,33.1,223.6,216.7,1992,719],
+  ['03','Cửa hàng 03',690,33.1,32.8,228.8,226.6,2036,764],
+  ['04','Cửa hàng 04',798,32.3,31.3,257.9,249.6,2486,634],
+  ['05','Cửa hàng 05',1086,33.9,32.0,368.1,347.1,3244,650],
+  ['06','Cửa hàng 06',600,31.5,31.4,189.3,188.3,1804,758],
+  ['07','Cửa hàng 07',863,32.2,32.1,277.8,277.6,2605,643],
+  ['08','Cửa hàng 08',520,33.6,32.6,174.7,169.5,1625,526],
+  ['09','Cửa hàng 09',464,33.9,33.5,157.5,155.8,1447,609],
+  ['10','Cửa hàng 10',1159,33.8,33.1,391.5,384.4,3975,661],
+  ['11','Cửa hàng 11',554,32.2,31.9,178.7,176.7,1610,752],
+  ['12','Cửa hàng 12',560,32.9,32.3,184.8,181.0,1632,740],
+  ['13','Cửa hàng 13',889,32.5,32.3,291.1,288.7,2663,734],
+  ['14','Cửa hàng 14',1166,33.1,32.8,386.0,382.0,3353,632],
+  ['15','Cửa hàng 15',880,31.4,28.8,276.4,253.9,2870,685],
+  ['16','Cửa hàng 16',760,32.6,29.6,248.4,224.9,2421,719],
+  ['17','Cửa hàng 17',697,32.8,28.7,228.7,200.5,2169,688],
+];
+let tRev=0,tTT=0,tDM=0,tG=0;
+const sb=document.getElementById('storeBody');
+stores.forEach(s=>{
+  const [c,n,rev,tt,dm,nt,nd,g,aov]=s;
+  const cl=(tt-dm).toFixed(1); const clM=(nt-nd).toFixed(1);
+  tRev+=rev;tTT+=nt;tDM+=nd;tG+=g;
+  sb.innerHTML+=`<tr>
+    <td class="l code">${c}</td><td class="l store">${n}</td><td class="num">${rev}M</td>
+    <td class="num">${tt}%</td><td class="num">${dm}%</td><td class="num ${cl>0?'pos':'neg'}">${cl>0?'+':''}${cl}%</td>
+    <td class="num">${nt}M</td><td class="num">${nd}M</td><td class="num ${clM>0?'pos':'neg'}">${clM>0?'+':''}${clM}M</td>
+    <td class="num">${g.toLocaleString()}</td><td class="num">${aov}K</td></tr>`;
+});
+const totTT=(tTT/tRev*100).toFixed(1), totDM=(tDM/tRev*100).toFixed(1);
+document.getElementById('storeTotal').innerHTML=
+  `<td class="l">—</td><td class="l">Tổng ${stores.length} cửa hàng</td><td class="num">${(tRev/1000).toFixed(2)} tỷ</td>
+   <td class="num">${totTT}%</td><td class="num">${totDM}%</td><td class="num pos">+${(totTT-totDM).toFixed(1)}%</td>
+   <td class="num">${(tTT/1000).toFixed(2)} tỷ</td><td class="num">${(tDM/1000).toFixed(2)} tỷ</td>
+   <td class="num pos">+${(tTT-tDM).toFixed(0)}M</td><td class="num">${tG.toLocaleString()}</td><td class="num">—</td>`;
+
+const groups=['Món chính','Món chia sẻ','Đồ uống','Gọi thêm','Khai vị','Tráng miệng','TỔNG'];
+const hmData=[
+  ['Cửa hàng 05',[+7.1,-3.8,+0.4,+2.0,+2.8,+7.8,+1.9]],
+  ['Cửa hàng 17',[+3.0,-7.1,-1.2,+1.3,-4.7,-1.8,+4.0]],
+  ['Cửa hàng 16',[+2.8,-8.5,-0.3,+1.2,-4.6,+7.6,+3.1]],
+  ['Cửa hàng 15',[-1.4,-18.6,-4.3,+0.5,-6.1,+5.4,+2.6]],
+  ['Cửa hàng 04',[+4.8,-0.0,-0.6,+0.7,+0.3,+0.3,+1.0]],
+  ['Cửa hàng 02',[+6.6,-4.1,+0.8,+2.1,-1.0,+16.5,+1.1]],
+  ['Cửa hàng 08',[+4.4,+0.2,-0.2,+1.1,+1.3,+6.1,+1.0]],
+  ['Cửa hàng 12',[+4.2,-1.6,+0.4,+2.3,+1.3,-3.2,+0.7]],
+  ['Cửa hàng 10',[+2.7,-8.1,+0.6,+1.4,-1.2,-5.1,+0.6]],
+  ['Cửa hàng 09',[+6.8,-13.7,-0.8,-0.2,+1.6,-0.9,+0.4]],
+  ['Cửa hàng 11',[+2.8,-1.3,-0.1,+1.8,+0.5,-12.4,+0.4]],
+  ['Cửa hàng 14',[+7.6,-2.9,-1.1,+1.2,+1.7,+38.4,+0.3]],
+  ['Cửa hàng 03',[+4.9,-2.6,+1.4,+1.6,-0.5,-4.3,+0.3]],
+  ['Cửa hàng 13',[+4.4,-0.3,+0.7,+2.0,+1.1,+13.8,+0.2]],
+  ['Cửa hàng 06',[+3.8,-1.9,-1.5,+2.8,-0.6,-23.9,+0.2]],
+  ['Cửa hàng 07',[+2.2,-5.0,+0.7,+0.2,-0.9,+16.6,+0.0]],
+];
+document.getElementById('hmHead').innerHTML='<th class="l">Cửa hàng</th>'+groups.map(g=>`<th>${g}</th>`).join('');
+function hmColor(v,isTot){
+  if(isTot){const a=Math.min(Math.abs(v)/3,1);
+    return v>0?`background:rgba(192,57,43,${0.10+a*0.55});color:${a>0.5?'#fff':'#7a1d14'}`:`background:rgba(31,138,91,${0.10+a*0.4});color:#12503a`;}
+  const a=Math.min(Math.abs(v)/12,1);
+  if(v>0) return `background:rgba(192,57,43,${0.08+a*0.55});color:${a>0.55?'#fff':'#7a1d14'}`;
+  if(v<0) return `background:rgba(31,138,91,${0.08+a*0.45});color:${a>0.55?'#fff':'#12503a'}`;
+  return 'background:#f7f8f7;color:#8a938f';
+}
+const hb=document.getElementById('hmBody');
+hmData.forEach(r=>{const [name,vals]=r;let row=`<td class="l">${name}</td>`;
+  vals.forEach((v,i)=>{const isTot=i===vals.length-1;row+=`<td class="${isTot?'tot':''}" style="${hmColor(v,isTot)}">${v>0?'+':''}${v}%</td>`;});
+  hb.innerHTML+=`<tr>${row}</tr>`;});
+
+const nvl=[
+  ['Nguyên liệu chính (thịt)','Phần',3442.0,216906301,216906301],
+  ['Nấm A','Kg',304.2,48011654,43449700],
+  ['Sốt nền','Kg',273.3,26233620,19423666],
+  ['Rau củ A','Kg',232.6,22327709,32596699],
+  ['Nấm khô B','Kg',1.0,2626270,5220569],
+  ['Kem tươi','Hộp',30.3,2244507,2206748],
+  ['Dầu ăn','Kg',53.1,1897664,302313],
+  ['Sữa tươi','Hộp',41.4,1067407,1727699],
+  ['Rau gia vị','Kg',22.4,322430,508681],
+  ['Tiêu','Kg',0.6,147292,62916],
+  ['Muối','Kg',0.2,1088,1690],
+];
+let nTT=0,nDM=0;
+const nb=document.getElementById('nvlBody');
+nvl.forEach(x=>{const [name,unit,sl,tt,dm]=x;const cl=tt-dm;const clp=dm!==0?(cl/dm*100):0;nTT+=tt;nDM+=dm;
+  nb.innerHTML+=`<tr><td class="l">${name}</td><td class="l code">${unit}</td>
+    <td class="num">${sl.toLocaleString('vi-VN')}</td><td class="num">${fmtVND(tt)}</td><td class="num">${fmtVND(dm)}</td>
+    <td class="num ${cl>0?'pos':cl<0?'neg':''}">${cl>0?'+':''}${fmtVND(cl)}</td>
+    <td class="num ${cl>0?'pos':cl<0?'neg':''}">${clp>0?'+':''}${clp.toFixed(1)}%</td></tr>`;});
+const nCL=nTT-nDM;
+document.getElementById('nvlTotal').innerHTML=
+  `<td class="l">= TỔNG MÓN</td><td></td><td></td><td class="num">${fmtVND(nTT)}</td><td class="num">${fmtVND(nDM)}</td>
+   <td class="num ${nCL>0?'pos':'neg'}">${nCL>0?'+':''}${fmtVND(nCL)}</td><td class="num ${nCL>0?'pos':'neg'}">${(nCL/nDM*100).toFixed(1)}%</td>`;
+
+/* ============ TAB 2 DATA ============ */
+/* colors per category */
+const catColors={ 'Alacarte Add':'#8fb0cb','Đồ ăn chính':'#2b4a68','Đồ uống':'#e0a94a','Khác':'#9aa3a8','Khai vị':'#b9c6d4','Tráng miệng':'#e08a5a' };
+/* donut = %revenue mix */
+const donutData=[
+  ['Alacarte Add',68.04],['Đồ ăn chính',16.81],['Đồ uống',7.62],
+  ['Khai vị',3.37],['Khác',3.18],['Tráng miệng',0.99]
+];
+const donut=document.getElementById('donut');
+let off=0; const R=15.9155;
+donutData.forEach(([name,pct])=>{
+  const c=catColors[name];
+  const circ=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  circ.setAttribute('cx','21');circ.setAttribute('cy','21');circ.setAttribute('r',R);
+  circ.setAttribute('fill','transparent');circ.setAttribute('stroke',c);circ.setAttribute('stroke-width','7');
+  circ.setAttribute('stroke-dasharray',`${pct} ${100-pct}`);
+  circ.setAttribute('stroke-dashoffset',`${25-off}`);
+  donut.appendChild(circ); off+=pct;
+});
+document.getElementById('donutLegend').innerHTML=donutData.map(([n,p])=>
+  `<div><span class="sw" style="background:${catColors[n]}"></span>${n} — <b>${p}%</b></div>`).join('');
+
+/* daypart stacked bars: order Alacarte, Core, Drink, Other-ish */
+const dpOrder=['Alacarte Add','Đồ ăn chính','Đồ uống','Khác/Khác'];
+function stackedRow(label, segs){
+  // segs: array of [name,pct,color]
+  let html=`<div class="sbar-row"><div class="sbar-label">${label}</div><div class="sbar">`;
+  segs.forEach(([n,p,c])=>{ html+=`<span style="width:${p}%;background:${c}" title="${n}: ${p}%">${p>=6?p+'%':''}</span>`; });
+  html+=`</div></div>`;
+  return html;
+}
+const grey='#c2cad0', navy='#2b4a68', orange='#e08a5a', light='#8fb0cb';
+const dayparts=[
+  ['dinner',    [['Alacarte',69.6,light],['Đồ ăn chính',15.4,navy],['Đồ uống',7.8,orange],['Khác',7.2,grey]]],
+  ['late lunch',[['Alacarte',76.3,light],['Đồ ăn chính',11.2,navy],['Đồ uống',7.2,orange],['Khác',5.3,grey]]],
+  ['lunch',     [['Alacarte',58.7,light],['Đồ ăn chính',24.3,navy],['Đồ uống',7.4,orange],['Khác',9.6,grey]]],
+  ['khác',      [['Alacarte',23.4,light],['Đồ ăn chính',11.9,navy],['Khác',61.5,grey],['Đồ uống',3.2,orange]]],
+];
+document.getElementById('daypartBars').innerHTML=dayparts.map(d=>stackedRow(d[0],d[1])).join('');
+
+const groupsizes=[
+  ['trên 10 người',[['Alacarte',84.7,light],['Đồ ăn chính',6.8,navy],['Đồ uống',8.5,orange]]],
+  ['1-2 người',    [['Alacarte',55.6,light],['Đồ ăn chính',25.8,navy],['Đồ uống',7.6,orange],['Khác',11.0,grey]]],
+  ['3-5 người',    [['Alacarte',73.2,light],['Đồ ăn chính',13.3,navy],['Đồ uống',7.5,orange],['Khác',6.0,grey]]],
+  ['5-10 người',   [['Alacarte',82.9,light],['Đồ ăn chính',9.6,navy],['Đồ uống',7.5,orange]]],
+];
+document.getElementById('groupsizeBars').innerHTML=groupsizes.map(d=>stackedRow(d[0],d[1])).join('');
+
+document.getElementById('tab2Legend').innerHTML=
+  `<span><span class="dot" style="background:${light}"></span>Alacarte Add</span>
+   <span><span class="dot" style="background:${navy}"></span>Đồ ăn chính</span>
+   <span><span class="dot" style="background:${orange}"></span>Đồ uống</span>
+   <span><span class="dot" style="background:${grey}"></span>Khác / Khai vị / Tráng miệng</span>`;
+
+/* category detail table */
+const cats=[
+  ['Alacarte Add',23.78,'4,742,066','68.0%','79,875M','68.04%','16,844'],
+  ['Đồ ăn chính',64.47,'1,020,469','16.8%','19,730M','16.81%','19,334'],
+  ['Đồ uống',16.40,'563,337','7.6%','8,946M','7.62%','15,881'],
+  ['Khác',14.80,'1,474,175','3.2%','3,734M','3.18%','2,533'],
+  ['Khai vị',34.88,'208,611','3.4%','3,952M','3.37%','18,945'],
+  ['Tráng miệng',13.57,'218,322','1.0%','1,165M','0.99%','5,337'],
+];
+document.getElementById('catBody').innerHTML=cats.map(c=>
+  `<tr><td class="l store">${c[0]}</td><td class="num">${c[1]}</td><td class="num">${c[2]}</td>
+   <td class="num">${c[3]}</td><td class="num">${c[4]}</td><td class="num">${c[5]}</td><td class="num">${c[6].toLocaleString()}</td></tr>`).join('');
+document.getElementById('catTotal').innerHTML=
+  `<td class="l">Total</td><td class="num">128.82</td><td class="num">5,647,083</td><td class="num">100.0%</td>
+   <td class="num">117,403M</td><td class="num">100.00%</td><td class="num">20,790</td>`;
+
+/* ============ TAB 3: MENU ENGINEERING ============ */
+/* [type, name, indent, #items, GS(M), %mix, avePriceK, costItemK, gmItemK, menuMix%, class, freqLabel, profit, popularity] */
+const menu=[
+  ['grp','Nhóm Buffet',0,73837,26334,'83.37%',342,,200458,'100.0%','Stars','1.64','High','High'],
+  ['itm','Buffet A · 369K',1,33684,12429,'39.35%',369,,207480,'45.6%','Stars','1.52','High','High'],
+  ['itm','Buffet B · 389K',1,13857,5390,'17.07%',389,,251587,'18.8%','Stars','1.81','High','High'],
+  ['itm','Buffet C · 299K',1,12206,3650,'11.55%',299,,135109,'16.5%','Horses','1.59','High','High'],
+  ['itm','Buffet D · 458K',1,4922,2358,'7.46%',479,,269004,'6.7%','Stars','1.58','High','High'],
+  ['itm','Buffet Trẻ em · 120K',1,2831,340,'1.08%',120,,49969,'3.8%','Dogs','1.58','Low','Low'],
+  ['itm','Buffet E · 499K',1,2433,1214,'3.84%',499,,305370,'3.3%','Puzzles','1.89','High','Low'],
+  ['itm','Buffet F · 329K',1,1468,483,'1.53%',329,,162192,'2.0%','Puzzles','1.25','Low','Low'],
+  ['itm','Buffet G · 239K',1,1075,257,'0.81%',239,,123430,'1.5%','Dogs','1.36','Low','Low'],
+  ['itm','Buffet Trẻ em · 100K',1,504,50,'0.16%',100,,24082,'0.7%','Dogs','1.49','Low','Low'],
+  ['itm','Buffet Trẻ em · 150K',1,464,70,'0.22%',150,,51777,'0.6%','Dogs','1.60','Low','Low'],
+  ['grp','Nhóm Alacarte',0,9435,606,'1.92%',66,,40982,'100.0%','Horses','1.96','High','High'],
+  ['itm','Alacarte - Món 1',1,663,6,'0.02%',9,,6459,'7.0%','Horses','1.82','Low','High'],
+  ['itm','Alacarte - Món 2',1,650,32,'0.10%',49,,31693,'6.9%','Horses','1.97','High','High'],
+  ['itm','Alacarte - Món 3',1,646,10,'0.03%',15,,10911,'6.8%','Horses','1.78','Low','High'],
+  ['itm','Alacarte - Món 4',1,517,72,'0.23%',139,,95624,'5.5%','Stars','2.09','High','High'],
+  ['itm','Alacarte - Món 5',1,480,38,'0.12%',79,,48164,'5.1%','Stars','1.89','High','High'],
+  ['itm','Alacarte - Món 6',1,415,24,'0.08%',59,,38061,'4.4%','Horses','1.82','Low','High'],
+  ['itm','Alacarte - Món 7',1,358,48,'0.15%',135,,61132,'3.8%','Stars','2.28','High','High'],
+  ['itm','Alacarte - Món 8',1,345,13,'0.04%',39,,25894,'3.7%','Horses','1.72','Low','High'],
+  ['itm','Alacarte - Món 9',1,315,25,'0.08%',79,,57388,'3.3%','Stars','1.84','High','High'],
+  ['itm','Alacarte - Món 10',1,309,5,'0.02%',15,,12589,'3.3%','Horses','1.86','High','High'],
+];
+const clsMap={Stars:'cls-stars',Horses:'cls-horses',Puzzles:'cls-puzzles',Dogs:'cls-dogs'};
+const clsIcon={Stars:'⭐',Horses:'🐴',Puzzles:'🧩',Dogs:'🐾'};
+const mb=document.getElementById('menuBody');
+menu.forEach(m=>{
+  const [type,name,ind,items,gs,mix,ave,cost,gmi,mm,cls,freq,prof,pop]=m;
+  const isGrp=type==='grp';
+  const indent=ind*16;
+  const profCls=prof==='High'?'hl-hi':'hl-lo';
+  const popCls=pop==='High'?'hl-hi':'hl-lo';
+  mb.innerHTML+=`<tr style="${isGrp?'background:#f4f6f8;font-weight:600':''}">
+    <td class="l" style="padding-left:${10+indent}px;${isGrp?'font-weight:700':''}">${isGrp?'▸ ':''}${name}</td>
+    <td class="num">${items.toLocaleString()}</td>
+    <td class="num">${gs>=1000?(gs/1000).toFixed(1)+' tỷ':gs+'M'}</td>
+    <td class="num">${mix}</td>
+    <td class="num">${ave}K</td>
+    <td class="num code">${cost?cost+'K':'—'}</td>
+    <td class="num">${gmi.toLocaleString()}</td>
+    <td class="num">${mm}</td>
+    <td class="l"><span class="cls-pill ${clsMap[cls]}">${clsIcon[cls]} ${cls}</span></td>
+    <td class="num">${freq}</td>
+    <td class="l"><span class="${profCls}" style="padding:1px 7px;border-radius:4px">${prof}</span></td>
+    <td class="l"><span class="${popCls}" style="padding:1px 7px;border-radius:4px">${pop}</span></td>
+  </tr>`;
+});
+document.getElementById('menuTotal').innerHTML=
+  `<td class="l">Total</td><td class="num">182,822</td><td class="num">31.6 tỷ</td><td class="num">100.00%</td>
+   <td class="num">157K</td><td class="num code">—</td><td class="num">99,291</td><td class="num">99.1%</td>
+   <td class="l"><span class="cls-pill cls-stars">⭐ Stars</span></td><td class="num">1.69</td>
+   <td class="l"><span class="hl-hi" style="padding:1px 7px;border-radius:4px">High</span></td>
+   <td class="l"><span class="hl-hi" style="padding:1px 7px;border-radius:4px">High</span></td>`;
+
+/* ============ TAB 4: P&L (full variance) ============ */
+/* [level, name, key?, actual(str), perT(str), gsPct, tgPct, dTG, lmPct, dLM] */
+const pnlF=[
+  [0,'Gross Sales',0,'59,166,916,334','835,184','100.00%','100.00%','0.00%','100.00%','0.00%'],
+  [2,'#T',0,'70,843','','','','','',''],
+  [2,'AOV',0,'835,184','','','','','',''],
+  [2,'TC',0,'174,299','2','','','','',''],
+  [2,'TA',0,'339,456','','','','','',''],
+  [1,'Cost of Sales',0,'20,987,429,027','296,253','35.47%','35.72%','-0.25%','34.90%','+0.57%'],
+  [0,'Gross Margin',0,'38,179,487,307','538,931','64.53%','64.28%','+0.25%','65.10%','-0.57%'],
+  [1,'Operating expense',0,'14,136,592,890','199,548','23.89%','24.39%','-0.50%','24.76%','-0.87%'],
+  [2,'Cost of Labor',0,'6,541,897,460','92,344','11.06%','11.35%','-0.30%','11.51%','-0.46%'],
+  [3,'Base Payroll',0,'6,541,568,697','92,339','11.06%','11.35%','-0.30%','10.78%','+0.28%'],
+  [3,'Overtime & Holiday',0,'328,763','5','0.00%','','','','-0.74%'],
+  [2,'Cost of Utilities',0,'4,141,005,962','58,453','7.00%','7.22%','-0.23%','6.60%','+0.40%'],
+  [3,'Utilities',0,'2,743,560,494','38,727','4.64%','4.83%','-0.19%','4.28%','+0.35%'],
+  [3,'Tool & Supply',0,'501,998,898','7,086','0.85%','0.88%','-0.04%','0.74%','+0.11%'],
+  [3,'Maintenance',0,'151,567,835','2,139','0.26%','0.23%','+0.03%','0.25%','+0.00%'],
+  [3,'Merchant fees',0,'325,102,801','4,589','0.55%','0.49%','+0.05%','0.51%','+0.04%'],
+  [3,'Other',0,'418,775,934','5,911','0.71%','0.79%','-0.08%','0.82%','-0.11%'],
+  [2,'Cost of Marketing',0,'3,453,689,468','48,751','5.84%','5.81%','+0.02%','6.65%','-0.82%'],
+  [3,'Branding cost',0,'571,793,399','8,071','0.97%','1.56%','-0.60%','1.16%','-0.19%'],
+  [3,'Promotion cost',0,'2,881,896,069','40,680','4.87%','4.25%','+0.62%','5.49%','-0.62%'],
+  [0,'Contribution Margin',1,'24,042,894,417','339,383','40.64%','39.89%','+0.75%','40.34%','+0.29%'],
+  [1,'Non-controllable expense',0,'14,455,343,256','204,048','24.43%','23.09%','+1.34%','24.29%','+0.14%'],
+  [2,'Rent',0,'9,104,560,605','128,517','15.39%','14.67%','+0.72%','15.27%','+0.12%'],
+  [3,'Base Rent',0,'8,814,674,678','124,425','14.90%','14.18%','+0.72%','14.73%','+0.17%'],
+  [3,'Parking & Security Fees',0,'289,885,927','4,092','0.49%','0.49%','-0.00%','0.54%','-0.05%'],
+  [2,'G&A',0,'1,999,048,932','28,218','3.38%','3.32%','+0.06%','3.37%','+0.01%'],
+  [3,'SCM Chargeback',0,'1,183,338,327','16,704','2.00%','2.00%','0.00%','2.00%','0.00%'],
+  [3,'Team incentives',0,'443,751,885','6,264','0.75%','0.75%','0.00%','0.75%','0.00%'],
+  [3,'Annual bonus',0,'371,958,720','5,250','0.63%','0.57%','+0.06%','0.62%','+0.01%'],
+  [3,'Quỹ phát triển sản phẩm',0,'0','0','0.00%','','','0.00%',''],
+  [2,'D&A Total',0,'3,351,733,719','47,312','5.66%','5.10%','+0.56%','5.65%','+0.02%'],
+  [3,'D&A',0,'3,222,089,975','45,482','5.45%','5.10%','+0.34%','5.53%','-0.09%'],
+  [3,'Pre-opening cost',0,'129,643,744','1,830','0.22%','','','0.12%','+0.10%'],
+  [0,'Unit Contribution',1,'9,587,551,161','135,335','16.20%','16.80%','-0.59%','16.05%','+0.15%'],
+  [0,'EBITDA',1,'12,939,284,880','182,647','21.87%','21.90%','-0.03%','21.70%','+0.17%'],
+];
+/* delta cell: for revenue/margin lines positive=good; for cost lines positive=bad.
+   We classify by name: margin/sales/contribution/EBITDA = revenue-type */
+const revLines=new Set(['Gross Sales','Gross Margin','Contribution Margin','Unit Contribution','EBITDA']);
+function deltaCell(val,name){
+  if(!val) return '<td class="num"></td>';
+  const n=parseFloat(val.replace('%',''));
+  if(isNaN(n)||n===0) return `<td class="num code">${val}</td>`;
+  const isRev=revLines.has(name);
+  // good if (rev && positive) or (cost && negative)
+  const good = isRev ? n>0 : n<0;
+  return `<td class="num" style="font-weight:600;color:${good?'#1f8a5b':'#c0392b'}">${val}</td>`;
+}
+(function renderPnlFull(){
+  const body=document.getElementById('pnlFullBody');
+  body.innerHTML=pnlF.map(r=>{
+    const [lvl,name,key,actual,perT,gs,tg,dtg,lm,dlm]=r;
+    const cls=`lv${lvl}${key?' key':''}`;
+    return `<tr class="${cls}">
+      <td class="l">${name}</td>
+      <td class="num">${actual}</td><td class="num">${perT}</td><td class="num">${gs}</td>
+      <td class="num">${tg||''}</td>${deltaCell(dtg,name)}
+      <td class="num">${lm||''}</td>${deltaCell(dlm,name)}
+    </tr>`;
+  }).join('');
+})();
+
+/* variance diverging bars — key cost & margin lines vs Target */
+function divergeBars(containerId, rows, maxAbs){
+  // rows: [label, deltaValue(number, +=bad for cost), isRevType]
+  const html=rows.map(([lbl,d,isRev])=>{
+    const good = isRev ? d>0 : d<0;
+    const w=Math.min(Math.abs(d)/maxAbs*50,50); // half-width max
+    const fillCls=good?'good':'bad';
+    const valCls=good?'good':'bad';
+    return `<div class="vbar-row">
+      <div class="vbar-lbl">${lbl}</div>
+      <div class="vbar-track"><div class="vbar-mid"></div><div class="vbar-fill ${fillCls}" style="width:${w}%"></div></div>
+      <div class="vbar-val ${valCls}">${d>0?'+':''}${d.toFixed(2)}%</div>
+    </div>`;
+  }).join('');
+  document.getElementById(containerId).innerHTML=html;
+}
+/* vs Target (Δ%GS vs TG) — value is delta in %GS points */
+divergeBars('varChartTG',[
+  ['Cost of Sales',-0.25,false],
+  ['Cost of Labor',-0.30,false],
+  ['Cost of Utilities',-0.23,false],
+  ['Cost of Marketing',+0.02,false],
+  ['Rent',+0.72,false],
+  ['G&A',+0.06,false],
+  ['D&A Total',+0.56,false],
+  ['Contribution Margin',+0.75,true],
+  ['Unit Contribution',-0.59,true],
+], 1.0);
+/* vs Last Month */
+divergeBars('varChartLM',[
+  ['Cost of Sales',+0.57,false],
+  ['Cost of Labor',-0.46,false],
+  ['Cost of Utilities',+0.40,false],
+  ['Cost of Marketing',-0.82,false],
+  ['Rent',+0.12,false],
+  ['Gross Margin',-0.57,true],
+  ['Contribution Margin',+0.29,true],
+  ['Unit Contribution',+0.15,true],
+  ['EBITDA',+0.17,true],
+], 1.0);
+
+
+/* ============ TAB 5: CƠ CẤU MÓN BÁN ============ */
+const catC={ 'Món chính':'#2b83d6','Món chia sẻ':'#1e4f8f','Đồ uống':'#e08a3a','Gọi thêm':'#8a5cc4','Khác':'#c94f6d' };
+/* donut = revenue mix */
+const donut2Data=[['Món chính',72.6],['Món chia sẻ',16.0],['Đồ uống',8.9],['Gọi thêm',1.7],['Khác',0.7]];
+const d2=document.getElementById('donut2'); let o2=0; const R2=15.9155;
+donut2Data.forEach(([n,p])=>{
+  const c=catC[n]; const el=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  el.setAttribute('cx','21');el.setAttribute('cy','21');el.setAttribute('r',R2);
+  el.setAttribute('fill','transparent');el.setAttribute('stroke',c);el.setAttribute('stroke-width','7');
+  el.setAttribute('stroke-dasharray',`${p} ${100-p}`);el.setAttribute('stroke-dashoffset',`${25-o2}`);
+  d2.appendChild(el); o2+=p;
+});
+document.getElementById('donut2Legend').innerHTML=donut2Data.map(([n,p])=>
+  `<div><span class="sw" style="background:${catC[n]}"></span>${n} — <b>${p}%</b></div>`).join('');
+
+/* anatomy of 1 bill */
+const anat=[
+  ['Món chính','12,574,174,000','72.6%','497,829','2.4'],
+  ['Món chia sẻ','2,763,446,000','16.0%','109,409','1.1'],
+  ['Đồ uống','1,539,847,000','8.9%','60,965','1.7'],
+  ['Gọi thêm','301,891,000','1.7%','11,952','5.7'],
+  ['Khác','128,777,000','0.7%','5,098','0.9'],
+];
+document.getElementById('anatBody').innerHTML=anat.map(a=>
+  `<tr><td class="l store">${a[0]}</td><td class="num">${a[1]}</td><td class="num">${a[2]}</td><td class="num">${a[3]}</td><td class="num">${a[4]}</td></tr>`).join('');
+document.getElementById('anatTotal').innerHTML=
+  `<td class="l">Total</td><td class="num">17,308,135,000</td><td class="num">100.0%</td><td class="num">685,254</td><td class="num">11.9</td>`;
+
+/* store 100% mix */
+const smixLoai=['Món chính','Món chia sẻ','Đồ uống','Gọi thêm','Khác'];
+document.getElementById('smixLegend').innerHTML=smixLoai.map(n=>
+  `<span><span class="dot" style="background:${catC[n]}"></span>${n}</span>`).join('');
+const smix=[
+  ['Cửa hàng 01',[73.1,15.1,9.7,1.4,0.7]],
+  ['Cửa hàng 02',[73.3,14.8,9.3,1.3,1.2]],
+  ['Cửa hàng 03',[76.3,12.6,8.8,1.2,1.1]],
+  ['Cửa hàng 04',[71.7,15.2,9.7,2.1,1.3]],
+  ['Cửa hàng 05',[66.6,20.6,10.0,1.8,0.9]],
+  ['Cửa hàng 06',[72.1,17.2,9.2,1.3,0.2]],
+  ['Cửa hàng 07',[71.3,17.2,8.5,2.4,0.7]],
+  ['Cửa hàng 08',[74.5,15.8,8.4,1.0,0.3]],
+  ['Cửa hàng 09',[73.9,13.9,9.1,2.0,1.2]],
+  ['Cửa hàng 10',[72.5,16.4,8.6,2.1,0.4]],
+  ['Cửa hàng 11',[71.8,17.0,9.1,1.4,0.7]],
+  ['Cửa hàng 12',[70.9,16.2,8.8,3.3,0.8]],
+  ['Cửa hàng 13',[71.8,15.4,9.5,2.5,0.8]],
+  ['Cửa hàng 14',[74.6,15.2,7.8,1.6,0.8]],
+  ['Cửa hàng 15',[73.9,14.5,9.1,1.7,0.8]],
+  ['Cửa hàng 16',[72.3,17.9,8.1,1.0,0.7]],
+  ['Cửa hàng 17',[71.2,17.0,9.4,1.6,0.8]],
+  ['Cửa hàng 18',[73.7,15.2,8.6,1.7,0.8]],
+  ['Cửa hàng 19',[69.8,17.5,8.8,3.1,0.8]],
+  ['Cửa hàng 20',[70.9,16.8,9.4,2.1,0.8]],
+];
+document.getElementById('smixBars').innerHTML=smix.map(s=>{
+  const [name,vals]=s;
+  let bar=vals.map((v,i)=>`<span style="width:${v}%;background:${catC[smixLoai[i]]}" title="${smixLoai[i]}: ${v}%">${v>=8?v+'%':''}</span>`).join('');
+  return `<div class="smix-row"><div class="smix-name">${name}</div><div class="smix-bar">${bar}</div></div>`;
+}).join('');
+
+/* pareto: 15 bars + cumulative line */
+const paretoVals=[906,842,712,638,528,391,325,308,270,243,228,187,163,156,139];
+const paretoTot=17308; // total M for cumulative context; use running sum of shown+rest approx
+let running=0; const grandForCum=paretoVals.reduce((a,b)=>a+b,0)/0.63; // ~ so top15 ≈ 63% cum feel
+const maxBar=paretoVals[0];
+const cumPts=[];
+let cum=0;
+const pc=document.getElementById('paretoChart');
+paretoVals.forEach((v,i)=>{
+  cum+=v;
+  const h=(v/maxBar*100);
+  pc.innerHTML+=`<div class="pbar" style="height:${h}%" title="Món ${i+1}: ${v}M"></div>`;
+  cumPts.push(cum);
+});
+// cumulative overlay line (SVG)
+const cumMax=cumPts[cumPts.length-1];
+const pts=cumPts.map((c,i)=>{
+  const x=((i+0.5)/paretoVals.length*100);
+  const y=100-(c/cumMax*90);
+  return `${x},${y}`;
+}).join(' ');
+const svgLine=`<svg class="pline" viewBox="0 0 100 100" preserveAspectRatio="none">
+  <polyline points="${pts}" fill="none" stroke="#c0392b" stroke-width="0.8"/>
+  ${cumPts.map((c,i)=>{const x=((i+0.5)/paretoVals.length*100);const y=100-(c/cumMax*90);return `<circle cx="${x}" cy="${y}" r="0.9" fill="#c0392b"/>`}).join('')}
+</svg>`;
+pc.innerHTML+=svgLine;
+
+/* top 10 rev / qty */
+const topRev=[
+  ['Combo A (gia đình)','Món chính','906,280,000','5.2%'],
+  ['Steak B · 280g','Món chính','841,890,000','4.9%'],
+  ['Steak C · 360g','Món chính','712,217,000','4.1%'],
+  ['Combo D (cặp đôi)','Món chính','670,880,000','3.9%'],
+  ['Steak E · 180g','Món chính','638,073,000','3.7%'],
+  ['Steak F','Món chính','632,820,000','3.7%'],
+  ['Steak G · 180g','Món chính','602,957,000','3.5%'],
+  ['Steak H · 180g','Món chính','527,951,000','3.1%'],
+  ['Steak I · 180g','Món chính','507,129,000','2.9%'],
+  ['Steak J · 180g','Món chính','503,316,000','2.9%'],
+];
+document.getElementById('topRevBody').innerHTML=topRev.map(t=>
+  `<tr><td class="l">${t[0]}</td><td class="l"><span class="pill core">${t[1]}</span></td><td class="num">${t[2]}</td><td class="num">${t[3]}</td></tr>`).join('');
+const topQty=[
+  ['Bánh mì phụ 1','Gọi thêm','32,465'],
+  ['Khăn lạnh','Khác','23,911'],
+  ['Món kèm 2','Gọi thêm','19,798'],
+  ['Bánh mì phụ 2','Gọi thêm','9,188'],
+  ['Sốt A','Gọi thêm','9,173'],
+  ['Sốt B','Gọi thêm','8,918'],
+  ['Súp A','Gọi thêm','8,365'],
+  ['Khoai chiên','Gọi thêm','7,191'],
+  ['Sốt C','Gọi thêm','7,052'],
+  ['Nước A','Đồ uống','5,438'],
+];
+document.getElementById('topQtyBody').innerHTML=topQty.map(t=>{
+  const pc={'Gọi thêm':'#8a5cc4','Khác':'#c94f6d','Đồ uống':'#e08a3a'}[t[1]]||'#888';
+  return `<tr><td class="l">${t[0]}</td><td class="l"><span style="color:#fff;background:${pc};padding:1px 7px;border-radius:20px;font-size:10px;font-weight:600">${t[1]}</span></td><td class="num">${t[2]}</td></tr>`;
+}).join('');
+
+/* ============ TAB 6: CUSTOMER BEHAVIOR ============ */
+function drawDonut(svgId, data){ // data: [[name,pct,color],...]
+  const svg=document.getElementById(svgId); let off=0; const R=15.9155;
+  data.forEach(([n,p,c])=>{
+    const el=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    el.setAttribute('cx','21');el.setAttribute('cy','21');el.setAttribute('r',R);
+    el.setAttribute('fill','transparent');el.setAttribute('stroke',c);el.setAttribute('stroke-width','7');
+    el.setAttribute('stroke-dasharray',`${p} ${100-p}`);el.setAttribute('stroke-dashoffset',`${25-off}`);
+    svg.appendChild(el); off+=p;
+  });
+}
+function legendHTML(data){return data.map(([n,p,c])=>`<div><span class="sw" style="background:${c}"></span>${n} — <b>${p}%</b></div>`).join('');}
+/* heat cell for AOV column: warmer = higher */
+function ovRow(cells, heatIdx, heatMin, heatMax){
+  return '<tr>'+cells.map((c,i)=>{
+    if(i===0) return `<td class="l store">${c}</td>`;
+    if(i===heatIdx){
+      const v=parseFloat(String(c).replace(/[^\d.]/g,''));
+      const a=Math.max(0,Math.min((v-heatMin)/(heatMax-heatMin),1));
+      return `<td class="num heatnum" style="background:rgba(224,138,58,${0.12+a*0.6});color:${a>0.6?'#fff':'#7a4410'}">${c}</td>`;
+    }
+    return `<td class="num">${c}</td>`;
+  }).join('')+'</tr>';
+}
+const blueShades=['#7fb0d4','#2b6ca3','#1b4a6b','#bcd4e8','#4a8bc0'];
+
+/* Group size */
+const gsDonutData=[['2 người',51.3,'#2b6ca3'],['3-4 người',26.8,'#1b4a6b'],['1 người',13.2,'#7fb0d4'],['trên 5 người',8.7,'#bcd4e8']];
+drawDonut('gsDonut',gsDonutData); document.getElementById('gsLegend').innerHTML=legendHTML(gsDonutData);
+const gsRows=[
+  ['3-4 người','1,005K','12.26','301,779','151,504','50.2%','44.0%'],
+  ['2 người','652K','9.46','325,923','163,153','50.1%','43.9%'],
+  ['trên 5 người','1,969K','16.69','307,027','158,609','51.7%','41.7%'],
+  ['1 người','357K','6.19','357,492','190,308','53.2%','41.2%'],
+];
+document.getElementById('gsBody').innerHTML=gsRows.map(r=>ovRow(r,1,357,1969)).join('')
+  +`<tr class="totalrow"><td class="l">Total</td><td class="num">682K</td><td class="num">9.36</td><td class="num">321,061</td><td class="num">162,637</td><td class="num">50.7%</td><td class="num">43.4%</td></tr>`;
+
+/* Daypart */
+const dpDonutData=[['dinner',58.4,'#1b4a6b'],['lunch',37.5,'#f0d9b8'],['late lunch',4.1,'#e08a3a']];
+drawDonut('dpDonut',dpDonutData); document.getElementById('dpLegend').innerHTML=legendHTML(dpDonutData);
+const dpRows=[
+  ['lunch','653K','9.32','312,658','156,333','50.0%','44.3%'],
+  ['dinner','712K','9.55','327,006','166,439','50.9%','42.9%'],
+  ['late lunch','559K','7.63','316,847','168,555','53.2%','41.7%'],
+];
+document.getElementById('dpBody').innerHTML=dpRows.map(r=>ovRow(r,1,559,712)).join('')
+  +`<tr class="totalrow"><td class="l">Total</td><td class="num">682K</td><td class="num">9.36</td><td class="num">321,061</td><td class="num">162,637</td><td class="num">50.7%</td><td class="num">43.4%</td></tr>`;
+
+/* Customer type */
+const ctDonutData=[['T-Repeat (quay lại)',46.9,'#1b4a6b'],['T-Non (vãng lai)',24.3,'#2b6ca3'],['T-New (mới)',23.8,'#7fb0d4'],['T-Reactive (kích hoạt lại)',5.0,'#bcd4e8']];
+drawDonut('ctDonut',ctDonutData); document.getElementById('ctLegend').innerHTML=legendHTML(ctDonutData);
+const ctRows=[
+  ['T-New (mới)','731K','10.63','320,659','148,906','46.4%','48.6%'],
+  ['T-Reactive (kích hoạt lại)','725K','10.60','320,751','149,552','46.6%','47.7%'],
+  ['T-Repeat (quay lại)','717K','10.03','323,807','149,230','46.1%','45.0%'],
+  ['T-Non (vãng lai)','580K','7.13','316,338','203,853','64.4%','34.3%'],
+];
+document.getElementById('ctBody').innerHTML=ctRows.map(r=>ovRow(r,1,580,731)).join('')
+  +`<tr class="totalrow"><td class="l">Total</td><td class="num">682K</td><td class="num">9.36</td><td class="num">321,061</td><td class="num">162,637</td><td class="num">50.7%</td><td class="num">43.4%</td></tr>`;
+
+/* ============ TAB 7: CUSTOMER BASE ============ */
+/* new->repeat by store */
+const newRepStore=[
+  ['Cửa hàng 01',5.62],['Cửa hàng 02',5.49],['Cửa hàng 03',5.19],['Cửa hàng 04',4.92],
+  ['Cửa hàng 05',4.89],['Cửa hàng 06',4.75],['Cửa hàng 07',4.36],['Cửa hàng 08',4.33],
+  ['Cửa hàng 09',4.26],['Cửa hàng 10',4.23],['Cửa hàng 11',4.07],
+];
+const nrMax=Math.max(...newRepStore.map(x=>x[1]));
+document.getElementById('newRepStore').innerHTML=newRepStore.map(([n,v])=>
+  `<div class="hbar-row"><div class="hbar-name">${n}</div><div class="hbar-track"><div class="hbar-fill" style="width:${v/nrMax*100}%"></div></div><div class="hbar-val">${v}%</div></div>`).join('');
+
+/* reactive by store */
+const reactStore=[
+  ['Cửa hàng 06',2.06],['Cửa hàng 02',1.59],['Cửa hàng 14',1.36],['Cửa hàng 12',1.18],
+  ['Cửa hàng 10',1.17],['Cửa hàng 13',1.15],['Cửa hàng 21',1.05],['Cửa hàng 17',0.94],
+  ['Cửa hàng 22',0.93],['Cửa hàng 03',0.91],['Cửa hàng 23',0.89],
+];
+const rsMax=Math.max(...reactStore.map(x=>x[1]));
+document.getElementById('reactStore').innerHTML=reactStore.map(([n,v])=>
+  `<div class="hbar-row"><div class="hbar-name">${n}</div><div class="hbar-track"><div class="hbar-fill" style="width:${v/rsMax*100}%"></div></div><div class="hbar-val">${v}%</div></div>`).join('');
+
+/* cohort retention triangle */
+const cohortMonths=['T-07','T-08','T-09','T-10','T-11','T-12','T-01','T-02','T-03','T-04','T-05','T-06','T-07'];
+const cohort=[ /* each row: [label, [m0..mN percentages]] */
+  ['Nhóm 1',[100,7.40,5.50,5.49,5.34,5.31,4.47,3.84,4.16,4.06,4.65,4.25,0.99]],
+  ['Nhóm 2',[100,5.90,5.39,4.79,4.81,4.10,4.06,3.88,3.77,4.08,4.30,0.88]],
+  ['Nhóm 3',[100,6.45,5.18,4.79,4.37,3.80,4.45,3.56,4.17,3.94,0.64]],
+  ['Nhóm 4',[100,6.41,5.38,4.48,4.03,3.87,3.82,4.08,4.01,0.81]],
+  ['Nhóm 5',[100,6.81,5.15,4.23,4.45,4.33,4.19,4.27,0.80]],
+  ['Nhóm 6',[100,6.08,4.67,4.63,4.42,4.32,4.40,0.97]],
+  ['Nhóm 7',[100,5.62,5.18,4.57,4.68,4.17,0.94]],
+  ['Nhóm 8',[100,5.43,4.51,4.39,3.61,0.99]],
+  ['Nhóm 9',[100,5.90,5.12,4.81,1.09]],
+  ['Nhóm 10',[100,6.62,5.21,1.25]],
+  ['Nhóm 11',[100,6.46,1.23]],
+  ['Nhóm 12',[100,1.86]],
+  ['Nhóm 13',[100]],
+];
+document.getElementById('cohortHead').innerHTML='<th class="l">Cohort</th>'+
+  Array.from({length:13},(_,i)=>`<th>M+${i}</th>`).join('');
+function cohortColor(v){
+  if(v===undefined) return '';
+  if(v>=100) return 'background:#dbe9fb;color:#1552c0;font-weight:700';
+  const a=Math.min(v/8,1);
+  return `background:rgba(43,108,224,${0.08+a*0.55});color:${a>0.6?'#fff':'#123a7a'}`;
+}
+document.getElementById('cohortBody').innerHTML=cohort.map(([lbl,vals])=>{
+  let row=`<td class="l">${lbl}</td>`;
+  for(let i=0;i<13;i++){ const v=vals[i]; row+=`<td style="${cohortColor(v)}">${v!==undefined?v+'%':''}</td>`; }
+  return `<tr>${row}</tr>`;
+}).join('');
+
+/* repeat behavior by visit */
+const repeat=[
+  ['Quay lại Lần 1',32417,'12.34%','770,376','327,218','2.35',''],
+  ['Lần 2',35119,'22.48%','769,395','331,612','2.32','84'],
+  ['Lần 3',18055,'29.02%','745,148','331,020','2.25','65'],
+  ['Lần 4',10981,'33.07%','721,618','321,451','2.24','52'],
+  ['Lần 5',7232,'37.38%','704,224','330,239','2.13','45'],
+  ['Lần 6',5011,'39.51%','679,794','328,998','2.07','38'],
+  ['Lần 7',3597,'40.48%','660,553','325,391','2.03','33'],
+  ['Lần 8',2692,'42.90%','649,544','324,591','2.00','30'],
+  ['Lần 9',2061,'44.88%','632,246','323,420','1.95','27'],
+  ['Lần 10',1582,'43.43%','642,040','330,957','1.94','23'],
+  ['Lần 10+',12399,'32.08%','609,146','324,517','1.88','11'],
+];
+document.getElementById('repeatBody').innerHTML=repeat.map(r=>
+  `<tr><td class="l store">${r[0]}</td><td class="num">${r[1].toLocaleString()}</td><td class="num">${r[2]}</td>
+   <td class="num">${r[3]}</td><td class="num">${r[4]}</td><td class="num">${r[5]}</td><td class="num code">${r[6]||'—'}</td></tr>`).join('');
+document.getElementById('repeatTotal').innerHTML=
+  `<td class="l">Tổng khách quay lại</td><td class="num">131,146</td><td class="num">25.66%</td><td class="num">730,994</td><td class="num">328,387</td><td class="num">2.23</td><td class="num">57</td>`;
+
+/* ============ TAB 8: BUFFET PERFORMANCE ============ */
+/* [name,#T,#GS(M),netSale(M),costNVL(M),GM(M),%GM,%Cost,%CostDM, thrLabel, thrType, haohut(M)] */
+const buffet=[
+  ['Combo nướng A · 239K',258,64,61,53,9,'13.6%','82.0%','51.2%','Vượt ngưỡng 30.9%','over',20],
+  ['Combo nướng lẩu B · 699K',252,181,178,128,51,'28.1%','70.5%','42.5%','Vượt ngưỡng 28.0%','over',51],
+  ['Buffet Trẻ Em · 100K',407,50,47,35,12,'24.1%','68.9%','254.2%','Tiết kiệm 185.3%','save',-93],
+  ['Combo đầy đủ C · 699K',323,233,228,152,77,'32.9%','65.1%','37.1%','Vượt ngưỡng 28.1%','over',65],
+  ['Combo nướng lẩu D · 799K',194,163,159,103,56,'34.6%','63.2%','38.2%','Vượt ngưỡng 25.0%','over',41],
+  ['Buffet Trẻ Em · 150K',366,70,67,43,24,'34.5%','62.3%','231.5%','Tiết kiệm 169.2%','save',-118],
+  ['Buffet Trẻ Em · 120K',2189,340,328,187,141,'41.6%','55.0%','221.0%','Tiết kiệm 166.0%','save',-564],
+  ['Combo đầy đủ E · 569K',456,262,255,143,112,'42.7%','54.7%','32.3%','Vượt ngưỡng 22.4%','over',59],
+  ['Alacarte - Bò Kobe',299,48,47,26,22,'45.6%','53.1%','35.0%','Vượt ngưỡng 18.1%','over',9],
+  ['Combo đầy đủ F · 469K',458,231,223,122,100,'43.4%','53.1%','31.9%','Vượt ngưỡng 21.2%','over',49],
+  ['Bia lon G',517,48,46,25,21,'43.6%','51.8%','49.1%','Cảnh báo > 2.7%','warn',1],
+  ['Alacarte - Mực nang',117,18,18,9,9,'48.1%','49.7%','32.7%','Vượt ngưỡng 16.9%','over',3],
+];
+function thrCls(t){return t==='over'?'thr-over':t==='save'?'thr-save':'thr-warn';}
+function gmColor(v){ // %GM string
+  const n=parseFloat(v);
+  if(n<0) return 'background:#f0b088;color:#7a3d1e';
+  const a=Math.min(n/60,1);
+  return `background:rgba(31,138,91,${0.10+a*0.35});color:#12503a`;
+}
+document.getElementById('buffetBody').innerHTML=buffet.map(b=>
+  `<tr><td class="l store">${b[0]}</td><td class="num">${b[1].toLocaleString()}</td><td class="num">${b[2]}M</td>
+   <td class="num">${b[3]}M</td><td class="num">${b[4]}M</td><td class="num">${b[5]}M</td>
+   <td class="num"><span class="gmbar" style="${gmColor(b[6])}">${b[6]}</span></td>
+   <td class="num">${b[7]}</td><td class="num code">${b[8]}</td>
+   <td class="l ${thrCls(b[9].includes('Vượt')?'over':b[9].includes('Tiết')?'save':'warn')}">${b[9]}</td>
+   <td class="num ${b[11]<0?'neg':'pos'}">${b[11]>0?'+':''}${b[11]}M</td></tr>`).join('');
+document.getElementById('buffetTotal').innerHTML=
+  `<td class="l">Total</td><td class="num">25,778</td><td class="num">31,584M</td><td class="num">29,782M</td>
+   <td class="num">11,212M</td><td class="num">18,570M</td><td class="num">58.8%</td><td class="num">35.5%</td>
+   <td class="num code">125.7%</td><td class="l thr-save">Tiết kiệm 90.2%</td><td class="num neg">−28,491M</td>`;
+
+/* cost efficiency by category */
+const catEff=[
+  ['DESSERT (Tráng miệng)','0M','0.3%','0.2%','3.4%'],
+  ['ĐỒ ĂN','11,017M','38.1%','136.8%','99.8%'],
+  ['— Alacarte','206M','33.9%','20.9%','8.4%'],
+  ['— Buffet','9,946M','37.8%','147.6%','87.7%'],
+  ['— Combo 2 người','863M','44.7%','26.7%','10.5%'],
+  ['— Đồ Combo','0M','28.2%','20.0%','5.4%'],
+];
+document.getElementById('catEffBody').innerHTML=catEff.map(c=>
+  `<tr${c[0].startsWith('—')?'':' style="font-weight:600;background:#faf6f2"'}><td class="l" style="${c[0].startsWith('—')?'padding-left:24px;color:#6b7773':''}">${c[0]}</td>
+   <td class="num">${c[1]}</td><td class="num">${c[2]}</td><td class="num code">${c[3]}</td><td class="num">${c[4]}</td></tr>`).join('');
+
+/* cost distribution donut */
+const costC=['#1b3a52','#2b5a7a','#3a7a9a','#5a9ab5','#7ab5c8','#a0cdd8','#c8e0e5','#e0b088','#d89a5a','#c07a3a'];
+const costData=[
+  ['Thịt bò',24],['Blank',14],['Thịt lợn',9],['Hải sản',9],['Thịt bò 1',9],
+  ['Khai vị',7],['Rau mỳ',6],['Sốt',5],['Sashimi',5],['Tráng miệng',4]
+];
+const cd=document.getElementById('costDonut'); let oc=0;
+costData.forEach(([n,p],i)=>{
+  const el=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  el.setAttribute('cx','21');el.setAttribute('cy','21');el.setAttribute('r',15.9155);
+  el.setAttribute('fill','transparent');el.setAttribute('stroke',costC[i]);el.setAttribute('stroke-width','7');
+  el.setAttribute('stroke-dasharray',`${p} ${100-p}`);el.setAttribute('stroke-dashoffset',`${25-oc}`);
+  cd.appendChild(el); oc+=p;
+});
+document.getElementById('costLegend').innerHTML=costData.map(([n,p],i)=>
+  `<div><span class="sw" style="background:${costC[i]}"></span>${n} — <b>${p}%</b></div>`).join('');
+
+/* ============ TAB 9: FORECASTING ============ */
+/* baseline: [daypart, dayType, tableTurn, servingTime, tableProd, fillRate, #T, GS, AOV] */
+const baseline=[
+  ['Lunch','Weekdays','0.51','210','2.95','1.3','13,400','12,096.6M','902.7K'],
+  ['Lunch','Weekend','—','210','2.93','—','3,767','3,481.4M','924.2K'],
+  ['Late Lunch','Weekdays','0.13','180','2.60','0.2','1,999','1,526.5M','763.6K'],
+  ['Late Lunch','Weekend','—','180','2.61','—','658','513.3M','780.1K'],
+  ['Dinner','Weekdays','1.05','270','3.47','3.2','28,370','27,171.8M','957.8K'],
+  ['Dinner','Weekend','—','270','3.55','—','6,022','5,693.7M','945.5K'],
+];
+document.getElementById('baselineBody').innerHTML=baseline.map(b=>
+  `<tr><td class="l store">${b[0]}</td><td class="l">${b[1]}</td><td class="num">${b[2]}</td><td class="num">${b[3]}</td>
+   <td class="num">${b[4]}</td><td class="num">${b[5]}</td><td class="num">${b[6]}</td><td class="num">${b[7]}</td><td class="num">${b[8]}</td></tr>`).join('');
+
+/* growth: [daypart,dayType,#Tbase,#Tnew,#Tuplift,GSbase,GSnew,GSuplift] */
+const growth=[
+  ['Lunch','Weekdays','13,400','3,054','10,346','12,096.6M','2,757.3M','9,339.3M'],
+  ['Lunch','Weekend','3,767','—','3,767','3,481.4M','—','3,481.4M'],
+  ['Late Lunch','Weekdays','1,999','1,328','671','1,526.5M','1,013.9M','512.6M'],
+  ['Late Lunch','Weekend','658','—','658','513.3M','—','513.3M'],
+  ['Dinner','Weekdays','28,370','9,361','19,009','27,171.8M','8,965.4M','18,206.4M'],
+  ['Dinner','Weekend','6,022','—','6,022','5,693.7M','—','5,693.7M'],
+];
+document.getElementById('growthBody').innerHTML=growth.map(g=>
+  `<tr><td class="l store">${g[0]}</td><td class="l">${g[1]}</td><td class="num">${g[2]}</td><td class="num">${g[3]}</td>
+   <td class="num pos" style="color:#6a54c4">${g[4]}</td><td class="num">${g[5]}</td><td class="num">${g[6]}</td><td class="num pos" style="color:#6a54c4">${g[7]}</td></tr>`).join('');
+
+/* forecast by month: Forecast TY vs Actual LY */
+const fcMonths=['','T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12','Total'];
+document.getElementById('fcHead').innerHTML=fcMonths.map((m,i)=>`<th class="${i===0?'l':''}">${m}</th>`).join('');
+const fcRows=[
+  ['Forecast TY',['','12,746','','','','','','','','','','','','12,746']],
+  ['Actual LY',['','39,072','36,993','39,430','36,515','41,376','41,946','42,216','50,261','45,252','47,437','45,219','51,356','517,073']],
+];
+document.getElementById('fcBody').innerHTML=fcRows.map((r,ri)=>{
+  const cells=r[1].map((c,i)=>i===0?`<td class="l store">${r[0]}</td>`:`<td class="num${ri===0?' pos':''}" ${ri===0&&c?'style="color:#6a54c4;font-weight:600"':''}>${c?c+'M':''}</td>`).join('');
+  return `<tr>${cells}</tr>`;
+}).join('');
+
+/* recon P&L: [name, TM, LM, %LM, target, %target, forecast, lmType, tgtType] */
+const recon=[
+  ['1. Doanh số tổng','50,483.2M','54,292.0M','93.0%','54,941.4M','91.9%','53,357.3M','bad','bad'],
+  ['2. Giảm trừ doanh số','','39.1M','','56.2M','','56.2M','',''],
+  ['3. Doanh thu thuần','50,483.2M','54,252.9M','93.1%','56,858.2M','88.8%','56,858.2M','bad','bad'],
+  ['4. Giá vốn hàng bán','17,654.5M','19,159.5M','92.1%','','','','bad',''],
+  ['5. Lợi nhuận gộp','','53,215.9M','','36,659.4M','','36,659.4M','',''],
+  ['6. Chi phí nhân công','1,518.0M','3,689.7M','41.1%','7,391.4M','20.5%','','bad','good'],
+  ['7. Chi phí bán hoạt động','3,386.3M','3,935.2M','86.1%','','','','bad',''],
+  ['8. LN từ kiểm soát tại NH','','37,411.1M','','24,908.4M','','24,908.4M','',''],
+  ['9. Thuê mặt bằng','8,081.8M','7,828.1M','103.2%','','','','good',''],
+  ['11. Khuyến mại','1,445.4M','2,902.6M','49.8%','1,397.9M','103.4%','1,397.9M','bad','good'],
+  ['12. Khấu hao đầu tư','3,666.8M','3,666.8M','100.0%','3,666.8M','100.0%','3,666.8M','good','good'],
+  ['14. LN NH trước khấu hao','','14,864.0M','','10,618.8M','','10,618.8M','',''],
+  ['15. Lợi nhuận NH','','11,148.7M','','7,719.2M','','7,719.2M','',''],
+];
+function pctCell(v,type){
+  if(!v) return '<td class="num"></td>';
+  const cls=type==='good'?'tgt-good':type==='bad'?'tgt-bad':'';
+  return `<td class="num">${cls?`<span class="${cls}">${v}</span>`:v}</td>`;
+}
+document.getElementById('reconBody').innerHTML=recon.map(r=>
+  `<tr><td class="l store">${r[0]}</td><td class="num">${r[1]}</td><td class="num">${r[2]}</td>
+   ${pctCell(r[3],r[7])}<td class="num">${r[4]}</td>${pctCell(r[5],r[8])}<td class="num">${r[6]}</td></tr>`).join('');
+
+/* ============ TAB 0: ANALYSIS MAP ============ */
+const mapData=[
+  { n:1, panel:'p1', name:'Hiệu suất NVL',
+    pain:'Food cost cao mà không truy được cửa hàng nào, món nào, nguyên liệu nào gây hao phí.',
+    insight:['Truy hao phí tới từng NVL của từng món/cửa hàng','<b>→</b> khoá định lượng bếp, đàm phán giá NVL vượt ngưỡng'],
+    val:'Cải thiện <b>1%</b> food cost → <b class="mapval">10 tỷ/năm</b><br><span style="color:#6b7773">GĐ: food cost ~33% = 330 tỷ</span>' },
+  { n:2, panel:'p2', name:'Cơ cấu chi tiêu / hóa đơn',
+    pain:'Không biết nhóm món nào còn dư địa up-sell, hóa đơn được xây từ đâu.',
+    insight:['Cơ cấu chi tiêu theo nhóm món / buổi / lượng khách','<b>→</b> thiết kế combo, gợi món đồ uống & gọi thêm'],
+    val:'Nâng AOV <b>2%</b> qua up-sell → <b class="mapval">20 tỷ/năm</b><br><span style="color:#6b7773">GĐ: +2% trên DT 1,000 tỷ</span>' },
+  { n:3, panel:'p3', name:'Ma trận Menu Engineering',
+    pain:'Menu 60-100 món, không biết món nào lãi thật vs doanh thu ảo.',
+    insight:['Phân loại Stars/Horses/Puzzles/Dogs theo lãi × phổ biến','<b>→</b> tăng giá Horses, đẩy Puzzles, cắt Dogs'],
+    val:'Nâng blended margin <b>1.5%</b> → <b class="mapval">15 tỷ/năm</b><br><span style="color:#6b7773">GĐ: không cần tăng DT</span>' },
+  { n:4, panel:'p4', name:'Báo cáo P&L + Variance',
+    pain:'P&L tổng gộp che mất từng điểm bán và dòng chi phí trượt target.',
+    insight:['P&L phân tầng tới CM + variance vs Target/tháng trước','<b>→</b> đóng/xoay store âm CM, xử lý dòng chi phí đỏ'],
+    val:'Chặn lỗ store + siết chi phí → <b class="mapval">8–12 tỷ/năm</b><br><span style="color:#6b7773">GĐ: ~0.5-1% DT cứu được</span>' },
+  { n:5, panel:'p5', name:'Cơ cấu món bán (Pareto)',
+    pain:'Không biết 80/20 nằm ở đâu, cửa hàng nào lệch mix.',
+    insight:['Pareto top món + món bán chạy = cửa ngõ up-sell','<b>→</b> bảo vệ món chủ lực, gợi kèm nâng AOV'],
+    val:'Nâng AOV <b>1%</b> qua món cửa ngõ → <b class="mapval">10 tỷ/năm</b><br><span style="color:#6b7773">GĐ: +1% AOV</span>' },
+  { n:6, panel:'p6', name:'Hành vi khách hàng',
+    pain:'Không biết phân khúc nào (nhóm/buổi) biên tốt để tập trung.',
+    insight:['Chi tiêu × food cost theo nhóm khách / buổi / loại khách','<b>→</b> combo nhóm đông, set-menu trưa tối ưu giá vốn'],
+    val:'Dịch mix sang phân khúc biên cao <b>+0.5% GM</b> → <b class="mapval">5 tỷ/năm</b><br><span style="color:#6b7773">GĐ: +0.5% GM</span>' },
+  { n:7, panel:'p7', name:'Phân tích tệp khách (CLV)',
+    pain:'Chỉ ~5% khách mới quay lại, chi phí kéo khách mới ngày càng đắt.',
+    insight:['Phễu New→Repeat, cohort retention, ROI voucher','<b>→</b> loyalty giữ Repeat, bịt "xô thủng" retention'],
+    val:'Nâng repeat rate vài điểm → <b class="mapval">15–30 tỷ/năm</b><br><span style="color:#6b7773">GĐ: đòn bẩy lớn nhất</span>' },
+  { n:8, panel:'p8', name:'Hiệu suất gói Buffet',
+    pain:'Food cost tổng nhìn đẹp nhưng từng gói lệch định mức, hao hụt mất kiểm soát.',
+    insight:['Từng gói: GM, food cost vs ĐM, hao hụt gram','<b>→</b> rà công thức gói vượt ngưỡng, kiểm soát portion'],
+    val:'Giảm 1% cost gói vượt ĐM → <b class="mapval">10 tỷ/năm</b><br><span style="color:#6b7773">GĐ: chồng lấn một phần DB①</span>' },
+  { n:9, panel:'p9', name:'Nền tảng Forecast',
+    pain:'Dự báo cảm tính, đặt target wishful, không biết dư địa công suất.',
+    insight:['Baseline công suất → dư địa fill rate → forecast → P&L target','<b>→</b> kế hoạch nhân sự/nhập hàng có cơ sở, target thực tế'],
+    val:'Lấp fill rate + giảm sai kế hoạch → <b class="mapval">10–20 tỷ/năm</b><br><span style="color:#6b7773">GĐ: dư địa có cơ sở vật lý</span>' },
+];
+function renderMap(lang){
+  const tr = s => (lang==='en' && typeof I18N!=='undefined' && I18N[s]!==undefined) ? I18N[s] : s;
+  const demoLabel = lang==='en' ? 'View demo →' : 'Xem demo →';
+  document.getElementById('mapBody').innerHTML=mapData.map(m=>
+  `<tr class="maprow" data-go="${m.panel}">
+    <td class="l"><div style="display:flex;gap:8px;align-items:flex-start"><span class="mapnum">${m.n}</span><div><div class="mapname">${tr(m.name)}</div><div class="mapgo">${demoLabel}</div></div></div></td>
+    <td class="l">${tr(m.pain)}</td>
+    <td class="l"><ul>${m.insight.map(i=>`<li>${tr(i)}</li>`).join('')}</ul></td>
+    <td class="l">${tr(m.val)}</td>
+  </tr>`).join('');
+  document.querySelectorAll('.maprow').forEach(r=>{
+    r.addEventListener('click',()=>{
+      document.querySelector(`.tab-btn[data-panel="${r.dataset.go}"]`).click();
+    });
+  });
+}
+renderMap('vn');
+
+/* ============ BILINGUAL i18n ============ */
+/* Exact VN string -> EN. Text-node walker swaps these live. */
+const I18N = {
+  // nav + brand
+  "Demo F&B":"Demo F&B",
+  "◈ Bản đồ":"◈ Map","① Hiệu suất NVL":"① Material Eff.","② Chi tiêu/HĐ":"② Spend/Ticket",
+  "③ Menu Engineering":"③ Menu Engineering","④ P&L":"④ P&L","⑤ Cơ cấu món":"⑤ Sales Mix",
+  "⑥ Hành vi khách":"⑥ Guest Behavior","⑦ Tệp khách":"⑦ Customer Base","⑧ Gói Buffet":"⑧ Buffet Perf.","⑨ Forecast":"⑨ Forecast",
+  // TAB 0 map
+  "Bản đồ phân tích — chuỗi F&B làm được gì với data":"Analysis Map — what an F&B chain can do with its data",
+  "9 loại phân tích · mỗi cái giải một nỗi đau, cho một hành động, tạo giá trị đo được. Bấm từng dòng để xem demo.":"9 analyses · each solves one pain, drives one action, creates measurable value. Click any row to see the demo.",
+  "Giá trị tính trên chuỗi giả định DT 1,000 tỷ/năm.":"Values estimated on a chain with assumed revenue of 1,000 bn VND/year.",
+  "Giải quyết painpoint gì":"Pain point solved",
+  "Insight → Action":"Insight → Action",
+  "Giá trị ước tính (DT 1,000 tỷ)":"Estimated value (1,000 bn rev)",
+  "Tổng đòn bẩy tiềm năng:":"Total potential leverage:",
+  "chỉ cần":"just",
+  "cải thiện food cost 1% + giảm 0.5% nhân sự lãng phí + nâng repeat rate vài điểm":"improving food cost by 1% + cutting 0.5% wasted labor + lifting repeat rate a few points",
+  "đã là":"already means",
+  "15–25 tỷ/năm":"15–25 bn/year",
+  "vào lợi nhuận — lớn hơn nhiều lần chi phí xây hệ phân tích. Không phải \"báo cáo đẹp\", là công cụ tìm tiền đang rò.":"into profit — many times more than the cost of building the analytics system. Not \"pretty reports\", but a tool to find leaking money.",
+  "Bắt đầu từ nơi rò rõ nhất, quick-win trong tuần.":"Start where the leak is clearest, quick-win within the week.",
+  // TAB 1
+  "Hiệu suất Nguyên vật liệu":"Material Efficiency",
+  "Chi phí NVL thực tế vs định mức BOM — soi hao phí theo cửa hàng · nhóm món · từng NVL":"Actual material cost vs BOM standard — trace waste by store · dish group · each ingredient",
+  "Kỳ":"Period","Khu vực":"Region","Tất cả":"All","Cửa hàng":"Store",
+  "% COS thực tế":"% COS actual","so với doanh thu món":"vs dish revenue","% COS định mức":"% COS standard",
+  "chuẩn công thức (BOM)":"recipe standard (BOM)","Chênh %COS":"%COS variance","hao phí":"waste",
+  "COS thực tế (NVL)":"Actual COS (material)","chi phí nguyên vật liệu":"raw material cost","doanh thu món bán":"dish revenue",
+  "Hệ số TT/ĐM":"Actual/Std ratio","thực tế ÷ định mức":"actual ÷ standard",
+  "Từng cửa hàng — Doanh thu · %COS (TT/ĐM/CL) · Chi phí NVL · Số khách · AOV":"By store — Revenue · %COS (Act/Std/Var) · Material cost · Guests · AOV",
+  "hao phí (CL dương)":"waste (positive var)","tiết kiệm (CL âm)":"savings (negative var)",
+  "Mã":"Code","%COS ĐM":"%COS Std","NVL ĐM":"Material Std","CL (đ)":"Var (VND)","Số khách":"Guests",
+  "Đọc nhanh: cửa hàng có":"Quick read: stores with",
+  "CL dương lớn":"large positive variance",
+  "(đỏ) đang hao phí NVL vượt định mức — mỗi 1% chênh trên doanh thu 800tr ≈":"(red) are wasting material above standard — each 1% variance on 800M revenue ≈",
+  "8tr/tháng":"8M/month",
+  "rò khỏi lợi nhuận. Đây là danh sách ưu tiên đi kiểm tra bếp.":"leaking from profit. This is the priority list for kitchen inspection.",
+  "Heatmap: Cửa hàng (hàng) × Nhóm món (cột)":"Heatmap: Store (rows) × Dish group (columns)",
+  "Ô = % chênh %COS so với định mức. Đỏ đậm = hao phí nặng · Xanh = tiết kiệm. Tìm nhanh \"ổ hao phí\" nằm ở giao điểm nào.":"Cell = %COS variance vs standard. Deep red = heavy waste · Green = savings. Quickly spot where the \"waste hotspots\" sit.",
+  "Điều tra 1 món — chi tiết NVL: TT − ĐM = CL":"Investigate 1 dish — material detail: Actual − Std = Variance",
+  "Chọn món chi phí cao nhất để mổ xẻ. Món demo:":"Pick the highest-cost dish to dissect. Demo dish:",
+  "Món chính A · 180g":"Main dish A · 180g",
+  "— xem từng nguyên liệu lệch định mức bao nhiêu.":"— see how far each ingredient deviates from standard.",
+  "Nguyên vật liệu":"Ingredient","ĐVT":"Unit","SL dùng (TT)":"Qty used (Act)","Chi phí TT":"Actual cost","Chi phí ĐM":"Std cost",
+  "Cách đọc drill-down:":"How to read the drill-down:",
+  "Với một món, hệ thống bung ra từng NVL trong công thức. NVL":"For a dish, the system unfolds each ingredient in the recipe. Ingredients with",
+  "CL dương":"positive variance",
+  "(đỏ) là nơi bếp dùng vượt định mức — do định lượng thực tế cao hơn BOM hoặc giá nhập tăng. NVL":"(red) are where the kitchen uses above standard — from actual portions above BOM or higher purchase price. Ingredients with",
+  "CL âm":"negative variance",
+  "(xanh) dùng ít hơn định mức. Tổng CL mọi NVL trong món = phần hao phí của món đó → cộng lên thành +1.5% toàn chuỗi ở KPI trên cùng.":"(green) use less than standard. Sum of all ingredient variances in a dish = that dish's waste → aggregating to +1.5% chain-wide in the top KPI.",
+  // TAB 2
+  "Cơ cấu chi tiêu trung bình / hóa đơn":"Average spend structure / ticket",
+  "Khách gọi gì, chi bao nhiêu mỗi hóa đơn — cơ cấu theo nhóm món, buổi ăn, lượng khách":"What guests order, how much per ticket — structure by dish group, daypart, party size",
+  "Kỳ (SOM)":"Period (SOM)","Nhóm khách":"Party size","vs tháng trước":"vs last month",
+  "Đồ ăn chính":"Main food","Đồ uống":"Beverage","Khai vị":"Appetizer","Tráng miệng":"Dessert","Khác":"Other",
+  "Cơ cấu chi tiêu TB":"Avg spend structure","mỗi 100đ hóa đơn đến từ đâu":"where every 100đ of the ticket comes from",
+  "Theo buổi ăn":"By daypart","cơ cấu chi tiêu theo dinner / lunch / khác":"spend structure by dinner / lunch / other",
+  "Theo lượng khách":"By party size","nhóm 1-2 / 3-5 / 5-10 / trên 10 người":"groups of 1-2 / 3-5 / 5-10 / over 10 people",
+  "Bảng chi tiết theo nhóm món":"Detail table by dish group",
+  "SL/hóa đơn · #TA đóng góp · %mix · doanh thu · %revenue · số hóa đơn có nhóm đó":"Qty/ticket · #TA contribution · %mix · revenue · %revenue · tickets containing that group",
+  "Nhóm món":"Dish group","Qty / hóa đơn":"Qty / ticket","#TA (đ)":"#TA (VND)","Số hóa đơn":"Tickets",
+  "Đọc nhanh: nhóm chiếm":"Quick read: a group with",
+  "%mix cao nhưng %revenue thấp hơn":"high %mix but lower %revenue",
+  "(hoặc ngược lại) là tín hiệu định giá lệch. Nhóm có mặt trong ít hóa đơn nhưng #TA cao = cơ hội":"(or vice versa) signals mispricing. A group in few tickets but with high #TA = opportunity to",
+  "up-sell mở rộng":"expand up-sell",
+  "sang các hóa đơn còn lại. Đây là bản đồ để thiết kế combo và gợi món.":"to the remaining tickets. This is the map to design combos and suggest dishes.",
+  // TAB 3
+  "Ma trận Menu Engineering":"Menu Engineering Matrix",
+  "Phân loại từng món theo Lợi nhuận (GM) × Độ phổ biến (Popularity) → Stars / Horses / Puzzles / Dogs":"Classify each dish by Margin (GM) × Popularity → Stars / Horses / Puzzles / Dogs",
+  "vs kỳ trước":"vs prior period","Tổng ticket":"Total tickets","Tổng khách":"Total guests","Avg khách/bill":"Avg guests/bill",
+  "Phân bổ Menu Engineering":"Menu Engineering distribution",
+  "Cao ↑ Lợi nhuận · Phải → Phổ biến. Số tiền = doanh thu (GS), số items = số món trong ô.":"Up ↑ Margin · Right → Popularity. Amount = revenue (GS), items = dishes in the cell.",
+  "Số lượng items theo class vs kỳ trước":"Item count by class vs prior period",
+  "So Q2 với Q1 — class nào đang co lại (VAR âm) cần chú ý":"Q2 vs Q1 — which class is shrinking (negative VAR) needs attention",
+  "Hiện tại":"Current","Kỳ trước":"Prior",
+  "Dogs giảm 32.7% là tín hiệu":"Dogs down 32.7% is a",
+  "tốt":"good signal",
+  "— menu đang tự lọc bớt món vừa ế vừa lãi thấp. Nhưng Puzzles giảm 18.5% cần soi: món lãi cao mà bớt đi thì mất cơ hội. Đây là bảng theo dõi \"sức khỏe menu\" qua từng kỳ.":"— the menu is self-filtering dishes that are both slow and low-margin. But Puzzles down 18.5% needs review: losing high-margin dishes means lost opportunity. This tracks \"menu health\" across periods.",
+  "Dữ liệu chi tiết theo món":"Detailed data by dish",
+  "Mỗi món: doanh số, %mix, giá vốn, GM/món, class (Stars/Horses/Puzzles/Dogs), tần suất, profitability, popularity":"Each dish: sales, %mix, cost, GM/dish, class (Stars/Horses/Puzzles/Dogs), frequency, profitability, popularity",
+  "Phân loại / Món":"Category / Dish",
+  "Cách đọc ma trận:":"How to read the matrix:",
+  "lãi cao + bán chạy → giữ nguyên, đặt vị trí đẹp trên menu.":"high margin + high sales → keep, place prominently on the menu.",
+  "bán chạy nhưng lãi thấp → tìm cách giảm giá vốn hoặc tăng giá nhẹ.":"high sales but low margin → cut cost or raise price slightly.",
+  "lãi cao nhưng ít người gọi → đẩy marketing, gợi món, đổi vị trí.":"high margin but few orders → push marketing, suggest, reposition.",
+  "vừa ế vừa lãi thấp → cân nhắc bỏ khỏi menu.":"both slow and low-margin → consider removing from the menu.",
+  "Bảng chú giải — công thức chỉ số":"Glossary — metric formulas",
+  "Chỉ số":"Metric","Định nghĩa":"Definition","Công thức":"Formula",
+  "Tổng doanh thu gross trong kỳ":"Total gross revenue in period",
+  "Lợi nhuận gộp = Doanh thu thuần − Giá vốn":"Gross profit = Net revenue − Cost",
+  "Lợi nhuận gộp trên 1 sản phẩm (sum-based)":"Gross profit per item (sum-based)",
+  "Tỷ trọng số lượng bán của món trong nhóm":"Share of dish sales quantity within group",
+  "Phân loại theo GM cao/thấp × Popularity cao/thấp":"Classified by high/low GM × high/low Popularity",
+  // TAB 4
+  "Báo cáo Kết quả Kinh doanh (P&L)":"Profit & Loss Report (P&L)",
+  "P&L phân tầng theo cửa hàng — từ Gross Sales xuống Contribution Margin, Unit Contribution, EBITDA":"Layered P&L by store — from Gross Sales down to Contribution Margin, Unit Contribution, EBITDA",
+  "Q2/2026 · Tháng 6":"Q2/2026 · June","Phạm vi":"Scope","Toàn chuỗi":"Whole chain",
+  "doanh thu gộp":"gross revenue","đóng góp sau chi phí trực tiếp":"contribution after direct cost",
+  "doanh thu / hóa đơn":"revenue / ticket","tổng hóa đơn":"total tickets","Tổng cửa hàng":"Total stores","store trong kỳ":"stores in period",
+  "Bảng P&L phân tầng — Actual vs Target vs Tháng trước":"Layered P&L — Actual vs Target vs Last Month",
+  "So sánh 3 chiều: thực tế (Actual) · mục tiêu (TG) · tháng trước (LM), kèm chênh lệch %GS. Đỏ = xấu đi, xanh = cải thiện.":"3-way comparison: Actual · Target (TG) · Last Month (LM), with %GS variance. Red = worse, green = better.",
+  "Chỉ tiêu":"Line item",
+  "Điểm kiểm soát = Contribution Margin (40.64%).":"Control point = Contribution Margin (40.64%).",
+  "Trên CM là chi phí trực tiếp gắn với vận hành cửa hàng; dưới CM là chi phí không kiểm soát ở cấp cửa hàng. Cột":"Above CM is direct cost tied to store operations; below CM is cost uncontrollable at store level. The",
+  "cho biết dòng nào lệch mục tiêu — dấu dương ở doanh thu là tốt, ở chi phí là xấu.":"column shows which line deviates from target — positive on revenue is good, on cost is bad.",
+  "Profit variance — chênh lệch so mục tiêu (theo %GS)":"Profit variance — deviation vs target (by %GS)",
+  "Mỗi dòng chi phí lệch mục tiêu bao nhiêu điểm % doanh thu. Bên phải (đỏ) = tốn hơn dự kiến → bào mòn lợi nhuận. Bên trái (xanh) = tiết kiệm.":"How many revenue % points each cost line deviates from target. Right (red) = costlier than planned → erodes profit. Left (green) = savings.",
+  "Xu hướng vs tháng trước (Δ%GS vs LM)":"Trend vs last month (Δ%GS vs LM)",
+  "Dòng nào đang cải thiện, dòng nào xấu đi so tháng trước — bắt sớm xu hướng trước khi thành vấn đề lớn.":"Which lines are improving vs worsening against last month — catch trends early before they become big problems.",
+  // TAB 5
+  "Cơ cấu món bán":"Sales Mix",
+  "Khách gọi gì, hóa đơn được xây từ đâu — cơ cấu theo loại món, khu vực, cửa hàng, và món gánh doanh thu":"What guests order, how the ticket is built — structure by dish type, region, store, and revenue-driving dishes",
+  "Món chính (Core) gánh 72.6% doanh thu":"Core dishes carry 72.6% of revenue",
+  "— đúng DNA nhà hàng steak. Đồ uống chỉ 8.9% · Gọi thêm 1.7% → 2 nhóm còn nhiều dư địa up-sell. Mỗi hóa đơn trung bình 11.9 món · 2.1 khách.":"— true steakhouse DNA. Beverage only 8.9% · Add-ons 1.7% → 2 groups with plenty of up-sell room. Average ticket: 11.9 items · 2.1 guests.",
+  "Số hóa đơn (#T)":"Tickets (#T)","Số khách (TC)":"Guests (TC)","2.1 khách/hóa đơn":"2.1 guests/ticket",
+  "AOV / hóa đơn":"AOV / ticket","doanh thu ÷ hóa đơn":"revenue ÷ ticket","Chi tiêu / khách":"Spend / guest","doanh thu ÷ khách":"revenue ÷ guest",
+  "Món / hóa đơn":"Items / ticket","số phần ÷ hóa đơn":"portions ÷ ticket",
+  "Khách gọi gì?":"What do guests order?","mỗi 100đ doanh thu đến từ đâu":"where every 100đ of revenue comes from",
+  "Giải phẫu 1 hóa đơn trung bình":"Anatomy of an average ticket","cơ cấu % + chỉ số mỗi loại / hóa đơn":"% structure + metrics per type / ticket",
+  "Loại món":"Dish type","Món/HĐ":"Items/Tkt",
+  "Khu vực A vs Khu vực B — khách ăn có khác nhau?":"Region A vs Region B — do guests dine differently?",
+  "% cơ cấu doanh thu + chỉ số hành vi theo khu vực":"% revenue structure + behavioral metrics by region",
+  "Chi tiêu/khách":"Spend/guest","Khách/HĐ":"Guests/Tkt","% Đồ uống":"% Beverage","% Gọi thêm":"% Add-on",
+  "Khu vực A":"Region A","Khu vực B":"Region B",
+  "Hai khu vực gần như giống hệt về hành vi ăn — chênh lệch nhỏ (KV B nhỉnh đồ uống 9.2% vs 8.8%). Có thể áp một playbook menu/combo thống nhất, không cần tách chiến lược theo vùng.":"The two regions are nearly identical in dining behavior — small gap (Region B slightly higher beverage 9.2% vs 8.8%). A unified menu/combo playbook works; no need for region-split strategy.",
+  "Cửa hàng nào lệch mix? — Cơ cấu 100% theo cửa hàng":"Which store is off-mix? — 100% structure by store",
+  "Mỗi thanh = 100% doanh thu cửa hàng, chia theo loại món. Tìm cửa hàng lệch chuẩn (Core quá cao/thấp).":"Each bar = 100% of store revenue, split by dish type. Find stores off-standard (Core too high/low).",
+  "Món nào gánh doanh thu? — Pareto top món":"Which dishes drive revenue? — Pareto top dishes",
+  "15 món đầu theo doanh thu + đường % tích lũy. Quy tắc 80/20: bao nhiêu món tạo 80% doanh thu?":"Top 15 dishes by revenue + cumulative % line. 80/20 rule: how many dishes create 80% of revenue?",
+  "Món":"Dish","Loại":"Type","Top 10 theo SỐ LƯỢNG":"Top 10 by QUANTITY","SL bán":"Units sold",
+  "Đối chiếu 2 bảng: món":"Compare the 2 tables: dishes that",
+  "gánh doanh thu":"drive revenue",
+  "(Core, giá cao) khác hẳn món":"(Core, high price) differ sharply from the",
+  "bán nhiều nhất":"best-selling ones",
+  "(Add-on, giá thấp — bánh mì, khăn lạnh, sốt). Món bán chạy số lượng chính là \"cửa ngõ up-sell\" — gợi kèm để nâng giá trị hóa đơn.":"(Add-on, low price — bread, wet towels, sauces). High-volume dishes are the \"up-sell gateway\" — suggest alongside to raise ticket value.",
+  // TAB 6
+  "Hành vi khách hàng":"Guest Behavior",
+  "Khách ăn theo nhóm mấy người, buổi nào, là khách mới hay quay lại — và chi tiêu khác nhau ra sao":"Party size, daypart, new vs returning — and how spend differs across them",
+  "Tháng gần nhất":"Latest month","Món / ticket":"Items / ticket","số món trung bình":"average items",
+  "Gross Profit / khách":"Gross Profit / guest","Giá TB / món":"Avg price / dish","TC / hóa đơn":"TC / ticket","số khách/hóa đơn":"guests/ticket",
+  "Phân tích theo nhóm khách":"Analysis by party size",
+  "Khách đi mấy người — nhóm nào chi nhiều, gọi nhiều món, biên lợi nhuận ra sao":"Party size — which group spends more, orders more, and its profit margin",
+  "Nhóm":"Group","GM/khách":"GM/guest","trên 5 người":"over 5 people",
+  "có AOV cao nhất (1,969K) và gọi nhiều món nhất (16.7 món) — nhưng %Food Cost thấp nhất (41.7%) nghĩa là biên lợi nhuận tốt nhất. Đây là phân khúc đáng thiết kế combo nhóm / ưu đãi đặt bàn lớn.":"has the highest AOV (1,969K) and orders the most items (16.7) — but the lowest %Food Cost (41.7%), meaning the best profit margin. This segment deserves group combos / large-booking offers.",
+  "Phân tích theo buổi ăn":"Analysis by daypart",
+  "Lunch / dinner / late lunch — buổi nào đông, buổi nào lời":"Lunch / dinner / late lunch — which is busiest, which is most profitable",
+  "Buổi":"Daypart",
+  "Dinner chiếm 58.4% doanh thu và AOV cao nhất (712K) — giờ vàng của nhà hàng. Lunch %Food Cost cao hơn (44.3%) → biên mỏng hơn, cân nhắc set-menu trưa tối ưu giá vốn.":"Dinner is 58.4% of revenue with the highest AOV (712K) — the restaurant's golden hours. Lunch %Food Cost is higher (44.3%) → thinner margin; consider a lunch set-menu to optimize cost.",
+  "Phân tích theo loại khách":"Analysis by customer type",
+  "Khách mới / quay lại / kích hoạt lại / vãng lai — ai giá trị nhất theo thời gian":"New / repeat / reactivated / walk-in — who is most valuable over time",
+  "Loại khách":"Customer type","Khách":"Customers",
+  "vãng lai (Non)":"walk-in (Non)",
+  "có %GM cao bất thường (64.4%) do gọi ít món giá cao — nhưng khách":"has an unusually high %GM (64.4%) from ordering few high-price items — but",
+  "quay lại (Repeat)":"repeat customers",
+  "chiếm 46.9% doanh thu, là xương sống. Cân đối: giữ Repeat bằng loyalty, khai thác Non bằng combo giá trị. Đây là cầu nối sang bài toán CLV/RFM.":"make up 46.9% of revenue — the backbone. Balance: retain Repeat via loyalty, tap Non via value combos. This bridges into the CLV/RFM problem.",
+  // TAB 7
+  "Phân tích tệp khách hàng":"Customer Base Analysis",
+  "Khách mới → quay lại → trung thành: tệp khách được nuôi ra sao, giữ chân hiệu quả đến đâu (nền tảng CLV)":"New → repeat → loyal: how the customer base is nurtured, how well it's retained (CLV foundation)",
+  "12 tháng gần nhất":"Last 12 months","OVERVIEW — 4 PHÂN KHÚC KHÁCH":"OVERVIEW — 4 CUSTOMER SEGMENTS",
+  "New (khách mới)":"New","Repeat (quay lại &lt;1 năm)":"Repeat (returned &lt;1 yr)","Reactive (quay lại &gt;1 năm)":"Reactive (returned &gt;1 yr)","Non-member (vãng lai)":"Non-member (walk-in)",
+  "Khách mới → quay lại: phễu chuyển đổi":"New → repeat: conversion funnel",
+  "Tỉ lệ khách ăn lần đầu và quay lại là bao nhiêu? Đây là \"van\" quan trọng nhất của tăng trưởng bền vững.":"What share of first-time guests return? This is the most important \"valve\" of sustainable growth.",
+  "Tỷ lệ khách mới":"New rate",
+  "Chỉ":"Only",
+  "khách mới quay lại — đây là":"of new guests return — this is a",
+  "\"xô thủng\"":"\"leaky bucket\"",
+  ". Doanh thu tăng nhờ liên tục kéo khách mới (chi phí acquisition đắt dần) thay vì giữ khách cũ. Bịt van này = đòn bẩy lợi nhuận lớn nhất.":". Revenue grows by constantly pulling new guests (rising acquisition cost) instead of keeping old ones. Sealing this valve = the biggest profit lever.",
+  "Nhà hàng nào giữ chân khách mới tốt nhất?":"Which restaurant retains new guests best?",
+  "Cohort giữ chân theo tháng (retention triangle)":"Monthly retention cohort (retention triangle)",
+  "Trong số khách mới của tháng X, bao nhiêu % quay lại ở tháng X+1, X+2...? Mỗi hàng là một nhóm khách theo tháng bắt đầu.":"Of month X's new guests, what % return in month X+1, X+2...? Each row is a cohort by starting month.",
+  "Màu nhạt dần sang phải = tỉ lệ quay lại rớt nhanh theo thời gian. Nhóm nào giữ được đường màu lâu hơn = chương trình giữ chân hiệu quả hơn. Đây là công cụ đo \"sức khỏe retention\" chuẩn của ngành.":"Fading color to the right = return rate drops fast over time. Cohorts that hold color longer = more effective retention. This is the industry-standard \"retention health\" tool.",
+  "Hành vi khách quay lại — theo số lần quay lại":"Repeat guest behavior — by number of return visits",
+  "Khách quay lại nhiều lần có chi tiêu nhiều hơn không? Tần suất dùng voucher? Số ngày giữa các lần?":"Do frequent returners spend more? Voucher usage rate? Days between visits?",
+  "Lần quay lại":"Return visit","%T có voucher":"%T with voucher","TB ngày từ lần trước":"Avg days since last",
+  "Đọc theo cột: AOV":"Read by column: AOV",
+  "giảm dần":"declines",
+  "theo số lần quay lại (770K → 609K) nhưng":"with more return visits (770K → 609K) but",
+  "% dùng voucher tăng vọt":"voucher usage jumps",
+  "(12% → 44%). Khách trung thành chi ít hơn/lần nhưng đến thường xuyên hơn (số ngày giữa các lần rút ngắn). Bài toán: voucher đang \"mua\" lượt quay lại — cần đo ROI của voucher, đừng để nó ăn mòn AOV vô tội vạ.":"(12% → 44%). Loyal guests spend less per visit but come more often (days-between shrink). The problem: vouchers are \"buying\" return visits — measure voucher ROI, don't let it erode AOV carelessly.",
+  "Khách kích hoạt lại → quay lại":"Reactivated → repeat",
+  "Khách quay lại sau hơn 1 năm có tiếp tục duy trì hành vi mua lặp lại không?":"Do guests returning after over 1 year keep up repeat-buying behavior?",
+  "Tổng":"Total","Nhà hàng giữ chân khách tái kích hoạt tốt nhất?":"Which restaurant retains reactivated guests best?",
+  // TAB 8
+  "Hiệu suất gói Buffet & Chi phí thực phẩm":"Buffet Package Performance & Food Cost",
+  "Góc nhìn Product Development: từng gói buffet/combo lãi bao nhiêu, food cost vượt/tiết kiệm định mức, hao hụt ở đâu":"Product Development view: how much each buffet/combo earns, food cost over/under standard, where the waste is",
+  "Số khách (#TC)":"Guests (#TC)","tổng lượt khách":"total guest count","Gram / khách":"Grams / guest",
+  "vượt 1.4%":"over 1.4%","định mức":"standard",
+  "Hiệu suất từng gói Buffet / Combo":"Performance by Buffet / Combo package",
+  "Mỗi gói: doanh thu, GM, %GM, food cost thực tế vs định mức, và hao hụt (gram). Đỏ = vượt ngưỡng food cost.":"Each package: revenue, GM, %GM, actual vs standard food cost, and waste (grams). Red = food cost over threshold.",
+  "Gói sản phẩm":"Package","%Cost ĐM":"%Cost Std","Vs ĐM":"Vs Std","Hao hụt":"Waste",
+  "Cột":"The",
+  "là tim của báo cáo: gói \"Vượt ngưỡng\" (đỏ) đang ăn mòn margin — combo nướng vượt 30.9%, buffet trẻ em vượt 28%. Gói \"Tiết kiệm\" (xanh) đang dùng ít NVL hơn định mức, có thể do định mức đặt lỏng hoặc portion bị cắt (rủi ro chất lượng). Cả hai đều cần Product team rà lại công thức.":"column is the heart of the report: \"Over threshold\" packages (red) erode margin — grill combo over 30.9%, kids' buffet over 28%. \"Savings\" packages (green) use less material than standard, possibly from loose standards or cut portions (quality risk). Both need the Product team to review recipes.",
+  "Hiệu quả chi phí theo danh mục":"Cost efficiency by category",
+  "Nhóm NVL nào chiếm nhiều cost, thâm nhập bao nhiêu % hóa đơn":"Which material groups take the most cost, and their % ticket penetration",
+  "Danh mục":"Category","Phân bổ Cost theo danh mục NVL":"Cost distribution by material category",
+  "Cơ cấu chi phí nguyên liệu — nhóm nào \"ăn\" nhiều tiền nhất":"Material cost structure — which group \"eats\" the most money",
+  "Ổn định: Food Cost 36.8%":"Stable: Food Cost 36.8%",
+  "— nhưng so định mức là 127% (vượt ~90%!). Nghĩa là %food cost tổng nhìn \"đẹp\" nhưng cấu trúc bên trong lệch nặng so công thức chuẩn. Thịt bò chiếm 24% cost — đòn bẩy lớn nhất để tối ưu. Đây là lý do phải soi tới tầng danh mục NVL, không dừng ở con số tổng.":"— but vs standard it's 127% (over ~90%!). The total %food cost looks \"nice\" but the internal structure is heavily off the standard recipe. Beef is 24% of cost — the biggest optimization lever. This is why you must drill to the material-category level, not stop at the total.",
+  // TAB 9
+  "Nền tảng dự báo doanh thu":"Revenue Forecasting Foundation",
+  "Chuỗi báo cáo tạo tiền đề forecast: năng lực bàn → dư địa tăng trưởng → hiệu quả khuyến mãi → dự báo → khớp P&L có target":"A report chain that sets up the forecast: table capacity → growth headroom → promo effectiveness → forecast → reconcile P&L with target",
+  "Kỳ dự báo":"Forecast period","Tháng tới":"Next month",
+  "Forecast không phải một con số — là một chuỗi lập luận.":"A forecast is not a single number — it is a chain of reasoning.",
+  "Mỗi khối dưới đây trả lời một câu, và câu sau dựa trên câu trước. Con số cuối cùng chỉ đáng tin khi mọi mắt xích được kiểm chứng — đúng nguyên tắc \"reconciliation là chuỗi, không phải điểm\".":"Each block below answers one question, and each builds on the previous. The final number is trustworthy only when every link is verified — per the principle \"reconciliation is a chain, not a point\".",
+  "BƯỚC 1":"STEP 1","Năng lực hiện tại":"Current capacity","Bàn quay mấy vòng, fill rate bao nhiêu — trần công suất đang ở đâu":"How many table turns, what fill rate — where the capacity ceiling is",
+  "BƯỚC 2":"STEP 2","Dư địa tăng trưởng":"Growth headroom","Nếu nâng fill rate, thêm được bao nhiêu #T và doanh thu":"If fill rate rises, how many more #T and revenue",
+  "BƯỚC 3":"STEP 3","Dự báo doanh số":"Sales forecast","Actual năm ngoái → forecast theo ngày/tháng/cửa hàng":"Last year's actuals → forecast by day/month/store",
+  "BƯỚC 4":"STEP 4","Khớp P&L target":"Reconcile P&L target","Forecast so với LM/Target — biết ngay lệch chỗ nào":"Forecast vs LM/Target — instantly see where it deviates",
+  "Baseline — năng lực bàn theo buổi":"Baseline — table capacity by daypart",
+  "Table turn (số vòng quay bàn), fill rate, table productivity — nền tảng để biết còn bao nhiêu dư địa":"Table turn (turns per table), fill rate, table productivity — the basis for how much headroom remains",
+  "Ngày":"Day",
+  "Growth Impact — dư địa nếu nâng fill rate":"Growth Impact — headroom if fill rate rises",
+  "Nếu tăng fill rate lên mức mục tiêu, mỗi buổi thêm được bao nhiêu hóa đơn (#T uplift) và doanh thu (GS uplift)":"If fill rate reaches target, how many more tickets (#T uplift) and revenue (GS uplift) each daypart gains",
+  "Dinner Weekdays có dư địa lớn nhất: +19,009 hóa đơn tiềm năng nếu lấp đầy bàn. Đây là uplift":"Dinner Weekdays has the largest headroom: +19,009 potential tickets if tables fill. This uplift has a",
+  "có cơ sở vật lý":"physical basis",
+  "(số bàn × vòng quay), không phải wishful target — khác hẳn kiểu \"cứ đặt tăng 20%\".":"(tables × turns), not a wishful target — unlike \"just set +20%\".",
+  "Forecast — dự báo theo tháng":"Forecast — by month",
+  "Actual năm ngoái (LY) làm nền → forecast năm nay (TY). Horizon ngắn (tháng tới) dùng time-series, độ tin cậy cao nhất.":"Last year actuals (LY) as base → this year forecast (TY). Short horizon (next month) uses time-series, highest reliability.",
+  "Đây là horizon 0–12 tháng — data quá khứ còn dùng trực tiếp được, forecast ra con số cụ thể. Xa hơn 1-3 năm phải chuyển sang range + kịch bản, xa nữa là scenario planning. Không cố ép một con số chính xác cho mọi horizon.":"This is the 0–12 month horizon — past data is still directly usable, forecasting concrete numbers. Beyond 1-3 years, shift to range + scenarios; further out, scenario planning. Don't force one exact number across every horizon.",
+  "Khớp P&L — Tháng này vs Tháng trước vs Target vs Forecast":"Reconcile P&L — This Month vs Last Month vs Target vs Forecast",
+  "P&L đối chiếu 4 cột: đỏ = dưới mục tiêu, xanh = đạt/vượt. Biết ngay dòng nào kéo tụt lợi nhuận.":"P&L across 4 columns: red = below target, green = met/exceeded. Instantly see which line drags profit down.",
+  "Tháng này":"This Month","Tháng trước":"Last Month",
+  "Nhìn cột":"Look at the",
+  ": chi phí nhân công đang ở 20.5% target (tốt — tiết kiệm), nhưng doanh số tổng chỉ đạt 91.9% target (cần chú ý). Đây là bảng để BLĐ ra quyết định hàng tháng — mỗi dòng lệch là một câu hỏi \"tại sao\" và \"ai xử lý\".":"column: labor cost is at 20.5% of target (good — savings), but total sales only reach 91.9% of target (needs attention). This is the table for management's monthly decisions — each deviating line is a \"why\" and \"who handles it\" question.",
+  "Nguyên tắc dự báo — điều đối tác nên hỏi trước khi tin bất kỳ con số nào":"Forecasting principles — what a partner should ask before trusting any number",
+  "Một forecast đẹp không có nghĩa là một forecast đúng. Ba câu hỏi luôn phải trả lời được:":"A pretty forecast doesn't mean a correct one. Three questions must always be answerable:",
+  "Ai dùng con số này, ra quyết định gì khác đi?":"Who uses this number, what decision changes because of it?",
+  "Trước khi có forecast, quyết định đó ra sao — baseline là gì?":"Before the forecast, how was that decision made — what's the baseline?",
+  "Sai 10% thì hậu quả gì, ai chịu? Giá trị của dự báo không đến từ độ chính xác tuyệt đối, mà từ đúng người + đúng lúc + đúng câu hỏi. Đây là thứ Idealab xây cùng khách — không phải bán một model \"chính xác 95%\", mà dựng một hệ ra quyết định.":"If it's 10% off, what's the consequence, who bears it? A forecast's value comes not from absolute accuracy, but from the right person + right time + right question. This is what Idealab builds with clients — not selling a \"95% accurate\" model, but building a decision-making system.",
+  // shared/footer
+  "Toàn bộ tên thương hiệu, cửa hàng, món ăn và nguyên liệu đã được ẩn danh. Cấu trúc phân tích & logic số liệu giữ nguyên theo bản gốc.":"All brand, store, dish, and ingredient names have been anonymized. The analysis structure & data logic remain faithful to the original.",
+};
+
+Object.assign(I18N, {
+  // stores
+  "Cửa hàng 01":"Store 01","Cửa hàng 02":"Store 02","Cửa hàng 03":"Store 03","Cửa hàng 04":"Store 04",
+  "Cửa hàng 05":"Store 05","Cửa hàng 06":"Store 06","Cửa hàng 07":"Store 07","Cửa hàng 08":"Store 08",
+  "Cửa hàng 09":"Store 09","Cửa hàng 10":"Store 10","Cửa hàng 11":"Store 11","Cửa hàng 12":"Store 12",
+  "Cửa hàng 13":"Store 13","Cửa hàng 14":"Store 14","Cửa hàng 15":"Store 15","Cửa hàng 16":"Store 16",
+  "Cửa hàng 17":"Store 17","Cửa hàng 18":"Store 18","Cửa hàng 19":"Store 19","Cửa hàng 20":"Store 20",
+  "Cửa hàng 21":"Store 21","Cửa hàng 22":"Store 22","Cửa hàng 23":"Store 23",
+  // dish groups
+  "Món chính":"Main","Món chia sẻ":"Sharing","Gọi thêm":"Add-on","TỔNG":"TOTAL",
+  '<th class="l">Cửa hàng</th>':'<th class="l">Store</th>',
+  // ingredients
+  "Nguyên liệu chính (thịt)":"Main ingredient (meat)","Phần":"Portion","Nấm A":"Mushroom A","Sốt nền":"Base sauce",
+  "Rau củ A":"Vegetable A","Nấm khô B":"Dried mushroom B","Kem tươi":"Fresh cream","Hộp":"Box","Dầu ăn":"Cooking oil",
+  "Sữa tươi":"Fresh milk","Rau gia vị":"Herbs","Tiêu":"Pepper","Muối":"Salt",
+  // categories & misc
+  "Khác/Khác":"Other/Other","trên 10 người":"over 10 people","1-2 người":"1-2 people","3-5 người":"3-5 people","5-10 người":"5-10 people",
+  "Nhóm Buffet":"Buffet Group","Nhóm Alacarte":"Alacarte Group",
+  "Buffet Trẻ em · 120K":"Kids Buffet · 120K","Buffet Trẻ em · 100K":"Kids Buffet · 100K","Buffet Trẻ em · 150K":"Kids Buffet · 150K",
+  "Alacarte - Món 1":"Alacarte - Dish 1","Alacarte - Món 2":"Alacarte - Dish 2","Alacarte - Món 3":"Alacarte - Dish 3",
+  "Alacarte - Món 4":"Alacarte - Dish 4","Alacarte - Món 5":"Alacarte - Dish 5","Alacarte - Món 6":"Alacarte - Dish 6",
+  "Alacarte - Món 7":"Alacarte - Dish 7","Alacarte - Món 8":"Alacarte - Dish 8","Alacarte - Món 9":"Alacarte - Dish 9","Alacarte - Món 10":"Alacarte - Dish 10",
+  "Quỹ phát triển sản phẩm":"Product development fund",
+  "Combo A (gia đình)":"Combo A (family)","Combo D (cặp đôi)":"Combo D (couple)",
+  "Bánh mì phụ 1":"Side bread 1","Khăn lạnh":"Wet towel","Món kèm 2":"Side dish 2","Bánh mì phụ 2":"Side bread 2",
+  "Sốt A":"Sauce A","Sốt B":"Sauce B","Súp A":"Soup A","Khoai chiên":"Fries","Sốt C":"Sauce C","Nước A":"Drink A",
+  "2 người":"2 people","3-4 người":"3-4 people","1 người":"1 person","trên 5 người":"over 5 people",
+  "T-Repeat (quay lại)":"T-Repeat (returning)","T-Non (vãng lai)":"T-Non (walk-in)","T-New (mới)":"T-New","T-Reactive (kích hoạt lại)":"T-Reactive",
+  "Nhóm 1":"Cohort 1","Nhóm 2":"Cohort 2","Nhóm 3":"Cohort 3","Nhóm 4":"Cohort 4","Nhóm 5":"Cohort 5",
+  "Nhóm 6":"Cohort 6","Nhóm 7":"Cohort 7","Nhóm 8":"Cohort 8","Nhóm 9":"Cohort 9","Nhóm 10":"Cohort 10",
+  "Nhóm 11":"Cohort 11","Nhóm 12":"Cohort 12","Nhóm 13":"Cohort 13",
+  "Quay lại Lần 1":"Return visit 1","Lần 2":"Visit 2","Lần 3":"Visit 3","Lần 4":"Visit 4","Lần 5":"Visit 5",
+  "Lần 6":"Visit 6","Lần 7":"Visit 7","Lần 8":"Visit 8","Lần 9":"Visit 9","Lần 10":"Visit 10","Lần 10+":"Visit 10+",
+  // buffet packages + thresholds
+  "Combo nướng A · 239K":"Grill combo A · 239K","Combo nướng lẩu B · 699K":"Grill-hotpot combo B · 699K",
+  "Buffet Trẻ Em · 100K":"Kids Buffet · 100K","Combo đầy đủ C · 699K":"Full combo C · 699K","Combo nướng lẩu D · 799K":"Grill-hotpot combo D · 799K",
+  "Buffet Trẻ Em · 150K":"Kids Buffet · 150K","Buffet Trẻ Em · 120K":"Kids Buffet · 120K","Combo đầy đủ E · 569K":"Full combo E · 569K",
+  "Alacarte - Bò Kobe":"Alacarte - Kobe Beef","Combo đầy đủ F · 469K":"Full combo F · 469K","Alacarte - Mực nang":"Alacarte - Cuttlefish",
+  "Vượt ngưỡng 30.9%":"Over threshold 30.9%","Vượt ngưỡng 28.0%":"Over threshold 28.0%","Tiết kiệm 185.3%":"Savings 185.3%",
+  "Vượt ngưỡng 28.1%":"Over threshold 28.1%","Vượt ngưỡng 25.0%":"Over threshold 25.0%","Tiết kiệm 169.2%":"Savings 169.2%",
+  "Tiết kiệm 166.0%":"Savings 166.0%","Vượt ngưỡng 22.4%":"Over threshold 22.4%","Vượt ngưỡng 18.1%":"Over threshold 18.1%",
+  "Vượt ngưỡng 21.2%":"Over threshold 21.2%","Cảnh báo > 2.7%":"Alert > 2.7%","Vượt ngưỡng 16.9%":"Over threshold 16.9%",
+  "Tiết kiệm 90.2%":"Savings 90.2%",
+  // cost categories
+  "DESSERT (Tráng miệng)":"DESSERT","ĐỒ ĂN":"FOOD","— Combo 2 người":"— Combo 2 people","— Đồ Combo":"— Combo items","— Alacarte":"— Alacarte","— Buffet":"— Buffet",
+  "Thịt bò":"Beef","Thịt lợn":"Pork","Hải sản":"Seafood","Thịt bò 1":"Beef 1","Rau mỳ":"Veg & noodle","Sốt":"Sauce","Sashimi":"Sashimi","Blank":"Blank",
+  // P&L lines
+  "1. Doanh số tổng":"1. Gross Sales","2. Giảm trừ doanh số":"2. Sales deductions","3. Doanh thu thuần":"3. Net Revenue",
+  "4. Giá vốn hàng bán":"4. Cost of Goods Sold","5. Lợi nhuận gộp":"5. Gross Profit","6. Chi phí nhân công":"6. Labor cost",
+  "7. Chi phí bán hoạt động":"7. Operating sales cost","8. LN từ kiểm soát tại NH":"8. Store-controllable profit","9. Thuê mặt bằng":"9. Rent",
+  "11. Khuyến mại":"11. Promotion","12. Khấu hao đầu tư":"12. Depreciation","14. LN NH trước khấu hao":"14. Store profit pre-D&A","15. Lợi nhuận NH":"15. Store profit",
+  // map rows (tab 0)
+  "Hiệu suất NVL":"Material Efficiency",
+  "Food cost cao mà không truy được cửa hàng nào, món nào, nguyên liệu nào gây hao phí.":"Food cost is high but you can't trace which store, dish, or ingredient causes the waste.",
+  "Truy hao phí tới từng NVL của từng món/cửa hàng":"Trace waste down to each ingredient of each dish/store",
+  "<b>→</b> khoá định lượng bếp, đàm phán giá NVL vượt ngưỡng":"<b>→</b> lock kitchen portions, renegotiate prices of over-threshold materials",
+  'Cải thiện <b>1%</b> food cost → <b class="mapval">10 tỷ/năm</b><br><span style="color:#6b7773">GĐ: food cost ~33% = 330 tỷ</span>':'Improve food cost <b>1%</b> → <b class="mapval">10 bn/yr</b><br><span style="color:#6b7773">Assume: food cost ~33% = 330 bn</span>',
+  "Cơ cấu chi tiêu / hóa đơn":"Spend structure / ticket",
+  "Không biết nhóm món nào còn dư địa up-sell, hóa đơn được xây từ đâu.":"Unknown which dish group has up-sell room, or how the ticket is built.",
+  "Cơ cấu chi tiêu theo nhóm món / buổi / lượng khách":"Spend structure by dish group / daypart / party size",
+  "<b>→</b> thiết kế combo, gợi món đồ uống & gọi thêm":"<b>→</b> design combos, suggest beverages & add-ons",
+  'Nâng AOV <b>2%</b> qua up-sell → <b class="mapval">20 tỷ/năm</b><br><span style="color:#6b7773">GĐ: +2% trên DT 1,000 tỷ</span>':'Lift AOV <b>2%</b> via up-sell → <b class="mapval">20 bn/yr</b><br><span style="color:#6b7773">Assume: +2% on 1,000 bn rev</span>',
+  "Menu 60-100 món, không biết món nào lãi thật vs doanh thu ảo.":"Menu of 60-100 dishes; unclear which truly profits vs vanity revenue.",
+  "Phân loại Stars/Horses/Puzzles/Dogs theo lãi × phổ biến":"Classify Stars/Horses/Puzzles/Dogs by margin × popularity",
+  "<b>→</b> tăng giá Horses, đẩy Puzzles, cắt Dogs":"<b>→</b> raise Horses' price, push Puzzles, cut Dogs",
+  'Nâng blended margin <b>1.5%</b> → <b class="mapval">15 tỷ/năm</b><br><span style="color:#6b7773">GĐ: không cần tăng DT</span>':'Lift blended margin <b>1.5%</b> → <b class="mapval">15 bn/yr</b><br><span style="color:#6b7773">Assume: no revenue increase needed</span>',
+  "Báo cáo P&L + Variance":"P&L Report + Variance",
+  "P&L tổng gộp che mất từng điểm bán và dòng chi phí trượt target.":"Aggregate P&L hides each outlet and each cost line slipping off target.",
+  "P&L phân tầng tới CM + variance vs Target/tháng trước":"Layered P&L to CM + variance vs Target/last month",
+  "<b>→</b> đóng/xoay store âm CM, xử lý dòng chi phí đỏ":"<b>→</b> close/reposition negative-CM stores, fix red cost lines",
+  'Chặn lỗ store + siết chi phí → <b class="mapval">8–12 tỷ/năm</b><br><span style="color:#6b7773">GĐ: ~0.5-1% DT cứu được</span>':'Stop store losses + tighten cost → <b class="mapval">8–12 bn/yr</b><br><span style="color:#6b7773">Assume: ~0.5-1% of revenue saved</span>',
+  "Cơ cấu món bán (Pareto)":"Sales Mix (Pareto)",
+  "Không biết 80/20 nằm ở đâu, cửa hàng nào lệch mix.":"Unknown where the 80/20 sits, or which store is off-mix.",
+  "Pareto top món + món bán chạy = cửa ngõ up-sell":"Pareto top dishes + best-sellers = up-sell gateway",
+  "<b>→</b> bảo vệ món chủ lực, gợi kèm nâng AOV":"<b>→</b> protect hero dishes, suggest alongside to lift AOV",
+  'Nâng AOV <b>1%</b> qua món cửa ngõ → <b class="mapval">10 tỷ/năm</b><br><span style="color:#6b7773">GĐ: +1% AOV</span>':'Lift AOV <b>1%</b> via gateway dishes → <b class="mapval">10 bn/yr</b><br><span style="color:#6b7773">Assume: +1% AOV</span>',
+  "Không biết phân khúc nào (nhóm/buổi) biên tốt để tập trung.":"Unknown which segment (party/daypart) has good margin to focus on.",
+  "Chi tiêu × food cost theo nhóm khách / buổi / loại khách":"Spend × food cost by party size / daypart / customer type",
+  "<b>→</b> combo nhóm đông, set-menu trưa tối ưu giá vốn":"<b>→</b> large-group combos, lunch set-menu to optimize cost",
+  'Dịch mix sang phân khúc biên cao <b>+0.5% GM</b> → <b class="mapval">5 tỷ/năm</b><br><span style="color:#6b7773">GĐ: +0.5% GM</span>':'Shift mix to high-margin segments <b>+0.5% GM</b> → <b class="mapval">5 bn/yr</b><br><span style="color:#6b7773">Assume: +0.5% GM</span>',
+  "Phân tích tệp khách (CLV)":"Customer Base (CLV)",
+  "Chỉ ~5% khách mới quay lại, chi phí kéo khách mới ngày càng đắt.":"Only ~5% of new guests return; acquisition cost keeps rising.",
+  "Phễu New→Repeat, cohort retention, ROI voucher":"New→Repeat funnel, cohort retention, voucher ROI",
+  '<b>→</b> loyalty giữ Repeat, bịt "xô thủng" retention':'<b>→</b> loyalty to keep Repeat, seal the retention "leaky bucket"',
+  'Nâng repeat rate vài điểm → <b class="mapval">15–30 tỷ/năm</b><br><span style="color:#6b7773">GĐ: đòn bẩy lớn nhất</span>':'Lift repeat rate a few points → <b class="mapval">15–30 bn/yr</b><br><span style="color:#6b7773">Assume: the biggest lever</span>',
+  "Hiệu suất gói Buffet":"Buffet Package Performance",
+  "Food cost tổng nhìn đẹp nhưng từng gói lệch định mức, hao hụt mất kiểm soát.":"Total food cost looks fine but each package is off-standard, waste uncontrolled.",
+  "Từng gói: GM, food cost vs ĐM, hao hụt gram":"Each package: GM, food cost vs standard, gram waste",
+  "<b>→</b> rà công thức gói vượt ngưỡng, kiểm soát portion":"<b>→</b> review over-threshold recipes, control portions",
+  'Giảm 1% cost gói vượt ĐM → <b class="mapval">10 tỷ/năm</b><br><span style="color:#6b7773">GĐ: chồng lấn một phần DB①</span>':'Cut 1% cost of over-standard packages → <b class="mapval">10 bn/yr</b><br><span style="color:#6b7773">Assume: partial overlap with DB①</span>',
+  "Nền tảng Forecast":"Forecasting Foundation",
+  "Dự báo cảm tính, đặt target wishful, không biết dư địa công suất.":"Forecasting by gut, wishful targets, unknown capacity headroom.",
+  "Baseline công suất → dư địa fill rate → forecast → P&L target":"Capacity baseline → fill-rate headroom → forecast → P&L target",
+  "<b>→</b> kế hoạch nhân sự/nhập hàng có cơ sở, target thực tế":"<b>→</b> grounded staffing/purchasing plans, realistic targets",
+  'Lấp fill rate + giảm sai kế hoạch → <b class="mapval">10–20 tỷ/năm</b><br><span style="color:#6b7773">GĐ: dư địa có cơ sở vật lý</span>':'Fill the rate + cut planning error → <b class="mapval">10–20 bn/yr</b><br><span style="color:#6b7773">Assume: physically grounded headroom</span>',
+});
+
+/* ===== language engine ===== */
+let CUR_LANG = 'vn';
+Object.assign(I18N, {
+  // segment cards (literal < > as rendered)
+  "Repeat (quay lại <1 năm)":"Repeat (returned <1 yr)",
+  "Reactive (quay lại >1 năm)":"Reactive (returned >1 yr)",
+  // legend fragments "Name — " (em dash trailing)
+  "Thịt bò —":"Beef —","Thịt lợn —":"Pork —","Hải sản —":"Seafood —","Thịt bò 1 —":"Beef 1 —",
+  "Rau mỳ —":"Veg & noodle —","Sốt —":"Sauce —","Sashimi —":"Sashimi —","Blank —":"Blank —",
+  "Khai vị —":"Appetizer —","Tráng miệng —":"Dessert —",
+  "Món chính —":"Main —","Món chia sẻ —":"Sharing —","Đồ uống —":"Beverage —","Gọi thêm —":"Add-on —","Khác —":"Other —",
+  "2 người —":"2 people —","3-4 người —":"3-4 people —","1 người —":"1 person —","trên 5 người —":"over 5 people —",
+  "dinner —":"dinner —","lunch —":"lunch —","late lunch —":"late lunch —",
+  "T-Repeat (quay lại) —":"T-Repeat (returning) —","T-Non (vãng lai) —":"T-Non (walk-in) —",
+  "T-New (mới) —":"T-New —","T-Reactive (kích hoạt lại) —":"T-Reactive —",
+  // map insight second-line fragments (after <b>→</b> the text node starts with a space)
+  "khoá định lượng bếp, đàm phán giá NVL vượt ngưỡng":"lock kitchen portions, renegotiate over-threshold material prices",
+  "thiết kế combo, gợi món đồ uống & gọi thêm":"design combos, suggest beverages & add-ons",
+  "tăng giá Horses, đẩy Puzzles, cắt Dogs":"raise Horses' price, push Puzzles, cut Dogs",
+  "đóng/xoay store âm CM, xử lý dòng chi phí đỏ":"close/reposition negative-CM stores, fix red cost lines",
+  "bảo vệ món chủ lực, gợi kèm nâng AOV":"protect hero dishes, suggest to lift AOV",
+  "combo nhóm đông, set-menu trưa tối ưu giá vốn":"large-group combos, lunch set-menu to optimize cost",
+  "loyalty giữ Repeat, bịt \"xô thủng\" retention":"loyalty to keep Repeat, seal retention \"leaky bucket\"",
+  "rà công thức gói vượt ngưỡng, kiểm soát portion":"review over-threshold recipes, control portions",
+  "kế hoạch nhân sự/nhập hàng có cơ sở, target thực tế":"grounded staffing/purchasing plans, realistic targets",
+  // map value fragments: "Cải thiện 1% food cost → " ... "10 tỷ/năm" ... "GĐ: ..."
+  "Cải thiện":"Improve","food cost →":"food cost →",
+  "10 tỷ/năm":"10 bn/yr","20 tỷ/năm":"20 bn/yr","15 tỷ/năm":"15 bn/yr","8–12 tỷ/năm":"8–12 bn/yr",
+  "5 tỷ/năm":"5 bn/yr","15–30 tỷ/năm":"15–30 bn/yr","10–20 tỷ/năm":"10–20 bn/yr",
+  "GĐ: food cost ~33% = 330 tỷ":"Assume: food cost ~33% = 330 bn",
+  "GĐ: +2% trên DT 1,000 tỷ":"Assume: +2% on 1,000 bn rev",
+  "GĐ: không cần tăng DT":"Assume: no revenue increase needed",
+  "GĐ: ~0.5-1% DT cứu được":"Assume: ~0.5-1% of revenue saved",
+  "GĐ: +1% AOV":"Assume: +1% AOV","GĐ: +0.5% GM":"Assume: +0.5% GM",
+  "GĐ: đòn bẩy lớn nhất":"Assume: the biggest lever",
+  "GĐ: chồng lấn một phần DB①":"Assume: partial overlap with DB①",
+  "GĐ: dư địa có cơ sở vật lý":"Assume: physically grounded headroom",
+  "Nâng AOV":"Lift AOV","qua up-sell →":"via up-sell →","qua món cửa ngõ →":"via gateway dishes →",
+  "Nâng blended margin":"Lift blended margin","Chặn lỗ store + siết chi phí →":"Stop store losses + tighten cost →",
+  "Dịch mix sang phân khúc biên cao":"Shift mix to high-margin segments","Nâng repeat rate vài điểm →":"Lift repeat rate a few points →",
+  "Giảm 1% cost gói vượt ĐM →":"Cut 1% cost of over-standard packages →","Lấp fill rate + giảm sai kế hoạch →":"Fill the rate + cut planning error →",
+  // buffet total row label
+  "Tổng khách quay lại":"Total returning guests",
+  "Tổng 17 cửa hàng":"Total 17 stores",
+  "= TỔNG MÓN":"= DISH TOTAL",
+  // segment overview headers rendered uppercase
+  "NEW (KHÁCH MỚI)":"NEW","REPEAT (QUAY LẠI <1 NĂM)":"REPEAT (RETURNED <1 YR)",
+  "REACTIVE (QUAY LẠI >1 NĂM)":"REACTIVE (RETURNED >1 YR)","NON-MEMBER (VÃNG LAI)":"NON-MEMBER (WALK-IN)",
+});
+Object.assign(I18N, {
+  "khác":"other",
+  "Khác / Khai vị / Tráng miệng":"Other / Appetizer / Dessert",
+  "Đồ ăn chính —":"Main food —","Đồ uống —":"Beverage —","Khai vị —":"Appetizer —","Tráng miệng —":"Dessert —",
+  "Đồ ăn chính":"Main food","Khai vị":"Appetizer","Tráng miệng":"Dessert",
+});
+Object.assign(I18N, {
+  "Doanh thu":"Revenue",
+  "Doanh thu (GS)":"Revenue (GS)",
+  "GS (Doanh thu)":"GS (Revenue)",
+  "% DT":"% Rev",
+});
+// build reverse map EN->VN for toggling back
+const I18N_REV = {};
+for (const k in I18N){ I18N_REV[I18N[k]] = k; }
+
+function translateNode(root, dict){
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+  const nodes=[];
+  let n; while(n=walker.nextNode()){ nodes.push(n); }
+  const toEn = (dict === I18N);
+  nodes.forEach(node=>{
+    const raw = node.nodeValue;
+    const t = raw.trim();
+    if(!t) return;
+    if(dict[t] !== undefined){
+      const lead = raw.match(/^\s*/)[0];
+      const trail = raw.match(/\s*$/)[0];
+      node.nodeValue = lead + dict[t] + trail;
+      return;
+    }
+    // unit-level: "tỷ" billion  <->  "bn"  (only when attached to a number)
+    if(toEn){
+      if(/\d\s*tỷ/.test(raw)) node.nodeValue = raw.replace(/tỷ/g,'bn');
+      else if(/▸?\s*Nhóm (Buffet|Alacarte)/.test(raw)) node.nodeValue = raw.replace('Nhóm Buffet','Buffet Group').replace('Nhóm Alacarte','Alacarte Group');
+    } else {
+      if(/\d\s*bn\b/.test(raw)) node.nodeValue = raw.replace(/\bbn\b/g,'tỷ');
+      else if(/▸?\s*(Buffet|Alacarte) Group/.test(raw)) node.nodeValue = raw.replace('Buffet Group','Nhóm Buffet').replace('Alacarte Group','Nhóm Alacarte');
+    }
+  });
+}
+
+function setLang(lang){
+  if(lang === CUR_LANG) return;
+  const dict = lang === 'en' ? I18N : I18N_REV;
+  translateNode(document.body, dict);
+  // re-render JS-built HTML content (fragmented nodes the walker can't catch)
+  if(typeof renderMap==='function') renderMap(lang);
+  CUR_LANG = lang;
+  document.documentElement.lang = lang;
+  document.querySelectorAll('.langbtn').forEach(b=>b.classList.toggle('on', b.dataset.lang===lang));
+}
+document.querySelectorAll('.langbtn').forEach(b=>{
+  b.addEventListener('click',()=>setLang(b.dataset.lang));
+});
+
+/* ============ TAB SWITCHING ============ */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.panel).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+});
+</script>
+</body>
+</html>
