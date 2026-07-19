@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KHEM Project - Mini Hotel P&L Simulation</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --ink: #182230;
+      --muted: #667085;
+      --line: #d9dee8;
+      --blue: #1d4ed8;
+      --green: #067647;
+      --red: #b42318;
+      --amber: #b54708;
+      --soft-blue: #eaf1ff;
+      --soft-green: #eaf8ef;
+      --soft-red: #feecec;
+      --soft-amber: #fff3dc;
+      --shadow: 0 10px 28px rgba(16, 24, 40, 0.08);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+    .app { max-width: 1440px; margin: 0 auto; padding: 28px; }
+    .hero {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: 20px;
+      align-items: stretch;
+      margin-bottom: 20px;
+    }
+    .hero-card, .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .hero-card { padding: 26px; }
+    h1 { margin: 0 0 10px; font-size: 28px; letter-spacing: -0.03em; }
+    h2 { margin: 0 0 14px; font-size: 18px; letter-spacing: -0.02em; }
+    h3 { margin: 0; font-size: 13px; color: var(--muted); font-weight: 600; }
+    p { margin: 0; color: var(--muted); line-height: 1.55; }
+    .pill-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+    .pill { padding: 8px 11px; border-radius: 999px; background: var(--soft-blue); color: var(--blue); font-size: 12px; font-weight: 700; }
+    .warning { background: var(--soft-amber); color: var(--amber); }
+    .grid { display: grid; grid-template-columns: 380px 1fr; gap: 20px; }
+    .card { padding: 20px; }
+    .controls { display: grid; gap: 16px; }
+    .section-title { display: flex; align-items: center; justify-content: space-between; margin-top: 2px; }
+    .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    button, .mode {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      padding: 12px 12px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: .15s ease;
+    }
+    button:hover, .mode:hover { border-color: #9db4e8; }
+    .mode.active { background: var(--soft-blue); border-color: #7aa2f7; color: var(--blue); }
+    .input-grid { display: grid; grid-template-columns: 1fr 120px; gap: 10px; align-items: center; }
+    label { font-size: 13px; color: var(--muted); font-weight: 650; }
+    input, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 11px;
+      font-size: 14px;
+      outline: none;
+      background: #fff;
+    }
+    input:focus, select:focus { border-color: #7aa2f7; box-shadow: 0 0 0 3px rgba(29, 78, 216, .11); }
+    .checkbox-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--line); }
+    .checkbox-row:last-child { border-bottom: 0; }
+    .checkbox-row input { width: 18px; height: 18px; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .kpi { padding: 16px; border-radius: 16px; background: #fbfcff; border: 1px solid var(--line); }
+    .kpi .value { margin-top: 8px; font-size: 24px; font-weight: 800; letter-spacing: -0.03em; }
+    .kpi .sub { margin-top: 5px; font-size: 12px; color: var(--muted); }
+    .positive { color: var(--green); }
+    .negative { color: var(--red); }
+    .neutral { color: var(--blue); }
+    .main-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 20px; margin-top: 20px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 10px 10px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+    th:first-child, td:first-child { text-align: left; white-space: normal; }
+    th { color: var(--muted); font-size: 12px; font-weight: 750; background: #fafbff; }
+    tr.total td { font-weight: 850; border-top: 2px solid var(--ink); }
+    tr.subtotal td { font-weight: 800; border-top: 1.5px solid var(--line); }
+    tr.emphasis td { background: var(--soft-green); font-weight: 850; }
+    tr.loss td { background: var(--soft-red); }
+    .chart-wrap { height: 280px; display: flex; align-items: end; gap: 18px; padding: 16px 8px 4px; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(180deg, #fff, #fbfcff); }
+    .bar-box { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 8px; }
+    .bar { width: 64%; min-height: 2px; border-radius: 10px 10px 4px 4px; background: var(--blue); transition: height .2s ease; }
+    .bar.neg { background: var(--red); border-radius: 4px 4px 10px 10px; }
+    .bar-label { font-size: 12px; color: var(--muted); text-align: center; }
+    .bar-value { font-size: 12px; font-weight: 800; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+    .note { font-size: 12px; color: var(--muted); line-height: 1.45; margin-top: 12px; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+    .primary { background: var(--blue); color: white; border-color: var(--blue); }
+    .ghost { background: #fff; }
+    .sensitivity td, .sensitivity th { padding: 8px 8px; font-size: 12px; }
+    .heat-pos { background: #e7f7ed; color: var(--green); font-weight: 700; }
+    .heat-mid { background: #fff6e5; color: var(--amber); font-weight: 700; }
+    .heat-neg { background: #feeeee; color: var(--red); font-weight: 700; }
+    .footer { margin: 24px 0 6px; color: var(--muted); font-size: 12px; }
+    @media (max-width: 1100px) {
+      .hero, .grid, .main-grid, .two-col { grid-template-columns: 1fr; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media print {
+      body { background: white; }
+      .app { padding: 0; max-width: none; }
+      .controls, .actions { display: none; }
+      .card, .hero-card { box-shadow: none; break-inside: avoid; }
+      .grid, .main-grid, .two-col { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="hero">
+      <div class="hero-card">
+        <h1>KHEM Project — Mini Hotel P&amp;L Simulation</h1>
+        <p>Bản simulation HTML dựng lại logic P&amp;L tháng từ financial model hiện có, đã tách riêng rent của D262 và D165 theo thông tin chính xác: D262 = 80 triệu/tháng, D165 = 120 triệu/tháng. Có thể chỉnh assumptions để xem ngay Revenue, EBITDA, PBT, breakeven và sensitivity.</p>
+        <div class="pill-row">
+          <span class="pill">Monthly P&amp;L</span>
+          <span class="pill">Scenario simulation</span>
+          <span class="pill">ADR × Occupancy sensitivity</span>
+          <span class="pill warning">Chưa bao gồm thuế, VAT, working capital, principal repayment</span>
+        </div>
+      </div>
+      <div class="hero-card">
+        <h2>Quick status</h2>
+        <div class="kpi-grid" style="grid-template-columns:1fr 1fr;">
+          <div class="kpi"><h3>Monthly EBITDA</h3><div id="kpiEbitda" class="value">-</div><div class="sub" id="kpiEbitdaMargin">-</div></div>
+          <div class="kpi"><h3>Monthly PBT</h3><div id="kpiPbt" class="value">-</div><div class="sub" id="kpiPbtMargin">-</div></div>
+        </div>
+        <p class="note" id="quickRead">-</p>
+      </div>
+    </div>
+
+    <div class="grid">
+      <aside class="card controls">
+        <div class="section-title"><h2>Input simulation</h2><button class="ghost" onclick="resetBase()">Reset base</button></div>
+        <div>
+          <label>Layout / phương án</label>
+          <div class="mode-grid" style="margin-top:8px;">
+            <button id="btnPA1" class="mode active" onclick="applyMode('PA1')">PA1 · 60 phòng<br><span style="font-size:12px;font-weight:600;color:var(--muted)">D262 only</span></button>
+            <button id="btnPA2" class="mode" onclick="applyMode('PA2')">PA2 · 72 phòng<br><span style="font-size:12px;font-weight:600;color:var(--muted)">D262 + D165</span></button>
+          </div>
+        </div>
+
+        <div>
+          <h3 style="margin-bottom:8px;">Room revenue assumptions</h3>
+          <div class="input-grid"><label for="rooms">Rooms</label><input id="rooms" type="number" min="1" step="1"></div>
+          <div class="input-grid"><label for="days">Days/month</label><input id="days" type="number" min="1" step="1"></div>
+          <div class="input-grid"><label for="occ">Occupancy</label><input id="occ" type="number" min="0" max="100" step="1"></div>
+          <div class="input-grid"><label for="adr">ADR / room night</label><input id="adr" type="number" min="0" step="50000"></div>
+        </div>
+
+        <div>
+          <h3 style="margin-bottom:8px;">Revenue & variable costs</h3>
+          <div class="input-grid"><label for="ancPct">Ancillary revenue %</label><input id="ancPct" type="number" min="0" step="1"></div>
+          <div class="input-grid"><label for="otaPct">OTA commission %</label><input id="otaPct" type="number" min="0" step="1"></div>
+          <div class="input-grid"><label for="hkCost">Housekeeping cost / sold room</label><input id="hkCost" type="number" min="0" step="10000"></div>
+          <div class="input-grid"><label for="ancCostPct">Ancillary cost %</label><input id="ancCostPct" type="number" min="0" step="1"></div>
+        </div>
+
+        <div>
+          <h3 style="margin-bottom:8px;">Lease / rent assumptions</h3>
+          <div class="checkbox-row"><label for="useD262">Include D262 rent · 80 triệu/tháng</label><input id="useD262" type="checkbox"></div>
+          <div class="checkbox-row"><label for="useD165">Include D165 rent · 120 triệu/tháng</label><input id="useD165" type="checkbox"></div>
+          <div class="input-grid"><label for="rentEsc">Annual rent escalation %</label><input id="rentEsc" type="number" step="0.5"></div>
+          <div class="input-grid"><label for="yearNo">Model year</label><input id="yearNo" type="number" min="1" step="1"></div>
+        </div>
+
+        <div>
+          <h3 style="margin-bottom:8px;">Fixed costs & below EBITDA</h3>
+          <div class="input-grid"><label for="payroll">Payroll</label><input id="payroll" type="number" step="10000000"></div>
+          <div class="input-grid"><label for="utilities">Utilities fixed</label><input id="utilities" type="number" step="5000000"></div>
+          <div class="input-grid"><label for="marketing">Marketing fixed</label><input id="marketing" type="number" step="5000000"></div>
+          <div class="input-grid"><label for="maintenance">Maintenance & repairs</label><input id="maintenance" type="number" step="5000000"></div>
+          <div class="input-grid"><label for="software">Software / internet / office</label><input id="software" type="number" step="5000000"></div>
+          <div class="input-grid"><label for="security">Security / common cleaning</label><input id="security" type="number" step="5000000"></div>
+          <div class="input-grid"><label for="admin">Other admin</label><input id="admin" type="number" step="5000000"></div>
+          <div class="input-grid"><label for="depr">Depreciation</label><input id="depr" type="number" step="10000000"></div>
+          <div class="input-grid"><label for="interest">Interest expense</label><input id="interest" type="number" step="10000000"></div>
+        </div>
+      </aside>
+
+      <main>
+        <div class="card">
+          <div class="section-title"><h2>Output KPIs</h2><span class="pill" id="layoutLabel">PA1 · 60 phòng</span></div>
+          <div class="kpi-grid">
+            <div class="kpi"><h3>Total revenue</h3><div id="revKpi" class="value neutral">-</div><div class="sub">VND / tháng</div></div>
+            <div class="kpi"><h3>EBITDA margin</h3><div id="ebitdaMarginKpi" class="value">-</div><div class="sub">EBITDA / Revenue</div></div>
+            <div class="kpi"><h3>PBT margin</h3><div id="pbtMarginKpi" class="value">-</div><div class="sub">PBT / Revenue</div></div>
+            <div class="kpi"><h3>PBT breakeven occ.</h3><div id="bePbtKpi" class="value">-</div><div class="sub" id="headroomKpi">Headroom -</div></div>
+          </div>
+        </div>
+
+        <div class="main-grid">
+          <div class="card">
+            <h2>Monthly P&amp;L</h2>
+            <table id="plTable"></table>
+            <p class="note">Format: số tiền theo triệu VND/tháng. Âm được hiển thị bằng ngoặc đỏ. Tất cả công thức chạy trực tiếp trong file HTML.</p>
+          </div>
+          <div class="card">
+            <h2>Profit bridge</h2>
+            <div class="chart-wrap" id="bridgeChart"></div>
+            <p class="note">Biểu đồ minh họa từ Revenue xuống PBT. Chi phí là phần kéo giảm lợi nhuận.</p>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="card">
+            <h2>Scenario comparison</h2>
+            <div class="actions">
+              <button onclick="applyScenario('down')">Apply downside</button>
+              <button onclick="applyScenario('base')" class="primary">Apply base</button>
+              <button onclick="applyScenario('up')">Apply upside</button>
+            </div>
+            <table id="scenarioTable" style="margin-top:14px;"></table>
+          </div>
+          <div class="card">
+            <h2>ADR × Occupancy sensitivity — Monthly PBT</h2>
+            <table id="sensitivityTable" class="sensitivity"></table>
+            <p class="note">Sensitivity giữ nguyên cost structure hiện tại, chỉ thay Occupancy và ADR.</p>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:20px;">
+          <h2>Key formula logic</h2>
+          <table>
+            <tr><th>Line</th><th>Formula</th></tr>
+            <tr><td>Room nights sold</td><td>Rooms × Days/month × Occupancy</td></tr>
+            <tr><td>Room revenue</td><td>Room nights sold × ADR</td></tr>
+            <tr><td>Ancillary revenue</td><td>Room revenue × Ancillary revenue %</td></tr>
+            <tr><td>OTA commission</td><td>Room revenue × OTA commission %</td></tr>
+            <tr><td>Housekeeping cost</td><td>Room nights sold × Housekeeping cost / room sold</td></tr>
+            <tr><td>Rent</td><td>(D262 80m + D165 120m if selected) × (1 + escalation %) ^ (Year - 1)</td></tr>
+            <tr><td>EBITDA</td><td>Total revenue - Variable costs - Fixed operating costs</td></tr>
+            <tr><td>PBT</td><td>EBITDA - Depreciation - Interest expense</td></tr>
+          </table>
+        </div>
+      </main>
+    </div>
+    <div class="footer">Source: uploaded workbook “260519 KHEM PROJECT - hotel_60_room_financial_model (Mr Trung).xlsx”; rent correction provided by user: D262 = 80m/month, D165 = 120m/month.</div>
+  </div>
+
+<script>
+const M = 1000000;
+const base = {
+  rooms: 60, days: 30, occ: 55, adr: 1050000,
+  ancPct: 12, otaPct: 16, hkCost: 140000, ancCostPct: 35,
+  useD262: true, useD165: false, rentEsc: 5, yearNo: 1,
+  payroll: 280*M, utilities: 45*M, marketing: 20*M, maintenance: 25*M,
+  software: 10*M, security: 20*M, admin: 15*M,
+  depr: 120*M, interest: 70*M
+};
+const scenarios = {
+  down: { label: 'Downside', occ: 42, adr: 900000 },
+  base: { label: 'Base', occ: 55, adr: 1050000 },
+  up: { label: 'Upside', occ: 68, adr: 1250000 }
+};
+const ids = ['rooms','days','occ','adr','ancPct','otaPct','hkCost','ancCostPct','rentEsc','yearNo','payroll','utilities','marketing','maintenance','software','security','admin','depr','interest'];
+function $(id){ return document.getElementById(id); }
+function fmtVnd(v){
+  const sign = v < 0; const n = Math.abs(v);
+  const out = n >= M ? (n/M).toLocaleString('vi-VN', {maximumFractionDigits:1}) + 'm' : n.toLocaleString('vi-VN');
+  return sign ? '(' + out + ')' : out;
+}
+function fmtPct(v){ return (v*100).toLocaleString('vi-VN', {maximumFractionDigits:1}) + '%'; }
+function cls(v){ return v < 0 ? 'negative' : 'positive'; }
+function setInputs(o){
+  ids.forEach(id => { $(id).value = o[id]; });
+  $('useD262').checked = o.useD262;
+  $('useD165').checked = o.useD165;
+  update();
+}
+function readInputs(){
+  const o = {};
+  ids.forEach(id => o[id] = parseFloat($(id).value || 0));
+  o.useD262 = $('useD262').checked;
+  o.useD165 = $('useD165').checked;
+  return o;
+}
+function calc(o, override={}){
+  const x = {...o, ...override};
+  const occ = x.occ/100;
+  const ancPct = x.ancPct/100;
+  const otaPct = x.otaPct/100;
+  const ancCostPct = x.ancCostPct/100;
+  const rentBase = (x.useD262 ? 80*M : 0) + (x.useD165 ? 120*M : 0);
+  const rent = rentBase * Math.pow(1 + x.rentEsc/100, Math.max(0, x.yearNo - 1));
+  const roomNights = x.rooms * x.days * occ;
+  const roomRevenue = roomNights * x.adr;
+  const ancillaryRevenue = roomRevenue * ancPct;
+  const totalRevenue = roomRevenue + ancillaryRevenue;
+  const ota = roomRevenue * otaPct;
+  const hk = roomNights * x.hkCost;
+  const ancillaryCost = ancillaryRevenue * ancCostPct;
+  const variableCost = ota + hk + ancillaryCost;
+  const fixedOps = x.payroll + rent + x.utilities + x.marketing + x.maintenance + x.software + x.security + x.admin;
+  const cm = totalRevenue - variableCost;
+  const ebitda = cm - fixedOps;
+  const pbt = ebitda - x.depr - x.interest;
+  const contributionPerSoldRoom = roomNights ? cm / roomNights : 0;
+  const fixedBeforeEbitda = fixedOps;
+  const fixedBeforePbt = fixedOps + x.depr + x.interest;
+  const contributionPerAvailableRoomAtOcc100 = x.days * ((x.adr * (1 + ancPct)) - (x.adr*otaPct) - x.hkCost - (x.adr*ancPct*ancCostPct));
+  const beEbitda = contributionPerAvailableRoomAtOcc100 > 0 ? fixedBeforeEbitda / (x.rooms * contributionPerAvailableRoomAtOcc100) : 0;
+  const bePbt = contributionPerAvailableRoomAtOcc100 > 0 ? fixedBeforePbt / (x.rooms * contributionPerAvailableRoomAtOcc100) : 0;
+  return {x, occ, roomNights, roomRevenue, ancillaryRevenue, totalRevenue, ota, hk, ancillaryCost, variableCost, cm, rent, fixedOps, ebitda, pbt, contributionPerSoldRoom, beEbitda, bePbt};
+}
+function update(){
+  const o = readInputs();
+  const r = calc(o);
+  const isPA2 = o.useD262 && o.useD165 && o.rooms >= 70;
+  $('layoutLabel').textContent = isPA2 ? 'PA2 · D262 + D165' : (o.useD165 ? 'Custom · includes D165' : 'PA1 / Custom');
+  $('revKpi').textContent = fmtVnd(r.totalRevenue);
+  $('ebitdaMarginKpi').textContent = fmtPct(r.ebitda / r.totalRevenue);
+  $('ebitdaMarginKpi').className = 'value ' + cls(r.ebitda);
+  $('pbtMarginKpi').textContent = fmtPct(r.pbt / r.totalRevenue);
+  $('pbtMarginKpi').className = 'value ' + cls(r.pbt);
+  $('bePbtKpi').textContent = fmtPct(r.bePbt);
+  const head = o.occ/100 - r.bePbt;
+  $('headroomKpi').textContent = 'Headroom ' + fmtPct(head);
+  $('headroomKpi').className = head >= 0 ? 'sub positive' : 'sub negative';
+  $('kpiEbitda').textContent = fmtVnd(r.ebitda);
+  $('kpiEbitda').className = 'value ' + cls(r.ebitda);
+  $('kpiEbitdaMargin').textContent = fmtPct(r.ebitda/r.totalRevenue) + ' margin';
+  $('kpiPbt').textContent = fmtVnd(r.pbt);
+  $('kpiPbt').className = 'value ' + cls(r.pbt);
+  $('kpiPbtMargin').textContent = fmtPct(r.pbt/r.totalRevenue) + ' margin';
+  $('quickRead').innerHTML = r.pbt >= 0
+    ? `Base đang <b class="positive">trên breakeven PBT</b> khoảng <b>${fmtPct(head)}</b>. Rent đang tính ${fmtVnd(r.rent)}/tháng.`
+    : `Case hiện tại <b class="negative">dưới breakeven PBT</b> khoảng <b>${fmtPct(head)}</b>. Rent đang tính ${fmtVnd(r.rent)}/tháng.`;
+  drawPL(r);
+  drawBridge(r);
+  drawScenarios(o);
+  drawSensitivity(o);
+}
+function row(label, value, pct, type=''){
+  const c = value < 0 ? 'negative' : '';
+  return `<tr class="${type}"><td>${label}</td><td class="${c}">${fmtVnd(value)}</td><td>${pct==null ? '' : fmtPct(pct)}</td></tr>`;
+}
+function drawPL(r){
+  const rev = r.totalRevenue || 1;
+  $('plTable').innerHTML = `<tr><th>Line item</th><th>VND m / month</th><th>% revenue</th></tr>` +
+    row('Room nights sold', r.roomNights, null) +
+    row('Room revenue', r.roomRevenue, r.roomRevenue/rev) +
+    row('Ancillary revenue', r.ancillaryRevenue, r.ancillaryRevenue/rev) +
+    row('Total revenue', r.totalRevenue, 1, 'total') +
+    row('OTA commission', -r.ota, -r.ota/rev) +
+    row('Variable housekeeping cost', -r.hk, -r.hk/rev) +
+    row('Ancillary direct cost', -r.ancillaryCost, -r.ancillaryCost/rev) +
+    row('Total variable cost', -r.variableCost, -r.variableCost/rev, 'subtotal') +
+    row('Contribution margin', r.cm, r.cm/rev, 'subtotal') +
+    row('Rent', -r.rent, -r.rent/rev) +
+    row('Other fixed operating cost', -(r.fixedOps-r.rent), -(r.fixedOps-r.rent)/rev) +
+    row('Fixed operating cost', -r.fixedOps, -r.fixedOps/rev, 'subtotal') +
+    row('EBITDA', r.ebitda, r.ebitda/rev, r.ebitda<0?'loss emphasis':'emphasis') +
+    row('Depreciation', -r.x.depr, -r.x.depr/rev) +
+    row('Interest expense', -r.x.interest, -r.x.interest/rev) +
+    row('Profit before tax', r.pbt, r.pbt/rev, r.pbt<0?'loss total':'total') +
+    row('Breakeven occupancy - EBITDA', r.beEbitda, null) +
+    row('Breakeven occupancy - PBT', r.bePbt, null);
+}
+function drawBridge(r){
+  const items = [
+    ['Revenue', r.totalRevenue], ['Var. cost', -r.variableCost], ['Fixed ops', -r.fixedOps], ['EBITDA', r.ebitda], ['D&A + Interest', -(r.x.depr+r.x.interest)], ['PBT', r.pbt]
+  ];
+  const max = Math.max(...items.map(i => Math.abs(i[1])), 1);
+  $('bridgeChart').innerHTML = items.map(([label, val]) => {
+    const h = Math.max(4, Math.abs(val)/max*220);
+    return `<div class="bar-box"><div class="bar-value ${val<0?'negative':'positive'}">${fmtVnd(val)}</div><div class="bar ${val<0?'neg':''}" style="height:${h}px"></div><div class="bar-label">${label}</div></div>`;
+  }).join('');
+}
+function drawScenarios(o){
+  const keys = ['down','base','up'];
+  const lines = [
+    ['Occupancy', s => fmtPct(s.occ/100)],
+    ['ADR', s => fmtVnd(s.adr)],
+    ['Revenue', s => fmtVnd(calc(o, {occ:s.occ, adr:s.adr}).totalRevenue)],
+    ['EBITDA', s => fmtVnd(calc(o, {occ:s.occ, adr:s.adr}).ebitda)],
+    ['PBT', s => fmtVnd(calc(o, {occ:s.occ, adr:s.adr}).pbt)],
+    ['PBT margin', s => { const r = calc(o, {occ:s.occ, adr:s.adr}); return fmtPct(r.pbt/r.totalRevenue); }]
+  ];
+  let html = `<tr><th>Metric</th>${keys.map(k=>`<th>${scenarios[k].label}</th>`).join('')}</tr>`;
+  lines.forEach(([label, fn]) => { html += `<tr><td>${label}</td>${keys.map(k=>`<td>${fn(scenarios[k])}</td>`).join('')}</tr>`; });
+  $('scenarioTable').innerHTML = html;
+}
+function drawSensitivity(o){
+  const occs = [40,45,50,55,60,65,70,75];
+  const adrBase = o.adr || 1050000;
+  const adrs = [adrBase-200000, adrBase-100000, adrBase, adrBase+100000, adrBase+200000].filter(x=>x>0);
+  let html = `<tr><th>ADR \ Occ.</th>${occs.map(x=>`<th>${x}%</th>`).join('')}</tr>`;
+  adrs.forEach(adr => {
+    html += `<tr><th>${fmtVnd(adr)}</th>`;
+    occs.forEach(occ => {
+      const pbt = calc(o,{occ, adr}).pbt;
+      const klass = pbt < 0 ? 'heat-neg' : (pbt < 150*M ? 'heat-mid' : 'heat-pos');
+      html += `<td class="${klass}">${fmtVnd(pbt)}</td>`;
+    });
+    html += `</tr>`;
+  });
+  $('sensitivityTable').innerHTML = html;
+}
+function applyMode(mode){
+  const o = readInputs();
+  if(mode === 'PA1') { o.rooms = 60; o.useD262 = true; o.useD165 = false; }
+  if(mode === 'PA2') { o.rooms = 72; o.useD262 = true; o.useD165 = true; }
+  setInputs(o);
+  $('btnPA1').classList.toggle('active', mode==='PA1');
+  $('btnPA2').classList.toggle('active', mode==='PA2');
+}
+function applyScenario(s){
+  const o = readInputs();
+  o.occ = scenarios[s].occ; o.adr = scenarios[s].adr;
+  setInputs(o);
+}
+function resetBase(){ setInputs(base); $('btnPA1').classList.add('active'); $('btnPA2').classList.remove('active'); }
+[...ids, 'useD262', 'useD165'].forEach(id => $(id).addEventListener('input', update));
+resetBase();
+</script>
+</body>
+</html>
