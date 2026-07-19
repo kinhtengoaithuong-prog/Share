@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>KHEM Hotel — Công cụ đánh giá dự án v11</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap&subset=latin,latin-ext,vietnamese" rel="stylesheet">
+<style>
+:root{
+--ink:#16201C;--muted:#6a746e;--line:#e3e8e4;--bg:#f4f6f4;--card:#fff;
+--accent:#0B5D4B;--accent-soft:#eaf3ef;--neg:#B3402E;--warn:#8a5a12;--warn-bg:#fff9e8;
+--ok:#0B5D4B;--ok-bg:#eaf3ef;--bad-bg:#fdeeeb;
+--radius:8px;
+}
+body.showcase{
+--ink:#eef2f8;--muted:#8fa0bd;--line:#22304d;--bg:#080b14;--card:#121a2e;
+--accent:#d4af6a;--accent-soft:#1b2540;--neg:#e08a9e;--warn:#e3b341;--warn-bg:#2a2415;
+--ok:#4fd1c5;--ok-bg:#14262c;--bad-bg:#2b1721;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Outfit,system-ui,sans-serif;font-size:13.5px;line-height:1.5}
+body.showcase{background:linear-gradient(160deg,#080b14,#121a2e 60%,#0d1424)}
+h1,h2,h3{font-family:'Noto Serif Display',Georgia,serif;font-weight:600;margin:0}
+.mono{font-family:'DM Mono',ui-monospace,monospace}
+
+/* ---------- TOP BAR ---------- */
+.topbar{position:sticky;top:0;z-index:80;background:var(--card);border-bottom:1px solid var(--line);
+ display:flex;align-items:center;gap:14px;padding:9px 18px;flex-wrap:wrap}
+body.showcase .topbar{background:rgba(18,26,46,.92);backdrop-filter:blur(10px)}
+.brand{font-family:'Noto Serif Display',serif;font-size:16px;font-weight:700;letter-spacing:.2px}
+.vbadge{font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border:1px solid var(--accent);
+ color:var(--accent);border-radius:20px;letter-spacing:.4px}
+.stamp{font-family:'DM Mono',monospace;font-size:9.5px;color:var(--muted);letter-spacing:.2px}
+.spacer{flex:1}
+.pill{font-size:11px;padding:4px 11px;border-radius:20px;opacity:0;transition:opacity .25s;
+ border:1px solid transparent;white-space:nowrap}
+.pill.show{opacity:1}
+.pill.ok{background:var(--ok-bg);color:var(--ok);border-color:var(--ok)}
+.pill.warn{background:var(--warn-bg);color:var(--warn);border-color:var(--warn)}
+.pill.err{background:var(--bad-bg);color:var(--neg);border-color:var(--neg)}
+
+/* ---------- BUTTONS: đúng 3 loại ---------- */
+button{font-family:Outfit,sans-serif;font-size:12px;cursor:pointer;border-radius:6px;
+ padding:6px 12px;border:1px solid var(--line);background:var(--card);color:var(--ink);transition:.15s}
+button:hover{border-color:var(--accent)}
+button:disabled{opacity:.35;cursor:not-allowed}
+button:disabled:hover{border-color:var(--line)}
+button.primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+body.showcase button.primary{color:#0b1020}
+button.primary:hover{filter:brightness(1.12)}
+button.danger{color:var(--neg);border-color:var(--bad-bg)}
+button.small{padding:3px 8px;font-size:11px}
+
+/* ---------- TABS ---------- */
+.tabs{display:flex;gap:2px;padding:0 18px;background:var(--card);border-bottom:1px solid var(--line);
+ position:sticky;top:43px;z-index:70;overflow-x:auto}
+body.showcase .tabs{background:rgba(18,26,46,.92)}
+.tab{padding:9px 16px;border:1px solid transparent;border-bottom:none;background:none;color:var(--muted);
+ border-radius:8px 8px 0 0;font-size:12.5px;white-space:nowrap}
+.tab.active{background:var(--bg);color:var(--accent);border-color:var(--line);font-weight:600}
+.hint{padding:7px 18px;font-size:11px;color:var(--muted);background:var(--bg);border-bottom:1px solid var(--line)}
+
+
+/* ---------- FIELD CONTROL: slider + stepper ---------- */
+.fctl{padding:6px 0 7px;border-bottom:1px dotted var(--line)}
+.fctl:last-child{border-bottom:none}
+.fctl.dep{border-left:2px solid var(--warn);padding-left:6px;margin-left:-6px}
+.ftop{display:flex;align-items:baseline;gap:6px}
+.flab{font-size:11.5px;line-height:1.25;flex:1}
+.fval{display:flex;align-items:baseline;gap:3px;white-space:nowrap}
+.numin{width:62px;text-align:right;font-family:'DM Mono',monospace;font-size:11.5px;
+ padding:2px 4px;border:1px solid var(--line);border-radius:4px;background:var(--card);color:var(--ink)}
+.numin:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.funit{font-size:9.5px;color:var(--muted);font-family:'DM Mono',monospace;min-width:44px}
+.fhint{font-size:9.5px;color:var(--muted);line-height:1.3;margin:1px 0 2px}
+.fbot{display:flex;align-items:center;gap:5px;margin-top:3px}
+.stp{width:20px;height:20px;padding:0;line-height:1;font-size:13px;border-radius:4px;
+ flex:0 0 20px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.stp:hover{border-color:var(--accent);color:var(--accent)}
+input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:3px;padding:0;border:none;
+ background:var(--line);border-radius:2px;cursor:pointer;width:auto}
+input[type=range]:focus{outline:none;box-shadow:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;
+ background:var(--accent);cursor:pointer;border:2px solid var(--card);box-shadow:0 0 0 1px var(--accent)}
+input[type=range]:focus::-webkit-slider-thumb{box-shadow:0 0 0 4px var(--accent-soft)}
+input[type=range]::-moz-range-thumb{width:11px;height:11px;border-radius:50%;background:var(--accent);
+ cursor:pointer;border:2px solid var(--card)}
+
+/* ---------- RESIZER ---------- */
+.resizer{width:5px;flex:0 0 5px;cursor:col-resize;background:transparent;position:relative;
+ border-right:1px solid var(--line)}
+.resizer:hover,.resizer.drag{background:var(--accent-soft);border-right-color:var(--accent)}
+.resizer::after{content:'';position:absolute;top:50%;left:1px;width:3px;height:34px;
+ margin-top:-17px;border-radius:2px;background:var(--line)}
+.resizer:hover::after{background:var(--accent)}
+body.resizing{cursor:col-resize;user-select:none}
+body.resizing iframe{pointer-events:none}
+
+/* ---------- CARD COLLAPSE (màn chính) ---------- */
+.card>.chead{display:flex;align-items:center;gap:7px;cursor:pointer;user-select:none}
+.card>.chead h2{flex:1;margin:0}
+.card>.chead{margin-bottom:11px}
+body.showcase .card>.chead{margin-bottom:15px}
+.card.folded>.chead{margin-bottom:0}
+.card>.chead .cchev{font-size:10px;color:var(--muted);transition:transform .18s}
+.card.folded>.chead .cchev{transform:rotate(-90deg)}
+.card.folded>*:not(.chead){display:none!important}
+.card.folded{padding-bottom:12px}
+body.showcase .card.folded{padding-bottom:16px}
+.uh{font-size:9px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);font-family:'DM Mono',monospace}
+.chead .cfold{font-size:9.5px;color:var(--muted);font-family:'DM Mono',monospace}
+
+
+/* ---------- DEPENDENCY MAP ---------- */
+.depwrap{overflow:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);padding:4px}
+.depwrap svg{display:block}
+text.dcol{font-family:'DM Mono',monospace;font-size:9.5px;fill:var(--muted);letter-spacing:.09em;text-transform:uppercase}
+.dnode rect{fill:var(--card);stroke:var(--line);stroke-width:1}
+.dnode text.dlab{font-family:Outfit,sans-serif;font-size:10.5px;fill:var(--ink);font-weight:500}
+.dnode text.dval{font-family:'DM Mono',monospace;font-size:9.5px;fill:var(--muted)}
+.dnode.d-in rect{fill:var(--accent-soft);stroke:var(--accent);stroke-opacity:.42}
+.dnode.d-mid rect{fill:var(--card);stroke:var(--line)}
+.dnode.d-out rect{fill:var(--card);stroke:var(--accent);stroke-width:1.6}
+.dnode.focus rect{stroke:var(--accent);stroke-width:2.4}
+.dnode.focus text.dlab{font-weight:700}
+.dnode.dim{opacity:.16}
+.dnode:hover rect{stroke:var(--accent)}
+path.dedge{fill:none;stroke:var(--line);stroke-width:1.1}
+path.dedge.dim{opacity:.07}
+.dchip{display:inline-block;font-size:10.5px;padding:2.5px 9px;border-radius:20px;margin:2px 3px 2px 0;
+ border:1px solid var(--line);cursor:pointer;background:var(--card)}
+.dchip:hover{border-color:var(--accent);color:var(--accent)}
+.dchip.d-in{background:var(--accent-soft)}
+.dchip.d-out{border-color:var(--accent);font-weight:600}
+.ddet .dh{display:flex;align-items:baseline;gap:9px;font-size:14px;margin-bottom:7px;flex-wrap:wrap}
+.dbadge{font-size:9px;padding:2px 8px;border-radius:12px;background:var(--accent-soft);color:var(--accent);
+ text-transform:uppercase;letter-spacing:.5px}
+.dnow{margin-left:auto;font-family:'DM Mono',monospace;font-size:13px;color:var(--accent)}
+.dformula{font-family:'DM Mono',monospace;font-size:11.5px;background:var(--bg);border-left:2px solid var(--accent);
+ padding:7px 11px;border-radius:0 5px 5px 0;margin-bottom:8px}
+.dnote{font-size:11.5px;color:var(--muted);font-style:italic;margin-bottom:8px}
+.dsec{margin-top:9px;padding-top:8px;border-top:1px solid var(--line)}
+.dsl{display:block;font-size:9.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:5px}
+.deplegend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-bottom:11px}
+.deplegend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+
+/* ---------- SIMULATOR SHELL ---------- */
+.shell{display:flex;align-items:stretch;min-height:calc(100vh - 76px)}
+.panel{width:var(--panelw,20%);min-width:210px;max-width:52%;flex:0 0 auto;background:var(--card);border-right:1px solid var(--line);
+ overflow-y:auto;max-height:calc(100vh - 76px);position:sticky;top:76px;padding:10px 11px 40px}
+.panel::-webkit-scrollbar{width:7px}
+.panel::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+.panel.collapsed{width:0;min-width:0;padding:0;overflow:hidden;border-right:none}
+.panel.collapsed + .resizer{display:none}
+.main{flex:1;min-width:0;overflow-x:hidden}
+.wrap{padding:15px 17px 40px;margin:0}
+
+/* zone collapse */
+.zone{border:1px solid var(--line);border-radius:6px;margin-bottom:7px;overflow:hidden}
+.zhead{display:flex;align-items:center;gap:6px;padding:7px 9px;cursor:pointer;background:var(--bg);
+ font-size:11.5px;font-weight:600;font-family:'Noto Serif Display',serif;user-select:none}
+.zhead:hover{background:var(--accent-soft)}
+.zhead .chev{font-size:9px;color:var(--muted);transition:transform .18s;display:inline-block}
+.zone.open .zhead .chev{transform:rotate(90deg)}
+.zhead .zc{margin-left:auto;font-size:9px;color:var(--muted);font-family:'DM Mono',monospace}
+.zbody{padding:8px 9px;display:none;border-top:1px solid var(--line)}
+.zone.open .zbody{display:block}
+.panelbar{display:flex;gap:5px;align-items:center;margin-bottom:9px;flex-wrap:wrap}
+.panelbar .lbl{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;width:100%}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:15px 17px;margin-bottom:14px}
+body.showcase .card{border-radius:16px;padding:22px 24px;box-shadow:0 8px 30px rgba(0,0,0,.35)}
+.card>h2{font-size:15px;margin-bottom:11px}
+body.showcase .card>h2{font-size:19px;margin-bottom:15px}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:repeat(3,1fr)}
+.note{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.55}
+
+/* ---------- KPI ---------- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:11px 13px}
+body.showcase .kpi{border-radius:14px;padding:16px 18px}
+.kpi .lab{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+.kpi .val{font-family:'Noto Serif Display',serif;font-size:22px;font-weight:600;margin-top:3px;letter-spacing:-.3px}
+body.showcase .kpi .val{font-size:28px}
+.kpi .sub{font-size:10.5px;color:var(--muted);margin-top:2px}
+.pos{color:var(--ok)}.negv{color:var(--neg)}
+
+/* ---------- TABLE ---------- */
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{padding:5px 8px;text-align:right;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+thead th{position:sticky;top:0;background:var(--card);font-weight:600;font-size:11px;
+ text-transform:uppercase;letter-spacing:.4px;color:var(--muted);z-index:5}
+tr.sub td{font-weight:600;background:var(--accent-soft)}
+tr.tot td{font-weight:700;background:var(--accent-soft);border-top:2px solid var(--accent)}
+tr.emph td{font-weight:600}
+td.num{font-family:'DM Mono',monospace;font-size:12px}
+.scrollx{overflow-x:auto}
+
+/* ---------- VERDICT ---------- */
+.verdict{border-radius:var(--radius);padding:16px 18px;border-left:4px solid;margin-bottom:14px}
+body.showcase .verdict{border-radius:16px;padding:22px 26px}
+.verdict.go{background:var(--ok-bg);border-color:var(--ok)}
+.verdict.no{background:var(--bad-bg);border-color:var(--neg)}
+.verdict.check{background:var(--warn-bg);border-color:var(--warn)}
+.verdict .vt{font-family:'Noto Serif Display',serif;font-size:19px;font-weight:700;margin-bottom:5px}
+body.showcase .verdict .vt{font-size:24px}
+.verdict .vb{font-size:13px;line-height:1.65}
+
+/* ---------- LENS ---------- */
+.lens{border:1px solid var(--line);border-radius:var(--radius);padding:13px 15px;background:var(--card)}
+body.showcase .lens{border-radius:14px;padding:18px 20px}
+.lens.focus{border-color:var(--accent);border-width:2px}
+.lens .lh{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:3px}
+.lens .lq{font-size:11.5px;color:var(--muted);font-style:italic;margin-bottom:9px;line-height:1.45}
+.lens .lv{font-family:'Noto Serif Display',serif;font-size:26px;font-weight:600}
+.lens .lr{display:flex;justify-content:space-between;font-size:11.5px;padding:3px 0;border-top:1px solid var(--line)}
+.badge{display:inline-block;font-size:9.5px;padding:2px 7px;border-radius:12px;letter-spacing:.4px;
+ text-transform:uppercase;font-weight:600}
+.badge.go{background:var(--ok-bg);color:var(--ok)}
+.badge.no{background:var(--bad-bg);color:var(--neg)}
+.badge.check{background:var(--warn-bg);color:var(--warn)}
+
+/* ---------- INPUTS ---------- */
+.frow{display:grid;grid-template-columns:1fr 104px;gap:6px;align-items:center;padding:2.5px 0}
+.frow label{font-size:11.5px;color:var(--ink);line-height:1.3}
+.frow .h{font-size:9.5px;color:var(--muted);display:block;line-height:1.25}
+input,select{font-family:Outfit,sans-serif;font-size:11.5px;padding:4px 6px;border:1px solid var(--line);
+ border-radius:5px;background:var(--card);color:var(--ink);width:100%;text-align:right}
+select{text-align:left}
+input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+input.money{font-family:'DM Mono',monospace}
+.fs{border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;margin-bottom:12px;background:var(--card)}
+.fs>.fh{font-family:'Noto Serif Display',serif;font-size:13.5px;font-weight:600;margin-bottom:9px;
+ padding-bottom:6px;border-bottom:1px solid var(--line)}
+.dep{border-left:2px solid var(--warn);padding-left:7px}
+
+/* ---------- SEGMENTED: đúng 1 kiểu ---------- */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{border:none;border-radius:0;border-right:1px solid var(--line);padding:5px 12px}
+.seg button:last-child{border-right:none}
+.seg button.on{background:var(--accent);color:#fff}
+body.showcase .seg button.on{color:#0b1020}
+
+/* ---------- GAP BAR ---------- */
+.gap{margin-bottom:15px}
+.gaphead{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px}
+.track{height:22px;background:var(--bg);border:1px solid var(--line);border-radius:5px;position:relative;overflow:hidden}
+.fill{height:100%;background:var(--accent);opacity:.28}
+.mark{position:absolute;top:0;bottom:0;width:2px;background:var(--neg)}
+.marklab{position:absolute;top:-16px;font-size:9.5px;color:var(--neg);transform:translateX(-50%);white-space:nowrap}
+.hidden{display:none!important}
+@media(max-width:900px){
+ .g2,.g3{grid-template-columns:1fr}
+ .shell{flex-direction:column}
+ .panel{width:100%;max-width:none;position:static;max-height:none;border-right:none;
+  border-bottom:1px solid var(--line)}
+ .panel.collapsed{border-bottom:none}
+ .wrap{padding:11px}
+ .topbar{padding:8px 11px}
+ .tabs{padding:0 11px}
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <span class="brand">KHEM Hotel — Đánh giá dự án</span>
+  <span class="vbadge" id="vBadge">v—</span>
+  <span class="stamp" id="vStamp">—</span>
+  <span class="spacer"></span>
+  <span class="pill" id="pill"></span>
+  <button id="undoBtn" onclick="doUndo()" disabled>↩ Undo (0)</button>
+  <button onclick="toggleTheme()" id="themeBtn" title="Workbench = nhập liệu · Showcase = trình bày">◐ Showcase</button>
+  <button onclick="exportJSON()" title="File JSON đầy đủ — import ngược lại được">💾 Export</button>
+  <button onclick="document.getElementById('importFile').click()" title="Nạp lại file đã export">📥 Import</button>
+  <input type="file" id="importFile" accept=".json" class="hidden" onchange="importJSON(event)"/>
+  <button onclick="allCards(true)" title="Thu gọn mọi vùng ở màn chính">⊟ Thu gọn</button>
+  <button onclick="allCards(false)" title="Mở lại mọi vùng">⊞ Mở</button>
+  <button id="panelBtn" onclick="togglePanel()">◀ Giả định</button>
+  <button class="primary" onclick="switchTab(2)">Xem quyết định</button>
+</div>
+
+<div class="tabs">
+  <button class="tab active" id="tb1" onclick="switchTab(1)">1. P&amp;L khi ổn định</button>
+  <button class="tab" id="tb2" onclick="switchTab(2)">2. Quyết định &amp; ngưỡng khả thi</button>
+  <button class="tab" id="tb3" onclick="switchTab(3)">3. Bản đồ phụ thuộc</button>
+</div>
+<div class="hint" id="tabHint"></div>
+
+<div class="shell">
+<aside class="panel" id="panel">
+  <div class="panelbar">
+    <span class="lbl">Preset kịch bản</span>
+    <div class="seg">
+      <button class="small" onclick="preset('low')" id="pLow">Thấp</button>
+      <button class="small" onclick="preset('mid')" id="pMid">TB</button>
+      <button class="small" onclick="preset('high')" id="pHigh">Cao</button>
+      <button class="small" onclick="preset('gm')" id="pGM">GM</button>
+    </div>
+    <button class="small danger" onclick="resetAll()">Reset</button>
+    <button class="small" onclick="allZones(true)">Mở hết</button>
+    <button class="small" onclick="allZones(false)">Đóng hết</button>
+  </div>
+  <div id="inputGrid"></div>
+</aside>
+<div class="resizer" id="resizer" title="Kéo để đổi độ rộng · nhấp đúp để về 20%"></div>
+<div class="main">
+<div class="wrap">
+
+<!-- ============ TAB 1 — P&L KHI ỔN ĐỊNH ============ -->
+<div id="p1">
+  <div class="kpis" style="margin-bottom:14px" id="plKpis"></div>
+  <div class="grid g2">
+    <div class="card" data-fold="c1"><div class="chead" onclick="foldCard(this)"><span class="cchev">▼</span><h2>P&amp;L tháng khi ổn định</h2><span class="cfold">thu gọn</span></div><table id="plTable"></table>
+      <p class="note">Hai cột: <b>Kinh tế</b> có tính chi phí cơ hội mặt bằng để so sánh công bằng với phương án cho thuê. <b>Tiền mặt</b> là dòng tiền thật, dùng cho định giá dự án.</p></div>
+    <div>
+      <div class="card" data-fold="c2"><div class="chead" onclick="foldCard(this)"><span class="cchev">▼</span><h2>Doanh thu phụ</h2><span class="cfold">thu gọn</span></div><table id="ancTable"></table></div>
+      <div class="card" data-fold="c3"><div class="chead" onclick="foldCard(this)"><span class="cchev">▼</span><h2>Chi phí cố định</h2><span class="cfold">thu gọn</span></div><table id="fixTable"></table></div>
+    </div>
+  </div>
+  <div class="card" data-fold="c4"><div class="chead" onclick="foldCard(this)"><span class="cchev">▼</span><h2>Benchmark validation</h2><span class="cfold">thu gọn</span></div><table id="bmTable"></table>
+    <p class="note">Khung phân khúc nội bộ dùng để chạy sensitivity, không phải kết luận thị trường. Cần comp set thực tế cùng vị trí, hạng phòng và kênh bán để chốt.</p></div>
+</div>
+
+<!-- ============ TAB 2 — QUYẾT ĐỊNH & NGƯỠNG ============ -->
+<div id="p2" class="hidden">
+  <div class="verdict" id="verdictBox">
+    <div class="vt" id="verdictTitle">—</div>
+    <div class="vb" id="verdictBody">—</div>
+  </div>
+  <div class="card" data-fold="c5"><div class="chead" onclick="foldCard(this)"><span class="cchev">▼</span><h2>Ba lens — cùng một dữ liệu, ba câu hỏi khác nhau</h2><span class="cfold">thu gọn</span></div>
+    <div class="grid g3">
+      <div class="lens" id="lensA">
+        <div class="lh">A · Tổng thể</div>
+        <div class="lq">Toàn bộ 120 tỷ tài sản đang sinh lời bao nhiêu?</div>
+        <div class="lv" id="a_irr">—</div>
+        <div id="a_rows"></div>
+      </div>
+      <div class="lens focus" id="lensB">
+        <div class="lh">B · Incremental <span class="badge check">quyết định thật</span></div>
+        <div class="lq">Bỏ thêm tiền fit-out, có hơn phương án cho thuê không?</div>
+        <div class="lv" id="b_irr">—</div>
+        <div id="b_rows"></div>
+      </div>
+      <div class="lens" id="lensC">
+        <div class="lh">C · Đối chứng</div>
+        <div class="lq">Không làm gì, cho thuê thuần thì được gì?</div>
+        <div class="lv" id="c_irr">—</div>
+        <div id="c_rows"></div>
+      </div>
+    </div>
+    <p class="note" id="lensNote"></p>
+  </div>
+  <div class="card" data-fold="c6"><div class="chead" onclick="foldCard(this)"><span class="cchev">▼</span><h2>Cấu trúc vốn &amp; khả năng vay</h2><span class="cfold">thu gọn</span></div>
+    <div class="grid g2">
+      <div><table id="capTable"></table></div>
+      <div><table id="dscrTable"></table></div>
+    </div>
+    <p class="note">Ngân hàng nhận thế chấp bất động sản, không nhận fit-out. Hạn mức vay tính trên giá trị định giá của BĐS, không phải trên tổng mức đầu tư. DSCR &lt; 1.2 là ngưỡng ngân hàng thường từ chối.</p>
+  </div>
+  <div class="card" data-fold="c7"><div class="chead" onclick="foldCard(this)"><span class="cchev">▼</span><h2>Dòng tiền dự án theo năm</h2><span class="cfold">thu gọn</span></div>
+    <div class="scrollx"><table id="cfTable"></table></div>
+    <p class="note">Dòng tiền vận hành đã cộng ngược chi phí cơ hội mặt bằng (không phải chi tiền thật) và trừ capex bảo trì FF&amp;E. Giá trị thu hồi cuối kỳ = bất động sản tăng giá + phần fit-out còn thu hồi được.</p>
+  </div>
+
+  <div class="card" style="border-left:4px solid var(--accent)" data-fold="c8"><div class="chead" onclick="foldCard(this)"><span class="cchev">▼</span><h2 style="margin:0">Cần gì để khả thi</h2><span class="cfold">thu gọn</span></div><p class="note" style="margin-top:5px">Giải ngược từ ngưỡng: mỗi biến cần đạt mức nào thì làm khách sạn mới hơn được phương án cho thuê.</p></div>
+  <div class="card" data-fold="c9"><div class="chead" onclick="foldCard(this)"><span class="cchev">▼</span><h2>Ngưỡng khả thi — cần đạt gì để bằng phương án cho thuê?</h2><span class="cfold">thu gọn</span></div>
+    <p class="note" style="margin-top:0" id="hurdleNote"></p>
+    <div id="gapBox" style="margin-top:16px"></div>
+  </div>
+  <div class="card" data-fold="c10"><div class="chead" onclick="foldCard(this)"><span class="cchev">▼</span><h2>Đọc kết quả</h2><span class="cfold">thu gọn</span></div>
+    <div id="solverRead"></div>
+  </div>
+</div>
+
+<!-- ============ TAB 3 — BẢN ĐỒ PHỤ THUỘC ============ -->
+<div id="p3" class="hidden">
+ <div class="card" data-fold="dep1">
+  <div class="chead" onclick="foldCard(this)"><span class="cchev">▼</span><h2>Bản đồ phụ thuộc — từ giả định tới kết luận</h2><span class="cfold">thu gọn</span></div>
+  <div class="deplegend">
+   <span><i style="background:var(--accent-soft);border:1px solid var(--accent)"></i>Đầu vào bạn nhập</span>
+   <span><i style="background:var(--card);border:1px solid var(--line)"></i>Giá trị trung gian</span>
+   <span><i style="background:var(--card);border:1.6px solid var(--accent)"></i>Kết quả cuối</span>
+   <span class="spacer"></span>
+   <button class="small" onclick="depClear()">Bỏ chọn</button>
+  </div>
+  <div class="depwrap" id="depCanvas"></div>
+  <p class="note" id="depStat"></p>
+ </div>
+ <div class="card" data-fold="dep2">
+  <div class="chead" onclick="foldCard(this)"><span class="cchev">▼</span><h2>Chi tiết nút đang chọn</h2><span class="cfold">thu gọn</span></div>
+  <div id="depDetail"></div>
+ </div>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+"use strict";
+const VERSION='11.3';
+const RELEASE='Build 18/07/2026 · Sửa lỗi quy đổi đơn vị ngày/nghìn · thêm tab Bản đồ phụ thuộc (62 nút)';
+const LS_KEY='khem_hotel_model_v11';
+
+const M=1e6,B=1e9;
+const RAMPS={
+ fast:{label:'Nhanh — thị trường tốt, có sẵn kênh bán',y:[[.75,.95],[.95,1],[1,1]]},
+ std :{label:'Chuẩn — mặc định',                        y:[[.60,.90],[.85,.95],[1,1]]},
+ slow:{label:'Chậm — thương hiệu mới, cạnh tranh cao',  y:[[.45,.85],[.70,.92],[.90,.98]]}
+};
+
+const DEFAULTS={
+ propertyValue:71430*M, landCost:3000*M, capexMode:'total',
+ capexTotalInput:45570*M, capexPerRoom:759500000,
+ designPct:5, constructionPct:55, interiorPct:28, equipmentPct:7, preopenPct:5,
+ rooms:60, days:30, occ:55, adr:1050000, vatRate:10,
+ fnbPct:5, minibarPct:1.5, spaPct:5, laundryPct:1, transportPct:2, latePct:1.5, otherAncPct:1,
+ otaPct:16, hkCost:140000, ancCostPct:35,
+ realRent:0, oppRentYield:3,
+ payroll:280*M, fte:18, siBaseSalary:6*M, siRate:21.5,
+ utilities:45*M, marketing:20*M, maintenance:25*M, software:10*M, security:20*M, admin:15*M,
+ deprYears:30, citRate:20,
+ debtMode:'ltv', valHaircut:85, ltv:70, debtManual:42500*M,
+ loanRate:10, loanTerm:10, gracePrincipal:1,
+ rampProfile:'std', horizon:10, propGrowth:5, fitoutRecovery:20,
+ maintCapexPct:3, maintStartYear:4, discountRate:12,
+ benchAdrLow:900000, benchAdrBase:1050000, benchAdrHigh:1250000,
+ benchOccLow:50, benchOccBase:60, benchOccHigh:70,
+ benchCapexLow:500*M, benchCapexBase:800*M, benchCapexHigh:1200*M,
+ benchEbitdaBase:25, benchPayback:7
+};
+
+const PRESETS={
+ low:{capexMode:'perRoom',capexPerRoom:500*M,adr:850000,occ:58,spaPct:2,fnbPct:3,payroll:200*M,fte:14,otaPct:14,hkCost:110000},
+ mid:{capexMode:'perRoom',capexPerRoom:800*M,adr:1200000,occ:62,spaPct:5,fnbPct:5,payroll:270*M,fte:18,otaPct:16,hkCost:140000},
+ high:{capexMode:'perRoom',capexPerRoom:1200*M,adr:1800000,occ:60,spaPct:8,fnbPct:8,payroll:350*M,fte:24,otaPct:17,hkCost:175000},
+ gm:{rooms:62,capexMode:'total',capexTotalInput:45000*M,adr:2300000,occ:69,vatRate:0,
+     fnbPct:31,minibarPct:2.5,laundryPct:2,spaPct:10,otherAncPct:1,transportPct:0,latePct:0,
+     otaPct:15,payroll:950*M,fte:40,marketing:35*M,utilities:95*M,maintenance:85*M}
+};
+
+const MONEY=new Set(['propertyValue','landCost','capexTotalInput','capexPerRoom','adr','hkCost','realRent',
+ 'payroll','siBaseSalary','utilities','marketing','maintenance','software','security','admin','debtManual',
+ 'benchAdrLow','benchAdrBase','benchAdrHigh','benchCapexLow','benchCapexBase','benchCapexHigh']);
+const SELECTS={capexMode:[['total','Nhập tổng fit-out'],['perRoom','Nhập theo suất đầu tư/phòng']],
+ debtMode:[['ltv','Theo LTV trên giá trị BĐS'],['manual','Nhập thẳng số tiền vay']],
+ rampProfile:[['fast','Nhanh'],['std','Chuẩn'],['slow','Chậm']]};
+
+let S={...DEFAULTS};
+let undoStack=[];
+
+/* ---------- FORMAT ---------- */
+const $=id=>document.getElementById(id);
+function fmtVnd(v){
+ if(v==null||!isFinite(v))return '—';
+ const s=v<0,n=Math.abs(v);let o;
+ if(n>=B)o=(n/B).toLocaleString('vi-VN',{maximumFractionDigits:2})+' tỷ';
+ else if(n>=M)o=(n/M).toLocaleString('vi-VN',{maximumFractionDigits:1})+' tr';
+ else if(n>=1000)o=(n/1000).toLocaleString('vi-VN',{maximumFractionDigits:0})+' ng';
+ else o=n.toLocaleString('vi-VN',{maximumFractionDigits:0});
+ return s?'('+o+')':o;
+}
+function fmtIn(v){
+ const n=Math.abs(v||0);
+ if(n>=B)return (v/B).toLocaleString('vi-VN',{maximumFractionDigits:3})+' tỷ';
+ if(n>=M)return (v/M).toLocaleString('vi-VN',{maximumFractionDigits:2})+' tr';
+ if(n>=1000)return (v/1000).toLocaleString('vi-VN',{maximumFractionDigits:0})+' ng';
+ return String(v||0);
+}
+function parseMoney(v){
+ if(typeof v==='number')return v;
+ let s=(v||'').toString().trim().toLowerCase();if(!s)return 0;
+ s=s.replace(/\s/g,'').replace(/,/g,'.');let m=1;
+ if(/(ty|tỷ|b)$/.test(s)){m=B;s=s.replace(/(ty|tỷ|b)$/,'')}
+ else if(/(tr|triệu|m)$/.test(s)){m=M;s=s.replace(/(tr|triệu|m)$/,'')}
+ else if(/(ng|k|nghìn|ngàn)$/.test(s)){m=1000;s=s.replace(/(ng|k|nghìn|ngàn)$/,'')}
+ s=s.replace(/[^0-9.\-]/g,'');return (parseFloat(s)||0)*m;
+}
+const pct=(v,d=1)=>v==null||!isFinite(v)?'—':(v*100).toLocaleString('vi-VN',{maximumFractionDigits:d})+'%';
+const cnt=v=>Math.round(v).toLocaleString('vi-VN');
+const yr =v=>v==null||!isFinite(v)?'>10 năm':v.toLocaleString('vi-VN',{maximumFractionDigits:1})+' năm';
+const sgn=v=>v>=0?'pos':'negv';
+
+/* ---------- ENGINE ---------- */
+function fitout(p){return p.capexMode==='perRoom'?p.rooms*p.capexPerRoom:p.capexTotalInput}
+function debtAmt(p){return p.debtMode==='manual'?p.debtManual:p.propertyValue*(p.valHaircut/100)*(p.ltv/100)}
+
+function pl(p,occF=1,adrF=1){
+ const occ=p.occ/100*occF, adrG=p.adr*adrF, vat=p.vatRate/100, adrN=adrG/(1+vat);
+ const rn=p.rooms*p.days*occ, roomRev=rn*adrN, roomGross=rn*adrG;
+ const aP={fnb:p.fnbPct,minibar:p.minibarPct,spa:p.spaPct,laundry:p.laundryPct,
+           transport:p.transportPct,late:p.latePct,other:p.otherAncPct};
+ const anc={}; let ancRev=0;
+ for(const k in aP){anc[k]=roomRev*aP[k]/100; ancRev+=anc[k]}
+ const totalRev=roomRev+ancRev;
+ const ota=roomRev*p.otaPct/100, hk=rn*p.hkCost, ancCost=ancRev*p.ancCostPct/100;
+ const varCost=ota+hk+ancCost, cm=totalRev-varCost;
+ const oppRent=p.propertyValue*(p.oppRentYield/100)/12;
+ const si=p.fte*p.siBaseSalary*p.siRate/100;
+ const fixLines={'Tiền thuê thực trả':p.realRent,'Nhân sự cố định':p.payroll,'BHXH doanh nghiệp':si,
+  'Điện nước':p.utilities,'Marketing':p.marketing,'Bảo trì':p.maintenance,
+  'Software/internet':p.software,'An ninh/vệ sinh':p.security,'Hành chính khác':p.admin};
+ let fixCash=0; for(const k in fixLines) fixCash+=fixLines[k];
+ const fixEcon=fixCash+oppRent;
+ const capex=fitout(p), depr=p.deprYears>0?capex/p.deprYears/12:0;
+ const ebitdaCash=cm-fixCash, ebitdaEcon=cm-fixEcon;
+ const ebitEcon=ebitdaEcon-depr;
+ return {occ,adrG,adrN,rn,roomGross,roomRev,vatOut:roomGross-roomRev,anc,ancRev,totalRev,
+  ota,hk,ancCost,varCost,cm,oppRent,si,fixLines,fixCash,fixEcon,ebitdaCash,ebitdaEcon,
+  depr,ebitEcon,ebitCash:ebitdaCash-depr,capex};
+}
+
+function cashflow(p){
+ const D=debtAmt(p), ramp=RAMPS[p.rampProfile].y, capex=fitout(p);
+ const amortY=Math.max(0,p.loanTerm-p.gracePrincipal), princ=amortY>0?D/amortY:0;
+ let bal=D; const rows=[];
+ for(let y=1;y<=p.horizon;y++){
+  const f=ramp[Math.min(y-1,ramp.length-1)];
+  const m=pl(p,f[0],f[1]);
+  const revY=m.totalRev*12, ebCash=m.ebitdaCash*12, deprY=m.depr*12;
+  const ebitY=ebCash-deprY;
+  const maint=(y>=p.maintStartYear)?revY*p.maintCapexPct/100:0;
+  const taxU=Math.max(0,ebitY)*p.citRate/100;
+  const cfProj=ebCash-taxU-maint;
+  const interest=bal*p.loanRate/100;
+  const pp=(y>p.gracePrincipal&&y<=p.loanTerm)?Math.min(princ,bal):0;
+  const taxL=Math.max(0,ebitY-interest)*p.citRate/100;
+  const cfEq=ebCash-taxL-maint-interest-pp;
+  const ds=(interest+pp)>0?(ebCash-maint)/(interest+pp):null;
+  rows.push({y,occF:f[0],adrF:f[1],revY,ebCash,ebitY,maint,taxU,cfProj,interest,pp,balOpen:bal,cfEq,dscr:ds});
+  bal-=pp;
+ }
+ const tvProp=p.propertyValue*Math.pow(1+p.propGrowth/100,p.horizon);
+ const nbv=Math.max(0,capex*(1-p.horizon/p.deprYears));
+ const tvFit=nbv*p.fitoutRecovery/100;
+ return {rows,D,capex,balEnd:bal,princ,tvProp,tvFit,tv:tvProp+tvFit,nbv};
+}
+
+function npv(r,c){return c.reduce((a,v,i)=>a+v/Math.pow(1+r,i),0)}
+function irr(c){
+ const f=r=>npv(r,c); let lo=-0.95,hi=8;
+ if(!isFinite(f(lo))||!isFinite(f(hi))||f(lo)*f(hi)>0)return null;
+ for(let i=0;i<220;i++){const m=(lo+hi)/2; if(f(lo)*f(m)<=0)hi=m; else lo=m}
+ return (lo+hi)/2;
+}
+function payback(c){
+ let cum=c[0];
+ for(let i=1;i<c.length;i++){const prev=cum;cum+=c[i];if(cum>=0&&c[i]!==0)return i-1+(-prev/c[i])}
+ return null;
+}
+
+function lenses(p){
+ const cf=cashflow(p), dr=p.discountRate/100;
+ const totalInv=p.propertyValue+p.landCost+cf.capex;
+ const oppY=p.propertyValue*(p.oppRentYield/100);
+
+ // A — tổng thể
+ const A=[-totalInv,...cf.rows.map(r=>r.cfProj)]; A[A.length-1]+=cf.tv;
+ // B — incremental: chỉ fit-out, dòng tiền phải gánh cơ hội phí mặt bằng
+ const Bc=[-cf.capex,...cf.rows.map(r=>r.cfProj-oppY)]; Bc[Bc.length-1]+=cf.tvFit;
+ // C — đối chứng cho thuê thuần
+ const C=[-(p.propertyValue+p.landCost)];
+ for(let y=1;y<=p.horizon;y++)C.push(oppY);
+ C[C.length-1]+=cf.tvProp;
+ // Levered
+ const L=[-(totalInv-cf.D),...cf.rows.map(r=>r.cfEq)]; L[L.length-1]+=(cf.tv-cf.balEnd);
+
+ const mk=c=>({irr:irr(c),npv:npv(dr,c),pb:payback(c),cfs:c});
+ const res={A:mk(A),B:mk(Bc),C:mk(C),L:mk(L),cf,totalInv,oppY,
+  pvTV:cf.tv/Math.pow(1+dr,p.horizon),
+  dscrMin:Math.min(...cf.rows.filter(r=>r.dscr!=null&&isFinite(r.dscr)).map(r=>r.dscr))};
+ res.hurdle=res.C.irr;
+ res.tvShare=res.pvTV/(res.A.npv+totalInv||1);
+ return res;
+}
+
+/* ---------- SOLVER ---------- */
+function solveFor(key,lo,hi,target,invert=false){
+ const f=v=>{const r=lenses({...S,[key]:v}).B.irr; return r==null?-9:r};
+ for(let i=0;i<70;i++){
+  const m=(lo+hi)/2, r=f(m);
+  if(invert){ if(r<target) hi=m; else lo=m; }
+  else      { if(r<target) lo=m; else hi=m; }
+ }
+ const out=(lo+hi)/2, chk=f(out);
+ return (chk<target-0.005)?null:out;
+}
+
+/* ---------- RENDER: TAB 1 ---------- */
+function renderDecision(){
+ const R=lenses(S), p=S;
+ const gap=R.B.irr==null?null:R.B.irr-R.hurdle;
+
+ // verdict
+ let cls,title,body;
+ const need=solveFor('adr',300000,10*M,R.hurdle);
+ if(gap!=null&&gap>=0.03){cls='go';title='NÊN LÀM — vượt rõ phương án cho thuê';
+  body=`Bỏ thêm ${fmtVnd(R.cf.capex)} vào fit-out cho IRR <b>${pct(R.B.irr)}</b>, cao hơn phương án cho thuê thuần (<b>${pct(R.hurdle)}</b>) khoảng <b>${pct(gap)}</b>. Chênh lệch này là phần thưởng cho rủi ro vận hành — cần xác nhận ADR và công suất bằng nghiên cứu thị trường trước khi xuống tiền.`;}
+ else if(gap!=null&&gap>=0){cls='check';title='CẦN VALIDATE — hơn cho thuê nhưng biên rất mỏng';
+  body=`IRR incremental <b>${pct(R.B.irr)}</b> chỉ nhỉnh hơn cho thuê thuần (<b>${pct(R.hurdle)}</b>) <b>${pct(gap)}</b>. Chênh lệch này chưa đủ bù rủi ro vận hành khách sạn: nhân sự, mùa vụ, cạnh tranh, biến động OTA. Cần ADR khoảng <b>${need?fmtVnd(need):'—'}</b> trở lên để có biên an toàn.`;}
+ else{cls='no';title='KHÔNG NÊN LÀM — với giả định hiện tại';
+  body=`Bỏ thêm ${fmtVnd(R.cf.capex)} vào fit-out cho IRR incremental <b>${R.B.irr==null?'âm':pct(R.B.irr)}</b>, thấp hơn phương án cho thuê thuần (<b>${pct(R.hurdle)}</b>). Nghĩa là làm khách sạn đang <b>phá huỷ giá trị</b> so với chỉ cho thuê căn nhà. Để hoà được ngưỡng đó, ADR cần đạt khoảng <b>${need?fmtVnd(need):'không đạt được ở mọi mức giá'}</b> — hiện đang ${fmtVnd(p.adr)}. Xem tab 2 để biết cần thay đổi gì.`;}
+ $('verdictBox').className='verdict '+cls;
+ $('verdictTitle').textContent=title;
+ $('verdictBody').innerHTML=body;
+
+ // lenses
+ const lrow=(a,b,c='')=>`<div class="lr"><span>${a}</span><span class="mono ${c}">${b}</span></div>`;
+ $('a_irr').innerHTML=`<span class="${sgn(R.A.irr||-1)}">${pct(R.A.irr)}</span>`;
+ $('a_rows').innerHTML=lrow('Vốn năm 0 (VND)',fmtVnd(-R.totalInv),'negv')
+  +lrow('NPV @'+p.discountRate+'%',fmtVnd(R.A.npv),sgn(R.A.npv))
+  +lrow('Hoàn vốn',yr(R.A.pb))
+  +lrow('PV giá trị thu hồi',fmtVnd(R.pvTV))
+  +lrow('→ chiếm % giá trị',pct(R.tvShare),R.tvShare>0.5?'negv':'');
+ $('b_irr').innerHTML=`<span class="${sgn(R.B.irr==null?-1:R.B.irr-R.hurdle)}">${pct(R.B.irr)}</span>`;
+ $('b_rows').innerHTML=lrow('Vốn tăng thêm (VND)',fmtVnd(-R.cf.capex),'negv')
+  +lrow('Ngưỡng phải vượt',pct(R.hurdle),'')
+  +lrow('Chênh lệch',gap==null?'—':pct(gap),sgn(gap==null?-1:gap))
+  +lrow('NPV @'+p.discountRate+'%',fmtVnd(R.B.npv),sgn(R.B.npv))
+  +lrow('Hoàn vốn',yr(R.B.pb));
+ $('c_irr').innerHTML=`<span class="pos">${pct(R.C.irr)}</span>`;
+ $('c_rows').innerHTML=lrow('Vốn năm 0 (VND)',fmtVnd(-(p.propertyValue+p.landCost)),'negv')
+  +lrow('Thuê/năm (VND)',fmtVnd(R.oppY))
+  +lrow('NPV @'+p.discountRate+'%',fmtVnd(R.C.npv),sgn(R.C.npv))
+  +lrow('Giá trị BĐS năm '+p.horizon,fmtVnd(R.cf.tvProp))
+  +lrow('Rủi ro vận hành','Không','pos');
+ $('lensNote').innerHTML=`<b>Vì sao tách ba lens:</b> tiền mua bất động sản đã bỏ ra rồi nên không còn là quyết định — lens A chỉ cho biết tổng tài sản đang sinh lời bao nhiêu. Quyết định thật nằm ở lens B: bỏ thêm ${fmtVnd(R.cf.capex)} fit-out có hơn việc chỉ cho thuê căn nhà không. Vì vậy dòng tiền lens B phải gánh chi phí cơ hội mặt bằng ${fmtVnd(R.oppY)}/năm — đúng bằng khoản thuê đang từ bỏ. Lens C là đường cơ sở để so.`;
+
+ // capital table
+ const eq=R.totalInv-R.cf.D;
+ $('capTable').innerHTML='<thead><tr><th>Hạng mục</th><th>Giá trị (VND)</th><th>% tổng ĐT</th></tr></thead><tbody>'
+  +`<tr><td>Giá mua bất động sản</td><td class="num">${fmtVnd(p.propertyValue)}</td><td class="num">${pct(p.propertyValue/R.totalInv)}</td></tr>`
+  +`<tr><td>Sổ đỏ / chi phí giao dịch</td><td class="num">${fmtVnd(p.landCost)}</td><td class="num">${pct(p.landCost/R.totalInv)}</td></tr>`
+  +`<tr><td>Fit-out (thiết kế/xây dựng/nội thất)</td><td class="num">${fmtVnd(R.cf.capex)}</td><td class="num">${pct(R.cf.capex/R.totalInv)}</td></tr>`
+  +`<tr class="tot"><td>Tổng mức đầu tư</td><td class="num">${fmtVnd(R.totalInv)}</td><td class="num">100%</td></tr>`
+  +`<tr><td>Giá trị định giá NH (${p.valHaircut}%)</td><td class="num">${fmtVnd(p.propertyValue*p.valHaircut/100)}</td><td class="num"></td></tr>`
+  +`<tr class="sub"><td>Vốn vay${p.debtMode==='ltv'?' (LTV '+p.ltv+'%)':' (nhập tay)'}</td><td class="num">${fmtVnd(R.cf.D)}</td><td class="num">${pct(R.cf.D/R.totalInv)}</td></tr>`
+  +`<tr class="sub"><td>Vốn chủ sở hữu</td><td class="num">${fmtVnd(eq)}</td><td class="num">${pct(eq/R.totalInv)}</td></tr>`
+  +`<tr><td>IRR vốn chủ (có vay)</td><td class="num ${sgn(R.L.irr==null?-1:R.L.irr)}">${pct(R.L.irr)}</td><td class="num"></td></tr>`
+  +'</tbody>';
+
+ const dmin=R.dscrMin;
+ const dv=isFinite(dmin)?dmin:null;
+ $('dscrTable').innerHTML='<thead><tr><th>Khả năng trả nợ</th><th>Giá trị (VND/năm)</th><th>Đánh giá</th></tr></thead><tbody>'
+  +`<tr><td>DSCR thấp nhất</td><td class="num ${dv!=null&&dv>=1.2?'pos':'negv'}">${dv!=null?dv.toFixed(2)+'x':'—'}</td><td>${dv!=null&&dv>=1.2?'<span class="badge go">Đạt</span>':'<span class="badge no">Không đạt</span>'}</td></tr>`
+  +`<tr><td>Ngưỡng ngân hàng</td><td class="num">1.20x</td><td></td></tr>`
+  +`<tr><td>Trả gốc/năm sau ân hạn</td><td class="num">${fmtVnd(R.cf.princ)}</td><td></td></tr>`
+  +`<tr><td>Lãi vay năm 1</td><td class="num">${fmtVnd(R.cf.rows[0].interest)}</td><td></td></tr>`
+  +`<tr><td>EBITDA tiền mặt ổn định/năm</td><td class="num">${fmtVnd(pl(S).ebitdaCash*12)}</td><td></td></tr>`
+  +`<tr class="tot"><td>Dư nợ cuối kỳ</td><td class="num">${fmtVnd(R.cf.balEnd)}</td><td></td></tr>`
+  +'</tbody>';
+
+ // cashflow table
+ let h='<thead><tr><th>Chỉ tiêu <span class="uh">(VND/năm)</span></th>';
+ R.cf.rows.forEach(r=>h+=`<th>N${r.y}</th>`); h+='<th>Thu hồi</th></tr></thead><tbody>';
+ const line=(lab,fn,cl='',tvv=null)=>{
+  h+=`<tr class="${cl}"><td>${lab}</td>`;
+  R.cf.rows.forEach(r=>h+=`<td class="num">${fn(r)}</td>`);
+  h+=`<td class="num">${tvv==null?'':tvv}</td></tr>`;};
+ line('Công suất áp dụng',r=>pct(S.occ/100*r.occF,0));
+ line('Doanh thu net',r=>fmtVnd(r.revY));
+ line('EBITDA tiền mặt',r=>fmtVnd(r.ebCash),'emph');
+ line('Capex bảo trì',r=>r.maint?fmtVnd(-r.maint):'—');
+ line('Thuế TNDN',r=>fmtVnd(-r.taxU));
+ line('Dòng tiền dự án',r=>fmtVnd(r.cfProj),'sub',fmtVnd(R.cf.tv));
+ line('Lãi vay',r=>fmtVnd(-r.interest));
+ line('Trả gốc',r=>r.pp?fmtVnd(-r.pp):'—');
+ line('Dòng tiền vốn chủ',r=>fmtVnd(r.cfEq),'sub',fmtVnd(R.cf.tv-R.cf.balEnd));
+ line('DSCR',r=>r.dscr!=null&&isFinite(r.dscr)?r.dscr.toFixed(2)+'x':'—');
+ h+='</tbody>';
+ $('cfTable').innerHTML=h;
+}
+
+/* ---------- RENDER: TAB 2 ---------- */
+function renderSolver(){
+ const R=lenses(S), t=R.hurdle;
+ $('hurdleNote').innerHTML=`Ngưỡng so sánh là <b>${pct(t)}</b> — chính là IRR của phương án cho thuê thuần ${S.oppRentYield}%/năm cộng phần bất động sản tăng giá ${S.propGrowth}%/năm. Đây mới là chuẩn đúng, không phải lãi suất chiết khấu ${S.discountRate}%: nếu không làm khách sạn thì tiền vẫn nằm trong căn nhà và vẫn sinh lời ở mức đó.`;
+
+ const curCapRaw=fitout(S);
+ const adrN=solveFor('adr',300000,12*M,t);
+ const occN=solveFor('occ',20,99.5,t);
+ const capN=solveFor('capexTotalInput',0.2*B,curCapRaw*3+10*B,t,true);
+ const curCap=fitout(S);
+
+ const bar=(lab,cur,need,fmt,hi,note)=>{
+  const max=Math.max(cur,need||0)*1.25||1;
+  const okNow=need!=null&&(hi?cur<=need:cur>=need);
+  return `<div class="gap">
+   <div class="gaphead"><span><b>${lab}</b> ${okNow?'<span class="badge go">đạt</span>':'<span class="badge no">chưa đạt</span>'}</span>
+   <span class="mono">hiện ${fmt(cur)} → cần ${need==null?'không đạt được':fmt(need)}</span></div>
+   <div class="track"><div class="fill" style="width:${Math.min(100,cur/max*100)}%"></div>
+   ${need==null?'':`<div class="mark" style="left:${Math.min(99.5,need/max*100)}%"></div>
+   <div class="marklab" style="left:${Math.min(97,need/max*100)}%">ngưỡng</div>`}</div>
+   <div class="note" style="margin-top:3px">${note}</div></div>`;
+ };
+ $('gapBox').innerHTML=
+  bar('ADR (giá phòng bình quân)',S.adr,adrN,fmtVnd,false,
+   adrN==null?'Không có mức giá nào đạt ngưỡng với cấu trúc chi phí hiện tại.':
+   `Chênh lệch ${pct(adrN/S.adr-1)} so với hiện tại. Đây là biến có sức bẩy mạnh nhất vì tăng giá gần như rơi thẳng xuống lợi nhuận.`)
+  +bar('Công suất phòng',S.occ/100,occN==null?null:occN/100,v=>pct(v,0),false,
+   occN==null?'<b>Công suất một mình không cứu được bài toán.</b> Kể cả lấp đầy 99% vẫn không đạt ngưỡng — nghĩa là đây là bài toán <b>giá</b>, không phải bài toán lấp phòng.':
+   `Cần thêm ${pct(occN/100-S.occ/100,0)} công suất so với hiện tại.`)
+  +bar('Fit-out tối đa',curCap,capN,fmtVnd,true,
+   capN==null?'Không mức đầu tư nào đạt ngưỡng ở ADR hiện tại.':
+   `Ở ADR ${fmtVnd(S.adr)}, chỉ nên bỏ tối đa ${fmtVnd(capN)} (${fmtVnd(capN/S.rooms)}/phòng). Đầu tư vượt mức này là phá huỷ giá trị.`);
+
+ // reading
+ const seg=curCap/S.rooms;
+ const segLab=seg<500*M?'Basic / sạch đẹp':seg<800*M?'Comfort / boutique cơ bản':seg<1200*M?'Boutique khá cao cấp':'Premium boutique';
+ const segAdr=seg<500*M?'650k–900k':seg<800*M?'900k–1.300k':seg<1200*M?'1.200k–1.800k':'1.700k–2.500k+';
+ const mismatch=adrN!=null&&adrN>1300000&&seg<800*M;
+ $('solverRead').innerHTML=`
+ <table><thead><tr><th>Chỉ tiêu</th><th>Hiện tại</th><th>Ngưỡng cần đạt</th><th>Nhận định</th></tr></thead><tbody>
+ <tr><td>Suất đầu tư/phòng</td><td class="num">${fmtVnd(seg)}</td><td class="num">${capN?fmtVnd(capN/S.rooms):'—'}</td><td>${segLab}</td></tr>
+ <tr><td>ADR hợp với phân khúc đó</td><td class="num">${fmtVnd(S.adr)}</td><td class="num">${segAdr}</td><td>Theo khung phân khúc nội bộ</td></tr>
+ <tr><td>ADR cần để đạt ngưỡng</td><td class="num">—</td><td class="num">${adrN?fmtVnd(adrN):'không đạt'}</td><td>${mismatch?'<span class="badge no">Mâu thuẫn</span>':'<span class="badge check">Kiểm tra thị trường</span>'}</td></tr>
+ </tbody></table>
+ ${mismatch?`<p class="note" style="font-size:12px;margin-top:11px"><b>Mâu thuẫn cần giải quyết:</b> suất đầu tư ${fmtVnd(seg)}/phòng đặt dự án vào phân khúc "${segLab}" với ADR thị trường khoảng ${segAdr}. Nhưng để dự án khả thi lại cần ADR ${fmtVnd(adrN)} — thuộc phân khúc cao hơn hẳn. Chỉ có hai lối ra: <b>(1)</b> nâng chuẩn sản phẩm và định vị lên đúng mức giá đó, chấp nhận fit-out và chi phí vận hành cao hơn; hoặc <b>(2)</b> không làm khách sạn, cho thuê nguyên căn. Vùng ở giữa — đầu tư vừa phải, bán giá vừa phải — là vùng phá huỷ giá trị.</p>`:''}
+ <p class="note">Ngưỡng được giải ngược từ IRR incremental = ${pct(t)}, mỗi biến giải độc lập trong khi các biến còn lại giữ nguyên. Thực tế các biến liên động: nâng ADR thường kéo theo fit-out, nhân sự và chi phí vận hành cao hơn — nên dùng preset ở tab 4 để kiểm tra kịch bản trọn gói thay vì chỉnh một biến.</p>`;
+}
+
+/* ---------- RENDER: TAB 3 ---------- */
+function renderPL(){
+ const m=pl(S), R=lenses(S), rev=m.totalRev||1;
+ const seg=m.capex/S.rooms;
+ const segLab=seg<500*M?'Basic':seg<800*M?'Comfort/boutique':seg<1200*M?'Boutique cao cấp':'Premium';
+ const kpi=(l,v,s,c='')=>`<div class="kpi"><div class="lab">${l}</div><div class="val ${c}">${v}</div><div class="sub">${s}</div></div>`;
+ $('plKpis').innerHTML=
+  kpi('Doanh thu/tháng',fmtVnd(m.totalRev),'VND · net sau VAT đầu ra')
+ +kpi('EBITDA tiền mặt',fmtVnd(m.ebitdaCash),'VND/tháng · '+pct(m.ebitdaCash/rev)+' margin',sgn(m.ebitdaCash))
+ +kpi('EBITDA kinh tế',fmtVnd(m.ebitdaEcon),'VND/tháng · sau chi phí cơ hội MB',sgn(m.ebitdaEcon))
+ +kpi('Room nights bán',cnt(m.rn),'đêm/tháng · '+S.rooms+' phòng × '+S.days+' ngày × '+S.occ+'%')
+ +kpi('RevPAR',fmtVnd(m.adrN*m.occ),'VND/phòng/đêm · ADR net × công suất')
+ +kpi('Suất đầu tư/phòng',fmtVnd(seg),'VND/phòng · '+segLab);
+
+ const r2=(l,ec,ca,cl='')=>`<tr class="${cl}"><td>${l}</td><td class="num ${ec<0?'negv':''}">${fmtVnd(ec)}</td><td class="num ${ca<0?'negv':''}">${fmtVnd(ca)}</td><td class="num">${pct(ec/rev)}</td></tr>`;
+ let h='<thead><tr><th>Khoản mục</th><th>Kinh tế<br><span class="uh">VND/tháng</span></th><th>Tiền mặt<br><span class="uh">VND/tháng</span></th><th>% doanh thu</th></tr></thead><tbody>';
+ h+=`<tr><td>Room nights bán được</td><td class="num">${cnt(m.rn)}</td><td class="num">${cnt(m.rn)}</td><td></td></tr>`;
+ h+=r2('Doanh thu phòng gross (gồm VAT)',m.roomGross,m.roomGross);
+ h+=r2('VAT đầu ra',-m.vatOut,-m.vatOut);
+ h+=r2('Doanh thu phòng net',m.roomRev,m.roomRev);
+ h+=r2('Doanh thu phụ',m.ancRev,m.ancRev);
+ h+=r2('Tổng doanh thu net',m.totalRev,m.totalRev,'sub');
+ h+=r2('Hoa hồng OTA',-m.ota,-m.ota);
+ h+=r2('Chi phí dọn phòng biến đổi',-m.hk,-m.hk);
+ h+=r2('Giá vốn doanh thu phụ',-m.ancCost,-m.ancCost);
+ h+=r2('Contribution margin',m.cm,m.cm,'sub');
+ h+=r2('Chi phí cố định tiền mặt',-m.fixCash,-m.fixCash);
+ h+=r2('Chi phí cơ hội mặt bằng',-m.oppRent,0);
+ h+=r2('EBITDA',m.ebitdaEcon,m.ebitdaCash,'emph');
+ h+=r2('Khấu hao fit-out',-m.depr,-m.depr);
+ h+=r2('EBIT',m.ebitEcon,m.ebitCash,'sub');
+ const intM=R.cf.rows[2]?R.cf.rows[2].interest/12:0;
+ h+=r2('Lãi vay (năm ổn định)',-intM,-intM);
+ const pbtE=m.ebitEcon-intM, pbtC=m.ebitCash-intM;
+ h+=r2('Lợi nhuận trước thuế',pbtE,pbtC,'sub');
+ const citE=Math.max(0,pbtE)*S.citRate/100, citC=Math.max(0,pbtC)*S.citRate/100;
+ h+=r2('Thuế TNDN',-citE,-citC);
+ h+=r2('Lợi nhuận sau thuế',pbtE-citE,pbtC-citC,'tot');
+ h+='</tbody>';
+ $('plTable').innerHTML=h;
+
+ const AN={fnb:'F&B / café / breakfast',minibar:'Minibar / đồ uống phòng',spa:'Spa / massage / wellness',
+  laundry:'Laundry / giặt là',transport:'Transfer / tour / vé',late:'Early check-in / late check-out',other:'Dịch vụ khác'};
+ let a='<thead><tr><th>Hạng mục</th><th>VND/tháng</th><th>% DT phòng</th></tr></thead><tbody>';
+ for(const k in AN)a+=`<tr><td>${AN[k]}</td><td class="num">${fmtVnd(m.anc[k])}</td><td class="num">${pct(m.anc[k]/(m.roomRev||1))}</td></tr>`;
+ a+=`<tr class="tot"><td>Tổng doanh thu phụ</td><td class="num">${fmtVnd(m.ancRev)}</td><td class="num">${pct(m.ancRev/(m.roomRev||1))}</td></tr></tbody>`;
+ $('ancTable').innerHTML=a;
+
+ let f='<thead><tr><th>Khoản mục</th><th>VND/tháng</th><th>% doanh thu</th><th>% tổng CP cố định</th></tr></thead><tbody>';
+ for(const k in m.fixLines){const v=m.fixLines[k];
+  f+=`<tr><td>${k}</td><td class="num">${fmtVnd(v)}</td><td class="num">${pct(v/rev)}</td><td class="num">${pct(v/(m.fixEcon||1))}</td></tr>`}
+ f+=`<tr><td>Chi phí cơ hội mặt bằng</td><td class="num">${fmtVnd(m.oppRent)}</td><td class="num">${pct(m.oppRent/rev)}</td><td class="num">${pct(m.oppRent/(m.fixEcon||1))}</td></tr>`;
+ f+=`<tr class="tot"><td>Tổng chi phí cố định kinh tế</td><td class="num">${fmtVnd(m.fixEcon)}</td><td class="num">${pct(m.fixEcon/rev)}</td><td class="num">100%</td></tr></tbody>`;
+ $('fixTable').innerHTML=f;
+
+ const revpar=m.adrN*m.occ, bmRev=S.benchAdrBase*(S.benchOccBase/100);
+ const ebm=m.ebitdaEcon/rev*100, pbk=m.ebitdaCash>0?m.capex/(m.ebitdaCash*12):null;
+ const judge=(v,lo,hi)=>v<lo?'<span class="badge no">Thấp</span>':v<=hi?'<span class="badge go">Ngang</span>':'<span class="badge check">Cao</span>';
+ $('bmTable').innerHTML='<thead><tr><th>Chỉ tiêu</th><th>Dự án</th><th>BM thấp</th><th>BM base</th><th>BM cao</th><th>Đánh giá</th></tr></thead><tbody>'
+ +`<tr><td>ADR gross</td><td class="num">${fmtVnd(S.adr)}</td><td class="num">${fmtVnd(S.benchAdrLow)}</td><td class="num">${fmtVnd(S.benchAdrBase)}</td><td class="num">${fmtVnd(S.benchAdrHigh)}</td><td>${judge(S.adr,S.benchAdrLow,S.benchAdrHigh)}</td></tr>`
+ +`<tr><td>Công suất</td><td class="num">${pct(m.occ,0)}</td><td class="num">${S.benchOccLow}%</td><td class="num">${S.benchOccBase}%</td><td class="num">${S.benchOccHigh}%</td><td>${judge(S.occ,S.benchOccLow,S.benchOccHigh)}</td></tr>`
+ +`<tr><td>RevPAR</td><td class="num">${fmtVnd(revpar)}</td><td class="num">${fmtVnd(S.benchAdrLow*S.benchOccLow/100)}</td><td class="num">${fmtVnd(bmRev)}</td><td class="num">${fmtVnd(S.benchAdrHigh*S.benchOccHigh/100)}</td><td>${judge(revpar,S.benchAdrLow*S.benchOccLow/100,S.benchAdrHigh*S.benchOccHigh/100)}</td></tr>`
+ +`<tr><td>Suất đầu tư/phòng</td><td class="num">${fmtVnd(seg)}</td><td class="num">${fmtVnd(S.benchCapexLow)}</td><td class="num">${fmtVnd(S.benchCapexBase)}</td><td class="num">${fmtVnd(S.benchCapexHigh)}</td><td>${judge(seg,S.benchCapexLow,S.benchCapexHigh)}</td></tr>`
+ +`<tr><td>EBITDA margin</td><td class="num">${ebm.toFixed(1)}%</td><td class="num">15%</td><td class="num">${S.benchEbitdaBase}%</td><td class="num">35%</td><td>${judge(ebm,15,35)}</td></tr>`
+ +`<tr><td>Payback fit-out</td><td class="num">${yr(pbk)}</td><td class="num">5 năm</td><td class="num">${S.benchPayback} năm</td><td class="num">10 năm</td><td>${pbk==null?'<span class="badge no">Không hoàn vốn</span>':judge(-pbk,-10,-5)}</td></tr>`
+ +'</tbody>';
+}
+
+/* ---------- RENDER: TAB 4 ---------- */
+/* key: [unit, min, max, step, decimals] — step theo sensitivity class */
+const META={
+ propertyValue:['tỷ',0,300*B,1*B,2], landCost:['tỷ',0,30*B,0.1*B,2],
+ oppRentYield:['%/năm',0,12,0.25,2], propGrowth:['%/năm',-5,15,0.5,1],
+ capexTotalInput:['tỷ',0,200*B,0.5*B,2], capexPerRoom:['tr/phòng',0,3000*M,25*M,0],
+ deprYears:['năm',5,50,1,0], fitoutRecovery:['%',0,100,5,0],
+ maintCapexPct:['% DT',0,10,0.5,1], maintStartYear:['năm',1,10,1,0],
+ rooms:['phòng',1,200,1,0], days:['ngày',28,31,1,0],
+ occ:['%',10,95,1,0], adr:['ng/đêm',200000,6*M,50000,0], vatRate:['%',0,15,1,0],
+ horizon:['năm',5,20,1,0], discountRate:['%',5,25,0.5,1],
+ fnbPct:['% DT phòng',0,50,0.5,1], minibarPct:['% DT phòng',0,10,0.25,2],
+ spaPct:['% DT phòng',0,25,0.5,1], laundryPct:['% DT phòng',0,10,0.25,2],
+ transportPct:['% DT phòng',0,10,0.25,2], latePct:['% DT phòng',0,10,0.25,2],
+ otherAncPct:['% DT phòng',0,10,0.25,2], ancCostPct:['%',0,80,1,0],
+ otaPct:['% DT phòng',0,35,0.5,1], hkCost:['ng/đêm',0,500000,5000,0],
+ realRent:['tr/tháng',0,500*M,5*M,0], payroll:['tr/tháng',0,2000*M,10*M,0],
+ fte:['người',0,150,1,0], siBaseSalary:['tr/người',0,50*M,0.5*M,1], siRate:['%',0,30,0.5,1],
+ utilities:['tr/tháng',0,300*M,5*M,0], marketing:['tr/tháng',0,200*M,5*M,0],
+ maintenance:['tr/tháng',0,200*M,5*M,0], software:['tr/tháng',0,100*M,1*M,0],
+ security:['tr/tháng',0,100*M,1*M,0], admin:['tr/tháng',0,100*M,1*M,0],
+ valHaircut:['%',50,100,5,0], ltv:['%',0,90,5,0], debtManual:['tỷ',0,150*B,0.5*B,2],
+ loanRate:['%/năm',0,20,0.25,2], loanTerm:['năm',1,25,1,0],
+ gracePrincipal:['năm',0,5,1,0], citRate:['%',0,35,1,0],
+ benchAdrLow:['ng',0,6*M,50000,0], benchAdrBase:['ng',0,6*M,50000,0], benchAdrHigh:['ng',0,6*M,50000,0],
+ benchOccLow:['%',0,100,1,0], benchOccBase:['%',0,100,1,0], benchOccHigh:['%',0,100,1,0],
+ benchCapexLow:['tr/phòng',0,3000*M,50*M,0], benchCapexBase:['tr/phòng',0,3000*M,50*M,0],
+ benchCapexHigh:['tr/phòng',0,3000*M,50*M,0],
+ benchEbitdaBase:['%',0,60,1,0], benchPayback:['năm',1,20,0.5,1]
+};
+
+const FIELDS=[
+ ['Tài sản đã sở hữu — không còn là quyết định',[
+  ['propertyValue','Giá mua bất động sản','Đã bỏ ra, là sunk cost'],
+  ['landCost','Sổ đỏ / chi phí giao dịch',''],
+  ['oppRentYield','Lợi suất cho thuê (%/năm)','Hurdle của quyết định làm khách sạn'],
+  ['propGrowth','Tăng giá BĐS (%/năm)','Dùng cho giá trị thu hồi cuối kỳ']]],
+ ['Đầu tư fit-out — đây mới là quyết định',[
+  ['capexMode','Cách nhập fit-out',''],
+  ['capexTotalInput','Tổng fit-out',''],
+  ['capexPerRoom','Suất đầu tư/phòng',''],
+  ['deprYears','Số năm khấu hao',''],
+  ['fitoutRecovery','Thu hồi fit-out cuối kỳ (%)','% giá trị còn lại trên sổ sách'],
+  ['maintCapexPct','Capex bảo trì (% doanh thu)','Thay thế FF&E'],
+  ['maintStartYear','Bắt đầu từ năm','']]],
+ ['Doanh thu phòng',[
+  ['rooms','Số phòng',''],['days','Số ngày/tháng',''],
+  ['occ','Công suất ổn định (%)','Không phải năm 1'],
+  ['adr','ADR gross (gồm VAT)',''],['vatRate','VAT (%)','']]],
+ ['Ramp-up & thời gian',[
+  ['rampProfile','Tốc độ lấp đầy',''],
+  ['horizon','Số năm đánh giá',''],
+  ['discountRate','Lãi suất chiết khấu (%)','']]],
+ ['Doanh thu phụ (% doanh thu phòng)',[
+  ['fnbPct','F&B / breakfast',''],['minibarPct','Minibar',''],['spaPct','Spa / wellness',''],
+  ['laundryPct','Laundry',''],['transportPct','Transfer / tour',''],
+  ['latePct','Early/late check-out',''],['otherAncPct','Khác',''],
+  ['ancCostPct','Giá vốn doanh thu phụ (%)','']]],
+ ['Chi phí biến đổi',[
+  ['otaPct','Hoa hồng OTA (% DT phòng)',''],
+  ['hkCost','Chi phí dọn phòng/đêm bán','Gồm nhân công, linen, amenities']]],
+ ['Chi phí cố định',[
+  ['realRent','Tiền thuê thực trả','0 nếu dùng nhà sở hữu'],
+  ['payroll','Nhân sự cố định','Không gồm dọn phòng nếu đã tính ở biến đổi'],
+  ['fte','Số người đóng BHXH',''],['siBaseSalary','Lương cơ bản BQ',''],['siRate','Tỷ lệ BHXH DN (%)',''],
+  ['utilities','Điện nước',''],['marketing','Marketing',''],['maintenance','Bảo trì',''],
+  ['software','Software/internet',''],['security','An ninh/vệ sinh',''],['admin','Hành chính khác','']]],
+ ['Vay ngân hàng',[
+  ['debtMode','Cách xác định vốn vay',''],
+  ['valHaircut','Hệ số định giá NH (%)','NH thường định giá thấp hơn giá mua'],
+  ['ltv','LTV (%)','Trên giá trị định giá BĐS'],
+  ['debtManual','Số tiền vay (nhập tay)',''],
+  ['loanRate','Lãi suất (%/năm)',''],['loanTerm','Thời hạn (năm)',''],
+  ['gracePrincipal','Ân hạn gốc (năm)',''],['citRate','Thuế TNDN (%)','']]],
+ ['Benchmark thị trường',[
+  ['benchAdrLow','ADR thấp',''],['benchAdrBase','ADR base',''],['benchAdrHigh','ADR cao',''],
+  ['benchOccLow','Occ thấp (%)',''],['benchOccBase','Occ base (%)',''],['benchOccHigh','Occ cao (%)',''],
+  ['benchCapexLow','Suất ĐT thấp',''],['benchCapexBase','Suất ĐT base',''],['benchCapexHigh','Suất ĐT cao',''],
+  ['benchEbitdaBase','EBITDA margin base (%)',''],['benchPayback','Payback base (năm)','']]]
+];
+const DEPENDENT=new Set(['adr','payroll','hkCost','ancCostPct','spaPct','fnbPct','utilities','marketing','maintenance','otaPct','capexPerRoom','capexTotalInput']);
+
+/* ---------- FIELD CONTROLS: slider + stepper + đơn vị ---------- */
+/* hệ số quy đổi đơn vị — khớp token đầu chính xác, tránh 'ngày' bị hiểu là 'nghìn' */
+const UNIT_SCALE={'tỷ':1e9,'tr':1e6,'ng':1e3};
+function unitScale(u){
+ const head=String(u).split('/')[0].trim();
+ return UNIT_SCALE[head]||1;
+}
+function uDisp(k,v){                       // giá trị hiển thị theo đơn vị của field
+ const m=META[k]; if(!m)return v;
+ const u=m[0], d=m[4];
+ let x=v/unitScale(u);
+ return x.toLocaleString('vi-VN',{maximumFractionDigits:d,minimumFractionDigits:0});
+}
+function uParse(k,txt){                    // ngược lại: text theo đơn vị -> VND gốc
+ const m=META[k]; if(!m)return parseFloat(txt)||0;
+ const u=m[0];
+ let x=parseFloat(String(txt).replace(/\./g,'').replace(/,/g,'.').replace(/[^0-9.\-]/g,''))||0;
+ return x*unitScale(u);
+}
+function clampF(k,v){const m=META[k]; if(!m)return v; return Math.min(m[2],Math.max(m[1],v))}
+function snapF(k,v){const m=META[k]; if(!m)return v;
+ const st=m[3]; return clampF(k,Math.round(v/st)*st)}
+
+function fieldHTML(k,lab,hint,dep){
+ if(SELECTS[k]){
+  const opts=SELECTS[k].map(([v,l])=>`<option value="${v}">${l}</option>`).join('');
+  return `<div class="frow${dep}"><label>${lab}${hint?`<span class="h">${hint}</span>`:''}</label>
+   <select id="f_${k}" onchange="onField('${k}')">${opts}</select></div>`;
+ }
+ const m=META[k];
+ if(!m) return `<div class="frow${dep}"><label>${lab}</label><input id="f_${k}" onchange="onField('${k}')"/></div>`;
+ const [unit,mn,mx,st]=m;
+ return `<div class="fctl${dep}">
+  <div class="ftop"><span class="flab">${lab}</span>
+   <span class="fval"><input id="f_${k}" class="numin" onchange="onField('${k}')" onfocus="this.select()"/><span class="funit">${unit}</span></span></div>
+  ${hint?`<div class="fhint">${hint}</div>`:''}
+  <div class="fbot">
+   <button class="stp" onclick="bump('${k}',-1)" title="Giảm ${uDisp(k,st)} ${unit}">−</button>
+   <input type="range" id="r_${k}" min="${mn}" max="${mx}" step="${st}"
+     oninput="onSlide('${k}',this.value)" onchange="commitSlide('${k}')"/>
+   <button class="stp" onclick="bump('${k}',1)" title="Tăng ${uDisp(k,st)} ${unit}">+</button>
+  </div>
+ </div>`;
+}
+let slideT=null, slidePushed=false;
+function onSlide(k,val){
+ if(!slidePushed){pushUndo(); slidePushed=true}
+ S[k]=clampF(k,parseFloat(val));
+ const el=$('f_'+k); if(el)el.value=uDisp(k,S[k]);
+ clearTimeout(slideT); slideT=setTimeout(()=>{save(); renderAll()},110);
+}
+function commitSlide(k){
+ slidePushed=false; save(); renderAll();
+ toast(fieldLabel(k)+': '+uDisp(k,S[k])+' '+META[k][0],'ok');
+}
+function bump(k,dir){
+ pushUndo();
+ S[k]=snapF(k,S[k]+dir*META[k][3]);
+ save(); syncOne(k); renderAll();
+ toast(fieldLabel(k)+': '+uDisp(k,S[k])+' '+META[k][0],'ok');
+}
+function fieldLabel(k){
+ for(const [,rows] of FIELDS) for(const r of rows) if(r[0]===k) return r[1];
+ return k;
+}
+function syncOne(k){
+ const el=$('f_'+k); if(el&&META[k])el.value=uDisp(k,S[k]);
+ const r=$('r_'+k); if(r)r.value=S[k];
+}
+
+const LS_ZONES='khem_zones_v11';
+let zoneOpen={};
+function loadZones(){
+ try{const r=localStorage.getItem(LS_ZONES); if(r)zoneOpen=JSON.parse(r)}catch(e){}
+ if(!Object.keys(zoneOpen).length) FIELDS.forEach((f,i)=>zoneOpen[i]=(i<3));
+}
+function saveZones(){try{localStorage.setItem(LS_ZONES,JSON.stringify(zoneOpen))}catch(e){}}
+function toggleZone(i){
+ zoneOpen[i]=!zoneOpen[i]; saveZones();
+ document.getElementById('z'+i).classList.toggle('open',zoneOpen[i]);
+}
+function allZones(open){
+ FIELDS.forEach((f,i)=>{zoneOpen[i]=open;
+  const el=document.getElementById('z'+i); if(el)el.classList.toggle('open',open)});
+ saveZones(); toast(open?'Đã mở tất cả nhóm':'Đã đóng tất cả nhóm','ok');
+}
+function buildInputs(){
+ loadZones();
+ let h='';
+ FIELDS.forEach(([title,rows],i)=>{
+  h+=`<div class="zone${zoneOpen[i]?' open':''}" id="z${i}">
+   <div class="zhead" onclick="toggleZone(${i})"><span class="chev">▶</span><span>${title}</span><span class="zc">${rows.length}</span></div>
+   <div class="zbody">`;
+  rows.forEach(([k,lab,hint])=>{
+   const dep=DEPENDENT.has(k)?' dep':'';
+   h+=fieldHTML(k,lab,hint,dep);
+  });
+  h+='</div></div>';
+ });
+ $('inputGrid').innerHTML=h;
+ syncInputs();
+}
+function syncInputs(){
+ FIELDS.forEach(([,rows])=>rows.forEach(([k])=>{
+  const el=$('f_'+k); if(!el)return;
+  if(SELECTS[k]){el.value=S[k];return}
+  el.value=META[k]?uDisp(k,S[k]):S[k];
+  const r=$('r_'+k); if(r)r.value=S[k];
+ }));
+}
+function onField(k){
+ const el=$('f_'+k); if(!el)return;
+ pushUndo();
+ if(SELECTS[k]) S[k]=el.value;
+ else if(META[k]) S[k]=clampF(k,uParse(k,el.value));
+ else S[k]=MONEY.has(k)?parseMoney(el.value):(parseFloat(el.value)||0);
+ syncOne(k); save(); renderAll();
+ toast(fieldLabel(k)+': '+(META[k]?uDisp(k,S[k])+' '+META[k][0]:S[k]),'ok');
+}
+
+/* ---------- STATE / UNDO / IO ---------- */
+function pushUndo(){
+ undoStack.push(JSON.stringify(S));
+ if(undoStack.length>50)undoStack.shift();
+ refreshUndo();
+}
+function refreshUndo(){
+ const b=$('undoBtn');
+ b.textContent='↩ Undo ('+undoStack.length+')';
+ b.disabled=undoStack.length===0;
+}
+function doUndo(){
+ if(!undoStack.length)return;
+ S=JSON.parse(undoStack.pop());
+ refreshUndo(); save(); syncInputs(); renderAll();
+ toast('Đã hoàn tác','ok');
+}
+let toastT=null;
+function toast(msg,kind){
+ const p=$('pill'); p.textContent=msg; p.className='pill show '+kind;
+ clearTimeout(toastT); toastT=setTimeout(()=>p.className='pill '+kind,4000);
+}
+function save(){try{localStorage.setItem(LS_KEY,JSON.stringify(S))}catch(e){}}
+function load(){
+ try{const r=localStorage.getItem(LS_KEY); if(r){S={...DEFAULTS,...JSON.parse(r)}; return true}}catch(e){}
+ return false;
+}
+function resetAll(){
+ if(!confirm('Đưa toàn bộ giả định về mặc định?\n\nMất: mọi thay đổi đang có trên máy này.\nKhông ảnh hưởng: file JSON đã export.'))return;
+ pushUndo(); S={...DEFAULTS}; save(); syncInputs(); renderAll();
+ document.querySelectorAll('#pLow,#pMid,#pHigh,#pGM').forEach(b=>b.classList.remove('on'));
+ toast('Đã reset về mặc định','warn');
+}
+function preset(k){
+ pushUndo(); S={...S,...PRESETS[k]};
+ if(k!=='gm'&&S.capexMode==='perRoom')S.capexTotalInput=S.capexPerRoom*S.rooms;
+ save(); syncInputs(); renderAll();
+ document.querySelectorAll('#pLow,#pMid,#pHigh,#pGM').forEach(b=>b.classList.remove('on'));
+ ({low:'pLow',mid:'pMid',high:'pHigh',gm:'pGM'})[k]&&$(({low:'pLow',mid:'pMid',high:'pHigh',gm:'pGM'})[k]).classList.add('on');
+ toast('Đã nạp preset: '+k.toUpperCase(),'ok');
+}
+function exportJSON(){
+ const blob=new Blob([JSON.stringify({version:VERSION,savedAt:new Date().toISOString(),assumptions:S},null,2)],{type:'application/json'});
+ const a=document.createElement('a');
+ a.href=URL.createObjectURL(blob);
+ a.download='khem_hotel_v'+VERSION+'_'+new Date().toISOString().slice(0,10)+'.json';
+ a.click(); toast('Đã export file JSON','ok');
+}
+function importJSON(e){
+ const f=e.target.files[0]; if(!f)return;
+ const r=new FileReader();
+ r.onload=ev=>{
+  try{
+   const d=JSON.parse(ev.target.result);
+   const a=d.assumptions||d;
+   if(typeof a!=='object'||a.rooms===undefined)throw new Error('Không đúng định dạng');
+   pushUndo(); S={...DEFAULTS,...a}; save(); syncInputs(); renderAll();
+   toast('Đã nạp file: '+f.name,'ok');
+  }catch(err){toast('Lỗi đọc file: '+err.message,'err')}
+ };
+ r.readAsText(f); e.target.value='';
+}
+function toggleTheme(){
+ const sc=document.body.classList.toggle('showcase');
+ $('themeBtn').textContent=sc?'◑ Workbench':'◐ Showcase';
+ toast(sc?'Chế độ trình bày':'Chế độ nhập liệu','ok');
+}
+
+/* ============ DEPENDENCY GRAPH — trích từ chính công thức engine ============ */
+/* type: in=đầu vào · mid=trung gian · out=kết quả cuối */
+const DEP={
+/* ---- lớp doanh thu ---- */
+ occ:{t:'in',lab:'Công suất',col:0},
+ rooms:{t:'in',lab:'Số phòng',col:0},
+ days:{t:'in',lab:'Số ngày/tháng',col:0},
+ adr:{t:'in',lab:'ADR gross',col:0},
+ vatRate:{t:'in',lab:'VAT',col:0},
+ _rn:{t:'mid',lab:'Room nights',f:'rooms × days × occ',d:['rooms','days','occ'],col:1},
+ _adrN:{t:'mid',lab:'ADR net',f:'adr ÷ (1+VAT)',d:['adr','vatRate'],col:1},
+ _roomRev:{t:'mid',lab:'Doanh thu phòng',f:'room nights × ADR net',d:['_rn','_adrN'],col:2},
+ _ancPct:{t:'in',lab:'7 dòng doanh thu phụ (%)',col:1,multi:['fnbPct','minibarPct','spaPct','laundryPct','transportPct','latePct','otherAncPct']},
+ _ancRev:{t:'mid',lab:'Doanh thu phụ',f:'DT phòng × Σ%',d:['_roomRev','_ancPct'],col:2},
+ _totalRev:{t:'mid',lab:'Tổng doanh thu net',f:'DT phòng + DT phụ',d:['_roomRev','_ancRev'],col:3},
+
+/* ---- lớp biến phí ---- */
+ otaPct:{t:'in',lab:'Hoa hồng OTA',col:2},
+ hkCost:{t:'in',lab:'CP dọn phòng/đêm',col:2},
+ ancCostPct:{t:'in',lab:'Giá vốn DT phụ',col:2},
+ _varCost:{t:'mid',lab:'Tổng biến phí',f:'OTA + dọn phòng + giá vốn DT phụ',d:['_roomRev','otaPct','_rn','hkCost','_ancRev','ancCostPct'],col:3},
+ _cm:{t:'mid',lab:'Contribution margin',f:'tổng DT − biến phí',d:['_totalRev','_varCost'],col:4},
+
+/* ---- lớp định phí ---- */
+ payroll:{t:'in',lab:'Nhân sự cố định',col:3},
+ fte:{t:'in',lab:'Số người BHXH',col:2},
+ siBaseSalary:{t:'in',lab:'Lương cơ bản BQ',col:2},
+ siRate:{t:'in',lab:'Tỷ lệ BHXH',col:2},
+ _si:{t:'mid',lab:'BHXH doanh nghiệp',f:'fte × lương CB × tỷ lệ',d:['fte','siBaseSalary','siRate'],col:3},
+ _opex:{t:'in',lab:'6 dòng chi phí vận hành',col:3,multi:['utilities','marketing','maintenance','software','security','admin']},
+ realRent:{t:'in',lab:'Tiền thuê thực trả',col:3},
+ _fixCash:{t:'mid',lab:'Định phí tiền mặt',f:'thuê + nhân sự + BHXH + vận hành',d:['realRent','payroll','_si','_opex'],col:4},
+
+/* ---- chi phí cơ hội ---- */
+ propertyValue:{t:'in',lab:'Giá trị bất động sản',col:3},
+ landCost:{t:'in',lab:'Sổ đỏ / chi phí giao dịch',col:3},
+ oppRentYield:{t:'in',lab:'Lợi suất cho thuê',col:3},
+ _oppRent:{t:'mid',lab:'Chi phí cơ hội mặt bằng',f:'giá trị BĐS × lợi suất',d:['propertyValue','oppRentYield'],col:4,note:'Không phải chi tiền thật — là mức từ bỏ khi không cho thuê'},
+
+/* ---- EBITDA ---- */
+ _ebitdaCash:{t:'mid',lab:'EBITDA tiền mặt',f:'CM − định phí tiền mặt',d:['_cm','_fixCash'],col:5},
+ _ebitdaEcon:{t:'mid',lab:'EBITDA kinh tế',f:'CM − định phí − CP cơ hội',d:['_cm','_fixCash','_oppRent'],col:5},
+
+/* ---- đầu tư ---- */
+ capexMode:{t:'in',lab:'Cách nhập fit-out',col:3},
+ capexTotalInput:{t:'in',lab:'Tổng fit-out',col:3},
+ capexPerRoom:{t:'in',lab:'Suất đầu tư/phòng',col:3},
+ _capex:{t:'mid',lab:'Fit-out',f:'nhập tổng, hoặc suất × số phòng',d:['capexMode','capexTotalInput','capexPerRoom','rooms'],col:4},
+ deprYears:{t:'in',lab:'Số năm khấu hao',col:4},
+ _depr:{t:'mid',lab:'Khấu hao',f:'fit-out ÷ số năm ÷ 12',d:['_capex','deprYears'],col:5},
+
+/* ---- ramp & thời gian ---- */
+ rampProfile:{t:'in',lab:'Tốc độ lấp đầy',col:4,note:'Nhân vào công suất và ADR các năm đầu'},
+ horizon:{t:'in',lab:'Số năm đánh giá',col:4},
+ maintCapexPct:{t:'in',lab:'Capex bảo trì',col:5},
+ maintStartYear:{t:'in',lab:'Bắt đầu bảo trì',col:5},
+ citRate:{t:'in',lab:'Thuế TNDN',col:5},
+ _cfProj:{t:'mid',lab:'Dòng tiền dự án/năm',f:'EBITDA tiền mặt − thuế − capex bảo trì',d:['_ebitdaCash','_depr','citRate','maintCapexPct','maintStartYear','rampProfile','horizon'],col:6},
+
+/* ---- vay ---- */
+ debtMode:{t:'in',lab:'Cách xác định vay',col:4},
+ valHaircut:{t:'in',lab:'Hệ số định giá NH',col:4},
+ ltv:{t:'in',lab:'LTV',col:4},
+ debtManual:{t:'in',lab:'Số tiền vay nhập tay',col:4},
+ _debt:{t:'mid',lab:'Vốn vay',f:'giá trị BĐS × hệ số định giá × LTV',d:['debtMode','propertyValue','valHaircut','ltv','debtManual'],col:5},
+ loanRate:{t:'in',lab:'Lãi suất',col:5},
+ loanTerm:{t:'in',lab:'Thời hạn vay',col:5},
+ gracePrincipal:{t:'in',lab:'Ân hạn gốc',col:5},
+ _debtSvc:{t:'mid',lab:'Lãi + gốc phải trả',f:'theo lịch trả nợ',d:['_debt','loanRate','loanTerm','gracePrincipal'],col:6},
+ _cfEq:{t:'mid',lab:'Dòng tiền vốn chủ',f:'CF dự án − lãi − gốc',d:['_cfProj','_debtSvc'],col:7},
+
+/* ---- giá trị thu hồi ---- */
+ propGrowth:{t:'in',lab:'Tăng giá BĐS',col:5},
+ fitoutRecovery:{t:'in',lab:'Thu hồi fit-out',col:5},
+ _tv:{t:'mid',lab:'Giá trị thu hồi cuối kỳ',f:'BĐS×(1+g)^n + fit-out còn lại×%',d:['propertyValue','propGrowth','_capex','deprYears','fitoutRecovery','horizon'],col:6},
+
+/* ---- kết quả ---- */
+ discountRate:{t:'in',lab:'Lãi suất chiết khấu',col:6},
+ _lensA:{t:'out',lab:'Lens A — IRR tổng thể',f:'vốn 120 tỷ vs CF dự án + thu hồi',d:['_cfProj','_tv','propertyValue','landCost','_capex','discountRate'],col:8},
+ _lensB:{t:'out',lab:'Lens B — IRR incremental',f:'vốn fit-out vs (CF − CP cơ hội)',d:['_cfProj','_oppRent','_capex','_tv','discountRate'],col:8,note:'Đây là quyết định thật: có nên làm khách sạn không'},
+ _lensC:{t:'out',lab:'Lens C — IRR cho thuê',f:'vốn BĐS vs tiền thuê + tăng giá',d:['propertyValue','landCost','oppRentYield','propGrowth','horizon','discountRate'],col:8,note:'Ngưỡng mà lens B phải vượt'},
+ _irrL:{t:'out',lab:'IRR vốn chủ',f:'sau lãi và gốc vay',d:['_cfEq','_tv','_debt'],col:8},
+ _dscr:{t:'out',lab:'DSCR',f:'(EBITDA − bảo trì) ÷ (lãi + gốc)',d:['_ebitdaCash','_debtSvc','maintCapexPct'],col:8},
+ _verdict:{t:'out',lab:'KẾT LUẬN ĐẦU TƯ',f:'so lens B với lens C',d:['_lensB','_lensC'],col:9,note:'NÊN LÀM khi IRR incremental vượt IRR cho thuê ít nhất 3%'}
+};
+
+/* ============ DEPENDENCY MAP VIEW ============ */
+let depFocus=null, depMode='all';
+function depValue(k){
+ try{
+  const R=lenses(S), m=pl(S), cf=R.cf, D=R.cf.D;
+  const V={
+   _rn:()=>cnt(m.rn)+' đêm', _adrN:()=>fmtVnd(m.adrN), _roomRev:()=>fmtVnd(m.roomRev)+'/th',
+   _ancRev:()=>fmtVnd(m.ancRev)+'/th', _totalRev:()=>fmtVnd(m.totalRev)+'/th',
+   _varCost:()=>fmtVnd(m.varCost)+'/th', _cm:()=>fmtVnd(m.cm)+'/th',
+   _si:()=>fmtVnd(m.si)+'/th', _fixCash:()=>fmtVnd(m.fixCash)+'/th',
+   _oppRent:()=>fmtVnd(m.oppRent)+'/th', _ebitdaCash:()=>fmtVnd(m.ebitdaCash)+'/th',
+   _ebitdaEcon:()=>fmtVnd(m.ebitdaEcon)+'/th', _capex:()=>fmtVnd(m.capex),
+   _depr:()=>fmtVnd(m.depr)+'/th', _debt:()=>fmtVnd(D),
+   _cfProj:()=>fmtVnd(cf.rows[2]?cf.rows[2].cfProj:0)+'/năm',
+   _debtSvc:()=>fmtVnd((cf.rows[2]?cf.rows[2].interest+cf.rows[2].pp:0))+'/năm',
+   _cfEq:()=>fmtVnd(cf.rows[2]?cf.rows[2].cfEq:0)+'/năm',
+   _tv:()=>fmtVnd(cf.tv), _lensA:()=>pct(R.A.irr), _lensB:()=>pct(R.B.irr),
+   _lensC:()=>pct(R.C.irr), _irrL:()=>pct(R.L.irr),
+   _dscr:()=>isFinite(R.dscrMin)?R.dscrMin.toFixed(2)+'x':'—',
+   _verdict:()=>{const g=R.B.irr==null?null:R.B.irr-R.hurdle;
+     return g==null?'—':(g>=0.03?'NÊN LÀM':g>=0?'CẦN VALIDATE':'KHÔNG NÊN')}
+  };
+  if(V[k])return V[k]();
+  const n=DEP[k];
+  if(n&&n.multi){let t=0;n.multi.forEach(x=>t+=(S[x]||0));return fmtVnd(t)+'/th'}
+  if(META[k])return uDisp(k,S[k])+' '+META[k][0];
+  if(SELECTS[k]){const o=SELECTS[k].find(x=>x[0]===S[k]);return o?o[1]:S[k]}
+  return '—';
+ }catch(e){return '—'}
+}
+function ancestors(k,acc){acc=acc||new Set();(DEP[k]?.d||[]).forEach(d=>{if(!acc.has(d)){acc.add(d);ancestors(d,acc)}});return acc}
+function descendants(k,acc){acc=acc||new Set();
+ for(const [n,v] of Object.entries(DEP)) if((v.d||[]).includes(k)&&!acc.has(n)){acc.add(n);descendants(n,acc)}
+ return acc}
+
+function renderDep(){
+ const box=$('depCanvas'); if(!box)return;
+ const cols={};
+ Object.entries(DEP).forEach(([k,v])=>{(cols[v.col]=cols[v.col]||[]).push(k)});
+ const ORD={in:0,mid:1,out:2};
+ Object.values(cols).forEach(a=>a.sort((x,y)=>ORD[DEP[x].t]-ORD[DEP[y].t]));
+ const CW=196, GAP=40, RH=44, PAD=16;
+ const maxCol=Math.max(...Object.keys(cols).map(Number));
+ const maxRows=Math.max(...Object.values(cols).map(a=>a.length));
+ const W=(maxCol+1)*(CW+GAP)+PAD*2, H=maxRows*RH+PAD*2+30;
+ const pos={};
+ const order=Object.keys(cols).map(Number).sort((a,b)=>a-b);
+ const idx={};
+ order.forEach(c=>{
+  let ks=cols[c];
+  if(c>order[0]){
+   const key=k=>{const ds=(DEP[k].d||[]).filter(d=>idx[d]!=null);
+     return ds.length?ds.reduce((a,d)=>a+idx[d],0)/ds.length:999};
+   const ORD2={in:0,mid:1,out:2};
+   ks=ks.slice().sort((x,y)=>(ORD2[DEP[x].t]-ORD2[DEP[y].t])||(key(x)-key(y)));
+   cols[c]=ks;
+  }
+  const off=(maxRows-ks.length)/2;
+  ks.forEach((k,i)=>{idx[k]=i+off; pos[k]={x:PAD+c*(CW+GAP), y:PAD+30+(i+off)*RH}});
+ });
+ let hi=null;
+ if(depFocus) hi=new Set([depFocus,...ancestors(depFocus),...descendants(depFocus)]);
+
+ let svg=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">`;
+ // column labels
+ const CL={0:'Đầu vào gốc',1:'Quy đổi',2:'Doanh thu',3:'Tổng hợp',4:'Biên & định phí',
+  5:'EBITDA / đầu tư',6:'Dòng tiền năm',7:'Sau vay',8:'Chỉ tiêu',9:'Kết luận'};
+ for(let c=0;c<=maxCol;c++)
+  svg+=`<text x="${PAD+c*(CW+GAP)}" y="20" class="dcol">${CL[c]||''}</text>`;
+ // edges
+ Object.entries(DEP).forEach(([k,v])=>{
+  (v.d||[]).forEach(d=>{
+   const a=pos[d],b=pos[k]; if(!a||!b)return;
+   const x1=a.x+CW, y1=a.y+17, x2=b.x, y2=b.y+17;
+   const on=hi?(hi.has(k)&&hi.has(d)):true;
+   const mx=(x1+x2)/2;
+   svg+=`<path d="M${x1} ${y1} C${mx} ${y1} ${mx} ${y2} ${x2} ${y2}" class="dedge${on?'':' dim'}"/>`;
+  });
+ });
+ // nodes
+ Object.entries(DEP).forEach(([k,v])=>{
+  const p=pos[k]; if(!p)return;
+  const on=hi?hi.has(k):true;
+  const isF=k===depFocus;
+  const val=depValue(k);
+  const short=v.lab.length>26?v.lab.slice(0,25)+'…':v.lab;
+  svg+=`<g class="dnode d-${v.t}${on?'':' dim'}${isF?' focus':''}" onclick="depClick('${k}')" style="cursor:pointer">
+   <rect x="${p.x}" y="${p.y}" width="${CW}" height="34" rx="6"/>
+   <text x="${p.x+9}" y="${p.y+14}" class="dlab">${short}</text>
+   <text x="${p.x+9}" y="${p.y+27}" class="dval">${val}</text></g>`;
+ });
+ svg+='</svg>';
+ box.innerHTML=svg;
+
+ // detail panel
+ const d=$('depDetail');
+ if(!depFocus){
+  d.innerHTML=`<p class="note" style="margin:0">Bấm vào một ô bất kỳ để xem công thức và chuỗi phụ thuộc của nó. Các ô không liên quan sẽ mờ đi.</p>`;
+ }else{
+  const v=DEP[depFocus];
+  const up=[...ancestors(depFocus)].filter(x=>!DEP[x].t.startsWith('m')||true);
+  const dn=[...descendants(depFocus)];
+  const chip=x=>`<span class="dchip d-${DEP[x].t}" onclick="depClick('${x}')">${DEP[x].lab}</span>`;
+  d.innerHTML=`<div class="ddet">
+   <div class="dh"><b>${v.lab}</b> <span class="dbadge d-${v.t}">${({in:'đầu vào',mid:'trung gian',out:'kết quả'})[v.t]}</span>
+    <span class="dnow">${depValue(depFocus)}</span></div>
+   ${v.f?`<div class="dformula">${v.f}</div>`:''}
+   ${v.note?`<div class="dnote">${v.note}</div>`:''}
+   ${v.multi?`<div class="dsec">Gộp từ: ${v.multi.map(m=>`<span class="dchip d-in">${fieldLabel(m)}</span>`).join('')}</div>`:''}
+   ${v.d?`<div class="dsec"><span class="dsl">Phụ thuộc trực tiếp</span>${v.d.map(chip).join('')}</div>`:''}
+   ${dn.length?`<div class="dsec"><span class="dsl">Ảnh hưởng tới ${dn.length} chỉ tiêu</span>${dn.slice(0,14).map(chip).join('')}${dn.length>14?`<span class="dchip">+${dn.length-14}</span>`:''}</div>`:'<div class="dsec"><span class="dsl">Đây là kết quả cuối, không dẫn tới đâu nữa</span></div>'}
+   ${up.length?`<div class="dsec"><span class="dsl">Toàn bộ ${up.length} biến ở thượng nguồn</span>${up.slice(0,16).map(chip).join('')}${up.length>16?`<span class="dchip">+${up.length-16}</span>`:''}</div>`:''}
+  </div>`;
+ }
+ $('depStat').textContent=`${Object.keys(DEP).length} nút · ${Object.values(DEP).reduce((a,v)=>a+(v.d?v.d.length:0),0)} liên kết`+(depFocus?` · đang soi: ${DEP[depFocus].lab}`:'');
+}
+function depClick(k){depFocus=(depFocus===k)?null:k;renderDep()}
+function depClear(){depFocus=null;renderDep();toast('Đã bỏ chọn','ok')}
+
+/* ---------- CARD FOLD (màn chính) ---------- */
+const LS_FOLD='khem_folds_v11';
+let folds={};
+function loadFolds(){try{const r=localStorage.getItem(LS_FOLD);if(r)folds=JSON.parse(r)}catch(e){}}
+function saveFolds(){try{localStorage.setItem(LS_FOLD,JSON.stringify(folds))}catch(e){}}
+function foldCard(head){
+ const card=head.parentElement, id=card.dataset.fold;
+ const f=card.classList.toggle('folded');
+ folds[id]=f; saveFolds();
+ head.querySelector('.cfold').textContent=f?'mở rộng':'thu gọn';
+}
+function applyFolds(){
+ document.querySelectorAll('.card[data-fold]').forEach(c=>{
+  const f=!!folds[c.dataset.fold];
+  c.classList.toggle('folded',f);
+  const lab=c.querySelector('.cfold'); if(lab)lab.textContent=f?'mở rộng':'thu gọn';
+ });
+}
+function allCards(fold){
+ document.querySelectorAll('.card[data-fold]').forEach(c=>folds[c.dataset.fold]=fold);
+ saveFolds(); applyFolds();
+ toast(fold?'Đã thu gọn tất cả vùng':'Đã mở tất cả vùng','ok');
+}
+
+/* ---------- RESIZER ---------- */
+const LS_PW='khem_panelw_v11';
+function setPanelW(px){
+ const min=210, max=Math.min(innerWidth*0.52, 620);
+ px=Math.min(max,Math.max(min,px));
+ document.documentElement.style.setProperty('--panelw',px+'px');
+ try{localStorage.setItem(LS_PW,px)}catch(e){}
+ return px;
+}
+function initResizer(){
+ const rz=$('resizer'); if(!rz)return;
+ let drag=false;
+ const saved=parseFloat(localStorage.getItem(LS_PW)||'0');
+ if(saved>0) setPanelW(saved);
+ const move=e=>{
+  if(!drag)return;
+  const x=(e.touches?e.touches[0].clientX:e.clientX);
+  setPanelW(x - $('panel').getBoundingClientRect().left);
+ };
+ const up=()=>{
+  if(!drag)return;
+  drag=false; rz.classList.remove('drag');
+  document.body.classList.remove('resizing');
+  toast('Độ rộng panel: '+Math.round(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--panelw')))+'px','ok');
+ };
+ const down=e=>{drag=true;rz.classList.add('drag');document.body.classList.add('resizing');e.preventDefault()};
+ rz.addEventListener('mousedown',down);
+ rz.addEventListener('touchstart',down,{passive:false});
+ window.addEventListener('mousemove',move);
+ window.addEventListener('touchmove',move,{passive:false});
+ window.addEventListener('mouseup',up);
+ window.addEventListener('touchend',up);
+ rz.addEventListener('dblclick',()=>{
+  document.documentElement.style.removeProperty('--panelw');
+  try{localStorage.removeItem(LS_PW)}catch(e){}
+  toast('Đã trả panel về 20%','ok');
+ });
+}
+
+/* ---------- TABS ---------- */
+const HINTS={
+ 1:'P&L khi dự án đã đi vào ổn định — để hình dung bài toán kinh doanh trông như thế nào ở trạng thái bình thường. Chỉnh giả định ở panel trái, số cập nhật ngay.',
+ 2:'Ba lens trả lời ba câu khác nhau. Tiền mua nhà đã bỏ ra rồi nên không còn là quyết định — quyết định thật nằm ở lens B: có nên bỏ thêm tiền fit-out không.',
+ 3:'Toàn bộ đường đi từ giả định tới kết luận. Bấm một ô để soi công thức và chuỗi phụ thuộc — dùng để kiểm tra xem đổi một biến sẽ lan tới đâu.'
+};
+function switchTab(n){
+ [1,2,3].forEach(i=>{
+  $('p'+i).classList.toggle('hidden',i!==n);
+  $('tb'+i).classList.toggle('active',i===n);
+ });
+ $('tabHint').textContent=HINTS[n];
+ if(n===3)renderDep();
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+function togglePanel(){
+ const c=$('panel').classList.toggle('collapsed');
+ $('panelBtn').textContent=c?'▶ Giả định':'◀ Giả định';
+}
+
+/* ---------- BOOT ---------- */
+function renderAll(){
+ try{ renderDecision(); renderSolver(); renderPL();
+  if(!$('p3').classList.contains('hidden'))renderDep(); }
+ catch(e){ toast('Lỗi tính toán: '+e.message,'err'); console.error(e); }
+}
+(function boot(){
+ $('vBadge').textContent='v'+VERSION;
+ $('vStamp').textContent=RELEASE;
+ load(); loadFolds();
+ buildInputs();
+ renderAll();
+ applyFolds();
+ initResizer();
+ switchTab(1);
+ refreshUndo();
+})();
+</script>
+</body>
+</html>
