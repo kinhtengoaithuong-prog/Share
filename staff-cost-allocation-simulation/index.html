@@ -1,0 +1,2829 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finan · Staff Cost Simulator v46 (no embedded data)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Display:wght@600;700&family=Outfit:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap&subset=vietnamese');
+:root{
+  --bg:#080E18;--surface:#0E1826;--card:#131F30;--border:#1E3048;--border2:#243A56;
+  --text:#C8D8E8;--sub:#6A8AAA;--dim:#3A5470;
+  --gold:#E8B84B;--gold2:#F5D07A;--goldfade:rgba(232,184,75,.12);
+  --teal:#29C4B0;--tealfade:rgba(41,196,176,.1);
+  --red:#E05555;--redfade:rgba(224,85,85,.1);
+  --green:#38C870;--greenfade:rgba(56,200,112,.1);
+  --amber:#F09030;--purple:#9B72E8;--blue:#4A9EE8;
+  --fh:'Outfit',sans-serif;--fs:'Noto Serif Display',serif;--fm:'DM Mono',monospace;
+  --bu1:#29C4B0;--bu2:#9B72E8;--bu3:#4A9EE8;--bu4:#E8B84B;--bu5:#E05555;
+}
+/* ===== LIGHT THEME (Finan Emerald Executive) — override every token ===== */
+:root[data-theme="light"]{
+  --bg:#f4f6f4;--surface:#ffffff;--card:#ffffff;--border:#e3e8e4;--border2:#d3ddd6;
+  --text:#16201C;--sub:#5a6a62;--dim:#98a69e;
+  --gold:#0B5D4B;--gold2:#0a4a3c;--goldfade:rgba(11,93,75,.10);
+  --teal:#0B5D4B;--tealfade:rgba(11,93,75,.08);
+  --red:#B3402E;--redfade:rgba(179,64,46,.08);
+  --green:#1f8a4c;--greenfade:rgba(31,138,76,.10);
+  --amber:#8a5a12;--purple:#5146A6;--blue:#1e6fb8;
+  --bu1:#0B5D4B;--bu2:#5146A6;--bu3:#1e6fb8;--bu4:#8a5a12;--bu5:#B3402E;
+}
+:root[data-theme="light"] body{color:var(--text)}
+:root[data-theme="light"] .hdr{background:linear-gradient(180deg,#ffffff,var(--bg))}
+:root[data-theme="light"] .hdr-title{color:#16201C}
+:root[data-theme="light"] .sidebar{background:linear-gradient(180deg,#ffffff,var(--surface))}
+:root[data-theme="light"] .sb-brand-title{color:#16201C}
+:root[data-theme="light"] .name-main{color:#16201C}
+:root[data-theme="light"] .modal-overlay{background:rgba(20,32,28,.35)}
+:root[data-theme="light"] table.sim th{background:var(--surface)}
+:root[data-theme="light"] tr.person-row{background:#ffffff}
+:root[data-theme="light"] tr.person-row:hover{background:#f4f6f4}
+:root[data-theme="light"] tr.person-row td{border-bottom:1px solid #eef1ee}
+:root[data-theme="light"] .th-out1{background:rgba(11,93,75,.05)!important}
+:root[data-theme="light"] .th-out2{background:rgba(81,70,166,.05)!important}
+:root[data-theme="light"] .th-out3{background:rgba(30,111,184,.05)!important}
+:root[data-theme="light"] .th-out4{background:rgba(138,90,18,.05)!important}
+:root[data-theme="light"] .th-out5{background:rgba(179,64,46,.05)!important}
+:root[data-theme="light"] .menu-pop,:root[data-theme="light"] .sb-pop{box-shadow:0 8px 24px rgba(20,32,28,.14)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--fh);font-size:12.5px;line-height:1.5;overflow-x:hidden}
+.hdr{background:var(--bg);border-bottom:1px solid var(--border);padding:14px 24px 10px;position:sticky;top:0;z-index:100}
+.hdr-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.hdr-title{font-family:var(--fs);font-size:16px;font-weight:700;color:#fff;letter-spacing:-.3px}
+.hdr-title span{color:var(--gold)}
+.hdr-sub{font-size:10px;color:var(--sub);margin-top:1px;font-family:var(--fm)}
+.hdr-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:4px;font-family:var(--fh);font-size:11px;font-weight:700;cursor:pointer;border:none;transition:all .15s;letter-spacing:.3px}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--sub)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+.btn-teal{background:var(--teal);color:#080E18}.btn-teal:hover{opacity:.85}
+.btn-red{background:var(--redfade);border:1px solid rgba(224,85,85,.3);color:var(--red)}.btn-red:hover{background:rgba(224,85,85,.2)}
+.menu-wrap{position:relative;display:inline-block}
+.menu-pop{position:absolute;top:calc(100% + 4px);right:0;background:var(--card);border:1px solid var(--border2);border-radius:6px;padding:5px;min-width:185px;z-index:150;box-shadow:0 8px 24px rgba(0,0,0,.5);display:none}
+.menu-pop.open{display:block}
+.menu-item{display:flex;align-items:center;gap:7px;width:100%;padding:7px 10px;border:none;background:none;color:var(--text);font-family:var(--fh);font-size:11px;font-weight:600;text-align:left;cursor:pointer;border-radius:4px;transition:background .12s}
+.menu-item:hover{background:var(--surface)}
+.menu-item.danger{color:var(--red)}.menu-item.danger:hover{background:var(--redfade)}
+.menu-item .mi-sub{display:block;font-size:9px;color:var(--dim);font-weight:400;font-family:var(--fm);margin-top:1px}
+.menu-divider{height:1px;background:var(--border);margin:4px 6px}
+/* ===== SIDEBAR LAYOUT ===== */
+.app-shell{display:flex;min-height:100vh}
+.sidebar{width:180px;flex-shrink:0;background:linear-gradient(180deg,#0A1220,var(--surface));border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:90;overflow-y:auto}
+.sidebar::-webkit-scrollbar{width:4px}.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.sb-brand{padding:16px 16px 12px;border-bottom:1px solid var(--border)}
+.sb-brand-title{font-family:var(--fs);font-size:14px;font-weight:700;color:#fff;letter-spacing:-.2px;line-height:1.3}
+.sb-brand-title span{color:var(--gold)}
+.sb-brand-ver{font-size:9px;color:var(--sub);font-family:var(--fm);margin-top:3px}
+.sb-section{padding:12px 10px 4px}
+.sb-section-lbl{font-size:8px;font-weight:700;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;padding:0 8px 6px;font-family:var(--fm)}
+.sb-item{display:flex;align-items:center;gap:9px;width:100%;padding:9px 12px;border:none;background:none;color:var(--sub);font-family:var(--fh);font-size:12px;font-weight:600;text-align:left;cursor:pointer;border-radius:6px;transition:all .12s;margin-bottom:2px}
+.sb-item:hover{background:var(--card);color:var(--text)}
+.sb-item.active{background:var(--goldfade);color:var(--gold)}
+.sb-item.active .sb-ico{opacity:1}
+.sb-ico{font-size:14px;opacity:.7;width:18px;text-align:center}
+.sb-item.teal-item{color:var(--teal)}.sb-item.teal-item:hover{background:var(--tealfade)}
+.sb-item.danger-item{color:var(--red)}.sb-item.danger-item:hover{background:var(--redfade)}
+.sb-spacer{flex:1}
+.sb-footer{padding:10px 16px;border-top:1px solid var(--border);font-size:9px;color:var(--dim);font-family:var(--fm)}
+.main-area{flex:1;margin-left:180px;min-width:0;display:flex;flex-direction:column}
+.sb-pop{position:fixed;top:0;left:186px;background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:6px;min-width:230px;max-height:80vh;overflow-y:auto;z-index:300;box-shadow:0 8px 28px rgba(0,0,0,.55);display:none}
+.sb-pop.open{display:block}
+.sb-menu-wrap{position:relative}
+/* ===== SIDEBAR COLLAPSE ===== */
+.sb-collapse-btn{position:absolute;top:14px;right:10px;width:22px;height:22px;border:1px solid var(--border2);background:var(--card);color:var(--sub);border-radius:5px;cursor:pointer;font-size:12px;line-height:1;display:flex;align-items:center;justify-content:center;z-index:5;transition:all .12s}
+.sb-collapse-btn:hover{border-color:var(--gold);color:var(--gold)}
+.app-shell.collapsed .sidebar{width:56px}
+.app-shell.collapsed .main-area{margin-left:56px}
+.app-shell.collapsed .sb-brand-title,
+.app-shell.collapsed .sb-brand-ver,
+.app-shell.collapsed .sb-section-lbl,
+.app-shell.collapsed .sb-item span:not(.sb-ico),
+.app-shell.collapsed .sb-footer{display:none}
+.app-shell.collapsed .sb-item{justify-content:center;padding:9px 0}
+.app-shell.collapsed .sb-ico{width:auto}
+.app-shell.collapsed .sb-brand{padding:14px 8px 10px}
+.app-shell.collapsed .sb-collapse-btn{right:auto;left:50%;transform:translateX(-50%);top:8px}
+.app-shell.collapsed .sb-section{padding:10px 6px 4px}
+.tabs-bar{background:var(--surface);border-bottom:2px solid var(--border);padding:0 24px;display:flex;gap:0}
+.tab-btn{padding:9px 18px;font-size:11px;font-weight:700;color:var(--sub);background:none;border:none;cursor:pointer;letter-spacing:.5px;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+.strip{background:var(--surface);border-bottom:1px solid var(--border);padding:9px 24px;display:flex;gap:0;overflow-x:auto;position:sticky;top:0;z-index:60}
+.kpi{padding:0 16px;border-right:1px solid var(--border);text-align:center;white-space:nowrap;min-width:90px}
+.kpi:first-child{padding-left:0}.kpi:last-child{border-right:none}
+.kpi-lbl{font-size:9px;color:var(--sub);letter-spacing:1.2px;text-transform:uppercase;font-family:var(--fm)}
+.kpi-val{font-family:var(--fm);font-size:13px;font-weight:500;color:var(--gold);margin-top:1px}
+.kpi-val.green{color:var(--green)}.kpi-val.teal{color:var(--teal)}.kpi-val.red{color:var(--red)}.kpi-val.amber{color:var(--amber)}
+.kpi-sub{font-size:9px;color:var(--dim);margin-top:1px}
+.toolbar{background:var(--surface);border-bottom:1px solid var(--border);padding:7px 24px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.search-box{position:relative;flex:1;min-width:160px;max-width:240px}
+.search-box input{width:100%;background:var(--card);border:1px solid var(--border2);border-radius:4px;padding:5px 9px 5px 26px;color:var(--text);font-family:var(--fm);font-size:11px}
+.search-box input:focus{outline:none;border-color:var(--teal)}
+.search-box::before{content:"⌕";position:absolute;left:7px;top:50%;transform:translateY(-50%);color:var(--dim);font-size:14px;pointer-events:none}
+.filter-sel{background:var(--card);border:1px solid var(--border2);border-radius:4px;padding:5px 7px;color:var(--text);font-family:var(--fm);font-size:11px;cursor:pointer}
+.filter-sel:focus{outline:none;border-color:var(--teal)}
+.alloc-hint{font-size:10px;color:var(--sub);margin-left:auto}
+.alloc-hint strong{color:var(--amber)}
+.page{display:none}.page.active{display:block}
+/* ── Hướng dẫn sử dụng ── */
+.guide-wrap{max-width:920px;margin:0 auto;padding:24px 28px 60px}
+.guide-hero{background:linear-gradient(135deg,var(--goldfade),transparent);border:1px solid var(--border);border-radius:14px;padding:22px 26px;margin-bottom:26px}
+.guide-hero h1{font-family:var(--fs);font-size:22px;color:var(--gold2);margin:0 0 6px}
+.guide-hero p{margin:0;color:var(--sub);font-size:13px;line-height:1.7}
+.guide-sec{margin-bottom:30px;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--card)}
+.guide-sec-hd{display:flex;align-items:center;gap:12px;padding:14px 20px;background:var(--surface);border-bottom:1px solid var(--border)}
+.guide-sec-num{flex-shrink:0;width:30px;height:30px;border-radius:8px;background:var(--gold);color:var(--bg);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;font-family:var(--fm)}
+.guide-sec-hd h2{font-family:var(--fs);font-size:17px;margin:0;color:var(--text)}
+.guide-sec-hd .gsub{font-size:11px;color:var(--sub);margin-top:1px}
+.guide-body{padding:20px 24px}
+.guide-body p{color:var(--text);font-size:13px;line-height:1.75;margin:0 0 12px}
+.guide-body strong{color:var(--gold2)}
+.guide-body ol,.guide-body ul{margin:0 0 14px;padding-left:4px;list-style:none;counter-reset:step}
+.guide-body ol li{position:relative;padding:7px 0 7px 34px;font-size:13px;line-height:1.65;color:var(--text);counter-increment:step}
+.guide-body ol li::before{content:counter(step);position:absolute;left:0;top:6px;width:22px;height:22px;border-radius:50%;background:var(--tealfade);color:var(--teal);font-weight:800;font-size:11px;font-family:var(--fm);display:flex;align-items:center;justify-content:center}
+.guide-body ul li{position:relative;padding:5px 0 5px 22px;font-size:13px;line-height:1.65;color:var(--text)}
+.guide-body ul li::before{content:'▸';position:absolute;left:2px;top:5px;color:var(--gold);font-weight:700}
+.guide-fig{margin:16px 0;padding:18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;text-align:center;overflow-x:auto}
+.guide-fig svg{max-width:100%;height:auto}
+.guide-figcap{font-size:11px;color:var(--sub);margin-top:10px;font-style:italic}
+.guide-callout{border-radius:9px;padding:12px 16px;margin:14px 0;font-size:12.5px;line-height:1.65;display:flex;gap:10px}
+.guide-callout .gc-ico{flex-shrink:0;font-size:16px}
+.guide-callout.tip{background:var(--tealfade);border:1px solid rgba(41,196,176,.3)}
+.guide-callout.warn{background:var(--redfade);border:1px solid rgba(224,85,85,.3)}
+.guide-callout.note{background:var(--goldfade);border:1px solid rgba(232,184,75,.3)}
+.guide-kbd{font-family:var(--fm);font-size:11px;background:var(--surface);border:1px solid var(--border2);border-radius:5px;padding:1px 7px;color:var(--gold2);white-space:nowrap}
+.guide-tbl{width:100%;border-collapse:collapse;font-size:12px;margin:14px 0}
+.guide-tbl th{background:var(--surface);color:var(--sub);text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);font-size:10.5px;text-transform:uppercase;letter-spacing:.5px}
+.guide-tbl td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:top}
+.guide-tbl td:first-child{font-family:var(--fm);color:var(--gold2);white-space:nowrap}
+.guide-toc{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
+.guide-toc a{font-size:11.5px;padding:6px 12px;border:1px solid var(--border);border-radius:20px;color:var(--sub);text-decoration:none;transition:all .15s;cursor:pointer}
+.guide-toc a:hover{border-color:var(--gold);color:var(--gold2)}
+.tbl-outer{overflow-x:auto;overflow-y:auto;max-height:calc(100vh - 150px)}
+.tbl-outer::-webkit-scrollbar{height:6px;width:6px}
+.tbl-outer::-webkit-scrollbar-track{background:var(--bg)}
+.tbl-outer::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+table.sim{border-collapse:collapse;width:max-content;min-width:100%}
+table.sim th{background:var(--surface);color:var(--sub);font-family:var(--fm);font-size:9px;font-weight:500;letter-spacing:.8px;text-transform:uppercase;padding:7px 9px;border-bottom:2px solid var(--border2);white-space:nowrap;position:sticky;top:0;z-index:10;text-align:right}
+table.sim th.left{text-align:left}
+table.sim th.center{text-align:center}
+table.sim th:nth-child(1),table.sim td:nth-child(1){position:sticky;left:0;z-index:12;background:inherit}
+table.sim th:nth-child(1){background:var(--surface);z-index:20}
+.th-bu1{color:var(--bu1)!important}.th-bu2{color:var(--bu2)!important}.th-bu3{color:var(--bu3)!important}.th-bu4{color:var(--bu4)!important}.th-bu5{color:var(--bu5)!important}
+.th-out1{background:rgba(41,196,176,.05)!important;color:var(--bu1)!important}
+.th-out2{background:rgba(155,114,232,.05)!important;color:var(--bu2)!important}
+.th-out3{background:rgba(74,158,232,.05)!important;color:var(--bu3)!important}
+.th-out4{background:rgba(232,184,75,.05)!important;color:var(--bu4)!important}
+.th-out5{background:rgba(224,85,85,.05)!important;color:var(--bu5)!important}
+.th-sep{border-left:1px solid var(--border2)!important}
+tr.dept-hdr{background:var(--card)}
+tr.dept-hdr td{font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1.2px;padding:9px 10px 6px;border-top:2px solid var(--border2);border-bottom:1px solid var(--border)}
+tr.dept-hdr td:first-child{border-left:3px solid var(--gold)}
+tr.person-row{background:var(--bg);transition:background .1s}
+tr.person-row:hover{background:#122236}
+tr.person-row.inactive-row{opacity:.4}
+tr.person-row td{border-bottom:1px solid var(--border);padding:5px 9px;vertical-align:middle;text-align:right}
+tr.person-row td.left{text-align:left}
+tr.person-row td.center{text-align:center}
+tr.new-row td{background:rgba(41,196,176,.03);border-bottom:1px solid rgba(41,196,176,.12)}
+tr.out-row td{background:rgba(155,114,232,.03)}
+tr.dept-total{background:var(--card)}
+tr.dept-total td{padding:6px 9px;text-align:right;border-bottom:2px solid var(--border2);font-family:var(--fm);font-size:11px;font-weight:500;color:var(--gold);border-top:1px solid var(--border2)}
+tr.dept-total td:first-child{text-align:left;font-size:10px;letter-spacing:.5px}
+tr.grand-total{background:var(--surface)}
+tr.grand-total td{padding:8px 9px;text-align:right;border-top:2px solid var(--gold);font-family:var(--fm);font-size:12px;font-weight:500;color:var(--gold2);position:sticky;bottom:0;z-index:9}
+tr.grand-total td:first-child{text-align:left;font-size:11px;font-weight:700}
+.inp-adj{width:72px;background:var(--card);border:1px solid var(--border2);border-radius:3px;padding:3px 6px;color:var(--text);font-family:var(--fm);font-size:11px;text-align:right}
+.inp-adj:focus{outline:none;border-color:var(--teal);background:#0E1F30}
+.inp-alloc{width:50px;background:transparent;border:1px solid transparent;border-radius:3px;padding:3px 4px;color:var(--text);font-family:var(--fm);font-size:11px;text-align:center;transition:border .1s}
+.inp-alloc:focus{outline:none;border-color:var(--teal);background:var(--card)}
+.inp-alloc.bu1:focus{border-color:var(--bu1)}.inp-alloc.bu2:focus{border-color:var(--bu2)}.inp-alloc.bu3:focus{border-color:var(--bu3)}.inp-alloc.bu4:focus{border-color:var(--bu4)}.inp-alloc.bu5:focus{border-color:var(--bu5)}
+.inp-alloc.over{background:rgba(224,85,85,.12);border-color:rgba(224,85,85,.4)!important;color:var(--red)!important}
+.inp-alloc.full{background:rgba(56,200,112,.07);border-color:rgba(56,200,112,.25)}
+.inp-alloc.dim-bu{opacity:.22;background:rgba(255,255,255,.01)}
+.alloc-sum{display:inline-block;min-width:28px;text-align:center;font-family:var(--fm);font-size:10px;border-radius:2px;padding:1px 4px}
+.alloc-sum.ok{background:rgba(56,200,112,.15);color:var(--green)}.alloc-sum.over{background:rgba(224,85,85,.15);color:var(--red)}.alloc-sum.zero{color:var(--dim)}
+.status-toggle{cursor:pointer;padding:2px 7px;border-radius:3px;font-family:var(--fm);font-size:10px;font-weight:500;border:none;transition:all .15s;white-space:nowrap}
+.status-toggle.active{background:rgba(56,200,112,.15);color:var(--green);border:1px solid rgba(56,200,112,.3)}
+.status-toggle.inactive{background:rgba(224,85,85,.1);color:var(--red);border:1px solid rgba(224,85,85,.2)}
+.del-btn{background:rgba(224,85,85,.12);border:1px solid rgba(224,85,85,.2);color:var(--red);border-radius:3px;padding:2px 6px;cursor:pointer;font-size:11px;font-family:var(--fm);line-height:1}
+.del-btn:hover{background:rgba(224,85,85,.25)}
+.pl-select{background:var(--card);border:1px solid var(--border2);border-radius:3px;padding:3px 6px;color:var(--sub);font-family:var(--fm);font-size:10.5px;max-width:185px;cursor:pointer}
+.md-subtab{font-size:12px;font-weight:700;padding:7px 14px;border:1px solid var(--border);border-radius:7px;background:var(--card);color:var(--sub);cursor:pointer}
+.md-subtab.on{background:var(--gold);color:#1a1205;border-color:var(--gold)}
+.md-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)}
+.md-row .md-dept{flex:1;font-family:var(--fm);font-size:12px;color:var(--text)}
+.md-row .md-cnt{font-size:10px;color:var(--dim);font-family:var(--fm)}
+.md-row select{background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:5px 8px;color:var(--text);font-family:var(--fm);font-size:11.5px;min-width:230px}
+.md-row.unmapped{background:rgba(232,184,75,.06)}
+.md-row.unmapped select{border-color:var(--warn)}
+.pl-select:focus{outline:none;border-color:var(--purple);color:var(--text)}
+.name-cell{display:flex;flex-direction:column;min-width:155px}
+.name-main{font-weight:600;color:#fff;font-size:12px}
+.name-pos{font-size:9px;color:var(--sub);margin-top:1px}
+.name-tag{font-size:9px;font-family:var(--fm)}
+.name-tag.new{color:var(--teal)}
+.name-tag.out{color:var(--purple)}
+.name-tag.prb{color:var(--amber)}
+.out-val{font-family:var(--fm);font-size:11px}
+.out-val.has-val{font-weight:500}
+.out-val.bu1{color:var(--bu1)}.out-val.bu2{color:var(--bu2)}.out-val.bu3{color:var(--bu3)}.out-val.bu4{color:var(--bu4)}.out-val.bu5{color:var(--bu5)}
+.summary-wrap{padding:20px 24px;display:flex;flex-direction:column;gap:20px}
+.sec-title{font-family:var(--fs);font-size:12px;font-weight:700;color:var(--gold);letter-spacing:1px;padding-bottom:8px;border-bottom:1px solid rgba(232,184,75,.2);margin-bottom:12px}
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.sum-box{background:var(--surface);border:1px solid var(--border2);border-radius:4px;overflow-x:auto}
+.sum-tbl{width:100%;border-collapse:collapse;font-size:11.5px}
+.sum-tbl th{background:rgba(232,184,75,.07);font-family:var(--fm);font-size:9px;font-weight:500;color:var(--sub);text-transform:uppercase;letter-spacing:.8px;padding:7px 10px;text-align:right;border-bottom:1px solid var(--border2);white-space:nowrap}
+.sum-tbl th:first-child{text-align:left}
+.sum-tbl td{padding:6px 10px;border-bottom:1px solid rgba(255,255,255,.03);text-align:right;font-family:var(--fm);white-space:nowrap}
+.sum-tbl td:first-child{text-align:left;color:var(--text);font-weight:600}
+.sum-tbl tr:hover td{background:rgba(255,255,255,.02)}
+.sum-tbl tr.sum-total td{background:rgba(232,184,75,.07);color:var(--gold2);font-weight:700;border-top:2px solid rgba(232,184,75,.25);border-bottom:none}
+.sum-tbl tr.sum-total td:first-child{text-align:left}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:200;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:22px;width:500px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.modal h2{font-family:var(--fs);font-size:15px;font-weight:700;color:var(--gold);margin-bottom:14px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.form-field{display:flex;flex-direction:column;gap:3px}
+.form-field.full{grid-column:1/-1}
+.form-field label{font-size:10px;color:var(--sub);font-family:var(--fm);letter-spacing:.5px;text-transform:uppercase}
+.form-field input,.form-field select{background:var(--surface);border:1px solid var(--border2);border-radius:4px;padding:6px 9px;color:var(--text);font-family:var(--fm);font-size:12px}
+.form-field input:focus,.form-field select:focus{outline:none;border-color:var(--teal)}
+.form-field input[readonly]{background:rgba(41,196,176,.05);border-color:rgba(41,196,176,.2);color:var(--teal)}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.ld-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:8px 0}
+.ld-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
+.ld-title{font-family:var(--fs);font-size:14px;font-weight:700;color:var(--gold);margin-bottom:6px}
+.ld-sub{font-size:11px;color:var(--sub);margin-bottom:10px}
+.ld-note{font-size:10px;color:var(--dim);line-height:1.5}
+.ld-input{flex:1;background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:6px 8px;color:var(--text);font-family:var(--fm);font-size:12px}
+.ver-row{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--border);font-size:11px}
+.ver-row .vn{font-family:var(--fm);font-weight:600;color:var(--text)}
+.ver-row .vm{color:var(--dim);font-size:9.5px;margin-left:auto}
+.ver-btn{border:1px solid var(--border2);background:var(--card);color:var(--sub);border-radius:4px;font-size:9.5px;padding:2px 6px;cursor:pointer}
+.ver-btn:hover{border-color:var(--gold);color:var(--gold)}
+.src-row{font-size:10.5px;padding:4px 0;border-bottom:1px solid var(--border);font-family:var(--fm);color:var(--sub)}
+.bu-chip{font-family:var(--fm);font-size:8.5px;color:var(--blue);background:rgba(74,158,232,.1);border-radius:4px;padding:1px 4px;margin-left:4px}
+.cmp-block{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:12px;content-visibility:auto;contain-intrinsic-size:auto 400px}
+.cmp-h{font-family:var(--fs);font-size:12.5px;font-weight:700;color:var(--gold);margin-bottom:8px}
+.cmp-sh{font-size:10.5px;font-weight:700;margin-bottom:4px}
+.cmp-t{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed}
+.cmp-t th{text-align:right;padding:4px 8px;color:var(--sub);font-size:9.5px;border-bottom:1px solid var(--border2)}
+.cmp-t th.left,.cmp-t td.left{text-align:left;width:34%;white-space:normal}
+.cmp-t td{padding:3px 8px;border-bottom:1px solid var(--border);font-family:var(--fm);overflow:hidden;text-overflow:ellipsis}
+.cmp-t td.num{text-align:right}
+.cmp-2col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cmp-nr{font-size:10.5px;padding:2px 0}
+.cmp-nr.new-hl{color:var(--green)}
+".cmp-t tr.cmp-total td{border-top:2px solid var(--border2);border-bottom:none;font-weight:700;color:var(--text)}
+.pchip{display:inline-block;font-size:8.5px;font-weight:800;border-radius:4px;padding:1px 5px;vertical-align:middle}
+.pchip.out{background:rgba(224,85,85,.15);color:var(--red)}
+.pchip.in{background:rgba(74,222,128,.15);color:var(--green)}
+.pchip.tch{background:rgba(232,184,75,.15);color:var(--gold)}
+".cmp-t.cmp-wide{table-layout:auto}.cmp-t.cmp-wide th,.cmp-t.cmp-wide td{padding:3px 7px;white-space:nowrap;overflow:visible}
+.cmp-t tr.pl-l1 td{font-weight:700;color:var(--text);border-top:1px solid var(--border2)}
+.cmp-t tr.pl-l1 td.left{color:var(--gold2)}
+.cmp-t tr.pl-l2 td{color:var(--sub)}
+.cmp-t tr.pl-l2 td.left{padding-left:16px;font-size:11px}
+.dim{color:var(--dim);font-size:9.5px}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+<aside class="sidebar">
+  <div class="sb-brand" style="position:relative">
+    <button class="sb-collapse-btn" id="sb-collapse" onclick="toggleSidebar()" title="Thu/mở sidebar">‹</button>
+    <div class="sb-brand-title">FINAN<br><span>Staff Cost</span></div>
+    <div class="sb-brand-ver">Simulator · v46 · fix entity parse · 06/07/2026</div>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-section-lbl">Workflow</div>
+    <button class="sb-item" id="nav-loaddata" onclick="showTab('loaddata',this)"><span class="sb-ico">📥</span> <span>1 · Load Data</span></button>
+    <button class="sb-item" id="nav-masterdata" onclick="showTab('masterdata',this)"><span class="sb-ico">🗂</span> <span>2 · Master Data</span></button>
+    <button class="sb-item active" id="nav-simulator" onclick="showTab('simulator',this)"><span class="sb-ico">📋</span> <span>3 · Simulate</span></button>
+    <button class="sb-item" id="nav-analytics" onclick="showTab('analytics',this)"><span class="sb-ico">📊</span> <span>4 · Analytics</span></button>
+    <button class="sb-item" id="nav-journal" onclick="showTab('journal',this)"><span class="sb-ico">📒</span> <span>5 · Journal Entry</span></button>
+    <button class="sb-item" id="nav-guide" onclick="showTab('guide',this)"><span class="sb-ico">📖</span> <span>Hướng dẫn sử dụng</span></button>
+  </div>
+  <!-- hidden file inputs (dùng chung, trigger từ các tab) -->
+  <div style="display:none">
+    <input type="file" id="payroll-file-input" accept=".xlsx" onchange="loadPayroll(event)">
+    <input type="file" id="budget-file-input" accept=".xlsx" onchange="loadBudget(event)">
+    <input type="file" id="template-file-input" accept=".json" onchange="applyTemplate(event)">
+    <input type="file" id="json-file-input" accept=".json" onchange="importJSON(event)">
+  </div>
+
+  <div class="sb-section" style="border-top:1px solid var(--border);padding-top:8px">
+    <div class="sb-section-lbl">Giao diện</div>
+    <button class="sb-item" id="theme-toggle" onclick="toggleTheme()"><span class="sb-ico" id="theme-ico">☀</span> <span id="theme-lbl">Tone sáng</span></button>
+  </div>
+
+  <div class="sb-spacer"></div>
+  <div class="sb-footer">
+    <span id="save-indicator">—</span><br>
+    <span style="opacity:.6">Base = Company Expense (SHUI incl.)</span>
+  </div>
+</aside>
+
+<div class="main-area">
+<div class="strip" id="strip"></div>
+
+<div class="toolbar" id="toolbar">
+  <button class="btn btn-ghost" onclick="openModal()" style="white-space:nowrap">＋ Thêm người</button>
+  <button class="btn btn-ghost" onclick="activateAll()" title="Bật cost tất cả nhân sự" style="white-space:nowrap">✓ Active All</button>
+  <button class="btn btn-ghost" onclick="resetAlloc()" title="Xoá hết % phân bổ về 0" style="white-space:nowrap;color:var(--red);border-color:rgba(224,85,85,.3)">↺ Reset Alloc</button>
+  <button class="btn btn-ghost" onclick="exportAllocTemplate()" title="Xuất quy tắc alloc/PL theo tên+dept" style="white-space:nowrap">⬇ Template</button>
+  <button class="btn btn-ghost" onclick="triggerApplyTemplate()" title="Áp quy tắc vào payroll kỳ mới" style="white-space:nowrap">🎯 Apply</button>
+  <button class="btn btn-ghost" onclick="exportCSV()" title="Employee CSV chi tiết" style="white-space:nowrap">⬇ CSV</button>
+  <div style="width:1px;height:20px;background:var(--border);margin:0 4px"></div>
+  <div class="search-box"><input type="text" id="search" placeholder="Tìm tên, chức danh..." oninput="filterTable()"></div>
+  <select class="filter-sel" id="filter-dept" onchange="filterTable()">
+    <option value="">Tất cả phòng ban</option>
+  </select>
+  <select class="filter-sel" id="filter-entity" onchange="filterTable()">
+    <option value="">Tất cả pháp nhân</option>
+  </select>
+  <select class="filter-sel" id="filter-status" onchange="filterTable()">
+    <option value="">Tất cả status</option>
+    <option value="active">Active</option><option value="inactive">Inactive</option>
+  </select>
+  <select class="filter-sel" id="filter-pl" onchange="filterTable()">
+    <option value="">Tất cả P&amp;L line</option>
+    <option>4.1 Staff cost — Salary</option>
+    <option>6.1 Staff - Customer Operation</option>
+    <option>6.2 Staff - BD &amp; Partnership</option>
+    <option>6.3 Staff - Product Development</option>
+    <option>6.4 Staff - Technology</option>
+    <option>6.5 Staff - Marketing</option>
+    <option>7.1 Staff - Management</option>
+    <option>7.2 Staff - Accounting &amp; Finance</option>
+    <option>7.3 Staff - Human Resource</option>
+  </select>
+  <select class="filter-sel" id="filter-emptype" onchange="filterTable()">
+    <option value="">FTE/PRB/OUT</option>
+    <option value="FTE">FTE</option><option value="PRB">PRB</option><option value="OUT">OUT</option>
+  </select>
+  <div class="alloc-hint">% alloc · bước nhảy 10% · <strong>Tổng = 100%</strong></div>
+</div>
+
+<div class="page" id="page-loaddata">
+  <div class="summary-wrap" style="max-width:1100px">
+    <div class="ld-grid">
+      <div class="ld-card">
+        <div class="ld-title">🔄 Nạp Payroll</div>
+        <div class="ld-sub">2 chế độ — chọn đúng ý định:</div>
+        <button class="btn btn-teal" style="width:100%;margin-bottom:6px" onclick="triggerLoadPayrollNew()">⬆ Load MỚI (ghi đè 100%)</button>
+        <div class="ld-note">Xóa bảng hiện tại, nạp từ file. Judgments mất sạch → Apply Template sau.</div>
+        <button class="btn btn-ghost" style="width:100%;margin:8px 0 6px" onclick="triggerLoadPayrollAppend()">＋ Load BỔ SUNG nhân sự</button>
+        <div class="ld-note">Chỉ thêm người chưa có (tên + loại HĐ). Người trùng bị bỏ qua.</div>
+      </div>
+      <div class="ld-card">
+        <div class="ld-title">📥 Budget (FP&amp;A)</div>
+        <div class="ld-sub">Sheet 05_Staff_Cost, so sánh ở tab Analytics.</div>
+        <button class="btn btn-ghost" style="width:100%" onclick="triggerLoadBudget()">📥 Load Budget Excel</button>
+        <div class="ld-title" style="margin-top:14px">🗂 Backup JSON</div>
+        <button class="btn btn-ghost" style="width:100%;margin-bottom:6px" onclick="exportVersionJSON()">⬇ Export JSON (bảng hiện tại)</button>
+        <button class="btn btn-ghost" style="width:100%" onclick="triggerImportJSON()">🔁 Restore từ JSON</button>
+      </div>
+      <div class="ld-card">
+        <div class="ld-title">🏷 Phiên bản đã lưu</div>
+        <div class="ld-sub">Nút <b>Lưu phiên bản</b> nằm ở tab <b>2 · Simulate</b> — lưu SAU khi đã áp quy tắc phân bổ, tránh snapshot thiếu alloc.</div>
+        <div id="ver-list"></div>
+      </div>
+      <div class="ld-card">
+        <div class="ld-title">📄 Nguồn dữ liệu đang có</div>
+        <div id="src-list"></div>
+        <div style="border-top:1px solid var(--border);margin-top:10px;padding-top:10px;display:flex;flex-direction:column;gap:6px">
+          <button class="btn btn-ghost" style="color:var(--red);border-color:rgba(224,85,85,.3);width:100%" onclick="clearSavedState()">🗑 Xóa trắng bảng làm việc</button>
+          <button class="btn btn-ghost" style="color:var(--red);border-color:rgba(224,85,85,.3);width:100%" onclick="purgeAllLocal()">⚠ Xóa SẠCH localStorage (bảng + mọi phiên bản)</button>
+          <div class="ld-note">Nút dưới xóa mọi dấu vết dữ liệu trên máy này — dùng khi rời máy demo/máy chung.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-masterdata">
+  <div class="summary-wrap" style="max-width:1000px">
+    <div style="display:flex;gap:6px;padding:6px 0 12px">
+      <button class="md-subtab on" id="mdsub-dept" onclick="mdSwitch('dept')">Department → P&L line</button>
+      <button class="md-subtab" id="mdsub-bu" onclick="mdSwitch('bu')">BU / Center</button>
+    </div>
+    <div id="md-dept-view">
+      <div class="ld-card">
+        <div class="ld-title">🗂 Department → P&L line</div>
+        <div class="ld-sub">Danh sách phòng ban <b>tự thống kê từ payroll đã load</b> (đúng tên HR viết). Chọn P&L line cho từng phòng. Mapping lưu theo tên phòng (không phân biệt hoa/thường).</div>
+        <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+          <button class="btn btn-ghost" onclick="triggerImportMD1()">📥 Import MD1 (JSON)</button>
+          <button class="btn btn-ghost" onclick="exportMD1()">⬇ Export MD1</button>
+          <span style="width:1px;background:var(--border);margin:0 4px"></span>
+          <button class="btn btn-ghost" onclick="triggerImportPL()">📥 Import PL Line list</button>
+          <button class="btn btn-ghost" onclick="exportPL()">⬇ Export PL list</button>
+          <input type="file" id="md1-file" accept=".json" style="display:none" onchange="importMD1(event)">
+          <input type="file" id="pl-file" accept=".json" style="display:none" onchange="importPL(event)">
+        </div>
+        <div id="md-dept-list"></div>
+      </div>
+    </div>
+    <div id="md-bu-view" style="display:none">
+      <div class="ld-card">
+        <div class="ld-title">🎯 BU / Center list</div>
+        <div class="ld-sub">Danh sách trung tâm nhận chi phí (allocation per-person theo EMP_ID áp vào các center này). Hiện <b>cố định 5 center</b> khớp COA Registry — không đổi hàng ngày.</div>
+        <div style="display:flex;gap:6px;margin-bottom:10px">
+          <button class="btn btn-ghost" onclick="exportBU()">⬇ Export BU list</button>
+        </div>
+        <div id="md-bu-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page active" id="page-simulator">
+  <div id="empty-state" style="display:none;padding:60px 24px;text-align:center">
+    <div style="font-family:var(--fs);font-size:20px;color:var(--gold);margin-bottom:10px">Chưa có dữ liệu nhân sự</div>
+    <div style="font-size:12.5px;color:var(--sub);max-width:440px;margin:0 auto 20px;line-height:1.7">Tool này khởi động rỗng và không chứa sẵn dữ liệu lương. Sang tab <b>1 · Load Data</b> để nạp payroll từ file Excel, khôi phục từ JSON, hoặc mở một phiên bản đã lưu.</div>
+    <button class="btn btn-teal" onclick="showTab('loaddata',document.getElementById('nav-loaddata'))">📥 Sang Load Data</button>
+  </div>
+  <div id="prov-strip" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:7px 16px;border-bottom:1px solid var(--border);background:var(--surface);font-size:10.5px;font-family:var(--fm);color:var(--sub)">
+    <span id="prov-payroll">📄 Payroll: —</span>
+    <span id="prov-rules">🎯 Rules: —</span>
+    <span style="margin-left:auto;display:flex;gap:6px;align-items:center">
+      <span id="prov-vername" style="color:var(--dim)"></span>
+      <input type="text" id="ver-name" class="ld-input" placeholder="T06_v1" style="width:110px;flex:none">
+      <button class="btn btn-teal" onclick="saveVersion()" title="Lưu snapshot đầy đủ (facts+judgments+adj) — làm SAU khi đã áp quy tắc phân bổ">💾 Lưu phiên bản</button>
+    </span>
+  </div>
+  <div class="tbl-outer" id="tbl-outer">
+    <table class="sim">
+      <thead id="sim-thead"></thead>
+      <tbody id="sim-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="page" id="page-analytics">
+  <div style="padding:10px 24px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);background:var(--surface)">
+    <span style="font-size:11px;color:var(--sub);font-family:var(--fm)">Tổng hợp phân bổ · so sánh budget · so sánh phiên bản</span>
+    <button class="btn btn-ghost" style="margin-left:auto" onclick="exportSummaryCSV()">⬇ Summary CSV</button>
+    <button class="btn btn-ghost" onclick="exportCompareCSV()" id="btn-cmp-csv" title="Xuất bảng so sánh phiên bản">⬇ So sánh CSV</button>
+    <button class="btn btn-teal" onclick="exportAnalysisCSV()" title="Một file đủ mọi bảng: tổng hợp hiện tại + so sánh phiên bản">⬇ Analysis (đủ bảng)</button>
+  </div>
+  <div id="ver-compare" style="padding:12px 24px;border-bottom:1px solid var(--border);position:sticky;top:58px;z-index:55;background:var(--bg)"></div>
+  <div id="summary-budget-bar" style="display:none;padding:10px 24px;align-items:center;gap:10px;border-bottom:1px solid var(--border);background:var(--surface)">
+    <span style="font-size:11px;color:var(--sub);font-family:var(--fm)">So sánh với budget kỳ:</span>
+    <select class="filter-sel" id="budget-period" onchange="if(typeof BUDGET!=='undefined'&&BUDGET){buildSummary();}">
+      <option value="T5">T5</option><option value="T6" selected>T6</option>
+      <option value="T7">T7</option><option value="T8">T8</option><option value="T9">T9</option>
+      <option value="Forecast Total T5-T9">Total T5-T9</option>
+    </select>
+  </div>
+  <div class="summary-wrap" id="summary-content"></div>
+</div>
+
+<div class="page" id="page-journal">
+  <div style="padding:12px 24px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);background:var(--surface)">
+    <span style="font-size:11px;color:var(--sub);font-family:var(--fm)">Bút toán từ payroll · Block 1 chi tiết PL×BU · Block 2 theo PL line</span>
+    <button class="btn btn-teal" style="margin-left:auto" onclick="exportJournalExcel()">⬇ Export Journal Entry → Excel</button>
+  </div>
+  <div class="summary-wrap" id="journal-content"></div>
+</div>
+
+<div class="page" id="page-guide">
+<div class="guide-wrap">
+
+  <div class="guide-hero">
+    <h1>📖 Hướng dẫn sử dụng</h1>
+    <p>Công cụ này biến file lương Excel thành bút toán kế toán, phân bổ chi phí nhân sự về từng đơn vị kinh doanh (BU) và so sánh giữa các tháng. Hướng dẫn đi theo đúng thứ tự bạn sẽ làm — người dùng lần đầu chỉ cần làm tuần tự từ trên xuống.</p>
+  </div>
+
+  <div class="guide-toc">
+    <a onclick="document.getElementById('g-flow').scrollIntoView({behavior:'smooth'})">Tổng quan quy trình</a>
+    <a onclick="document.getElementById('g-s1').scrollIntoView({behavior:'smooth'})">1 · Load Data</a>
+    <a onclick="document.getElementById('g-s2').scrollIntoView({behavior:'smooth'})">2 · Master Data</a>
+    <a onclick="document.getElementById('g-s3').scrollIntoView({behavior:'smooth'})">3 · Simulate</a>
+    <a onclick="document.getElementById('g-s4').scrollIntoView({behavior:'smooth'})">4 · Analytics</a>
+    <a onclick="document.getElementById('g-s5').scrollIntoView({behavior:'smooth'})">5 · Journal Entry</a>
+    <a onclick="document.getElementById('g-concepts').scrollIntoView({behavior:'smooth'})">Khái niệm chính</a>
+    <a onclick="document.getElementById('g-trouble').scrollIntoView({behavior:'smooth'})">Xử lý sự cố</a>
+  </div>
+
+  <!-- ── TỔNG QUAN FLOW ── -->
+  <div class="guide-sec" id="g-flow">
+    <div class="guide-sec-hd"><div class="guide-sec-num">◎</div><div><h2>Tổng quan quy trình 5 bước</h2><div class="gsub">Luồng dữ liệu từ file lương đến bút toán</div></div></div>
+    <div class="guide-body">
+      <p>Mỗi tháng bạn đi qua 5 tab theo thứ tự. Dữ liệu chảy một chiều: nạp lương → gán quy tắc → phân bổ → kiểm tra → xuất bút toán.</p>
+      <div class="guide-fig">
+        <svg viewBox="0 0 860 190" xmlns="http://www.w3.org/2000/svg" font-family="Outfit,sans-serif">
+          <defs><marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#6A8AAA"/></marker></defs>
+          <!-- 5 boxes -->
+          <g>
+            <rect x="8" y="60" width="150" height="70" rx="10" fill="#131F30" stroke="#29C4B0" stroke-width="1.5"/>
+            <text x="83" y="80" text-anchor="middle" fill="#29C4B0" font-size="20">📥</text>
+            <text x="83" y="103" text-anchor="middle" fill="#C8D8E8" font-size="13" font-weight="700">1 · Load Data</text>
+            <text x="83" y="119" text-anchor="middle" fill="#6A8AAA" font-size="10">Nạp file lương</text>
+          </g>
+          <line x1="160" y1="95" x2="192" y2="95" stroke="#6A8AAA" stroke-width="1.5" marker-end="url(#arr)"/>
+          <g>
+            <rect x="194" y="60" width="150" height="70" rx="10" fill="#131F30" stroke="#9B72E8" stroke-width="1.5"/>
+            <text x="269" y="80" text-anchor="middle" font-size="20">🗂</text>
+            <text x="269" y="103" text-anchor="middle" fill="#C8D8E8" font-size="13" font-weight="700">2 · Master Data</text>
+            <text x="269" y="119" text-anchor="middle" fill="#6A8AAA" font-size="10">Gán Phòng ban → P&amp;L</text>
+          </g>
+          <line x1="346" y1="95" x2="378" y2="95" stroke="#6A8AAA" stroke-width="1.5" marker-end="url(#arr)"/>
+          <g>
+            <rect x="380" y="60" width="150" height="70" rx="10" fill="#131F30" stroke="#E8B84B" stroke-width="1.5"/>
+            <text x="455" y="80" text-anchor="middle" font-size="20">📋</text>
+            <text x="455" y="103" text-anchor="middle" fill="#C8D8E8" font-size="13" font-weight="700">3 · Simulate</text>
+            <text x="455" y="119" text-anchor="middle" fill="#6A8AAA" font-size="10">Phân bổ % về BU</text>
+          </g>
+          <line x1="532" y1="95" x2="564" y2="95" stroke="#6A8AAA" stroke-width="1.5" marker-end="url(#arr)"/>
+          <g>
+            <rect x="566" y="60" width="140" height="70" rx="10" fill="#131F30" stroke="#4A9EE8" stroke-width="1.5"/>
+            <text x="636" y="80" text-anchor="middle" font-size="20">📊</text>
+            <text x="636" y="103" text-anchor="middle" fill="#C8D8E8" font-size="13" font-weight="700">4 · Analytics</text>
+            <text x="636" y="119" text-anchor="middle" fill="#6A8AAA" font-size="10">So sánh, kiểm tra</text>
+          </g>
+          <line x1="706" y1="95" x2="738" y2="95" stroke="#6A8AAA" stroke-width="1.5" marker-end="url(#arr)"/>
+          <g>
+            <rect x="740" y="60" width="112" height="70" rx="10" fill="#131F30" stroke="#38C870" stroke-width="1.5"/>
+            <text x="796" y="80" text-anchor="middle" font-size="20">📒</text>
+            <text x="796" y="103" text-anchor="middle" fill="#C8D8E8" font-size="12" font-weight="700">5 · Journal</text>
+            <text x="796" y="119" text-anchor="middle" fill="#6A8AAA" font-size="10">Xuất bút toán</text>
+          </g>
+          <text x="430" y="24" text-anchor="middle" fill="#6A8AAA" font-size="11" font-style="italic">File lương Excel  ➞  Bút toán + Phân bổ chi phí theo BU</text>
+          <text x="430" y="168" text-anchor="middle" fill="#3A5470" font-size="10">Làm tuần tự từ trái sang phải · mỗi tháng lặp lại quy trình này</text>
+        </svg>
+      </div>
+      <div class="guide-callout note"><span class="gc-ico">💡</span><div><strong>Bắt đầu ở đâu?</strong> Nếu là lần đầu, mở tab <span class="guide-kbd">1 · Load Data</span> ở thanh bên trái và làm theo Bước 1 bên dưới. Công cụ khởi động trống — mọi dữ liệu bạn tự nạp vào mỗi phiên.</div></div>
+    </div>
+  </div>
+
+  <!-- ── BƯỚC 1 ── -->
+  <div class="guide-sec" id="g-s1">
+    <div class="guide-sec-hd"><div class="guide-sec-num">1</div><div><h2>Load Data — Nạp dữ liệu lương</h2><div class="gsub">Đưa file lương Excel vào công cụ</div></div></div>
+    <div class="guide-body">
+      <p>Đây là bước đầu tiên mỗi tháng. Bạn nạp file lương do bộ phận nhân sự (HR) xuất ra. Công cụ đọc từng nhân viên: tên, mã, phòng ban, và các cấu phần lương.</p>
+      <ol>
+        <li>Vào tab <span class="guide-kbd">1 · Load Data</span>, nhấn nút <strong>Load Payroll</strong> và chọn file Excel lương.</li>
+        <li>Chọn <strong>chế độ nạp</strong> (xem sơ đồ dưới): nạp mới hay bổ sung.</li>
+        <li>Xem thông báo sau khi nạp — công cụ báo số nhân viên đọc được và cảnh báo ai thiếu mã hoặc thiếu phòng ban.</li>
+      </ol>
+      <div class="guide-fig">
+        <svg viewBox="0 0 720 250" xmlns="http://www.w3.org/2000/svg" font-family="Outfit,sans-serif">
+          <defs><marker id="arr2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#6A8AAA"/></marker></defs>
+          <rect x="290" y="14" width="140" height="46" rx="9" fill="#131F30" stroke="#29C4B0" stroke-width="1.5"/>
+          <text x="360" y="35" text-anchor="middle" font-size="15">📄</text>
+          <text x="360" y="52" text-anchor="middle" fill="#C8D8E8" font-size="11" font-weight="700">File lương Excel</text>
+          <line x1="360" y1="60" x2="360" y2="88" stroke="#6A8AAA" stroke-width="1.5" marker-end="url(#arr2)"/>
+          <!-- 2 modes -->
+          <rect x="70" y="92" width="250" height="120" rx="10" fill="#131F30" stroke="#E8B84B" stroke-width="1.5"/>
+          <text x="195" y="116" text-anchor="middle" fill="#E8B84B" font-size="13" font-weight="800">Chế độ: NẠP MỚI</text>
+          <text x="195" y="138" text-anchor="middle" fill="#C8D8E8" font-size="11">Xoá sạch bảng cũ,</text>
+          <text x="195" y="154" text-anchor="middle" fill="#C8D8E8" font-size="11">nạp lại từ file</text>
+          <text x="195" y="178" text-anchor="middle" fill="#E05555" font-size="10">⚠ Mất hết quy tắc phân bổ đã set</text>
+          <text x="195" y="194" text-anchor="middle" fill="#6A8AAA" font-size="10">→ dùng khi bắt đầu tháng mới</text>
+          <rect x="400" y="92" width="250" height="120" rx="10" fill="#131F30" stroke="#38C870" stroke-width="1.5"/>
+          <text x="525" y="116" text-anchor="middle" fill="#38C870" font-size="13" font-weight="800">Chế độ: BỔ SUNG</text>
+          <text x="525" y="138" text-anchor="middle" fill="#C8D8E8" font-size="11">Chỉ thêm người mới,</text>
+          <text x="525" y="154" text-anchor="middle" fill="#C8D8E8" font-size="11">người trùng bỏ qua</text>
+          <text x="525" y="178" text-anchor="middle" fill="#38C870" font-size="10">✓ Giữ nguyên dữ liệu đang có</text>
+          <text x="525" y="194" text-anchor="middle" fill="#6A8AAA" font-size="10">→ dùng khi thêm vài người giữa kỳ</text>
+          <line x1="195" y1="88" x2="195" y2="60" stroke="#6A8AAA" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="525" y1="88" x2="525" y2="60" stroke="#6A8AAA" stroke-width="1" stroke-dasharray="3,3"/>
+          <path d="M320,80 L360,88 L400,80" fill="none" stroke="#6A8AAA" stroke-width="1" stroke-dasharray="3,3"/>
+          <text x="360" y="238" text-anchor="middle" fill="#3A5470" font-size="10">Lần đầu trong tháng → chọn NẠP MỚI</text>
+        </svg>
+        <div class="guide-figcap">Hai chế độ nạp lương — chọn đúng để không mất công đã làm</div>
+      </div>
+      <div class="guide-callout warn"><span class="gc-ico">⚠</span><div><strong>Cẩn thận với "Nạp mới":</strong> nó xoá toàn bộ quy tắc phân bổ (%, P&amp;L line) bạn đã set thủ công. Trước khi nạp mới, hãy lưu lại quy tắc bằng nút <strong>⬇ Template</strong> ở tab Simulate, rồi <strong>🎯 Apply</strong> lại sau khi nạp.</div></div>
+    </div>
+  </div>
+
+  <!-- ── BƯỚC 2 ── -->
+  <div class="guide-sec" id="g-s2">
+    <div class="guide-sec-hd"><div class="guide-sec-num">2</div><div><h2>Master Data — Gán Phòng ban vào dòng P&amp;L</h2><div class="gsub">Dạy công cụ biết mỗi phòng ban thuộc dòng chi phí nào</div></div></div>
+    <div class="guide-body">
+      <p>File lương ghi <strong>phòng ban</strong> (vd "Engineering", "Sales"), nhưng báo cáo tài chính cần <strong>dòng P&amp;L</strong> (vd "6.4 Staff - Technology"). Bước này bạn nối hai thứ đó lại — làm một lần, công cụ nhớ cho các tháng sau.</p>
+      <div class="guide-fig">
+        <svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg" font-family="Outfit,sans-serif">
+          <defs><marker id="arr3" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#9B72E8"/></marker></defs>
+          <text x="130" y="24" text-anchor="middle" fill="#6A8AAA" font-size="11" font-weight="700">TỪ FILE LƯƠNG (HR viết)</text>
+          <text x="510" y="24" text-anchor="middle" fill="#6A8AAA" font-size="11" font-weight="700">DÒNG P&amp;L (báo cáo)</text>
+          <g font-size="11">
+            <rect x="40" y="40" width="180" height="34" rx="7" fill="#131F30" stroke="#243A56"/><text x="130" y="61" text-anchor="middle" fill="#C8D8E8">Engineering</text>
+            <rect x="40" y="84" width="180" height="34" rx="7" fill="#131F30" stroke="#243A56"/><text x="130" y="105" text-anchor="middle" fill="#C8D8E8">Sales</text>
+            <rect x="40" y="128" width="180" height="34" rx="7" fill="#131F30" stroke="#243A56"/><text x="130" y="149" text-anchor="middle" fill="#C8D8E8">Accounting &amp; Tax</text>
+            <rect x="40" y="172" width="180" height="34" rx="7" fill="#131F30" stroke="#243A56"/><text x="130" y="193" text-anchor="middle" fill="#C8D8E8">Human Resource</text>
+            <rect x="420" y="40" width="180" height="34" rx="7" fill="#1a2942" stroke="#9B72E8"/><text x="510" y="61" text-anchor="middle" fill="#C8D8E8" font-family="DM Mono,monospace" font-size="10">6.4 Technology</text>
+            <rect x="420" y="84" width="180" height="34" rx="7" fill="#1a2942" stroke="#9B72E8"/><text x="510" y="105" text-anchor="middle" fill="#C8D8E8" font-family="DM Mono,monospace" font-size="10">6.2 BD &amp; Partnership</text>
+            <rect x="420" y="128" width="180" height="34" rx="7" fill="#1a2942" stroke="#9B72E8"/><text x="510" y="149" text-anchor="middle" fill="#C8D8E8" font-family="DM Mono,monospace" font-size="10">7.2 Accounting &amp; Finance</text>
+            <rect x="420" y="172" width="180" height="34" rx="7" fill="#1a2942" stroke="#9B72E8"/><text x="510" y="193" text-anchor="middle" fill="#C8D8E8" font-family="DM Mono,monospace" font-size="10">7.3 Human Resource</text>
+          </g>
+          <line x1="222" y1="57" x2="418" y2="57" stroke="#9B72E8" stroke-width="1.3" marker-end="url(#arr3)"/>
+          <line x1="222" y1="101" x2="418" y2="101" stroke="#9B72E8" stroke-width="1.3" marker-end="url(#arr3)"/>
+          <line x1="222" y1="145" x2="418" y2="145" stroke="#9B72E8" stroke-width="1.3" marker-end="url(#arr3)"/>
+          <line x1="222" y1="189" x2="418" y2="189" stroke="#9B72E8" stroke-width="1.3" marker-end="url(#arr3)"/>
+        </svg>
+        <div class="guide-figcap">Bạn chọn dòng P&amp;L cho từng phòng ban qua ô chọn (dropdown)</div>
+      </div>
+      <ol>
+        <li>Vào tab <span class="guide-kbd">2 · Master Data</span>. Công cụ tự liệt kê các phòng ban có trong file lương vừa nạp.</li>
+        <li>Với mỗi phòng ban, chọn <strong>dòng P&amp;L tương ứng</strong> ở ô chọn bên cạnh.</li>
+        <li>Xong là tự lưu. Tháng sau nạp lương, công cụ áp lại quy tắc này — chỉ phòng ban mới mới cần gán thêm.</li>
+      </ol>
+      <div class="guide-callout tip"><span class="gc-ico">✓</span><div>Không cần lo viết hoa hay thường: "Sales", "SALES", "sales" đều được coi là một. Nếu một phòng ban chưa gán, nhân viên phòng đó sẽ rơi vào dòng mặc định — công cụ cảnh báo để bạn biết mà gán.</div></div>
+    </div>
+  </div>
+
+  <!-- ── BƯỚC 3 ── -->
+  <div class="guide-sec" id="g-s3">
+    <div class="guide-sec-hd"><div class="guide-sec-num">3</div><div><h2>Simulate — Phân bổ chi phí về đơn vị kinh doanh</h2><div class="gsub">Chia lương mỗi người cho các BU theo tỷ lệ %</div></div></div>
+    <div class="guide-body">
+      <p>Một nhân viên có thể làm cho nhiều đơn vị kinh doanh (BU) cùng lúc. Ở đây bạn khai <strong>bao nhiêu % chi phí của họ</strong> tính vào mỗi BU. Đây là phán đoán của CFO — công cụ không tự đoán.</p>
+      <p>Có 5 BU: <strong>SBH Own</strong> (kênh tự bán), <strong>SBH Partnership</strong> (qua đối tác), <strong>HLB</strong>, <strong>BU3</strong> (FinanOne), <strong>CSS</strong> (chi phí chung công ty).</p>
+      <div class="guide-fig">
+        <svg viewBox="0 0 640 210" xmlns="http://www.w3.org/2000/svg" font-family="Outfit,sans-serif">
+          <defs><marker id="arr4" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#E8B84B"/></marker></defs>
+          <rect x="220" y="16" width="200" height="52" rx="10" fill="#131F30" stroke="#E8B84B" stroke-width="1.5"/>
+          <text x="320" y="37" text-anchor="middle" fill="#C8D8E8" font-size="12" font-weight="700">1 nhân viên</text>
+          <text x="320" y="55" text-anchor="middle" fill="#6A8AAA" font-size="11" font-family="DM Mono,monospace">Chi phí = 30 triệu/tháng</text>
+          <line x1="270" y1="68" x2="150" y2="108" stroke="#E8B84B" stroke-width="1.2" marker-end="url(#arr4)"/>
+          <line x1="320" y1="68" x2="320" y2="108" stroke="#E8B84B" stroke-width="1.2" marker-end="url(#arr4)"/>
+          <line x1="370" y1="68" x2="490" y2="108" stroke="#E8B84B" stroke-width="1.2" marker-end="url(#arr4)"/>
+          <rect x="70" y="112" width="150" height="60" rx="9" fill="#0f2a26" stroke="#29C4B0" stroke-width="1.3"/>
+          <text x="145" y="134" text-anchor="middle" fill="#29C4B0" font-size="12" font-weight="800">SBH Own</text>
+          <text x="145" y="154" text-anchor="middle" fill="#C8D8E8" font-size="13" font-family="DM Mono,monospace">50% = 15tr</text>
+          <rect x="245" y="112" width="150" height="60" rx="9" fill="#251a3a" stroke="#9B72E8" stroke-width="1.3"/>
+          <text x="320" y="134" text-anchor="middle" fill="#9B72E8" font-size="12" font-weight="800">BU3</text>
+          <text x="320" y="154" text-anchor="middle" fill="#C8D8E8" font-size="13" font-family="DM Mono,monospace">30% = 9tr</text>
+          <rect x="420" y="112" width="150" height="60" rx="9" fill="#2a2410" stroke="#E8B84B" stroke-width="1.3"/>
+          <text x="495" y="134" text-anchor="middle" fill="#E8B84B" font-size="12" font-weight="800">CSS</text>
+          <text x="495" y="154" text-anchor="middle" fill="#C8D8E8" font-size="13" font-family="DM Mono,monospace">20% = 6tr</text>
+          <text x="320" y="196" text-anchor="middle" fill="#38C870" font-size="12" font-weight="700">Tổng % phải = 100%  (50 + 30 + 20)</text>
+        </svg>
+        <div class="guide-figcap">Chia chi phí một người cho các BU — tổng các % luôn phải bằng 100%</div>
+      </div>
+      <p><strong>Cách đọc bảng nhân sự:</strong></p>
+      <table class="guide-tbl">
+        <tr><th>Cột</th><th>Ý nghĩa</th></tr>
+        <tr><td>Nhân sự / EMP_ID</td><td>Tên và mã nhân viên. Mã dùng để đối chiếu chính xác giữa các tháng.</td></tr>
+        <tr><td>P&amp;L Line</td><td>Dòng chi phí (tự điền từ Master Data, sửa tay được).</td></tr>
+        <tr><td>Base Cost</td><td>Tổng chi phí công ty gánh cho người này = Lương thực tế + bảo hiểm công ty + kinh phí công đoàn.</td></tr>
+        <tr><td>Adj</td><td>Điều chỉnh thêm (chi phí ngoài lương) — nhập tay khi cần.</td></tr>
+        <tr><td>% alloc (mỗi BU)</td><td>Bạn gõ % chi phí vào từng BU. Cột <strong>Alloc Sum</strong> phải hiện 100%.</td></tr>
+      </table>
+      <div class="guide-callout warn"><span class="gc-ico">⚠</span><div>Nếu cột <strong>Alloc Sum</strong> của ai đó không bằng 100%, chi phí của họ sẽ vào bút toán bị thiếu hoặc dư. Công cụ sẽ chặn cảnh báo ở tab Journal Entry (xem Bước 5).</div></div>
+    </div>
+  </div>
+
+  <!-- ── BƯỚC 4 ── -->
+  <div class="guide-sec" id="g-s4">
+    <div class="guide-sec-hd"><div class="guide-sec-num">4</div><div><h2>Analytics — So sánh và kiểm tra</h2><div class="gsub">Đối chiếu với ngân sách và với tháng trước</div></div></div>
+    <div class="guide-body">
+      <p>Sau khi phân bổ xong, tab này giúp bạn nhìn tổng thể: chi phí phân về mỗi BU bao nhiêu, so với ngân sách thế nào, và thay đổi gì so với tháng trước.</p>
+      <ul>
+        <li><strong>Tổng hợp phân bổ:</strong> chi phí mỗi BU, mỗi dòng P&amp;L, số người, trung bình/người.</li>
+        <li><strong>So sánh ngân sách:</strong> nạp file ngân sách (nút Load Budget ở tab 1) để thấy chênh lệch thực tế so với kế hoạch.</li>
+        <li><strong>So sánh 2 phiên bản:</strong> chọn tháng này với tháng trước — công cụ chỉ ra ai vào, ai ra, ai đổi lương, đổi phòng ban, đổi loại hợp đồng.</li>
+        <li><strong>Chi tiết per-BU:</strong> mở từng BU để xem danh sách nhân viên (kèm EMP_ID) đóng góp vào BU đó.</li>
+      </ul>
+      <div class="guide-callout tip"><span class="gc-ico">✓</span><div>Muốn so sánh giữa các tháng, hãy <strong>Lưu phiên bản</strong> ở tab Simulate sau khi phân bổ xong mỗi tháng. Công cụ so khớp theo mã nhân viên (EMP_ID) nên rất chính xác.</div></div>
+    </div>
+  </div>
+
+  <!-- ── BƯỚC 5 ── -->
+  <div class="guide-sec" id="g-s5">
+    <div class="guide-sec-hd"><div class="guide-sec-num">5</div><div><h2>Journal Entry — Xuất bút toán</h2><div class="gsub">Sinh bút toán kế toán + 2 lớp kiểm tra dữ liệu</div></div></div>
+    <div class="guide-body">
+      <p>Đây là kết quả cuối: bút toán ghi sổ chi phí lương, chia theo dòng P&amp;L và BU. Trước khi cho bạn bút toán, công cụ chạy <strong>2 lớp kiểm tra</strong> để chắc dữ liệu đúng.</p>
+      <div class="guide-fig">
+        <svg viewBox="0 0 700 250" xmlns="http://www.w3.org/2000/svg" font-family="Outfit,sans-serif">
+          <defs><marker id="arr5" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#6A8AAA"/></marker></defs>
+          <rect x="270" y="12" width="160" height="42" rx="9" fill="#131F30" stroke="#243A56"/>
+          <text x="350" y="38" text-anchor="middle" fill="#C8D8E8" font-size="12" font-weight="700">Vào tab Journal Entry</text>
+          <line x1="350" y1="54" x2="350" y2="78" stroke="#6A8AAA" stroke-width="1.5" marker-end="url(#arr5)"/>
+          <!-- gate A -->
+          <rect x="120" y="82" width="460" height="52" rx="9" fill="#1a1010" stroke="#E05555" stroke-width="1.3"/>
+          <text x="140" y="104" fill="#E05555" font-size="13" font-weight="800">Kiểm tra A</text>
+          <text x="140" y="122" fill="#C8D8E8" font-size="11">Company Expense mỗi người = Lương + Bảo hiểm + Công đoàn?</text>
+          <text x="560" y="113" text-anchor="end" fill="#6A8AAA" font-size="10">lệch → báo đỏ</text>
+          <line x1="350" y1="134" x2="350" y2="152" stroke="#6A8AAA" stroke-width="1.5" marker-end="url(#arr5)"/>
+          <!-- gate B -->
+          <rect x="120" y="156" width="460" height="52" rx="9" fill="#1a1010" stroke="#E05555" stroke-width="1.3"/>
+          <text x="140" y="178" fill="#E05555" font-size="13" font-weight="800">Kiểm tra B</text>
+          <text x="140" y="196" fill="#C8D8E8" font-size="11">Tổng % phân bổ mỗi người active = 100%?</text>
+          <text x="560" y="187" text-anchor="end" fill="#6A8AAA" font-size="10">lệch → báo đỏ</text>
+          <line x1="350" y1="208" x2="350" y2="224" stroke="#38C870" stroke-width="1.5" marker-end="url(#arr5)"/>
+          <text x="350" y="242" text-anchor="middle" fill="#38C870" font-size="12" font-weight="700">✓ Cả hai OK → Bút toán sẵn sàng · nhấn Export → Excel</text>
+        </svg>
+        <div class="guide-figcap">Hai lớp kiểm tra chặn lỗi dữ liệu trước khi xuất bút toán</div>
+      </div>
+      <table class="guide-tbl">
+        <tr><th>Kiểm tra</th><th>Bắt lỗi gì</th><th>Cách sửa</th></tr>
+        <tr><td>A · Company Expense</td><td>File lương HR lấy sai cột — chi phí công ty không khớp tổng các cấu phần lương.</td><td>Đối chiếu file lương với kế toán, sửa cột cho đúng.</td></tr>
+        <tr><td>B · Phân bổ %</td><td>Có người tổng % phân bổ ≠ 100% → bút toán chia BU sai tổng.</td><td>Về tab Simulate, set đủ % cho người đó (Alloc Sum = 100).</td></tr>
+      </table>
+      <p>Nếu cả hai kiểm tra đều xanh, nhấn <strong>⬇ Export Journal Entry → Excel</strong> để lấy file bút toán. Nếu có lệch, danh sách người lỗi hiện ngay trên màn hình và được xuất kèm trong file Excel để đối chiếu.</p>
+    </div>
+  </div>
+
+  <!-- ── KHÁI NIỆM ── -->
+  <div class="guide-sec" id="g-concepts">
+    <div class="guide-sec-hd"><div class="guide-sec-num">★</div><div><h2>Khái niệm chính</h2><div class="gsub">Vài thuật ngữ cần hiểu để dùng đúng</div></div></div>
+    <div class="guide-body">
+      <table class="guide-tbl">
+        <tr><th>Thuật ngữ</th><th>Nghĩa</th></tr>
+        <tr><td>Base / Company Expense</td><td>Tổng chi phí công ty thực gánh cho một người: Lương thực nhận + phần bảo hiểm công ty đóng + kinh phí công đoàn (2%). Đây là con số vào chi phí P&amp;L.</td></tr>
+        <tr><td>Cấu phần (cost1..5)</td><td>Base được tách thành 5 phần: Lương, và các loại bảo hiểm/công đoàn. Cộng lại phải bằng Base.</td></tr>
+        <tr><td>Alloc %</td><td>Tỷ lệ chia chi phí một người cho các BU. Tổng luôn = 100%.</td></tr>
+        <tr><td>BU</td><td>Đơn vị kinh doanh — nơi chi phí được quy về. Có 5 BU cố định.</td></tr>
+        <tr><td>P&amp;L Line</td><td>Dòng trên báo cáo kết quả kinh doanh, vd "6.4 Staff - Technology".</td></tr>
+        <tr><td>Active / Inactive</td><td>Chỉ người active mới vào bút toán và tính chi phí. Đánh inactive để tạm loại ai đó khỏi tính toán mà không xoá.</td></tr>
+      </table>
+      <div class="guide-callout note"><span class="gc-ico">🔑</span><div><strong>Hai quy tắc vàng công cụ luôn kiểm:</strong><br>① Base mỗi người = tổng 5 cấu phần lương (kiểm tra A).<br>② Tổng % phân bổ mỗi người = 100% (kiểm tra B).<br>Giữ hai điều này đúng thì bút toán luôn cân.</div></div>
+    </div>
+  </div>
+
+  <!-- ── SỰ CỐ ── -->
+  <div class="guide-sec" id="g-trouble">
+    <div class="guide-sec-hd"><div class="guide-sec-num">?</div><div><h2>Xử lý sự cố thường gặp</h2><div class="gsub">Gặp vấn đề thì xem đây trước</div></div></div>
+    <div class="guide-body">
+      <table class="guide-tbl">
+        <tr><th>Hiện tượng</th><th>Nguyên nhân &amp; cách xử lý</th></tr>
+        <tr><td>Nhiều người rơi vào dòng "7.99"</td><td>Phòng ban của họ chưa được gán P&amp;L. Vào tab Master Data gán dòng P&amp;L cho phòng ban đó.</td></tr>
+        <tr><td>Journal Entry báo đỏ "Kiểm tra A lệch"</td><td>File lương HR lấy sai cột Company Expense. Xem danh sách người lệch, đối chiếu với kế toán, sửa file rồi nạp lại.</td></tr>
+        <tr><td>Journal Entry báo đỏ "Phân bổ chưa đủ 100%"</td><td>Có người chưa set đủ %. Về Simulate, xem cột Alloc Sum, sửa cho đủ 100%.</td></tr>
+        <tr><td>Nạp lương xong mất hết % đã set</td><td>Bạn đã dùng chế độ "Nạp mới". Lần sau: xuất Template trước, Apply lại sau khi nạp.</td></tr>
+        <tr><td>Mất dữ liệu khi đóng trình duyệt</td><td>Công cụ tự lưu tạm trong trình duyệt, nhưng để chắc chắn hãy dùng nút xuất JSON backup ở tab Load Data và lưu file lại.</td></tr>
+        <tr><td>Người thiếu mã (hiện dấu ~)</td><td>File lương thiếu cột EMP_ID cho người đó. Không chặn dùng, nhưng nên bổ sung mã để so sánh giữa các tháng chính xác.</td></tr>
+      </table>
+      <div class="guide-callout tip"><span class="gc-ico">💾</span><div><strong>Thói quen tốt:</strong> sau khi phân bổ xong mỗi tháng, (1) Lưu phiên bản ở Simulate, (2) xuất JSON backup ở Load Data. Có hai cái này thì không bao giờ mất công.</div></div>
+    </div>
+  </div>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h2>＋ Thêm nhân sự mới (T6)</h2>
+    <div class="form-grid">
+      <div class="form-field full">
+        <label>Họ và Tên *</label>
+        <input type="text" id="new-name" placeholder="Nguyễn Văn A">
+      </div>
+      <div class="form-field">
+        <label>Chức danh</label>
+        <input type="text" id="new-position" placeholder="Software Engineer">
+      </div>
+      <div class="form-field">
+        <label>Phòng ban *</label>
+        <select id="new-dept">
+          <option value="MANAGEMENT">Management</option>
+          <option value="ACCOUNTING &amp; FINANCE">Accounting &amp; Finance</option>
+          <option value="HR">HR</option>
+          <option value="CUSTOMER SERVICE &amp; SUCCESS">Customer Service &amp; Success</option>
+          <option value="MARKETING">Marketing</option>
+          <option value="PARTNERSHIP">Partnership</option>
+          <option value="PRODUCT MANAGEMENT">Product Management</option>
+          <option value="PRODUCT OPS">Product OPS</option>
+          <option value="SALES &amp; BUSINESS DEVELOPMENT">Sales &amp; Business Development</option>
+          <option value="SYSTEM &amp; ENGINEERING">System &amp; Engineering</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Gross Salary/tháng (M VND)</label>
+        <input type="number" id="new-gross" placeholder="20" step="0.5" oninput="autoCalcBase()">
+      </div>
+      <div class="form-field">
+        <label>Company Expense Base (M VND) <span style="color:var(--teal);font-size:9px">≈ Gross × 1.30</span></label>
+        <input type="number" id="new-base" placeholder="26" step="0.5" readonly>
+      </div>
+      <div class="form-field">
+        <label>Salary Adjustment (M VND)</label>
+        <input type="number" id="new-adj" placeholder="0" step="0.5">
+      </div>
+      <div class="form-field full">
+        <label>P&amp;L Line</label>
+        <select id="new-pl">
+          <option>4.1 Staff cost — Salary</option>
+          <option>6.1 Staff - Customer Operation</option>
+          <option>6.2 Staff - BD &amp; Partnership</option>
+          <option>6.3 Staff - Product Development</option>
+          <option>6.4 Staff - Technology</option>
+          <option>6.5 Staff - Marketing</option>
+          <option>7.1 Staff - Management</option>
+          <option>7.2 Staff - Accounting &amp; Finance</option>
+          <option>7.3 Staff - Human Resource</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Huỷ</button>
+      <button class="btn btn-teal" onclick="addPerson()">Thêm nhân sự</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const PERSONS_RAW=[];  // v33: NO embedded PII — all data imported per session
+
+const BUS=[
+  {key:'SBH_own',    label:'SBH Own Channel', short:'SBH-Own',cls:'bu1',thcls:'th-bu1',outcls:'th-out1'},
+  {key:'SBH_partner',label:'SBH Partnership', short:'SBH-Ptn',cls:'bu2',thcls:'th-bu2',outcls:'th-out2'},
+  {key:'HLB',        label:'HLB',             short:'HLB',    cls:'bu3',thcls:'th-bu3',outcls:'th-out3'},
+  {key:'BU3',        label:'BU3 — FinanOne',  short:'BU3',    cls:'bu4',thcls:'th-bu4',outcls:'th-out4'},
+  {key:'CSS',        label:'Corp. Shared Svc',short:'CSS',    cls:'bu5',thcls:'th-bu5',outcls:'th-out5'},
+];
+const PL_LINES=[
+  '4.1 Staff cost — Salary',
+  '6.1 Staff - Customer Operation',
+  '6.2 Staff - BD & Partnership',
+  '6.3 Staff - Product Development',
+  '6.4 Staff - Technology',
+  '6.5 Staff - Marketing',
+  '7.1 Staff - Management',
+  '7.2 Staff - Accounting & Finance',
+  '7.3 Staff - Human Resource',
+];
+const PL_COA_MAP={
+  '4.1 Staff cost — Salary':         ['SBH_own','HLB','BU3'],
+  '6.1 Staff - Customer Operation':  ['SBH_own','HLB'],
+  '6.2 Staff - BD & Partnership':    ['SBH_partner','BU3'],
+  '6.3 Staff - Product Development': ['SBH_own','BU3'],
+  '6.4 Staff - Technology':          ['SBH_own','SBH_partner','HLB','BU3'],
+  '6.5 Staff - Marketing':           ['SBH_own','HLB','BU3'],
+  '7.1 Staff - Management':          ['SBH_own','BU3','CSS'],
+  '7.2 Staff - Accounting & Finance':['SBH_own','BU3','CSS'],
+  '7.3 Staff - Human Resource':      ['SBH_own','BU3','CSS'],
+};
+const DEPT_ORDER=['MANAGEMENT','ACCOUNTING & FINANCE','HR','CUSTOMER SERVICE & SUCCESS','MARKETING','PARTNERSHIP','PRODUCT MANAGEMENT','PRODUCT OPS','SALES & BUSINESS DEVELOPMENT','SYSTEM & ENGINEERING'];
+const DEPT_LABELS={'MANAGEMENT':'Management','ACCOUNTING & FINANCE':'Accounting & Finance','HR':'HR','CUSTOMER SERVICE & SUCCESS':'CS & Success','MARKETING':'Marketing','PARTNERSHIP':'Partnership','PRODUCT MANAGEMENT':'Product Management','PRODUCT OPS':'Product OPS','SALES & BUSINESS DEVELOPMENT':'Sales & BD','SYSTEM & ENGINEERING':'System & Engineering'};
+// ── MD1: Department → P&L line (mutable master data, seed RỖNG — A(i)). Key = dept name chuẩn hóa (upper+trim). ──
+let MD1={};   // { normDeptKey : {display:'<tên HR viết>', pl_line:'<PL line>'} }
+const MD1_LS='finan_sim_md1_v37';
+function _normDept(d){return String(d||'').trim().toUpperCase().replace(/\s+/g,' ');}
+function deptPL(deptRaw){const e=MD1[_normDept(deptRaw)];return e&&e.pl_line?e.pl_line:'';}
+function saveMD1(){try{localStorage.setItem(MD1_LS,JSON.stringify(MD1));}catch(e){}}
+function loadMD1(){try{const r=localStorage.getItem(MD1_LS);if(r)MD1=JSON.parse(r)||{};}catch(e){MD1={};}}
+// PL line list (mutable, seed = 9 dòng hiện có — B). Import/export để đồng bộ file cũ.
+let PL_LIST=[...PL_LINES];
+const PLLIST_LS='finan_sim_pllist_v37';
+function savePLList(){try{localStorage.setItem(PLLIST_LS,JSON.stringify(PL_LIST));}catch(e){}}
+function loadPLList(){try{const r=localStorage.getItem(PLLIST_LS);if(r){const a=JSON.parse(r);if(Array.isArray(a)&&a.length)PL_LIST=a;}}catch(e){}}
+
+let persons=PERSONS_RAW.map(p=>({...p,alloc:{...p.alloc}}));
+
+// ── HELPERS ──
+const fmtMc=n=>{if(!n||n===0)return'—';const neg=n<0;const a=Math.abs(n)/1e6;const t=(a>=1?a.toFixed(1):a.toFixed(2))+'tr';return neg?'('+t+')':t;};
+const fmtMl=n=>{if(n===0)return'—';const neg=n<0;const t=(Math.abs(n)/1e6).toFixed(1)+'tr';return neg?'('+t+')':t;};
+const num=s=>parseFloat(s)||0;
+function effectiveCost(p){if(p.status==='inactive')return 0;return p.base+(p.adj||0);}
+function allocSum(p){return BUS.reduce((s,b)=>s+num(p.alloc[b.key]),0);}
+function entityOf(p){return p.entity||'(Chưa xác định)';}
+function entityList(){const s=[];persons.forEach(p=>{const e=entityOf(p);if(!s.includes(e))s.push(e);});return s.sort();}
+function buCost(p,buKey){return effectiveCost(p)*num(p.alloc[buKey])/100;}
+function getValidBUs(pl){return PL_COA_MAP[pl]||BUS.map(b=>b.key);}
+function getAutoAlloc(pl){const v=getValidBUs(pl);return v.length===1?v[0]:null;}
+function applyAutoAlloc(p){const a=getAutoAlloc(p.pl_line);if(a)BUS.forEach(b=>{p.alloc[b.key]=b.key===a?100:0;});}
+
+// ── DROPDOWN MENUS ──
+function toggleMenu(id,ev){
+  if(ev)ev.stopPropagation();
+  const m=document.getElementById(id);const wasOpen=m.classList.contains('open');
+  closeMenus();
+  if(!wasOpen)m.classList.add('open');
+}
+function toggleSbMenu(id,ev){
+  if(ev)ev.stopPropagation();
+  const m=document.getElementById(id);const wasOpen=m.classList.contains('open');
+  closeMenus();
+  if(!wasOpen){
+    m.classList.add('open');
+    // position: fixed popup, anchored just right of the sidebar, aligned to the trigger row.
+    // currentTarget can be null after event bubbling; fall back to the clicked element's button.
+    let btn=(ev&&ev.currentTarget)?ev.currentTarget:(ev&&ev.target?ev.target.closest('.sb-item'):null);
+    if(!btn){btn=document.querySelector('[onclick*="'+id+'"]');}
+    if(btn){
+      const r=btn.getBoundingClientRect();
+      const sb=document.querySelector('.sidebar');
+      const left=(sb?sb.getBoundingClientRect().right:180)+6;
+      const top=Math.max(8,Math.min(r.top,window.innerHeight-m.offsetHeight-12));
+      m.style.left=left+'px';
+      m.style.top=top+'px';
+    }
+  }
+}
+function closeMenus(){document.querySelectorAll('.menu-pop,.sb-pop').forEach(m=>m.classList.remove('open'));}
+// ── THEME TOGGLE (dark ⇄ light) ──
+const THEME_KEY='finan_sim_theme_v30';
+function applyTheme(t){
+  const root=document.documentElement;
+  if(t==='light')root.setAttribute('data-theme','light'); else root.removeAttribute('data-theme');
+  const ico=document.getElementById('theme-ico'),lbl=document.getElementById('theme-lbl');
+  if(ico&&lbl){ if(t==='light'){ico.textContent='☾';lbl.textContent='Tone tối';} else {ico.textContent='☀';lbl.textContent='Tone sáng';} }
+}
+function toggleTheme(){
+  const cur=document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';
+  const next=cur==='light'?'dark':'light';
+  applyTheme(next);
+  try{localStorage.setItem(THEME_KEY,next);}catch(e){}
+}
+(function initTheme(){
+  let t='dark';
+  try{const saved=localStorage.getItem(THEME_KEY);if(saved==='light'||saved==='dark')t=saved;}catch(e){}
+  applyTheme(t);
+})();
+// ── SIDEBAR COLLAPSE ──
+const SB_KEY='finan_sim_sbcollapse_v31';
+function applySidebar(collapsed){
+  const shell=document.querySelector('.app-shell');
+  const btn=document.getElementById('sb-collapse');
+  if(!shell)return;
+  if(collapsed){shell.classList.add('collapsed');if(btn)btn.textContent='›';}
+  else{shell.classList.remove('collapsed');if(btn)btn.textContent='‹';}
+}
+function toggleSidebar(){
+  const shell=document.querySelector('.app-shell');
+  const next=!shell.classList.contains('collapsed');
+  applySidebar(next);
+  try{localStorage.setItem(SB_KEY,next?'1':'0');}catch(e){}
+}
+(function initSidebar(){
+  let c=false;
+  try{c=localStorage.getItem(SB_KEY)==='1';}catch(e){}
+  // auto-collapse on small screens if no explicit preference saved
+  try{if(localStorage.getItem(SB_KEY)===null&&window.innerWidth<1100)c=true;}catch(e){}
+  applySidebar(c);
+})();
+document.addEventListener('click',e=>{if(!e.target.closest('.menu-wrap')&&!e.target.closest('.sb-menu-wrap'))closeMenus();});
+
+// ── TAB ──
+function showTab(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(b=>{if(b.id&&b.id.startsWith('nav-'))b.classList.remove('active');});
+  document.getElementById('page-'+id).classList.add('active');
+  const nav=document.getElementById('nav-'+id);if(nav)nav.classList.add('active');
+  document.getElementById('toolbar').style.display=id==='simulator'?'flex':'none';
+  const bb=document.getElementById('summary-budget-bar');
+  if(bb)bb.style.display=(id==='analytics'&&typeof BUDGET!=='undefined'&&BUDGET)?'flex':'none';
+  if(id==='analytics'){buildSummary();renderCompareUI();}
+  if(id==='journal')buildJournal();
+  if(id==='loaddata')renderLoadData();
+  if(id==='masterdata')renderMasterData();
+}
+
+// ── HEADER ──
+function buildHeader(){
+  const tr=document.createElement('tr');
+  const fixed=[
+    {l:'Nhân sự',cls:'left',style:'min-width:165px'},
+    {l:'EMP_ID',cls:'left',style:'min-width:70px',title:'Mã nhân viên từ payroll (khóa đối chiếu)'},
+    {l:'Entity',cls:'left',style:'min-width:90px',title:'Pháp nhân — tách sổ JE theo entity'},
+    {l:'Type',cls:'center',style:'min-width:42px'},
+    {l:'P&L Line',cls:'left',style:'min-width:185px'},
+    {l:'Fixed\nIncome',cls:'',style:'min-width:76px',title:'TOTAL FIXED INCOME từ payroll'},
+    {l:'Base Cost\n(T6 Payroll)',cls:'',style:'min-width:92px',title:'COMPANY EXPENSE = Actual Salary + SHUI công ty + Trade Union'},
+    {l:'Adj\n(M VND)',cls:'',style:'min-width:76px',title:'Chi phí nhân sự ngoài payroll'},
+    {l:'Total Eff.\nCost',cls:'',style:'min-width:90px'},
+    {l:'Status',cls:'center',style:'min-width:68px'},
+    {l:'Del',cls:'center',style:'min-width:34px'},
+    {l:'Alloc\nSum',cls:'center',style:'min-width:50px'},
+  ];
+  fixed.forEach(f=>{
+    const th=document.createElement('th');
+    th.className=f.cls||'';th.style.cssText=f.style||'';
+    if(f.title)th.title=f.title;
+    th.innerHTML=f.l.replace('\n','<br>');
+    tr.appendChild(th);
+  });
+  BUS.forEach(b=>{
+    const th=document.createElement('th');
+    th.innerHTML=`${b.short}<br><span style="font-size:8px;opacity:.55">% alloc</span>`;
+    th.className=`${b.thcls} th-sep`;th.style.cssText='min-width:56px';
+    tr.appendChild(th);
+  });
+  BUS.forEach(b=>{
+    const th=document.createElement('th');
+    th.innerHTML=`${b.short}<br><span style="font-size:8px;opacity:.55">cost</span>`;
+    th.className=`${b.outcls} th-sep`;th.style.cssText='min-width:68px';
+    tr.appendChild(th);
+  });
+  document.getElementById('sim-thead').appendChild(tr);
+}
+
+// ── FILTER ──
+function getFiltered(){
+  const q=(document.getElementById('search')?.value||'').toLowerCase();
+  const dept=document.getElementById('filter-dept')?.value||'';
+  const status=document.getElementById('filter-status')?.value||'';
+  const pl=document.getElementById('filter-pl')?.value||'';
+  const et=document.getElementById('filter-emptype')?.value||'';
+  const ent=document.getElementById('filter-entity')?.value||'';
+  return persons.filter(p=>{
+    if(q&&!p.name.toLowerCase().includes(q)&&!(p.position||'').toLowerCase().includes(q))return false;
+    if(dept&&p.dept!==dept)return false;
+    if(status&&p.status!==status)return false;
+    if(pl&&p.pl_line!==pl)return false;
+    if(et&&p.emp_type!==et)return false;
+    if(ent&&entityOf(p)!==ent)return false;
+    return true;
+  });
+}
+
+// ── BUILD TABLE ──
+function renderProvenance(){
+  const pp=document.getElementById('prov-payroll'),pr=document.getElementById('prov-rules'),pv=document.getElementById('prov-vername');
+  if(!pp)return;
+  const srcs=(META.sources||[]).filter(x=>x.mode!=='legacy');
+  pp.textContent='📄 Payroll: '+(srcs.length?srcs.map(x=>x.file+(x.mode==='append'?' (bổ sung)':'')).join(' + '):'— chưa nạp');
+  const r=META.ruleSource;
+  pr.textContent='🎯 Rules: '+(r?(r.file+(r.edited?' + chỉnh tay':'')):(persons.length?'— chỉnh tay / chưa áp template':'—'));
+  if(pv)pv.textContent=META.versionName?('phiên bản: '+META.versionName):'';
+}
+function buildTable(){
+  renderProvenance();
+  const _es=document.getElementById('empty-state'),_to=document.getElementById('tbl-outer');
+  if(_es&&_to){const empty=!persons||persons.length===0;_es.style.display=empty?'block':'none';_to.style.display=empty?'none':'';}
+  const tbody=document.getElementById('sim-tbody');tbody.innerHTML='';
+  const filtered=getFiltered();
+  const deptFiltered=document.getElementById('filter-dept')?.value||'';
+  // depts sinh ĐỘNG từ dữ liệu thật (giữ tên HR viết), sắp theo DEPT_ORDER nếu khớp, còn lại theo alpha.
+  const presentDepts=[...new Set(persons.map(p=>p.dept).filter(Boolean))];
+  const orderIdx=d=>{const i=DEPT_ORDER.indexOf(_normDept(d));return i<0?999:i;};
+  presentDepts.sort((a,b)=>{const oa=orderIdx(a),ob=orderIdx(b);return oa!==ob?oa-ob:a.localeCompare(b);});
+  const depts=deptFiltered?[deptFiltered]:presentDepts;
+  // đồng bộ dropdown filter-dept theo dept thật (giữ lựa chọn hiện tại)
+  const fdSel=document.getElementById('filter-dept');
+  if(fdSel){
+    const cur=fdSel.value;
+    const opts=['<option value="">Tất cả phòng ban</option>'].concat(presentDepts.slice().sort((a,b)=>a.localeCompare(b)).map(d=>`<option value="${d.replace(/"/g,'&quot;')}"${d===cur?' selected':''}>${d}</option>`));
+    fdSel.innerHTML=opts.join('');
+  }
+  // đồng bộ dropdown filter-entity theo pháp nhân thật
+  const feSel=document.getElementById('filter-entity');
+  if(feSel){
+    const curE=feSel.value;const ents=entityList();
+    feSel.innerHTML=['<option value="">Tất cả pháp nhân</option>'].concat(ents.map(e=>`<option value="${e.replace(/"/g,'&quot;')}"${e===curE?' selected':''}>${e}</option>`)).join('');
+  }
+  const numCols=12+BUS.length*2;
+
+  if(!persons.length){
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td colspan="${numCols}" style="text-align:center;padding:60px 20px;color:var(--sub)">
+      <div style="font-size:32px;margin-bottom:12px;opacity:.4">📋</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px">Bảng nhân sự đang trống</div>
+      <div style="font-size:12px;color:var(--sub)">Nhấn <span style="color:var(--teal);font-weight:700">🔄 Load Payroll</span> để nạp dữ liệu lương từ file Excel, hoặc <span style="color:var(--text)">＋ Thêm người</span> để nhập tay.</div>
+    </td>`;
+    tbody.appendChild(tr);
+    return;
+  }
+
+  depts.forEach(dept=>{
+    const rows=filtered.filter(p=>p.dept===dept);
+    if(!rows.length)return;
+    const dhr=document.createElement('tr');dhr.className='dept-hdr';
+    const deptLabel=DEPT_LABELS[_normDept(dept)]||dept;
+    const dActive=rows.filter(p=>p.status==='active');
+    const fte=rows.filter(p=>p.emp_type==='FTE').length;
+    const prb=rows.filter(p=>p.emp_type==='PRB').length;
+    const out=rows.filter(p=>p.emp_type==='OUT').length;
+    dhr.innerHTML=`<td colspan="${numCols}">${deptLabel} <span style="color:var(--sub);font-size:9px;font-weight:400;font-family:var(--fm)">${rows.length} người · FTE:${fte} PRB:${prb} OUT:${out} · active: ${dActive.length} · ${fmtMl(dActive.reduce((s,p)=>s+effectiveCost(p),0))}</span></td>`;
+    tbody.appendChild(dhr);
+
+    rows.forEach(p=>{
+      const tr=document.createElement('tr');
+      let rowClass='person-row';
+      if(p.status==='inactive')rowClass+=' inactive-row';
+      if(p.emp_type==='OUT')rowClass+=' out-row';
+      tr.className=rowClass;tr.id=`row-${p.id}`;
+      const ec=effectiveCost(p);
+      const as=allocSum(p);
+      const asOver=as>100.01;const asOk=Math.abs(as-100)<0.01;
+      const validBUs=getValidBUs(p.pl_line);
+
+      // Name
+      const tdN=document.createElement('td');tdN.className='left';
+      let tag='';
+      if(p.emp_type==='OUT')tag=`<span class="name-tag out">◆ OUT</span>`;
+      else if(p.emp_type==='PRB')tag=`<span class="name-tag prb">◈ PRB</span>`;
+      const buChip=p.bu?`<span class="bu-chip" title="BU tham khảo (từ payroll)">${p.bu}</span>`:'';
+      tdN.innerHTML=`<div class="name-cell"><span class="name-main">${p.name}</span><span class="name-pos">${p.position||''}${buChip}</span>${tag}</div>`;
+      tr.appendChild(tdN);
+
+      // EMP_ID
+      const tdEid=document.createElement('td');tdEid.className='left';
+      tdEid.innerHTML=p.emp_id?`<span style="font-family:var(--fm);font-size:10px">${p.emp_id}</span>`:`<span class="dim" title="Thiếu mã NV trong payroll">~</span>`;
+      tr.appendChild(tdEid);
+
+      // Entity (pháp nhân)
+      const tdEnt=document.createElement('td');tdEnt.className='left';
+      const entV=entityOf(p);const entUnk=entV==='(Chưa xác định)';
+      tdEnt.innerHTML=`<span style="font-size:10.5px;${entUnk?'color:var(--dim)':''}">${entV}</span>`;
+      tr.appendChild(tdEnt);
+
+      // Emp type badge
+      const tdT=document.createElement('td');tdT.className='center';
+      const typeColor=p.emp_type==='FTE'?'var(--green)':p.emp_type==='PRB'?'var(--amber)':'var(--purple)';
+      tdT.innerHTML=`<span style="font-family:var(--fm);font-size:9px;color:${typeColor}">${p.emp_type}</span>`;
+      tr.appendChild(tdT);
+
+      // PL line
+      const tdPL=document.createElement('td');tdPL.className='left';
+      const sel=document.createElement('select');sel.className='pl-select';
+      PL_LIST.forEach(l=>{const o=document.createElement('option');o.value=l;o.textContent=l;if(l===p.pl_line)o.selected=true;sel.appendChild(o);});
+      sel.onchange=e=>{p.pl_line=e.target.value;applyAutoAlloc(p);buildTable();updateStrip();saveState();};
+      tdPL.appendChild(sel);tr.appendChild(tdPL);
+
+      // Fixed income
+      const tdInc=document.createElement('td');
+      tdInc.innerHTML=`<span style="font-family:var(--fm);font-size:11px;color:var(--dim)">${fmtMc(p.income||0)}</span>`;
+      tr.appendChild(tdInc);
+
+      // Base
+      const tdBase=document.createElement('td');
+      tdBase.innerHTML=`<span style="font-family:var(--fm);font-size:11px;color:var(--sub)">${fmtMc(p.base)}</span>`;
+      tr.appendChild(tdBase);
+
+      // Adj
+      const tdAdj=document.createElement('td');
+      const inp=document.createElement('input');inp.className='inp-adj';inp.type='number';inp.placeholder='0';inp.step='0.5';
+      inp.value=p.adj?+(p.adj/1e6).toFixed(2):'';
+      inp.oninput=e=>{p.adj=Math.round((parseFloat(e.target.value)||0)*1e6);refreshRow(p.id);updateStrip();saveState();};
+      tdAdj.appendChild(inp);tr.appendChild(tdAdj);
+
+      // Total eff cost
+      const tdEC=document.createElement('td');tdEC.id=`ec-${p.id}`;
+      const ecColor=p.status==='inactive'?'var(--dim)':p.adj?'var(--teal)':'#fff';
+      tdEC.innerHTML=`<span style="font-family:var(--fm);font-size:11.5px;font-weight:500;color:${ecColor}" title="Base:${fmtMc(p.base)} + Adj:${fmtMc(p.adj||0)}">${fmtMc(ec)}</span>`;
+      tr.appendChild(tdEC);
+
+      // Status
+      const tdS=document.createElement('td');tdS.className='center';
+      const sbtn=document.createElement('button');sbtn.className=`status-toggle ${p.status}`;
+      sbtn.textContent=p.status==='active'?'Active':'Inactive';
+      sbtn.onclick=()=>{p.status=p.status==='active'?'inactive':'active';buildTable();updateStrip();saveState();};
+      tdS.appendChild(sbtn);tr.appendChild(tdS);
+
+      // Delete (new only)
+      const tdD=document.createElement('td');tdD.className='center';
+      if(p._new){
+        const db=document.createElement('button');db.className='del-btn';db.textContent='✕';
+        db.onclick=()=>{persons=persons.filter(x=>x.id!==p.id);buildTable();updateStrip();saveState();};
+        tdD.appendChild(db);
+      }
+      tr.appendChild(tdD);
+
+      // Alloc sum
+      const tdAS=document.createElement('td');tdAS.className='center';tdAS.id=`as-${p.id}`;
+      tdAS.innerHTML=`<span class="alloc-sum ${asOver?'over':asOk?'ok':'zero'}">${as.toFixed(0)}%</span>`;
+      tr.appendChild(tdAS);
+
+      // Alloc inputs
+      BUS.forEach((b,bi)=>{
+        const td=document.createElement('td');if(bi===0)td.className='th-sep';
+        const isValid=validBUs.includes(b.key);
+        const ai=document.createElement('input');
+        ai.className=`inp-alloc ${b.cls}${asOver?' over':asOk?' full':''}${!isValid?' dim-bu':''}`;
+        ai.type='number';ai.min='0';ai.max='100';ai.step='10';
+        ai.value=p.alloc[b.key]||'';ai.placeholder='0';
+        if(!isValid)ai.title=`${b.label} không trong COA của line này`;
+        ai.oninput=e=>{p.alloc[b.key]=parseFloat(e.target.value)||0;if(META.ruleSource)META.ruleSource.edited=true;refreshRow(p.id);updateStrip();saveState();};
+        td.appendChild(ai);tr.appendChild(td);
+      });
+
+      // Cost outputs
+      BUS.forEach((b,bi)=>{
+        const td=document.createElement('td');td.id=`out-${p.id}-${b.key}`;
+        if(bi===0)td.className='th-sep';
+        const isValid=validBUs.includes(b.key);
+        const cost=buCost(p,b.key);
+        const dimStyle=!isValid&&cost===0?'opacity:.2':'';
+        td.innerHTML=`<span class="out-val ${cost>0?b.cls+' has-val':''}" style="${dimStyle}">${cost>0?fmtMc(cost):'—'}</span>`;
+        tr.appendChild(td);
+      });
+
+      tbody.appendChild(tr);
+    });
+
+    // Dept subtotal
+    const stId=`st-${dept.replace(/\W/g,'_')}`;
+    const stRow=document.createElement('tr');stRow.className='dept-total';stRow.id=stId;
+    const totA=rows.filter(p=>p.status==='active');
+    const dEC=totA.reduce((s,p)=>s+effectiveCost(p),0);
+    const dAdj=totA.reduce((s,p)=>s+(p.adj||0),0);
+    let stHtml=`<td>↳ ${deptLabel} SUBTOTAL (${totA.length} active / ${rows.length} total)</td>
+      <td></td><td></td>
+      <td style="color:var(--dim);font-family:var(--fm)">${fmtMc(totA.reduce((s,p)=>s+(p.income||0),0))}</td>
+      <td style="font-family:var(--fm)"><span data-st="base">${fmtMc(totA.reduce((s,p)=>s+p.base,0))}</span></td>
+      <td style="font-family:var(--fm);color:${dAdj?'var(--amber)':'var(--dim)'}"><span data-st="adj">${dAdj?fmtMc(dAdj):'—'}</span></td>
+      <td><span data-st="ec">${fmtMc(dEC)}</span></td>
+      <td></td><td></td><td></td>`;
+    BUS.forEach(()=>stHtml+='<td></td>');
+    BUS.forEach((b,bi)=>{
+      const bT=totA.reduce((s,p)=>s+buCost(p,b.key),0);
+      stHtml+=`<td${bi===0?' class="th-sep"':''}><span data-st="${b.key}" style="color:var(--${b.cls});font-family:var(--fm)">${bT>0?fmtMc(bT):'—'}</span></td>`;
+    });
+    stRow.innerHTML=stHtml;tbody.appendChild(stRow);
+  });
+
+  // Grand total
+  const active=persons.filter(p=>p.status==='active');
+  const gEC=active.reduce((s,p)=>s+effectiveCost(p),0);
+  const gBase=active.reduce((s,p)=>s+p.base,0);
+  const gAdj=active.reduce((s,p)=>s+(p.adj||0),0);
+  const gtr=document.createElement('tr');gtr.className='grand-total';gtr.id='grand-total-row';
+  let gHtml=`<td>GRAND TOTAL — ${active.length} ACTIVE / ${persons.length} TOTAL</td>
+    <td></td><td></td>
+    <td style="color:var(--dim);font-family:var(--fm)">${fmtMc(active.reduce((s,p)=>s+(p.income||0),0))}</td>
+    <td style="font-family:var(--fm)"><span data-gt="base">${fmtMc(gBase)}</span></td>
+    <td style="font-family:var(--fm);color:var(--amber)"><span data-gt="adj">${gAdj?fmtMc(gAdj):'—'}</span></td>
+    <td style="font-family:var(--fm);font-size:13px;color:var(--gold2)"><span data-gt="ec">${fmtMc(gEC)}</span></td>
+    <td></td><td></td><td></td>`;
+  BUS.forEach(()=>gHtml+='<td></td>');
+  BUS.forEach((b,bi)=>{
+    const bT=active.reduce((s,p)=>s+buCost(p,b.key),0);
+    gHtml+=`<td${bi===0?' class="th-sep"':''}><span data-gt="${b.key}" style="color:var(--${b.cls});font-weight:700;font-family:var(--fm);font-size:12px">${bT>0?fmtMc(bT):'—'}</span></td>`;
+  });
+  gtr.innerHTML=gHtml;tbody.appendChild(gtr);
+}
+
+// ── REFRESH ROW ──
+function refreshRow(id){
+  const p=persons.find(x=>x.id===id);if(!p)return;
+  const ec=effectiveCost(p);const as=allocSum(p);
+  const asOver=as>100.01;const asOk=Math.abs(as-100)<0.01;
+  const ecEl=document.getElementById(`ec-${id}`);
+  if(ecEl){
+    const ecColor=p.status==='inactive'?'var(--dim)':p.adj?'var(--teal)':'#fff';
+    ecEl.innerHTML=`<span style="font-family:var(--fm);font-size:11.5px;font-weight:500;color:${ecColor}" title="Base:${fmtMc(p.base)} + Adj:${fmtMc(p.adj||0)}">${fmtMc(ec)}</span>`;
+  }
+  const asEl=document.getElementById(`as-${id}`);
+  if(asEl)asEl.innerHTML=`<span class="alloc-sum ${asOver?'over':asOk?'ok':'zero'}">${as.toFixed(0)}%</span>`;
+  BUS.forEach(b=>{
+    const el=document.getElementById(`out-${id}-${b.key}`);
+    if(el){const cost=buCost(p,b.key);el.innerHTML=`<span class="out-val ${cost>0?b.cls+' has-val':''}">${cost>0?fmtMc(cost):'—'}</span>`;}
+  });
+  const stEl=document.getElementById(`st-${p.dept.replace(/\W/g,'_')}`);
+  if(stEl){
+    const deptP=persons.filter(x=>x.dept===p.dept&&x.status==='active');
+    const dEC=deptP.reduce((s,x)=>s+effectiveCost(x),0);
+    const dAdj=deptP.reduce((s,x)=>s+(x.adj||0),0);
+    const dBase=deptP.reduce((s,x)=>s+x.base,0);
+    stEl.querySelectorAll('[data-st]').forEach(c=>{
+      const r=c.getAttribute('data-st');
+      if(r==='base')c.textContent=fmtMc(dBase);
+      else if(r==='adj'){c.textContent=dAdj?fmtMc(dAdj):'—';c.parentElement.style.color=dAdj?'var(--amber)':'var(--dim)';}
+      else if(r==='ec')c.textContent=fmtMc(dEC);
+      else{const bT=deptP.reduce((s,x)=>s+buCost(x,r),0);c.textContent=bT>0?fmtMc(bT):'—';}
+    });
+  }
+  const gEl=document.getElementById('grand-total-row');
+  if(gEl){
+    const act=persons.filter(x=>x.status==='active');
+    const gEC=act.reduce((s,x)=>s+effectiveCost(x),0);
+    const gAdj=act.reduce((s,x)=>s+(x.adj||0),0);
+    const gBase=act.reduce((s,x)=>s+x.base,0);
+    gEl.querySelectorAll('[data-gt]').forEach(c=>{
+      const r=c.getAttribute('data-gt');
+      if(r==='base')c.textContent=fmtMc(gBase);
+      else if(r==='adj')c.textContent=gAdj?fmtMc(gAdj):'—';
+      else if(r==='ec')c.textContent=fmtMc(gEC);
+      else{const bT=act.reduce((s,x)=>s+buCost(x,r),0);c.textContent=bT>0?fmtMc(bT):'—';}
+    });
+  }
+}
+
+// ── STRIP ──
+function updateStrip(){
+  const active=persons.filter(p=>p.status==='active');
+  const gEC=active.reduce((s,p)=>s+effectiveCost(p),0);
+  const gBase=active.reduce((s,p)=>s+p.base,0);
+  const gAdj=active.reduce((s,p)=>s+(p.adj||0),0);
+  const inactive=persons.filter(p=>p.status==='inactive').length;
+  const allocated=active.filter(p=>Math.abs(allocSum(p)-100)<0.5).length;
+  const buTotals=BUS.map(b=>active.reduce((s,p)=>s+buCost(p,b.key),0));
+  const totalAllocated=buTotals.reduce((s,v)=>s+v,0);
+  const fte=persons.filter(p=>p.emp_type==='FTE').length;
+  const prb=persons.filter(p=>p.emp_type==='PRB').length;
+  const out=persons.filter(p=>p.emp_type==='OUT').length;
+  const strip=document.getElementById('strip');
+  const kpis=[
+    {lbl:'Total Cost Active',val:fmtMl(gEC),sub:`${active.length} active`,cls:''},
+    {lbl:'Base T6',val:fmtMl(gBase),sub:'Company Expense',cls:''},
+    {lbl:'Adj.',val:gAdj?fmtMl(gAdj):'—',sub:'Lương khác',cls:gAdj?'teal':''},
+    {lbl:'FTE / PRB / OUT',val:`${fte}/${prb}/${out}`,sub:`${persons.length} total`,cls:''},
+    {lbl:'Inactive',val:inactive||'—',sub:'Không tính',cls:inactive?'red':''},
+    {lbl:'Alloc 100%',val:`${allocated}/${active.length}`,sub:'hoàn thiện',cls:allocated===active.length?'green':'amber'},
+    {lbl:'Allocated',val:fmtMl(totalAllocated),sub:`${gEC?((totalAllocated/gEC)*100).toFixed(0):0}% tổng`,cls:'teal'},
+    ...BUS.map((b,i)=>({lbl:b.short,val:fmtMl(buTotals[i]),sub:b.label,cls:''})),
+  ];
+  strip.innerHTML=kpis.map(k=>`<div class="kpi"><div class="kpi-lbl">${k.lbl}</div><div class="kpi-val ${k.cls}">${k.val}</div><div class="kpi-sub">${k.sub}</div></div><div style="width:1px;background:var(--border);flex-shrink:0"></div>`).join('').replace(/<div style[^>]+><\/div>$/,'');
+}
+
+// ── SUMMARY ──
+function buildSummary(){
+  const active=persons.filter(p=>p.status==='active');
+  const wrap=document.getElementById('summary-content');
+  const buTotals=BUS.map(b=>({...b,total:active.reduce((s,p)=>s+buCost(p,b.key),0),hc:active.filter(p=>p.alloc[b.key]>0).length}));
+  const buGrand=buTotals.reduce((s,b)=>s+b.total,0);
+  const gEC=active.reduce((s,p)=>s+effectiveCost(p),0);
+  const plTotals=PL_LIST.map(l=>{
+    const lp=active.filter(p=>p.pl_line===l);
+    const total=lp.reduce((s,p)=>s+effectiveCost(p),0);
+    const allocated=lp.reduce((s,p)=>s+BUS.reduce((ss,b)=>ss+buCost(p,b.key),0),0);
+    return{l2:l,hc:lp.length,total,allocated,unalloc:total-allocated};
+  });
+  const crossData={};
+  PL_LINES.forEach(l=>{crossData[l]={};BUS.forEach(b=>{crossData[l][b.key]=active.filter(p=>p.pl_line===l).reduce((s,p)=>s+buCost(p,b.key),0);});});
+  const drillData=BUS.map(b=>{
+    const plGroups=PL_LINES.map(l=>{
+      const pp=active.filter(p=>p.pl_line===l&&p.alloc[b.key]>0);
+      const cost=pp.reduce((s,p)=>s+buCost(p,b.key),0);
+      return{l2:l,cost,persons:pp.map(p=>({name:p.name,emp_id:p.emp_id||'',position:p.position,dept:DEPT_LABELS[p.dept]||p.dept,ec:effectiveCost(p),pct:p.alloc[b.key]||0,cost:buCost(p,b.key)})).sort((a,b)=>b.cost-a.cost)};
+    }).filter(g=>g.cost>0);
+    return{...b,plGroups,buTotal:plGroups.reduce((s,g)=>s+g.cost,0)};
+  }).filter(b=>b.buTotal>0);
+
+  wrap.innerHTML=`
+  ${BUDGET?(()=>{
+    const per=curPeriod();
+    const bGrand=budgetGrand(per);
+    // BU comparison: actual = allocated cost by BU
+    const buCmp=BUS.map(b=>({...b,actual:active.reduce((s,p)=>s+buCost(p,b.key),0),budget:budgetByBU(b.key,per)}));
+    const actGrand=buCmp.reduce((s,b)=>s+b.actual,0);
+    // PL comparison: actual = allocated cost by PL line (to match budget which is allocated)
+    const plCmp=PL_LINES.map(l=>{
+      const lp=active.filter(p=>p.pl_line===l);
+      const actual=lp.reduce((s,p)=>s+BUS.reduce((ss,b)=>ss+buCost(p,b.key),0),0);
+      return{l,actual,budget:budgetByPL(l,per)};
+    });
+    return `
+    <div>
+      <div class="sec-title" style="color:var(--teal)">⚖ Actual vs Budget (${per}) — theo BU / Segment</div>
+      <div class="sum-box"><table class="sum-tbl">
+        <thead><tr><th>BU / Segment</th><th>Actual (tr)</th><th>Budget (tr)</th><th>Variance</th><th>% Used</th></tr></thead>
+        <tbody>
+          ${buCmp.map(b=>`<tr>
+            <td><span style="display:inline-block;width:8px;height:8px;background:var(--${b.cls});border-radius:2px;margin-right:6px;vertical-align:middle"></span>${b.label}</td>
+            <td style="color:#fff;font-weight:600">${fmtMl(b.actual)}</td>
+            <td style="color:var(--sub)">${fmtMl(b.budget)}</td>
+            <td style="font-family:var(--fm)">${fmtVar(b.actual,b.budget)}</td>
+            <td style="color:var(--sub)">${b.budget?(b.actual/b.budget*100).toFixed(0):'—'}%</td>
+          </tr>`).join('')}
+          <tr class="sum-total">
+            <td>TOTAL</td><td>${fmtMl(actGrand)}</td><td>${fmtMl(bGrand)}</td>
+            <td style="font-family:var(--fm)">${fmtVar(actGrand,bGrand)}</td>
+            <td>${bGrand?(actGrand/bGrand*100).toFixed(0):'—'}%</td>
+          </tr>
+        </tbody>
+      </table></div>
+    </div>
+    <div>
+      <div class="sec-title" style="color:var(--teal)">⚖ Actual vs Budget (${per}) — theo P&L Line</div>
+      <div class="sum-box"><table class="sum-tbl">
+        <thead><tr><th>P&L Line</th><th>Actual alloc (tr)</th><th>Budget (tr)</th><th>Variance</th><th>% Used</th></tr></thead>
+        <tbody>
+          ${plCmp.map(r=>`<tr>
+            <td>${r.l}</td>
+            <td style="color:#fff;font-weight:600">${fmtMl(r.actual)}</td>
+            <td style="color:var(--sub)">${fmtMl(r.budget)}</td>
+            <td style="font-family:var(--fm)">${(r.actual>0.5||r.budget>0.5)?fmtVar(r.actual,r.budget):'—'}</td>
+            <td style="color:var(--sub)">${r.budget?(r.actual/r.budget*100).toFixed(0):'—'}%</td>
+          </tr>`).join('')}
+          <tr class="sum-total">
+            <td>TOTAL</td><td>${fmtMl(plCmp.reduce((s,r)=>s+r.actual,0))}</td><td>${fmtMl(plCmp.reduce((s,r)=>s+r.budget,0))}</td>
+            <td style="font-family:var(--fm)">${fmtVar(plCmp.reduce((s,r)=>s+r.actual,0),plCmp.reduce((s,r)=>s+r.budget,0))}</td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table></div>
+    </div>
+    <div>
+      <div class="sec-title" style="color:var(--teal)">⚖ Variance Matrix (${per}) — P&L × BU · Actual − Budget (tr)</div>
+      <div class="sum-box"><table class="sum-tbl">
+        <thead><tr><th>P&L Line</th>${BUS.map(b=>`<th style="color:var(--${b.cls})">${b.short}</th>`).join('')}<th>Row Var</th></tr></thead>
+        <tbody>
+          ${PL_LINES.map(l=>{
+            const lp=active.filter(p=>p.pl_line===l);
+            let rowVar=0;
+            const cells=BUS.map(b=>{
+              const act=lp.reduce((s,p)=>s+buCost(p,b.key),0);
+              const bud=getBudget(b.key,l,per);
+              const v=act-bud;rowVar+=v;
+              if(Math.abs(act)<0.5&&Math.abs(bud)<0.5)return `<td style="color:var(--dim)">—</td>`;
+              const color=Math.abs(v)<bud*0.02+0.5?'var(--green)':(v>0?'var(--red)':'var(--teal)');
+              return `<td style="font-family:var(--fm);color:${color}" title="A:${fmtMl(act)} B:${fmtMl(bud)}">${v>0?'+':''}${(v/1e6).toFixed(1)}</td>`;
+            }).join('');
+            return `<tr><td>${l}</td>${cells}<td style="font-family:var(--fm);color:${Math.abs(rowVar)<1e6?'var(--green)':(rowVar>0?'var(--red)':'var(--teal)')};font-weight:600">${rowVar>0?'+':''}${(rowVar/1e6).toFixed(1)}</td></tr>`;
+          }).join('')}
+        </tbody>
+      </table></div>
+      <div class="note-box">Var > 0 (đỏ) = Actual vượt Budget · Var < 0 (teal) = dưới Budget · xanh lá = sát budget (±2%). Hover cell xem chi tiết A/B.</div>
+    </div>
+    `;
+  })():''}
+  <div class="sum-grid">
+  <div>
+    <div class="sec-title">Chi phí theo BU / Segment</div>
+    <div class="sum-box"><table class="sum-tbl">
+      <thead><tr><th>BU / Segment</th><th>Cost (tr)</th><th>% Total</th><th>HC</th><th>Avg/người</th></tr></thead>
+      <tbody>
+        ${buTotals.map(b=>`<tr>
+          <td><span style="display:inline-block;width:8px;height:8px;background:var(--${b.cls});border-radius:2px;margin-right:6px;vertical-align:middle"></span>${b.label}</td>
+          <td style="color:var(--${b.cls});font-weight:600">${fmtMl(b.total)}</td>
+          <td style="color:var(--sub)">${gEC?(b.total/gEC*100).toFixed(1):0}%</td>
+          <td>${b.hc}</td>
+          <td style="color:var(--sub)">${b.hc?fmtMl(b.total/b.hc):'—'}</td>
+        </tr>`).join('')}
+        <tr class="sum-total"><td>TOTAL ALLOCATED</td><td>${fmtMl(buGrand)}</td><td>${gEC?(buGrand/gEC*100).toFixed(1):0}%</td><td>—</td><td>—</td></tr>
+        <tr><td style="color:var(--amber)">Chưa phân bổ</td><td style="color:var(--amber)">${fmtMl(gEC-buGrand)}</td><td style="color:var(--amber)">${gEC?((gEC-buGrand)/gEC*100).toFixed(1):0}%</td><td>—</td><td>—</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div>
+    <div class="sec-title">Chi phí theo P&L Line</div>
+    <div class="sum-box"><table class="sum-tbl">
+      <thead><tr><th>P&L L2</th><th>HC</th><th>Total (tr)</th><th>Allocated</th><th>Unalloc</th><th>%</th></tr></thead>
+      <tbody>
+        ${plTotals.map(row=>`<tr>
+          <td>${row.l2}</td>
+          <td style="color:var(--sub)">${row.hc}</td>
+          <td style="color:#fff;font-weight:600">${fmtMl(row.total)}</td>
+          <td style="color:var(--teal)">${fmtMl(row.allocated)}</td>
+          <td style="color:${row.unalloc>0.5?'var(--amber)':'var(--green)'}">${fmtMl(row.unalloc)}</td>
+          <td style="color:var(--sub)">${gEC?(row.total/gEC*100).toFixed(1):0}%</td>
+        </tr>`).join('')}
+        <tr class="sum-total"><td>GRAND TOTAL</td><td>${active.length}</td><td>${fmtMl(gEC)}</td><td>${fmtMl(buGrand)}</td><td style="color:${(gEC-buGrand)>0.5?'var(--amber)':'var(--green)'}">${fmtMl(gEC-buGrand)}</td><td>100%</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  </div>
+
+  <div>
+    <div class="sec-title">Cross Table: P&L Line × BU / Segment (triệu VND)</div>
+    <div class="sum-box"><table class="sum-tbl">
+      <thead><tr>
+        <th>P&L Line</th>
+        ${BUS.map(b=>`<th style="color:var(--${b.cls})">${b.short}</th>`).join('')}
+        <th>Allocated (tr)</th><th>EC Total (tr)</th><th style="color:var(--amber)">Unalloc</th>
+      </tr></thead>
+      <tbody>
+        ${PL_LINES.map(l=>{
+          const lp=active.filter(p=>p.pl_line===l);
+          const lineEC=lp.reduce((s,p)=>s+effectiveCost(p),0);
+          const buVals=BUS.map(b=>lp.reduce((s,p)=>s+buCost(p,b.key),0));
+          const rowTotal=buVals.reduce((s,v)=>s+v,0);
+          return`<tr>
+            <td>${l}</td>
+            ${buVals.map((v,i)=>`<td style="color:${v>0?'var(--'+BUS[i].cls+')':'var(--dim)'}">${v>0?fmtMl(v):'—'}</td>`).join('')}
+            <td style="color:var(--teal);font-weight:600">${fmtMl(rowTotal)}</td>
+            <td style="color:#fff">${fmtMl(lineEC)}</td>
+            <td style="color:${(lineEC-rowTotal)>0.5?'var(--amber)':'var(--green)'}">${fmtMl(lineEC-rowTotal)}</td>
+          </tr>`;
+        }).join('')}
+        <tr class="sum-total">
+          <td>TOTAL</td>
+          ${BUS.map(b=>`<td style="color:var(--${b.cls})">${fmtMl(buTotals.find(x=>x.key===b.key)?.total||0)}</td>`).join('')}
+          <td>${fmtMl(buGrand)}</td><td>${fmtMl(gEC)}</td>
+          <td style="color:${(gEC-buGrand)>0.5?'var(--amber)':'var(--green)'}">${fmtMl(gEC-buGrand)}</td>
+        </tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  ${drillData.map(bu=>`
+  <div>
+    <div class="sec-title" style="color:var(--${bu.cls})">${bu.label} — Chi tiết nhân sự · ${fmtMl(bu.buTotal)}</div>
+    <div class="sum-box"><table class="sum-tbl">
+      <thead><tr><th>Nhân sự</th><th>EMP_ID</th><th>P&L Line</th><th>Dept</th><th>Position</th><th>Total EC</th><th>% Alloc</th><th style="color:var(--${bu.cls})">Cost to BU</th><th>% BU</th></tr></thead>
+      <tbody>
+        ${bu.plGroups.map(g=>`
+          <tr style="background:rgba(255,255,255,.04)">
+            <td colspan="7" style="font-size:10px;color:var(--${bu.cls});font-family:var(--fm);letter-spacing:.8px">${g.l2}</td>
+            <td style="color:var(--${bu.cls});font-weight:700;font-family:var(--fm)">${fmtMl(g.cost)}</td>
+            <td style="color:var(--sub);font-family:var(--fm)">${bu.buTotal?(g.cost/bu.buTotal*100).toFixed(1):0}%</td>
+          </tr>
+          ${g.persons.map((p,pi)=>`<tr style="${pi%2===0?'':'background:rgba(255,255,255,.015)'}">
+            <td style="color:#fff;font-weight:600;padding-left:20px">${p.name}</td>
+            <td style="font-family:var(--fm);font-size:10px;color:var(--sub)">${p.emp_id||'~'}</td>
+            <td style="color:var(--sub);font-size:10px">${g.l2}</td>
+            <td style="color:var(--sub);font-size:10px">${p.dept}</td>
+            <td style="color:var(--dim);font-size:10px">${p.position||'—'}</td>
+            <td style="font-family:var(--fm);color:var(--text)">${fmtMl(p.ec)}</td>
+            <td style="font-family:var(--fm);color:var(--${bu.cls})">${p.pct}%</td>
+            <td style="font-family:var(--fm);color:var(--${bu.cls});font-weight:600">${fmtMl(p.cost)}</td>
+            <td style="color:var(--sub);font-family:var(--fm)">${bu.buTotal?(p.cost/bu.buTotal*100).toFixed(1):0}%</td>
+          </tr>`).join('')}
+          <tr style="background:rgba(44,74,110,.3)">
+            <td colspan="7" style="color:var(--gold);font-family:var(--fm);font-size:10px;padding-left:20px">Subtotal ${g.l2} · ${g.persons.length} người</td>
+            <td style="color:var(--gold);font-family:var(--fm);font-weight:700">${fmtMl(g.cost)}</td>
+            <td style="color:var(--sub);font-family:var(--fm)">${bu.buTotal?(g.cost/bu.buTotal*100).toFixed(1):0}%</td>
+          </tr>
+        `).join('')}
+        <tr style="background:rgba(200,169,110,.08);border-top:2px solid rgba(200,169,110,.3)">
+          <td colspan="7" style="font-family:var(--fh);font-weight:700;color:var(--gold2);font-size:12px">TOTAL ${bu.label}</td>
+          <td style="font-family:var(--fm);font-weight:700;color:var(--gold2);font-size:13px">${fmtMl(bu.buTotal)}</td>
+          <td style="color:var(--gold2);font-family:var(--fm)">100%</td>
+        </tr>
+      </tbody>
+    </table></div>
+  </div>`).join('')}
+  `;
+}
+
+// ── FILTER ──
+function filterTable(){buildTable();updateStrip();}
+
+// ── ACTIVE ALL ──
+function activateAll(){
+  const inactive=persons.filter(p=>p.status==='inactive').length;
+  if(!inactive){alert('Tất cả nhân sự đã active.');return;}
+  if(!confirm(`Enable cost cho ${inactive} nhân sự đang inactive?`))return;
+  persons.forEach(p=>{p.status='active';});
+  buildTable();updateStrip();saveState();
+}
+
+// ── JOURNAL ENTRY CONFIG ──
+// Block 1: chi phí công ty (= base). Cost components, mỗi cái 1 cặp Dr/Cr, chi tiết PL×BU.
+// Adj (ngoài payroll) → gộp vào Cost 1.
+const JE_COST=[
+  {key:'cost1',label:'Cost 1 — Lương + phụ cấp',cr:'Payable to Employee',cr_acc:'334',withAdj:true},
+  {key:'cost2',label:'Cost 2 — BHXH công ty (17.5%)',cr:'Payable to Social Insurance',cr_acc:'3383'},
+  {key:'cost3',label:'Cost 3 — BHYT công ty (3%)',cr:'Payable to Social Insurance',cr_acc:'3384'},
+  {key:'cost4',label:'Cost 4 — BHTN công ty (1%)',cr:'Payable to Social Insurance',cr_acc:'3386'},
+  {key:'cost5',label:'Cost 5 — Trade Union công ty (2%)',cr:'Payable to Trade Union',cr_acc:'3382'},
+];
+// Block 2: khấu trừ từ NV. Dr Payable Employee / Cr payable khác. Theo PL line, KHÔNG BU.
+const JE_DED=[
+  {key:'ded1',label:'Deduction 1 — BHXH NV (8%)',cr:'Payable to Social Insurance',cr_acc:'3383'},
+  {key:'ded2',label:'Deduction 2 — BHYT NV (1.5%)',cr:'Payable to Social Insurance',cr_acc:'3384'},
+  {key:'ded3',label:'Deduction 3 — BHTN NV (1%)',cr:'Payable to Social Insurance',cr_acc:'3386'},
+  {key:'ded4',label:'Deduction 4 — Union NV (0.5%)',cr:'Payable to Trade Union',cr_acc:'3382'},
+  {key:'ded5',label:'Deduction 5 — Thuế TNCN (PIT)',cr:'Payable to Tax',cr_acc:'3335'},
+];
+// PL line → debit account (632/642 staff cost). Dùng acc 642111 cho tất cả (CP lương NV QL).
+const PL_DR_ACC='642111';
+
+function comp(p,key){
+  // cost1 includes adj (book 100% adj to Cost 1)
+  if(p.status==='inactive')return 0;
+  // New/imported hires without payroll breakdown: book full base to cost1
+  if(!p.comp){
+    if(key==='cost1')return p.base+(p.adj||0);
+    return 0;
+  }
+  const base=p.comp[key]||0;
+  if(key==='cost1')return base+(p.adj||0);
+  return base;
+}
+function compBU(p,key,buKey){return comp(p,key)*num(p.alloc[buKey])/100;}
+
+// ── BUILD JOURNAL ──
+// Reconciliation gate: base (Company Expense) PHẢI = Σ(cost1..5)+adj. Lệch = data đầu vào chưa khớp.
+function reconCheck(entityFilter){
+  let active=persons.filter(p=>p.status==='active');
+  if(entityFilter)active=active.filter(p=>entityOf(p)===entityFilter);
+  const TOL=0.001; // 1k VND = 0.001 triệu (đơn vị tool là triệu VND)
+  let sumBase=0,sumComp=0;const bad=[];const badAlloc=[];
+  active.forEach(p=>{
+    const base=effectiveCost(p); // base + adj
+    const compSum=comp(p,'cost1')+comp(p,'cost2')+comp(p,'cost3')+comp(p,'cost4')+comp(p,'cost5'); // cost1 đã gồm adj
+    sumBase+=base;sumComp+=compSum;
+    const gap=base-compSum;
+    if(Math.abs(gap)>TOL)bad.push({name:p.name,emp_id:p.emp_id||'',dept:p.dept,entity:entityOf(p),base,compSum,gap});
+    const as=allocSum(p);
+    if(Math.abs(as-100)>0.01)badAlloc.push({name:p.name,emp_id:p.emp_id||'',dept:p.dept,entity:entityOf(p),pl:p.pl_line,as,ec:base,miss:base*(100-as)/100});
+  });
+  bad.sort((a,b)=>Math.abs(b.gap)-Math.abs(a.gap));
+  badAlloc.sort((a,b)=>Math.abs(b.miss)-Math.abs(a.miss));
+  return {sumBase,sumComp,gap:sumBase-sumComp,bad,badAlloc,n:active.length};
+}
+function buildJournal(){
+  const ents=entityList();
+  // entity đang chọn cho JE (tách sổ). Mặc định entity đầu tiên nếu chưa chọn / không còn hợp lệ.
+  if(!window.JE_ENTITY||(ents.length&&!ents.includes(JE_ENTITY)))window.JE_ENTITY=ents[0]||'';
+  const jeEnt=window.JE_ENTITY;
+  const active=persons.filter(p=>p.status==='active'&&(!jeEnt||entityOf(p)===jeEnt));
+  const wrap=document.getElementById('journal-content');
+
+  // BLOCK 1 — by PL line × BU, per cost component
+  // Aggregate: {plLine: {buKey: {cost1,cost2,...}}}
+  const b1={};
+  PL_LINES.forEach(l=>{b1[l]={};BUS.forEach(b=>{b1[l][b.key]={};JE_COST.forEach(c=>b1[l][b.key][c.key]=0);});});
+  active.forEach(p=>{
+    if(!b1[p.pl_line]){b1[p.pl_line]={};BUS.forEach(b=>{b1[p.pl_line][b.key]={};JE_COST.forEach(c=>b1[p.pl_line][b.key][c.key]=0);});}
+    BUS.forEach(b=>{
+      JE_COST.forEach(c=>{b1[p.pl_line][b.key][c.key]+=compBU(p,c.key,b.key);});
+    });
+  });
+
+  // BLOCK 2 — by PL line only (no BU), per deduction
+  const b2={};
+  PL_LINES.forEach(l=>{b2[l]={};JE_DED.forEach(d=>b2[l][d.key]=0);});
+  active.forEach(p=>{if(!b2[p.pl_line]){b2[p.pl_line]={};JE_DED.forEach(d=>b2[p.pl_line][d.key]=0);}JE_DED.forEach(d=>{b2[p.pl_line][d.key]+=comp(p,d.key);});});
+
+  // Grand totals per component
+  const b1tot={};JE_COST.forEach(c=>b1tot[c.key]=active.reduce((s,p)=>s+comp(p,c.key),0));
+  const b2tot={};JE_DED.forEach(d=>b2tot[d.key]=active.reduce((s,p)=>s+comp(p,d.key),0));
+  const block1Grand=Object.values(b1tot).reduce((s,v)=>s+v,0);
+  // Allocated portion of Block 1 (sum of detail rows = comp × alloc%) and the unallocated gap
+  let block1Allocated=0;
+  active.forEach(p=>{BUS.forEach(b=>{JE_COST.forEach(c=>{block1Allocated+=compBU(p,c.key,b.key);});});});
+  const block1Unalloc=block1Grand-block1Allocated;
+
+  // Build Block 1 detail rows (PL × BU × component, only nonzero)
+  let b1rows='';
+  PL_LINES.forEach(l=>{
+    BUS.forEach(b=>{
+      JE_COST.forEach(c=>{
+        const amt=b1[l][b.key][c.key];
+        if(amt>0.5){
+          b1rows+=`<tr>
+            <td style="color:var(--sub);font-size:10px">${l}</td>
+            <td><span style="display:inline-block;width:7px;height:7px;background:var(--${b.cls});border-radius:2px;margin-right:5px"></span>${b.short}</td>
+            <td style="color:var(--text);font-size:10px">${c.label}</td>
+            <td style="font-family:var(--fm);color:var(--dim)">${PL_DR_ACC}</td>
+            <td style="font-family:var(--fm);color:#fff;font-weight:600">${fmtMl(amt)}</td>
+            <td style="font-family:var(--fm);color:var(--dim)">${c.cr_acc}</td>
+            <td style="color:var(--sub);font-size:10px">${c.cr}</td>
+          </tr>`;
+        }
+      });
+    });
+  });
+
+  // Block 2 detail rows (PL × deduction)
+  let b2rows='';
+  PL_LINES.forEach(l=>{
+    JE_DED.forEach(d=>{
+      const amt=b2[l][d.key];
+      if(amt>0.5){
+        b2rows+=`<tr>
+          <td style="color:var(--sub);font-size:10px">${l}</td>
+          <td style="color:var(--text);font-size:10px">${d.label}</td>
+          <td style="font-family:var(--fm);color:var(--dim)">334</td>
+          <td style="font-family:var(--fm);color:#fff;font-weight:600">${fmtMl(amt)}</td>
+          <td style="font-family:var(--fm);color:var(--dim)">${d.cr_acc}</td>
+          <td style="color:var(--sub);font-size:10px">${d.cr}</td>
+        </tr>`;
+      }
+    });
+  });
+
+  wrap.innerHTML=`
+  <div>
+    ${(()=>{
+      if(!ents.length)return '';
+      // Bảng tổng quan tách sổ: mỗi entity 1 dòng, gate A+B riêng
+      const rows=ents.map(e=>{
+        const r=reconCheck(e);
+        const aOk=Math.abs(r.gap)<=0.01, bOk=r.badAlloc.length===0;
+        return {e,n:r.n,sumBase:r.sumBase,gapOk:aOk,allocOk:bOk,badN:r.bad.length,badAllocN:r.badAlloc.length};
+      });
+      const chip=(ok,txt)=>`<span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:5px;background:${ok?'var(--greenfade)':'var(--redfade)'};color:${ok?'var(--green)':'var(--red)'}">${ok?'✓':'✗'} ${txt}</span>`;
+      return `<div style="margin-bottom:16px;border:1px solid var(--border);border-radius:10px;overflow:hidden">
+        <div style="padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--border);font-size:12px;font-weight:700;color:var(--gold2)">🏛 Tách sổ theo pháp nhân — mỗi entity là một bộ sổ độc lập</div>
+        <table class="cmp-t" style="font-size:11.5px;width:100%">
+          <thead><tr><th class="left">Pháp nhân</th><th>Số NV active</th><th>Σ Company Expense</th><th class="left">Gate A (base=Σcost)</th><th class="left">Gate B (alloc=100%)</th><th>Xem sổ</th></tr></thead>
+          <tbody>${rows.map(r=>`<tr style="${r.e===jeEnt?'background:var(--goldfade)':''}">
+            <td class="left" style="font-weight:600;color:var(--text)">${r.e}${r.e===jeEnt?' <span style="color:var(--gold);font-size:9px">(đang xem)</span>':''}</td>
+            <td class="num">${r.n}</td>
+            <td class="num" style="font-family:var(--fm)">${fmtMl(r.sumBase)}</td>
+            <td class="left">${chip(r.gapOk,r.gapOk?'khớp':r.badN+' người lệch')}</td>
+            <td class="left">${chip(r.allocOk,r.allocOk?'đủ 100%':r.badAllocN+' người thiếu')}</td>
+            <td><button class="btn btn-ghost" style="padding:3px 10px;font-size:10px" onclick="window.JE_ENTITY='${r.e.replace(/'/g,"\\'")}';buildJournal();">Chọn</button></td>
+          </tr>`).join('')}</tbody>
+        </table>
+      </div>
+      <div style="margin-bottom:14px;padding:8px 14px;background:var(--goldfade);border-radius:8px;font-size:12px;color:var(--gold2)">📒 Bút toán dưới đây chỉ gồm pháp nhân: <b>${jeEnt}</b> (${active.length} người active). Đổi pháp nhân ở bảng trên hoặc nút Export xuất tách sheet theo entity.</div>`;
+    })()}
+    ${(()=>{const rc=reconCheck(jeEnt);
+      if(Math.abs(rc.gap)<=0.01)return `<div style="background:rgba(74,222,128,.08);border:1px solid var(--green);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--green)">✓ Data check OK — Σ Company Expense (${fmtMl(rc.sumBase)}) khớp Σ cấu phần lương (${fmtMl(rc.sumComp)}). JE ghi nhận đủ chi phí.</div>`;
+      return `<div style="background:rgba(224,85,85,.08);border:1px solid var(--red);border-radius:8px;padding:12px 14px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:6px">⚠ DATA CHECK LỆCH — JE CHƯA GHI ĐỦ CHI PHÍ</div>
+        <div style="font-size:11.5px;color:var(--text);line-height:1.7">
+          Σ Company Expense (base): <b>${fmtMl(rc.sumBase)}</b> · Σ cấu phần lương (cost1..5): <b>${fmtMl(rc.sumComp)}</b> · <span style="color:var(--red);font-weight:700">Chênh: ${fmtMl(rc.gap)}</span> ở <b>${rc.bad.length}/${rc.n}</b> người.<br>
+          Nghĩa là COMPANY EXPENSE trong payroll KHÔNG bằng (Actual Salary + BH công ty + KPCĐ). JE đang ghi theo cấu phần → thiếu ${fmtMl(rc.gap)} so với P&L.<br>
+          <span style="color:var(--sub)">→ CFO + kế toán đối chiếu nguồn payroll: xác định phần chênh là khoản gì (phụ cấp/thưởng chưa tách?) rồi sửa file cho khớp, HOẶC bổ sung cột cấu phần. Cảnh báo này được xuất kèm file JE.</span>
+        </div>
+        <div style="margin-top:8px;overflow-x:auto"><table class="cmp-t" style="font-size:10.5px"><tr><th class="left">Người (toàn bộ lệch)</th><th class="left">EMP_ID</th><th class="left">Dept</th><th>Base</th><th>Σcost1..5</th><th>Chênh</th></tr>
+        ${rc.bad.map(x=>`<tr><td class="left">${x.name}</td><td class="left" style="font-family:var(--fm)">${x.emp_id||'~'}</td><td class="left dim">${x.dept}</td><td class="num">${fmtMl(x.base)}</td><td class="num">${fmtMl(x.compSum)}</td><td class="num" style="color:var(--red);font-weight:600">${fmtMl(x.gap)}</td></tr>`).join('')}</table></div>
+      </div>`;})()}
+    ${(()=>{const rc=reconCheck(jeEnt);const ba=rc.badAlloc;
+      if(!ba.length)return `<div style="background:rgba(74,222,128,.08);border:1px solid var(--green);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--green)">✓ Phân bổ OK — mọi nhân sự active có Σ alloc% = 100%. JE phân bổ đủ chi phí về BU.</div>`;
+      const totMiss=ba.reduce((s,x)=>s+x.miss,0);
+      return `<div style="background:rgba(224,85,85,.08);border:1px solid var(--red);border-radius:8px;padding:12px 14px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:6px">⚠ PHÂN BỔ CHƯA ĐỦ 100% — JE PHÂN BỔ SAI TỔNG THEO BU</div>
+        <div style="font-size:11.5px;color:var(--text);line-height:1.7">
+          <b>${ba.length}/${rc.n}</b> người active có Σ alloc% ≠ 100%. Tổng chi phí <b>thiếu/dư phân bổ</b>: <span style="color:var(--red);font-weight:700">${fmtMl(totMiss)}</span>.<br>
+          JE Block 1 book theo cost × alloc% → người alloc≠100 làm tổng cost-to-BU lệch khỏi effective cost. Gate cấu phần (base vs Σcost) KHÔNG bắt lỗi này vì Dr 642111 vẫn cân nội bộ.<br>
+          <span style="color:var(--sub)">→ Sang tab Simulate set đủ alloc% cho từng người (cột Alloc Sum phải = 100). Bảng này xuất kèm file JE.</span>
+        </div>
+        <div style="margin-top:8px;overflow-x:auto"><table class="cmp-t" style="font-size:10.5px"><tr><th class="left">Người (toàn bộ lệch)</th><th class="left">EMP_ID</th><th class="left">Dept</th><th class="left">P&L Line</th><th>Σ Alloc%</th><th>Eff. Cost</th><th>Thiếu/dư</th></tr>
+        ${ba.map(x=>`<tr><td class="left">${x.name}</td><td class="left" style="font-family:var(--fm)">${x.emp_id||'~'}</td><td class="left dim">${x.dept}</td><td class="left dim" style="font-size:10px">${x.pl}</td><td class="num" style="color:var(--red);font-weight:600">${x.as.toFixed(1)}%</td><td class="num">${fmtMl(x.ec)}</td><td class="num" style="color:var(--red);font-weight:600">${fmtMl(x.miss)}</td></tr>`).join('')}</table></div>
+      </div>`;})()}
+    <div class="sec-title">Net Impact by Account Cluster — Tổng phát sinh Nợ/Có (${active.length} active)</div>
+    <div class="sum-box"><table class="sum-tbl">
+      <thead><tr><th>Account</th><th>Tên tài khoản</th><th>Dr (tr)</th><th>Cr (tr)</th><th>Net (tr)</th><th>Ý nghĩa</th></tr></thead>
+      <tbody>
+        ${(()=>{
+          const c1=b1tot.cost1,c2=b1tot.cost2,c3=b1tot.cost3,c4=b1tot.cost4,c5=b1tot.cost5;
+          const d1=b2tot.ded1,d2=b2tot.ded2,d3=b2tot.ded3,d4=b2tot.ded4,d5=b2tot.ded5;
+          const clusters=[
+            {acc:'642111',name:'Staff cost (P&L)',dr:c1+c2+c3+c4+c5,cr:0,note:'Chi phí lương ghi nhận'},
+            {acc:'334',name:'Payable to Employee',dr:d1+d2+d3+d4+d5,cr:c1,note:'Net = lương thực lãnh'},
+            {acc:'3383/3384/3386',name:'Payable to Social Insurance',dr:0,cr:c2+c3+c4+d1+d2+d3,note:'Phải nộp cơ quan BH'},
+            {acc:'3382',name:'Payable to Trade Union',dr:0,cr:c5+d4,note:'Phải nộp công đoàn'},
+            {acc:'3335',name:'Payable to Tax (PIT)',dr:0,cr:d5,note:'Phải nộp thuế TNCN'},
+          ];
+          const tDr=clusters.reduce((s,c)=>s+c.dr,0),tCr=clusters.reduce((s,c)=>s+c.cr,0);
+          const bal=Math.abs(tDr-tCr)<1;
+          return clusters.map(c=>{
+            const net=c.dr-c.cr;
+            return `<tr>
+              <td style="font-family:var(--fm);color:var(--gold)">${c.acc}</td>
+              <td>${c.name}</td>
+              <td style="font-family:var(--fm);color:${c.dr>0?'#fff':'var(--dim)'}">${c.dr>0?fmtMl(c.dr):'—'}</td>
+              <td style="font-family:var(--fm);color:${c.cr>0?'#fff':'var(--dim)'}">${c.cr>0?fmtMl(c.cr):'—'}</td>
+              <td style="font-family:var(--fm);color:${net>0?'var(--teal)':'var(--purple)'};font-weight:600">${net>0?'+':''}${fmtMl(Math.abs(net))}${net<0?' (Cr)':''}</td>
+              <td style="color:var(--sub);font-size:10px">${c.note}</td>
+            </tr>`;
+          }).join('')+`<tr class="sum-total">
+            <td colspan="2">TOTAL ${bal?'· ⚖ Balanced':'· ⚠ LỆCH'}</td>
+            <td>${fmtMl(tDr)}</td><td>${fmtMl(tCr)}</td>
+            <td style="color:${bal?'var(--green)':'var(--red)'}">${bal?'0 ✓':fmtMl(tDr-tCr)}</td>
+            <td style="color:${bal?'var(--green)':'var(--red)'};font-size:10px">Dr = Cr</td>
+          </tr>`;
+        })()}
+      </tbody>
+    </table></div>
+  </div>
+
+  <div>
+    <div class="sec-title">Summary — Bút toán tổng hợp (${active.length} nhân sự active)</div>
+    <div class="sum-grid">
+      <div class="sum-box"><table class="sum-tbl">
+        <thead><tr><th>Block 1 — Chi phí công ty</th><th>Dr</th><th>Cr</th><th>Amount (tr)</th></tr></thead>
+        <tbody>
+          ${JE_COST.map(c=>`<tr>
+            <td>${c.label}</td>
+            <td style="font-family:var(--fm);color:var(--dim)">${PL_DR_ACC}</td>
+            <td style="font-family:var(--fm);color:var(--dim)">${c.cr_acc}</td>
+            <td style="color:#fff;font-weight:600">${fmtMl(b1tot[c.key])}</td>
+          </tr>`).join('')}
+          <tr class="sum-total"><td>TOTAL BLOCK 1 (= Base)</td><td>—</td><td>—</td><td>${fmtMl(block1Grand)}</td></tr>
+        </tbody>
+      </table></div>
+      <div class="sum-box"><table class="sum-tbl">
+        <thead><tr><th>Block 2 — Khấu trừ NV</th><th>Dr</th><th>Cr</th><th>Amount (tr)</th></tr></thead>
+        <tbody>
+          ${JE_DED.map(d=>`<tr>
+            <td>${d.label}</td>
+            <td style="font-family:var(--fm);color:var(--dim)">334</td>
+            <td style="font-family:var(--fm);color:var(--dim)">${d.cr_acc}</td>
+            <td style="color:#fff;font-weight:600">${fmtMl(b2tot[d.key])}</td>
+          </tr>`).join('')}
+          <tr class="sum-total"><td>TOTAL BLOCK 2</td><td>—</td><td>—</td><td>${fmtMl(Object.values(b2tot).reduce((s,v)=>s+v,0))}</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="sec-title">Block 1 Detail — [${jeEnt}] Chi phí công ty theo PL Line × BU × Component</div>
+    <div class="sum-box"><table class="sum-tbl">
+      <thead><tr><th>P&L Line</th><th>BU/Segment</th><th>Component</th><th>Dr Acc</th><th>Amount (tr)</th><th>Cr Acc</th><th>Cr Account</th></tr></thead>
+      <tbody>${b1rows}
+        <tr class="sum-total"><td colspan="4">TOTAL ĐÃ PHÂN BỔ (Σ dòng trên)</td><td>${fmtMl(block1Allocated)}</td><td colspan="2">Allocated to BU</td></tr>
+        ${block1Unalloc>0.5?`<tr style="background:rgba(240,144,48,.08)"><td colspan="4" style="color:var(--amber)">⚠ CHƯA PHÂN BỔ (alloc 0%)</td><td style="color:var(--amber);font-family:var(--fm);font-weight:600">${fmtMl(block1Unalloc)}</td><td colspan="2" style="color:var(--amber);font-size:10px">Cần set allocation %</td></tr>`:''}
+        <tr class="sum-total" style="border-top:2px solid var(--gold)"><td colspan="4">TOTAL BLOCK 1 (= Base)</td><td>${fmtMl(block1Grand)}</td><td colspan="2">= Company Staff Cost</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div>
+    <div class="sec-title">Block 2 Detail — [${jeEnt}] Khấu trừ NV theo PL Line (không chi tiết BU)</div>
+    <div class="sum-box"><table class="sum-tbl">
+      <thead><tr><th>P&L Line</th><th>Component</th><th>Dr Acc</th><th>Amount (tr)</th><th>Cr Acc</th><th>Cr Account</th></tr></thead>
+      <tbody>${b2rows}
+        <tr class="sum-total"><td colspan="3">TOTAL BLOCK 2</td><td>${fmtMl(Object.values(b2tot).reduce((s,v)=>s+v,0))}</td><td colspan="2">Reclass trong Payable to Employee</td></tr>
+      </tbody>
+    </table></div>
+  </div>`;
+}
+
+// ── EXPORT JOURNAL EXCEL ──
+function exportJournalExcel(){
+  if(typeof XLSX==='undefined'){alert('Thư viện Excel chưa load. Kiểm tra kết nối mạng rồi thử lại.');return;}
+  const ents=entityList();
+  const entGroups=ents.length?ents:['(Chưa xác định)'];
+  const wb=XLSX.utils.book_new();
+  // Sheet chỉ mục tách sổ
+  const idxData=[['FINAN — JOURNAL ENTRY (TÁCH SỔ THEO PHÁP NHÂN)'],['Mỗi pháp nhân là một bộ sổ độc lập — Summary + Detail + Person riêng.'],[],['Pháp nhân','Số NV active','Σ Company Expense (VND)','Gate A','Gate B']];
+  entGroups.forEach(e=>{
+    const r=reconCheck(e);
+    idxData.push([e,r.n,Math.round(r.sumBase),Math.abs(r.gap)<=0.01?'OK':(r.bad.length+' lech'),r.badAlloc.length?(r.badAlloc.length+' thieu'):'OK']);
+  });
+  const wsIdx=XLSX.utils.aoa_to_sheet(idxData);wsIdx['!cols']=[{wch:22},{wch:14},{wch:24},{wch:12},{wch:12}];
+  XLSX.utils.book_append_sheet(wb,wsIdx,'Index');
+
+  const _safe=s=>String(s).replace(/[\\\/\?\*\[\]:]/g,'').slice(0,20);
+  entGroups.forEach((entName,ei)=>{
+  const active=persons.filter(p=>p.status==='active'&&entityOf(p)===entName);
+
+  // SUMMARY sheet
+  const sumData=[['FINAN — JOURNAL ENTRY SUMMARY — T6/2026 · Pháp nhân: '+entName],['Source: Payroll · '+active.length+' active'],[]];
+  // ── DATA CHECK (reconciliation gate) — xuất đầu file để CFO + kế toán cùng đối chiếu ──
+  {const rc=reconCheck(entName);
+   sumData.push(['*** DATA CHECK — COMPANY EXPENSE vs CAU PHAN LUONG ***']);
+   sumData.push(['Sigma Company Expense (base)',Math.round(rc.sumBase)]);
+   sumData.push(['Sigma cost1..5 (JE ghi nhan)',Math.round(rc.sumComp)]);
+   sumData.push(['CHENH (base - cost1..5)',Math.round(rc.gap),Math.abs(rc.gap)<=0.01?'OK - khop':'LECH - CAN DOI CHIEU']);
+   if(rc.bad.length){
+     sumData.push(['So nguoi lech',rc.bad.length+'/'+rc.n]);
+     sumData.push(['Nguoi lech (name / emp_id / dept / base / cost1..5 / chenh)']);
+     rc.bad.forEach(x=>sumData.push([x.name,x.emp_id,x.dept,Math.round(x.base),Math.round(x.compSum),Math.round(x.gap)]));
+     sumData.push(['=> CFO + ke toan doi chieu nguon payroll: phan chenh la khoan gi, sua file cho khop hoac bo sung cot cau phan.']);
+   }
+   sumData.push([]);
+   // Check B — alloc% != 100
+   const ba=rc.badAlloc;
+   sumData.push(['*** DATA CHECK — PHAN BO ALLOC% (active) ***']);
+   if(!ba.length){
+     sumData.push(['Moi nguoi active co Sigma alloc% = 100%','OK']);
+   }else{
+     sumData.push(['So nguoi alloc != 100%',ba.length+'/'+rc.n]);
+     sumData.push(['Tong thieu/du phan bo (VND)',Math.round(ba.reduce((s,x)=>s+x.miss,0))]);
+     sumData.push(['Nguoi lech (name / emp_id / dept / pl_line / alloc% / eff_cost / thieu_du)']);
+     ba.forEach(x=>sumData.push([x.name,x.emp_id,x.dept,x.pl,Number(x.as.toFixed(1)),Math.round(x.ec),Math.round(x.miss)]));
+     sumData.push(['=> Sang Simulate set du alloc% cho tung nguoi (Alloc Sum = 100).']);
+   }
+   sumData.push([]);
+  }
+  // Net impact by account cluster (top section)
+  const _c1=active.reduce((s,p)=>s+comp(p,'cost1'),0),_c2=active.reduce((s,p)=>s+comp(p,'cost2'),0),_c3=active.reduce((s,p)=>s+comp(p,'cost3'),0),_c4=active.reduce((s,p)=>s+comp(p,'cost4'),0),_c5=active.reduce((s,p)=>s+comp(p,'cost5'),0);
+  const _d1=active.reduce((s,p)=>s+comp(p,'ded1'),0),_d2=active.reduce((s,p)=>s+comp(p,'ded2'),0),_d3=active.reduce((s,p)=>s+comp(p,'ded3'),0),_d4=active.reduce((s,p)=>s+comp(p,'ded4'),0),_d5=active.reduce((s,p)=>s+comp(p,'ded5'),0);
+  const clusters=[
+    ['642111','Staff cost (P&L)',Math.round(_c1+_c2+_c3+_c4+_c5),0,'Chi phí lương ghi nhận'],
+    ['334','Payable to Employee',Math.round(_d1+_d2+_d3+_d4+_d5),Math.round(_c1),'Net = lương thực lãnh'],
+    ['3383/3384/3386','Payable to Social Insurance',0,Math.round(_c2+_c3+_c4+_d1+_d2+_d3),'Phải nộp cơ quan BH'],
+    ['3382','Payable to Trade Union',0,Math.round(_c5+_d4),'Phải nộp công đoàn'],
+    ['3335','Payable to Tax (PIT)',0,Math.round(_d5),'Phải nộp thuế TNCN'],
+  ];
+  sumData.push(['NET IMPACT BY ACCOUNT CLUSTER'],['Account','Account Name','Dr (VND)','Cr (VND)','Note']);
+  clusters.forEach(c=>sumData.push([c[0],c[1],c[2]||'',c[3]||'',c[4]]));
+  const _tDr=clusters.reduce((s,c)=>s+c[2],0),_tCr=clusters.reduce((s,c)=>s+c[3],0);
+  sumData.push(['TOTAL','Dr = Cr '+(Math.abs(_tDr-_tCr)<1?'(Balanced ✓)':'(LỆCH!)'),_tDr,_tCr,'']);
+  sumData.push([],
+    ['BLOCK 1 — COMPANY STAFF COST'],['Component','Dr Acc','Cr Acc','Cr Account','Amount (VND)']);
+  JE_COST.forEach(c=>{const t=active.reduce((s,p)=>s+comp(p,c.key),0);sumData.push([c.label,PL_DR_ACC,c.cr_acc,c.cr,t]);});
+  const b1g=JE_COST.reduce((s,c)=>s+active.reduce((ss,p)=>ss+comp(p,c.key),0),0);
+  sumData.push(['TOTAL BLOCK 1 (= Base)','','','',b1g],[],
+    ['BLOCK 2 — EMPLOYEE DEDUCTIONS'],['Component','Dr Acc','Cr Acc','Cr Account','Amount (VND)']);
+  JE_DED.forEach(d=>{const t=active.reduce((s,p)=>s+comp(p,d.key),0);sumData.push([d.label,'334',d.cr_acc,d.cr,t]);});
+  const b2g=JE_DED.reduce((s,d)=>s+active.reduce((ss,p)=>ss+comp(p,d.key),0),0);
+  sumData.push(['TOTAL BLOCK 2','','','',b2g]);
+
+  // DETAIL sheet: Block 1 (PL×BU×component) + Block 2 (PL×component)
+  const detData=[['BLOCK 1 — COMPANY STAFF COST (chi tiết PL Line × BU × Component)'],
+    ['P&L Line','BU/Segment','Component','Dr Acc','Amount (VND)','Cr Acc','Cr Account']];
+  let detB1Alloc=0;
+  PL_LINES.forEach(l=>{BUS.forEach(b=>{JE_COST.forEach(c=>{
+    const amt=active.filter(p=>p.pl_line===l).reduce((s,p)=>s+compBU(p,c.key,b.key),0);
+    if(amt>0.5){detData.push([l,b.label,c.label,PL_DR_ACC,Math.round(amt),c.cr_acc,c.cr]);detB1Alloc+=amt;}
+  });});});
+  detData.push(['','','','TOTAL ĐÃ PHÂN BỔ',Math.round(detB1Alloc),'','']);
+  const detB1Unalloc=b1g-detB1Alloc;
+  if(detB1Unalloc>0.5)detData.push(['','','','CHƯA PHÂN BỔ (alloc 0%)',Math.round(detB1Unalloc),'','']);
+  detData.push(['','','','TOTAL BLOCK 1 (= Base)',Math.round(b1g),'','']);
+  detData.push([],['BLOCK 2 — EMPLOYEE DEDUCTIONS (chi tiết PL Line, không BU)'],
+    ['P&L Line','Component','Dr Acc','Amount (VND)','Cr Acc','Cr Account']);
+  PL_LINES.forEach(l=>{JE_DED.forEach(d=>{
+    const amt=active.filter(p=>p.pl_line===l).reduce((s,p)=>s+comp(p,d.key),0);
+    if(amt>0.5)detData.push([l,d.label,'334',Math.round(amt),d.cr_acc,d.cr]);
+  });});
+  detData.push(['','','TOTAL B2',Math.round(b2g),'','']);
+
+  // PERSON-LEVEL sheet (audit trail backup) — chỉ người thuộc entity này
+  const persData=[['PERSON-LEVEL COMPONENTS (audit trail) · '+entName],
+    ['Emp ID','Name','Entity','Dept','P&L Line','Status','Cost1+Adj','Cost2','Cost3','Cost4','Cost5','Ded1','Ded2','Ded3','Ded4','Ded5',...BUS.map(b=>b.short+' %')]];
+  persons.filter(p=>entityOf(p)===entName).forEach(p=>{
+    persData.push([p.emp_id||'',p.name,entityOf(p),p.dept_label,p.pl_line,p.status,
+      comp(p,'cost1'),comp(p,'cost2'),comp(p,'cost3'),comp(p,'cost4'),comp(p,'cost5'),
+      comp(p,'ded1'),comp(p,'ded2'),comp(p,'ded3'),comp(p,'ded4'),comp(p,'ded5'),
+      ...BUS.map(b=>p.alloc[b.key]||0)]);
+  });
+
+  const ws1=XLSX.utils.aoa_to_sheet(sumData);
+  const ws2=XLSX.utils.aoa_to_sheet(detData);
+  const ws3=XLSX.utils.aoa_to_sheet(persData);
+  ws1['!cols']=[{wch:38},{wch:9},{wch:9},{wch:26},{wch:18}];
+  ws2['!cols']=[{wch:30},{wch:20},{wch:32},{wch:9},{wch:18},{wch:9},{wch:26}];
+  ws3['!cols']=[{wch:10},{wch:24},{wch:16},{wch:22},{wch:30},{wch:9},...Array(10).fill({wch:13}),...BUS.map(()=>({wch:9}))];
+  const tag=_safe(entName);
+  XLSX.utils.book_append_sheet(wb,ws1,('Sum '+tag).slice(0,31));
+  XLSX.utils.book_append_sheet(wb,ws2,('Det '+tag).slice(0,31));
+  XLSX.utils.book_append_sheet(wb,ws3,('Per '+tag).slice(0,31));
+  }); // end entGroups loop
+  XLSX.writeFile(wb,'finan_journal_entry_t6_by_entity_v45.xlsx');
+}
+
+// ── RESET ALLOC ──
+function resetAlloc(){
+  if(!confirm('Reset toàn bộ % phân bổ về 0?'))return;
+  persons.forEach(p=>{BUS.forEach(b=>{p.alloc[b.key]=0;});});
+  buildTable();updateStrip();saveState();
+}
+
+// ── MODAL ──
+function openModal(){document.getElementById('modal').classList.add('open');}
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+function autoCalcBase(){
+  const g=parseFloat(document.getElementById('new-gross').value)||0;
+  document.getElementById('new-base').value=g>0?(g*1.30).toFixed(1):'';
+}
+function addPerson(){
+  const name=document.getElementById('new-name').value.trim();
+  if(!name){alert('Nhập tên nhân sự');return;}
+  const dept=document.getElementById('new-dept').value;
+  const baseM=parseFloat(document.getElementById('new-base').value)||0;
+  if(!baseM){alert('Nhập Gross Salary để tính Base');return;}
+  const np={
+    id:Date.now(),emp_no:'NEW',emp_id:'',name,position:document.getElementById('new-position').value,
+    dept,dept_label:DEPT_LABELS[dept]||dept,
+    entity:'(Chưa xác định)',
+    income:Math.round((parseFloat(document.getElementById('new-gross').value)||0)*1e6),
+    base:Math.round(baseM*1e6),
+    adj:Math.round((parseFloat(document.getElementById('new-adj').value)||0)*1e6),
+    status:'active',emp_type:'FTE',pl_line:document.getElementById('new-pl').value,
+    alloc:{SBH_own:0,SBH_partner:0,HLB:0,BU3:0,CSS:0},bu:'',_new:true,
+  };
+  applyAutoAlloc(np);
+  persons.push(np);
+  closeModal();
+  ['new-name','new-position','new-gross','new-base','new-adj'].forEach(id=>document.getElementById(id).value='');
+  buildTable();updateStrip();saveState();
+}
+
+// ── LOCAL STORAGE ──
+const LS_NS='finan_sim_v32';
+const LS_CUR=LS_NS+'::__current';                 // working state autosave
+const LS_IDX=LS_NS+'::__versions';                // version index [{name,ts,rows,totalBase}]
+let META={versionName:'',sources:[]};             // provenance: sources=[{file,mode,ts,rows}]
+function versionIndex(){try{return JSON.parse(localStorage.getItem(LS_IDX))||[]}catch(e){return[]}}
+function _writeIndex(ix){try{localStorage.setItem(LS_IDX,JSON.stringify(ix));}catch(e){}}
+function _personSnap(p){return{id:p.id,emp_no:p.emp_no,emp_id:p.emp_id||'',name:p.name,position:p.position,dept:p.dept,dept_label:p.dept_label,entity:p.entity||'(Chưa xác định)',bu:p.bu||'',emp_type:p.emp_type,status:p.status,income:p.income,base:p.base,adj:p.adj,pl_line:p.pl_line,alloc:{...p.alloc},comp:p.comp?{...p.comp}:null,_new:p._new||false};}
+function saveVersion(){
+  const inp=document.getElementById('ver-name');
+  let name=(inp?inp.value:'').trim();
+  if(!name){alert('Nhập tên phiên bản (gợi ý: T06_v1).');return;}
+  if(name.startsWith('__')||name.includes('::')){alert('Tên không hợp lệ.');return;}
+  const ix=versionIndex();
+  if(ix.some(v=>v.name===name)&&!confirm(`Phiên bản "${name}" đã tồn tại. Ghi đè?`))return;
+  const unalloc=persons.filter(p=>p.status==='active'&&Object.values(p.alloc||{}).reduce((t,v)=>t+(v||0),0)===0).length;
+  if(unalloc>0&&!confirm(`⚠ ${unalloc}/${persons.length} người active chưa có phân bổ (alloc=0).\n\nSnapshot lưu bây giờ sẽ cho allocated cost thiếu — bảng so sánh ΔBU sẽ lệch (như trường hợp cột B trống).\n\nVẫn lưu?`))return;
+  META.versionName=name;
+  const payload={ts:Date.now(),meta:JSON.parse(JSON.stringify(META)),persons:persons.map(_personSnap)};
+  try{localStorage.setItem(LS_NS+'::'+name,JSON.stringify(payload));}catch(e){alert('Lưu thất bại (localStorage đầy?): '+e.message);return;}
+  const rec={name,ts:payload.ts,rows:persons.length,totalBase:persons.reduce((t,x)=>t+(x.base||0)+(x.adj||0),0)};
+  _writeIndex([...ix.filter(v=>v.name!==name),rec].sort((a,b)=>a.name.localeCompare(b.name)));
+  saveState();renderLoadData();
+  alert(`✓ Đã lưu phiên bản "${name}" (${persons.length} nhân sự).`);
+}
+function loadVersion(name){
+  try{
+    const raw=localStorage.getItem(LS_NS+'::'+name);if(!raw){alert('Không tìm thấy phiên bản.');return;}
+    const v=JSON.parse(raw);
+    persons=(v.persons||[]).map(x=>({...x,alloc:{...x.alloc},comp:x.comp?{...x.comp}:null}));
+    META=v.meta||{versionName:name,sources:[]};META.versionName=name;
+    buildTable();updateStrip();saveState();renderLoadData();
+  }catch(e){alert('Lỗi load phiên bản: '+e.message);}
+}
+function deleteVersion(name){
+  if(!confirm(`Xóa phiên bản "${name}"? (không ảnh hưởng bảng đang làm việc)`))return;
+  try{localStorage.removeItem(LS_NS+'::'+name);}catch(e){}
+  _writeIndex(versionIndex().filter(v=>v.name!==name));
+  renderLoadData();
+}
+function exportVersionJSON(name){
+  // export a SAVED version snapshot (name given) or current working state (no name)
+  let payload;
+  if(name){const raw=localStorage.getItem(LS_NS+'::'+name);if(!raw){alert('Không tìm thấy phiên bản.');return;}payload=JSON.parse(raw);}
+  else payload={ts:Date.now(),meta:JSON.parse(JSON.stringify(META)),persons:persons.map(_personSnap)};
+  const fn=`finan_staffcost_${(name||META.versionName||'working').replace(/[^\w\-]+/g,'_')}.json`;
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));a.download=fn;a.click();
+}
+function saveState(){
+  try{
+    // Snapshot FULL working state (facts + judgments + adj + meta) — Q4 decision
+    localStorage.setItem(LS_CUR,JSON.stringify({ts:Date.now(),meta:META,persons:persons.map(_personSnap)}));
+    const ind=document.getElementById('save-indicator');
+    if(ind){ind.textContent='✓ Saved';ind.style.color='var(--green)';setTimeout(()=>{ind.textContent='Auto-saved';ind.style.color='var(--dim)';},1500);}
+  }catch(e){console.warn('Save failed',e);}
+}
+function loadState(){
+  // v32: current snapshot is the FULL truth → replace, not merge-into-RAW.
+  try{
+    const raw=localStorage.getItem(LS_CUR);
+    if(raw){
+      const saved=JSON.parse(raw);if(!saved?.persons)return false;
+      persons=saved.persons.map(x=>({...x,alloc:{...x.alloc},comp:x.comp?{...x.comp}:null}));
+      META=saved.meta||{versionName:'',sources:[]};
+      return true;
+    }
+    // v33: no migration from legacy PII key — tool starts empty, data imported per session.
+    return false;
+  }catch(e){return false;}
+}
+function purgeAllLocal(){
+  if(!confirm('⚠ XÓA SẠCH TOÀN BỘ localStorage\n\nMọi thứ tool này lưu trên máy sẽ bị xóa vĩnh viễn:\n• Bảng làm việc hiện tại\n• TẤT CẢ phiên bản đã lưu\n\nKhông thể hoàn tác. Hãy Export JSON trước nếu cần giữ.\n\nXác nhận xóa sạch?'))return;
+  try{
+    const kill=[];
+    for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&(k===LS_CUR||k===LS_IDX||k.startsWith(LS_NS+'::')||k==='finan_sim_t6_v29'))kill.push(k);}
+    kill.forEach(k=>localStorage.removeItem(k));
+  }catch(e){}
+  persons=[];META={versionName:'',sources:[]};BUDGET=null;
+  const bb=document.getElementById('summary-budget-bar');if(bb)bb.style.display='none';
+  buildTable();updateStrip();if(typeof renderLoadData==='function')renderLoadData();
+  const ind=document.getElementById('save-indicator');
+  if(ind){ind.textContent='Đã xóa sạch localStorage';ind.style.color='var(--red)';}
+  alert('✓ Đã xóa sạch mọi dữ liệu tool này lưu trên máy.');
+}
+function clearSavedState(){
+  if(!confirm('⚠ XÓA TRẮNG BẢNG LÀM VIỆC\n\nBảng nhân sự hiện tại sẽ về RỖNG (các PHIÊN BẢN ĐÃ LƯU không bị xóa).\nSau đó dùng Load Payroll (mới) để nạp lại, hoặc mở một phiên bản đã lưu.\n\nXác nhận?'))return;
+  localStorage.removeItem(LS_CUR);
+  META={versionName:'',sources:[]};
+  persons=[];
+  BUDGET=null;
+  const bb=document.getElementById('summary-budget-bar');if(bb)bb.style.display='none';
+  buildTable();updateStrip();if(typeof renderLoadData==='function')renderLoadData();
+  const ind=document.getElementById('save-indicator');
+  if(ind){ind.textContent='Đã xóa trắng';ind.style.color='var(--red)';}
+}
+
+// ── EXPORT CSV ──
+function exportCSV(){
+  const h=['ID','Emp No','Name','Position','Dept','Emp Type','P&L Line','Status','Fixed Income (VND)','Base Cost (VND)','Adj (VND)','Effective Cost (VND)',...BUS.map(b=>`${b.label} % Alloc`),...BUS.map(b=>`${b.label} Cost (VND)`)];
+  const rows=persons.map(p=>[p.id,p.emp_no||'',p.name,p.position||'',p.dept,p.emp_type||'',p.pl_line,p.status,p.income||0,p.base,p.adj||0,effectiveCost(p),...BUS.map(b=>p.alloc[b.key]||0),...BUS.map(b=>Math.round(buCost(p,b.key)))]);
+  const csv=[h,...rows].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));a.download='finan_staffcost_t6_v19.csv';a.click();
+}
+function exportSummaryCSV(){
+  const active=persons.filter(p=>p.status==='active');
+  const gEC=active.reduce((s,p)=>s+effectiveCost(p),0);
+  const buTotals=BUS.map(b=>({...b,total:active.reduce((s,p)=>s+buCost(p,b.key),0),hc:active.filter(p=>p.alloc[b.key]>0).length}));
+  const buGrand=buTotals.reduce((s,b)=>s+b.total,0);
+  const s1=[['=== SUMMARY BY BU/SEGMENT ==='],['BU','Cost (VND)','Cost (tr)','% EC','HC'],...buTotals.map(b=>[b.label,b.total,(b.total/1e6).toFixed(1),(gEC?(b.total/gEC*100).toFixed(1):'0')+'%',b.hc]),['TOTAL ALLOCATED',buGrand,(buGrand/1e6).toFixed(1),(gEC?(buGrand/gEC*100).toFixed(1):'0')+'%',''],['Unallocated',gEC-buGrand,((gEC-buGrand)/1e6).toFixed(1),(gEC?((gEC-buGrand)/gEC*100).toFixed(1):'0')+'%','']];
+  const s2=[[''],['=== SUMMARY BY P&L LINE ==='],['P&L Line','HC','EC (VND)','EC (tr)','Allocated (tr)','Unalloc (tr)','%'],...PL_LINES.map(l=>{const lp=active.filter(p=>p.pl_line===l);const tot=lp.reduce((s,p)=>s+effectiveCost(p),0);const alloc=lp.reduce((s,p)=>s+BUS.reduce((ss,b)=>ss+buCost(p,b.key),0),0);return[l,lp.length,tot,(tot/1e6).toFixed(1),(alloc/1e6).toFixed(1),((tot-alloc)/1e6).toFixed(1),(gEC?(tot/gEC*100).toFixed(1):'0')+'%'];}),['TOTAL',active.length,gEC,(gEC/1e6).toFixed(1),(buGrand/1e6).toFixed(1),((gEC-buGrand)/1e6).toFixed(1),'100%']];
+  const s3=[[''],['=== CROSS TABLE: P&L × BU (tr VND) ==='],['P&L Line',...BUS.map(b=>b.label),'Allocated (tr)','EC (tr)','Unalloc'],...PL_LINES.map(l=>{const lp=active.filter(p=>p.pl_line===l);const lineEC=lp.reduce((s,p)=>s+effectiveCost(p),0);const buVals=BUS.map(b=>lp.reduce((s,p)=>s+buCost(p,b.key),0));const rowTotal=buVals.reduce((s,v)=>s+v,0);return[l,...buVals.map(v=>(v/1e6).toFixed(1)),(rowTotal/1e6).toFixed(1),(lineEC/1e6).toFixed(1),((lineEC-rowTotal)/1e6).toFixed(1)];}),['TOTAL',...BUS.map(b=>(buTotals.find(x=>x.key===b.key)?.total||0)/1e6).map(v=>v.toFixed(1)),(buGrand/1e6).toFixed(1),(gEC/1e6).toFixed(1),((gEC-buGrand)/1e6).toFixed(1)]];
+  const csv=[...s1,...s2,...s3].map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));a.download='finan_staffcost_t6_summary_v19.csv';a.click();
+}
+function exportJSON(){
+  const active=persons.filter(p=>p.status==='active');
+  const data={meta:{version:'v32',versionName:META.versionName||'',sources:META.sources||[],exported:new Date().toISOString(),currency:'VND',display_unit:'M VND',base_definition:'COMPANY EXPENSE = Actual Salary + SHUI Company + Trade Union'},
+    summary:{total_persons:persons.length,active:active.length,total_effective_cost:active.reduce((s,p)=>s+effectiveCost(p),0),by_bu:Object.fromEntries(BUS.map(b=>[b.label,active.reduce((s,p)=>s+buCost(p,b.key),0)])),by_pl_line:Object.fromEntries(PL_LINES.map(l=>[l,active.filter(p=>p.pl_line===l).reduce((s,p)=>s+effectiveCost(p),0)]))},
+    cross_matrix:Object.fromEntries(PL_LINES.map(l=>[l,Object.fromEntries(BUS.map(b=>[b.key,active.filter(p=>p.pl_line===l).reduce((s,p)=>s+buCost(p,b.key),0)]))])),
+    persons:persons.map(p=>({id:p.id,emp_no:p.emp_no||'',name:p.name,position:p.position||'',dept:p.dept,emp_type:p.emp_type||'',pl_line:p.pl_line,status:p.status,fixed_income:p.income||0,base_cost:p.base,adjustment:p.adj||0,effective_cost:effectiveCost(p),comp:p.comp?{...p.comp}:null,allocations:Object.fromEntries(BUS.map(b=>[b.key,{pct:p.alloc[b.key]||0,amount:Math.round(buCost(p,b.key))}]))}))};
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.download='finan_staffcost_backup.json';a.click();
+}
+
+
+// ── IMPORT JSON (restore snapshot) ──
+// ── RESTORE BACKUP (full state incl. comp, from JSON export) ──
+function triggerImportJSON(){
+  if(!confirm('🔁 RESTORE BACKUP\n\nKhôi phục TOÀN BỘ trạng thái (base, components, alloc%, adj, P&L line, status) từ file JSON đã export trước.\nDùng để chuyển máy hoặc khôi phục phiên làm việc.\n\nState hiện tại sẽ bị ghi đè. Tiếp tục?'))return;
+  document.getElementById('json-file-input').click();
+}
+function importJSON(event){
+  const file=event.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const data=JSON.parse(e.target.result);
+      const list=data.persons||data.employees||(Array.isArray(data)?data:null);
+      if(!list||!list.length){alert('File JSON không có mảng persons hợp lệ.');return;}
+      const normType=s=>s==='OUT'?'OUT':s==='PRB'?'PRB':'FTE';
+      let updated=0,added=0,skipped=0;const usedOld=new Set();
+      list.forEach(s=>{
+        const id=s.id;
+        const name=(s.name||'').trim();
+        const adj=Math.round(s.adjustment!==undefined?s.adjustment:(s.adj||0));
+        const status=s.status||'active';
+        const pl_line=s.pl_line||'';
+        const etype=normType(s.emp_type);
+        const alloc={};
+        BUS.forEach(b=>{
+          const a=s.allocations?s.allocations[b.key]:(s.alloc?s.alloc[b.key]:undefined);
+          alloc[b.key]=(a&&typeof a==='object')?(a.pct||0):(a||0);
+        });
+        const base=Math.round(s.base_cost!==undefined?s.base_cost:(s.base||0));
+        const income=Math.round(s.fixed_income!==undefined?s.fixed_income:(s.income||0));
+        // comp from export (allocations don't carry comp; backup JSON should). Accept s.comp or rebuild cost1=base
+        let comp=s.comp?{...s.comp}:null;
+        // match: id (unused) → name+emp_type → name+dept → name
+        let p=id!==undefined?persons.find(x=>x.id===id&&!usedOld.has(x)):null;
+        if(!p&&name)p=persons.find(x=>x.name===name&&normType(x.emp_type)===etype&&!usedOld.has(x));
+        if(!p&&name)p=persons.find(x=>x.name===name&&x.dept===s.dept&&!usedOld.has(x));
+        if(!p&&name)p=persons.find(x=>x.name===name&&!usedOld.has(x));
+        if(p){
+          usedOld.add(p);
+          p.adj=adj;p.status=status||p.status;if(pl_line)p.pl_line=pl_line;p.alloc={...alloc};
+          if(base>0)p.base=base;if(income>0)p.income=income;
+          if(comp)p.comp=comp;p.emp_type=etype;
+          updated++;
+        }else if(name&&base>0){
+          if(!comp)comp={cost1:base,cost2:0,cost3:0,cost4:0,cost5:0,ded1:0,ded2:0,ded3:0,ded4:0,ded5:0};
+          persons.push({
+            id:id||Date.now()+added,emp_no:s.emp_no||'IMP',name,
+            position:s.position||'',dept:s.dept||'',dept_label:DEPT_LABELS[s.dept]||s.dept||'',
+            income,base,adj,status:status||'active',emp_type:etype,
+            pl_line:pl_line||deptPL(s.dept)||'7.99 Khác',alloc,comp,_new:true,
+          });
+          added++;
+        }else skipped++;
+      });
+      buildTable();updateStrip();saveState();
+      event.target.value='';
+      alert(`🔁 Restore Backup hoàn tất:\n✓ Khôi phục: ${updated}\n✦ Thêm mới: ${added}\n— Bỏ qua: ${skipped}`);
+    }catch(err){console.error(err);alert('Lỗi đọc JSON: '+err.message);}
+  };
+  reader.readAsText(file,'UTF-8');
+}
+
+// ── ALLOCATION TEMPLATE (CFO judgment layer: alloc/pl_line/adj/status by name+dept) ──
+function exportAllocTemplate(){
+  const tmpl={
+    meta:{type:'finan_allocation_template',version:'v27',exported:new Date().toISOString(),
+      match_key:'name+dept',note:'Tầng phán đoán phân bổ của CFO. KHÔNG chứa base/payroll. Apply sau khi Load Payroll kỳ mới.'},
+    rules:persons.map(p=>({
+      name:p.name,dept:p.dept,emp_type:p.emp_type||'FTE',position:p.position||'',
+      pl_line:p.pl_line,
+      alloc:{...p.alloc}
+    }))
+  };
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(tmpl,null,2)],{type:'application/json'}));
+  a.download='finan_allocation_template.json';a.click();
+}
+function triggerApplyTemplate(){
+  if(!persons.length){alert('Bảng đang trống. Hãy Load Payroll trước, rồi mới Apply Template.');return;}
+  if(!confirm('🎯 APPLY ALLOCATION TEMPLATE\n\nÁp quy tắc phân bổ (alloc% + P&L line) từ template, match theo Tên + Dept. adj/status KHÔNG nằm trong template — nhập tay theo kỳ.\n\n• Base/components GIỮ NGUYÊN (từ payroll)\n• Người không có trong template: giữ nguyên, được liệt kê để bạn set tay\n\nTiếp tục?'))return;
+  document.getElementById('template-file-input').click();
+}
+function applyTemplate(event){
+  const file=event.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const data=JSON.parse(e.target.result);
+      const rules=data.rules||(Array.isArray(data)?data:null);
+      if(!rules||!rules.length){alert('File template không hợp lệ (thiếu mảng rules).');return;}
+      const normType=s=>s==='OUT'?'OUT':s==='PRB'?'PRB':'FTE';
+      const usedRule=new Set();
+      let applied=0;const noRule=[];
+      // For each current person, find matching rule by name+dept (+emp_type for dups)
+      persons.forEach(p=>{
+        const et=normType(p.emp_type);
+        let r=rules.find(x=>!usedRule.has(x)&&x.name===p.name&&x.dept===p.dept&&normType(x.emp_type)===et);
+        if(!r)r=rules.find(x=>!usedRule.has(x)&&x.name===p.name&&x.dept===p.dept);
+        if(!r)r=rules.find(x=>!usedRule.has(x)&&x.name===p.name);
+        if(r){
+          usedRule.add(r);
+          if(r.alloc)p.alloc={...p.alloc,...r.alloc};
+          if(r.pl_line)p.pl_line=r.pl_line;
+          // v34: adj/status KHÔNG áp từ template (Q3 — adj là quyết định theo kỳ, nhập tay)
+          applied++;
+        }else{
+          noRule.push(`${p.name}${et!=='FTE'?' ('+et+')':''} · ${p.dept_label||p.dept}`);
+        }
+      });
+      META.ruleSource={file:file.name,ts:Date.now(),applied,edited:false};
+      buildTable();updateStrip();saveState();if(typeof renderProvenance==='function')renderProvenance();
+      event.target.value='';
+      let msg=`🎯 Apply Template hoàn tất:\n✓ Áp quy tắc: ${applied}\n`;
+      if(noRule.length){
+        msg+=`⚠ Chưa có rule (cần set tay): ${noRule.length}\n`;
+        msg+=noRule.slice(0,12).map(n=>'  • '+n).join('\n');
+        if(noRule.length>12)msg+=`\n  ...và ${noRule.length-12} người nữa`;
+        msg+=`\n\n→ Set alloc cho họ rồi Export Template lại để lần sau tự áp.`;
+      }else{
+        msg+=`✓ Tất cả nhân sự đều có rule.`;
+      }
+      alert(msg);
+    }catch(err){console.error(err);alert('Lỗi đọc template: '+err.message);}
+  };
+  reader.readAsText(file,'UTF-8');
+}
+
+// ── LOAD BUDGET (from Financial Forecast xlsx) ──
+let BUDGET=null; // {buKey: {pl_line: {T5,T6,...}}}
+const SCOPE_TO_BU={
+  'BU12 — SBH Own channel':'SBH_own',
+  'BU12 — SBH Partnership':'SBH_partner',
+  'BU12 — HLB':'HLB',
+  'BU3 — FinanOne':'BU3',
+  'Corporate Shared Service':'CSS',
+};
+function triggerLoadBudget(){
+  if(typeof XLSX==='undefined'){alert('Thư viện Excel chưa load. Kiểm tra mạng rồi thử lại.');return;}
+  document.getElementById('budget-file-input').click();
+}
+function loadBudget(event){
+  const file=event.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+      const sheet=wb.Sheets['05_Staff_Cost'];
+      if(!sheet){alert('Không tìm thấy sheet "05_Staff_Cost" trong file.');return;}
+      const rows=XLSX.utils.sheet_to_json(sheet,{header:1});
+      if(!rows.length){alert('Sheet 05_Staff_Cost rỗng.');return;}
+      const hdr=rows[0].map(h=>String(h).trim());
+      const ci={};['Scope','P&L Line','T5','T6','T7','T8','T9','Forecast Total T5-T9'].forEach(c=>ci[c]=hdr.indexOf(c));
+      if(ci['Scope']<0||ci['P&L Line']<0){alert('Sheet thiếu cột Scope hoặc P&L Line.');return;}
+      const periods=['T5','T6','T7','T8','T9','Forecast Total T5-T9'];
+      const budget={};let parsed=0;const unmapped=new Set();
+      rows.slice(1).forEach(r=>{
+        const scope=String(r[ci['Scope']]||'').trim();
+        const pl=String(r[ci['P&L Line']]||'').trim();
+        if(!scope||!pl)return;
+        const buKey=SCOPE_TO_BU[scope];
+        if(!buKey){unmapped.add(scope);return;}
+        if(!budget[buKey])budget[buKey]={};
+        if(!budget[buKey][pl])budget[buKey][pl]={};
+        periods.forEach(per=>{
+          if(ci[per]>=0){const v=parseFloat(r[ci[per]])||0;budget[buKey][pl][per]=Math.abs(v)*1e6;}
+        });
+        parsed++;
+      });
+      BUDGET=budget;
+      event.target.value='';
+      let msg=`Load budget hoàn tất: ${parsed} dòng (Scope × P&L).`;
+      if(unmapped.size)msg+=`\n⚠ Scope chưa map: ${[...unmapped].join(', ')}`;
+      msg+='\nChuyển sang tab Summary để xem so sánh.';
+      alert(msg);
+      // jump to Summary via sidebar nav (shows budget bar inside showTab)
+      const nav=document.getElementById('nav-analytics');if(nav)showTab('analytics',nav);
+    }catch(err){console.error(err);alert('Lỗi đọc file budget: '+err.message);}
+  };
+  reader.readAsArrayBuffer(file);
+}
+function getBudget(buKey,pl,per){if(!BUDGET||!BUDGET[buKey]||!BUDGET[buKey][pl])return 0;return BUDGET[buKey][pl][per]||0;}
+function budgetByBU(buKey,per){if(!BUDGET||!BUDGET[buKey])return 0;return Object.values(BUDGET[buKey]).reduce((s,o)=>s+(o[per]||0),0);}
+function budgetByPL(pl,per){if(!BUDGET)return 0;return Object.keys(BUDGET).reduce((s,bk)=>s+(BUDGET[bk][pl]?BUDGET[bk][pl][per]||0:0),0);}
+function budgetGrand(per){if(!BUDGET)return 0;return Object.keys(BUDGET).reduce((s,bk)=>s+budgetByBU(bk,per),0);}
+function curPeriod(){const el=document.getElementById('budget-period');return el?el.value:'T6';}
+function fmtVar(actual,budget){
+  const v=actual-budget;const pct=budget!==0?(v/budget*100):0;
+  const color=Math.abs(v)<budget*0.02?'var(--green)':(v>0?'var(--red)':'var(--teal)');
+  const sign=v>0?'+':'';
+  return `<span style="color:${color}">${sign}${fmtMl(Math.abs(v))}${v<0?' ↓':v>0?' ↑':''} (${sign}${pct.toFixed(0)}%)</span>`;
+}
+
+// ── LOAD PAYROLL (from Payroll_to_BOD xlsx, merge keep state) ──
+let LOAD_MODE='new';
+function triggerLoadPayrollNew(){
+  if(typeof XLSX==='undefined'){alert('Thư viện Excel chưa load. Kiểm tra mạng rồi thử lại.');return;}
+  if(!confirm('LOAD MỚI (ghi đè 100%)\n\n• Toàn bộ bảng hiện tại bị XÓA, nạp lại từ file\n• Judgments (alloc%/PL/adj) MẤT SẠCH → dùng 🎯 Apply Template để phủ lại quy tắc\n• Nên LƯU PHIÊN BẢN trước khi ghi đè\n\nTiếp tục?'))return;
+  LOAD_MODE='new';document.getElementById('payroll-file-input').click();
+}
+function triggerLoadPayrollAppend(){
+  if(typeof XLSX==='undefined'){alert('Thư viện Excel chưa load. Kiểm tra mạng rồi thử lại.');return;}
+  if(!confirm('LOAD BỔ SUNG\n\n• CHỈ THÊM người chưa có trong bảng (khóa: tên + loại HĐ)\n• Người trùng trong file bị BỎ QUA hoàn toàn — không cập nhật gì\n\nTiếp tục?'))return;
+  LOAD_MODE='append';document.getElementById('payroll-file-input').click();
+}
+function _norm(s){return String(s==null?'':s).trim();}
+function _numCell(v){if(v==null||v==='-'||v==='')return 0;const n=parseFloat(String(v).replace(/,/g,''));return isNaN(n)?0:n;}
+function loadPayroll(event){
+  const file=event.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+      const sheet=wb.Sheets['Payroll T05']||wb.Sheets[wb.SheetNames[0]];
+      if(!sheet){alert('Không tìm thấy sheet Payroll.');return;}
+      const rows=XLSX.utils.sheet_to_json(sheet,{header:1,defval:null});
+      // Find EN header row: the row containing 'FULL NAME' and 'COMPANY EXPENSE'
+      let hr=-1;
+      for(let i=0;i<Math.min(10,rows.length);i++){
+        const joined=(rows[i]||[]).map(x=>_norm(x).toUpperCase()).join('|');
+        if(joined.includes('FULL NAME')&&joined.includes('DEPARTMENT')){hr=i;break;}
+      }
+      if(hr<0){alert('Không tìm thấy dòng header (FULL NAME / DEPARTMENT).');return;}
+      const H=rows[hr].map(x=>_norm(x));
+      const find=(...kw)=>{for(let i=0;i<H.length;i++){if(H[i]&&kw.every(k=>H[i].toUpperCase().includes(k.toUpperCase())))return i;}return -1;};
+      // identity
+      const cName=find('FULL NAME'),cPos=find('POSITION'),cDept=find('DEPARTMENT'),cStatus=find('STATUS');
+      const cFixed=find('TOTAL FIXED INCOME'),cActual=find('ACTUAL SALARY'),cCE=find('COMPANY EXPENSE');
+      const cBU=H.findIndex(h=>h.toUpperCase()==='BU');  // exact match — 'BU' as substring would false-hit
+      const cEmpId=H.findIndex(h=>{const u=h.toUpperCase();return u==='EMP_ID'||u==='EMP ID'||u==='EMPLOYEE ID';});
+      const cEntity=H.findIndex(h=>{const u=h.toUpperCase();return u==='ENTITY'||u==='PHÁP NHÂN'||u==='PHAP NHAN';});
+      if(cName<0||cDept<0||cCE<0||cActual<0){alert('Thiếu cột bắt buộc (NAME/DEPT/ACTUAL SALARY/COMPANY EXPENSE).');return;}
+      // component anchors + offset
+      const shuiCo=find('SHUI BY COMPANY'),shuiEe=find('SHUI BY EMPLOYEE'),tu=find('TOTAL TRADE UNION'),pit=find('INCOME TAX PAYAB');
+      const c2=shuiCo-3,c3=shuiCo-2,c4=shuiCo-1;
+      const dd1=shuiEe-3,dd2=shuiEe-2,dd3=shuiEe-1;
+      const c5=tu-2,dd4=tu-1;
+      const cPIT=pit;
+      // section keywords to skip
+      const isSection=a=>{const u=_norm(a).toUpperCase();return['CAPITAL','FTE','PRB','OUT','TỔNG','CỘNG','FINAN ='].some(k=>u.includes(k))||['A.','B.','C.','I.','II.','III.','IV.'].includes(u);};
+      // parse employees: col0 (STT) numeric + has name
+      const parsed=[];
+      for(let r=hr+2;r<rows.length;r++){
+        const row=rows[r];if(!row)continue;
+        const stt=row[0],name=_norm(row[cName]);
+        if(!name)continue;
+        const sttNum=parseInt(String(stt).trim());
+        if(isNaN(sttNum))continue;       // employee rows have numeric STT
+        if(isSection(stt))continue;
+        const dept=_norm(row[cDept]);
+        if(!dept)continue;
+        const base=Math.round(_numCell(row[cCE]));
+        parsed.push({
+          name,position:_norm(row[cPos]),dept,
+          entity:cEntity>=0?(_norm(row[cEntity])||'(Chưa xác định)'):'(Chưa xác định)',
+          emp_id:cEmpId>=0?_norm(row[cEmpId]):'',
+          bu:cBU>=0?_norm(row[cBU]):'',
+          status:_norm(row[cStatus])||'FTE',
+          income:Math.round(_numCell(row[cFixed])),
+          base,
+          comp:{
+            cost1:Math.round(_numCell(row[cActual])),
+            cost2:Math.round(_numCell(row[c2])),cost3:Math.round(_numCell(row[c3])),cost4:Math.round(_numCell(row[c4])),
+            cost5:Math.round(_numCell(row[c5])),
+            ded1:Math.round(_numCell(row[dd1])),ded2:Math.round(_numCell(row[dd2])),ded3:Math.round(_numCell(row[dd3])),
+            ded4:Math.round(_numCell(row[dd4])),ded5:Math.round(_numCell(row[cPIT])),
+          }
+        });
+      }
+      if(!parsed.length){alert('Không parse được nhân viên nào. Kiểm tra format file.');return;}
+      // EMP_ID bắt buộc — cảnh báo rõ số bản ghi thiếu (không chặn cứng, cho phép sửa dần)
+      const noId=parsed.filter(x=>!x.emp_id);
+      if(!(cEmpId>=0)){
+        if(!confirm('⚠ FILE KHÔNG CÓ CỘT EMP_ID\n\nSo sánh phiên bản sẽ dựa trên tên + loại HĐ (kém chắc chắn: đổi type PRB→FTE hoặc trùng tên sẽ nhận nhầm).\n\nNên dùng template v3 có cột EMP_ID. Vẫn tiếp tục load?'))return;
+      }else if(noId.length){
+        if(!confirm(`⚠ THIẾU EMP_ID: ${noId.length}/${parsed.length} bản ghi\n\nCác dòng thiếu mã: ${noId.slice(0,10).map(x=>x.name).join(', ')}${noId.length>10?` ...và ${noId.length-10} người nữa`:''}\n\nNhững người thiếu mã sẽ so khớp bằng tên+loại HĐ (kém chắc). Nên bổ sung mã rồi load lại.\n\nVẫn tiếp tục load?`))return;
+      }
+
+      // v32: 2 chế độ — 'new' (ghi đè 100%, judgments mất sạch) | 'append' (chỉ thêm, người trùng SKIP)
+      const normType=s=>s==='OUT'?'OUT':s==='PRB'?'PRB':'FTE';
+      parsed.forEach(p=>{p._etype=normType(p.status);});
+      const mkPerson=(np,id)=>({
+        id,emp_no:'NEW',emp_id:np.emp_id||'',name:np.name,position:np.position,
+        dept:np.dept,dept_label:DEPT_LABELS[np.dept]||np.dept,bu:np.bu||'',
+        entity:np.entity||'(Chưa xác định)',
+        income:np.income,base:np.base,adj:0,
+        status:'active',emp_type:np._etype,
+        pl_line:deptPL(np.dept)||'7.99 Khác',
+        alloc:(()=>{const a={SBH_own:0,SBH_partner:0,HLB:0,BU3:0,CSS:0};const auto=getAutoAlloc(deptPL(np.dept));if(auto)a[auto]=100;else if(_normDept(np.dept)==='SALES & BUSINESS DEVELOPMENT')a.SBH_own=100;return a;})(),
+        comp:np.comp,_new:false,
+      });
+      let added=0,skipped=0;const skipList=[];
+      if(LOAD_MODE==='new'){
+        persons=[];let id=1;
+        parsed.forEach(np=>{persons.push(mkPerson(np,id++));added++;});
+        META.sources=[{file:file.name,mode:'new',ts:Date.now(),rows:parsed.length}];
+        META.versionName='';
+      }else{
+        const key=p=>p.name+'|'+normType(p.emp_type);
+        const existing=new Set(persons.map(key));
+        let id=Math.max(0,...persons.map(p=>p.id))+1;
+        parsed.forEach(np=>{
+          const k=np.name+'|'+np._etype;
+          if(existing.has(k)){skipped++;skipList.push(np.name+(np._etype!=='FTE'?` (${np._etype})`:''));return;}
+          existing.add(k);persons.push(mkPerson(np,id++));added++;
+        });
+        META.sources=[...(META.sources||[]),{file:file.name,mode:'append',ts:Date.now(),rows:parsed.length}];
+      }
+      buildTable();updateStrip();saveState();if(typeof renderLoadData==='function')renderLoadData();
+      event.target.value='';
+      const totalCE=parsed.reduce((s2,p2)=>s2+p2.base,0);
+      let msg=LOAD_MODE==='new'
+        ?`✓ LOAD MỚI HOÀN TẤT (ghi đè 100%)\n\nFile: ${file.name}\n${parsed.length} nhân viên · Company Expense ${(totalCE/1e6).toFixed(1)}tr\n\n⚠ Judgments đã reset — dùng 🎯 Apply Template để phủ lại alloc/PL.`
+        :`✓ LOAD BỔ SUNG HOÀN TẤT\n\nFile: ${file.name}\n• Thêm mới: ${added}\n• Trùng, bỏ qua (không cập nhật): ${skipped}`;
+      if(LOAD_MODE==='append'&&skipList.length)msg+=`\n  → ${skipList.slice(0,8).join(', ')}${skipList.length>8?'...':''}`;
+      // cảnh báo phòng ban chưa map P&L line (MD1)
+      const unmappedDepts=[...new Set(parsed.map(x=>x.dept))].filter(d=>d&&!deptPL(d));
+      if(unmappedDepts.length){
+        msg+=`\n\n⚠ ${unmappedDepts.length} phòng ban CHƯA map P&L line → nhân sự rơi vào 7.99 Khác:\n  ${unmappedDepts.slice(0,10).join(', ')}${unmappedDepts.length>10?'...':''}\n→ Sang tab '2 · Master Data' để chọn P&L line cho từng phòng.`;
+      }
+      alert(msg);
+      if(unmappedDepts.length&&typeof renderMasterData==='function')renderMasterData();
+    }catch(err){console.error(err);alert('Lỗi đọc payroll: '+err.message);}
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ── MASTER DATA TAB ──
+let MD_SUB='dept';
+function mdSwitch(v){MD_SUB=v;
+  document.getElementById('mdsub-dept').classList.toggle('on',v==='dept');
+  document.getElementById('mdsub-bu').classList.toggle('on',v==='bu');
+  document.getElementById('md-dept-view').style.display=v==='dept'?'':'none';
+  document.getElementById('md-bu-view').style.display=v==='bu'?'':'none';
+  renderMasterData();
+}
+function _distinctDepts(){
+  // thống kê distinct dept từ payroll (giữ tên hiển thị đầu tiên gặp), đếm active
+  const m={};persons.forEach(p=>{if(!p.dept)return;const k=_normDept(p.dept);if(!m[k])m[k]={display:p.dept,n:0,total:0};m[k].n+=(p.status!=='inactive'?1:0);m[k].total++;});
+  return m;
+}
+function renderMasterData(){
+  if(MD_SUB==='dept'){
+    const host=document.getElementById('md-dept-list');if(!host)return;
+    const dd=_distinctDepts();const keys=Object.keys(dd).sort((a,b)=>dd[a].display.localeCompare(dd[b].display));
+    if(!keys.length){host.innerHTML='<div class="ld-note">Chưa có payroll. Load payroll ở tab 1 trước, danh sách phòng ban sẽ tự hiện ở đây.</div>';return;}
+    const opts=pl=>'<option value="">— chọn P&L line —</option>'+PL_LIST.map(l=>`<option value="${l}"${l===pl?' selected':''}>${l}</option>`).join('');
+    let unmapped=0;
+    host.innerHTML=keys.map(k=>{
+      const e=MD1[k],cur=e&&e.pl_line?e.pl_line:'';if(!cur)unmapped++;
+      return `<div class="md-row${cur?'':' unmapped'}"><span class="md-dept">${dd[k].display}</span><span class="md-cnt">${dd[k].n} active / ${dd[k].total}</span>
+        <select onchange="setMD1('${k.replace(/'/g,"\\'")}','${dd[k].display.replace(/'/g,"\\'")}',this.value)">${opts(cur)}</select></div>`;
+    }).join('');
+    if(unmapped>0)host.insertAdjacentHTML('afterbegin',`<div style="font-size:11px;color:var(--warn);background:var(--warnbg);border-radius:6px;padding:6px 10px;margin-bottom:8px">⚠ ${unmapped}/${keys.length} phòng chưa map P&L line → nhân sự thuộc phòng đó rơi vào <b>7.99 Khác</b>. Chọn P&L cho đủ.</div>`);
+  }else{
+    const host=document.getElementById('md-bu-list');if(!host)return;
+    host.innerHTML='<table class="cmp-t"><tr><th class="left">Center key</th><th class="left">Label</th></tr>'+
+      BUS.map(b=>`<tr><td class="left" style="font-family:var(--fm)">${b.key}</td><td class="left">${b.label||b.key}</td></tr>`).join('')+'</table>';
+  }
+}
+function setMD1(normKey,display,pl){
+  if(!MD1[normKey])MD1[normKey]={};
+  MD1[normKey].display=display;MD1[normKey].pl_line=pl;
+  if(!pl)delete MD1[normKey].pl_line;
+  saveMD1();
+  // re-apply PL line to current persons of this dept (chỉ đổi pl_line, KHÔNG đụng alloc — CR4)
+  persons.forEach(p=>{if(_normDept(p.dept)===normKey){p.pl_line=pl||'7.99 Khác';}});
+  buildTable&&buildTable();updateStrip&&updateStrip();saveState&&saveState();
+  renderMasterData();
+}
+function triggerImportMD1(){document.getElementById('md1-file').click();}
+function importMD1(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{
+  const d=JSON.parse(e.target.result);const arr=d.departments||d;if(!Array.isArray(arr))throw new Error('Thiếu mảng departments');
+  MD1={};arr.forEach(x=>{const k=_normDept(x.name||x.department||x.display);if(k)MD1[k]={display:x.name||x.department||x.display,pl_line:x.pl_line||x.pl||''};});
+  saveMD1();
+  // re-apply lên persons hiện tại
+  persons.forEach(p=>{const pl=deptPL(p.dept);if(pl)p.pl_line=pl;});
+  buildTable&&buildTable();updateStrip&&updateStrip();saveState&&saveState();renderMasterData();
+  alert('✓ Import MD1: '+Object.keys(MD1).length+' phòng ban.');
+}catch(err){alert('Lỗi import MD1: '+err.message);}};r.readAsText(f,'UTF-8');ev.target.value='';}
+function exportMD1(){
+  const departments=Object.keys(MD1).map(k=>({name:MD1[k].display||k,pl_line:MD1[k].pl_line||''}));
+  const blob=new Blob([JSON.stringify({meta:{type:'finan_md1_department_pl',exported:new Date().toISOString()},departments},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='finan_md1_department_pl.json';a.click();
+}
+function triggerImportPL(){document.getElementById('pl-file').click();}
+function importPL(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{
+  const d=JSON.parse(e.target.result);const arr=d.pl_lines||d.rules||d;
+  let list=[];
+  if(Array.isArray(arr))list=arr.map(x=>typeof x==='string'?x:(x.pl_line||x.name||x.pl)).filter(Boolean);
+  if(!list.length)throw new Error('Không tìm thấy danh sách PL line');
+  PL_LIST=[...new Set(list)];savePLList();
+  buildTable&&buildTable();renderMasterData();
+  alert('✓ Import PL Line list: '+PL_LIST.length+' dòng.');
+}catch(err){alert('Lỗi import PL list: '+err.message);}};r.readAsText(f,'UTF-8');ev.target.value='';}
+function exportPL(){const blob=new Blob([JSON.stringify({meta:{type:'finan_pl_line_list',exported:new Date().toISOString()},pl_lines:PL_LIST},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='finan_pl_line_list.json';a.click();}
+function exportBU(){const blob=new Blob([JSON.stringify({meta:{type:'finan_bu_center_list',exported:new Date().toISOString()},centers:BUS.map(b=>({key:b.key,label:b.label||b.key}))},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='finan_bu_center_list.json';a.click();}
+
+// ── LOAD DATA TAB RENDER ──
+function renderLoadData(){
+  const vl=document.getElementById('ver-list'),sl=document.getElementById('src-list');
+  if(vl){
+    const ix=versionIndex();
+    vl.innerHTML=ix.length?ix.map(v=>{
+      const cur=v.name===META.versionName?' <span style="color:var(--teal)">●</span>':'';
+      const d=new Date(v.ts).toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+      return `<div class="ver-row"><span class="vn">${v.name}</span>${cur}
+        <span class="vm">${v.rows} ns · ${(v.totalBase/1e6).toFixed(0)}tr · ${d}</span>
+        <button class="ver-btn" onclick="loadVersion('${v.name}')">Mở</button>
+        <button class="ver-btn" onclick="exportVersionJSON('${v.name}')">⬇</button>
+        <button class="ver-btn" style="color:var(--red)" onclick="deleteVersion('${v.name}')">✕</button></div>`;
+    }).join(''):'<div class="ld-note">Chưa có phiên bản nào. Đặt tên rồi bấm Lưu.</div>';
+  }
+  if(sl){
+    const srcs=META.sources||[];
+    sl.innerHTML=(srcs.length?srcs.map(x=>{
+      const d=new Date(x.ts).toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+      const mode=x.mode==='new'?'GHI ĐÈ':x.mode==='append'?'BỔ SUNG':'LEGACY';
+      return `<div class="src-row">[${mode}] ${x.file} · ${x.rows} dòng · ${d}</div>`;
+    }).join(''):'<div class="ld-note">Chưa nạp file nào (đang dùng data nhúng sẵn hoặc bảng trống).</div>')
+    +`<div class="src-row" style="border-bottom:none;color:var(--text)">Bảng hiện tại: <b>${persons.length}</b> nhân sự · phiên bản: <b>${META.versionName||'(chưa đặt tên)'}</b></div>`;
+    const vn=document.getElementById('ver-name');if(vn&&!vn.value&&META.versionName)vn.value=META.versionName;
+  }
+}
+
+// ── VERSION COMPARISON (6 chiều: headcount · Δbase/người · ΔBU · ΔPL · Δdept · Δalloc%) ──
+let CMP_LAST=null;
+function _verPersons(name){try{const raw=localStorage.getItem(LS_NS+'::'+name);return raw?(JSON.parse(raw).persons||[]):null;}catch(e){return null;}}
+function _pkey(p){const t=p.emp_type==='OUT'?'OUT':p.emp_type==='PRB'?'PRB':'FTE';return p.name+'|'+t;}
+function _eff(p){return (p.base||0)+(p.adj||0);}
+function _buAmt(p,bu){return _eff(p)*((p.alloc&&p.alloc[bu])||0)/100;}
+function _nt(t){return t==='OUT'?'OUT':t==='PRB'?'PRB':'FTE';}
+// Build match key: emp_id when present & unique in its own period; else name+type (flagged).
+function _matchMaps(A,B){
+  const idCntA={},idCntB={};
+  A.forEach(p=>{if(p.emp_id)idCntA[p.emp_id]=(idCntA[p.emp_id]||0)+1;});
+  B.forEach(p=>{if(p.emp_id)idCntB[p.emp_id]=(idCntB[p.emp_id]||0)+1;});
+  const keyOf=(p,idCnt)=>{
+    if(p.emp_id&&idCnt[p.emp_id]===1)return{k:'id:'+p.emp_id,byId:true};
+    return{k:'nm:'+p.name+'|'+_nt(p.emp_type),byId:false};
+  };
+  const mA=new Map(),mB=new Map();
+  A.forEach(p=>{const{k,byId}=keyOf(p,idCntA);mA.set(k,{...p,_byId:byId});});
+  B.forEach(p=>{const{k,byId}=keyOf(p,idCntB);mB.set(k,{...p,_byId:byId});});
+  return{mA,mB};
+}
+function compareVersions(nA,nB,f){
+  f=f||{};
+  let A=_verPersons(nA),B=_verPersons(nB);
+  if(!A||!B)return null;
+  const flt=p=>{
+    if(f.et&&_nt(p.emp_type)!==f.et)return false;
+    if(f.dept&&p.dept!==f.dept)return false;
+    if(f.bu&&!(((p.alloc&&p.alloc[f.bu])||0)>0))return false;
+    return true;
+  };
+  if(f.et||f.dept||f.bu){A=A.filter(flt);B=B.filter(flt);}
+  // coverage stats for emp_id (on filtered set)
+  const idCovA=A.length?A.filter(p=>p.emp_id).length/A.length:1;
+  const idCovB=B.length?B.filter(p=>p.emp_id).length/B.length:1;
+  const byName=(idCovA<1||idCovB<1);
+  const {mA,mB}=_matchMaps(A,B);
+  const enteredK=[...mB.keys()].filter(k=>!mA.has(k));
+  const leftK=[...mA.keys()].filter(k=>!mB.has(k));
+  const stayedK=[...mB.keys()].filter(k=>mA.has(k));
+  const entered=enteredK.map(k=>mB.get(k));
+  const left=leftK.map(k=>mA.get(k));
+  const stayed=stayedK.map(k=>({a:mA.get(k),b:mB.get(k)}));
+  // unified people rows: left(-100%) → stayed(Δ) → entered(+100%), sort |Δ| desc within group
+  const rowLeft=left.map(p=>({kind:'left',name:p.name,emp_id:p.emp_id||'',dept:p.dept,typeA:_nt(p.emp_type),typeB:null,byId:p._byId,vA:_eff(p),vB:0,d:-_eff(p)}));
+  const rowStay=stayed.map(x=>({kind:'stay',name:x.b.name,emp_id:x.b.emp_id||'',dept:x.b.dept,typeA:_nt(x.a.emp_type),typeB:_nt(x.b.emp_type),byId:x.b._byId,vA:_eff(x.a),vB:_eff(x.b),d:_eff(x.b)-_eff(x.a)}));
+  const rowEnter=entered.map(p=>({kind:'enter',name:p.name,emp_id:p.emp_id||'',dept:p.dept,typeA:null,typeB:_nt(p.emp_type),byId:p._byId,vA:0,vB:_eff(p),d:_eff(p)}));
+  const byAbs=(x,y)=>Math.abs(y.d)-Math.abs(x.d);
+  rowLeft.sort(byAbs);rowStay.sort(byAbs);rowEnter.sort(byAbs);
+  const people=[...rowLeft,...rowStay,...rowEnter];
+  const typeChanged=rowStay.filter(x=>x.typeA!==x.typeB);
+  // dept 6-col: cost + headcount(active) + avg
+  const buKeys=['SBH_own','SBH_partner','HLB','BU3','CSS'];
+  const aggD=list=>{const m={};list.filter(p=>p.status!=='inactive').forEach(p=>{const k=p.dept;if(!m[k])m[k]={cost:0,n:0};m[k].cost+=_eff(p);m[k].n++;});return m;};
+  const deptA6=aggD(A),deptB6=aggD(B);
+  // PL→dept hierarchy: L1 = PL line, L2 = dept (một PL có thể chứa nhiều dept, vd 6.3)
+  const plDeptAgg=list=>{const m={};list.filter(p=>p.status!=='inactive').forEach(p=>{const pl=p.pl_line||'(chưa gán PL)';const dp=p.dept||'(chưa gán dept)';if(!m[pl])m[pl]={cost:0,n:0,depts:{}};m[pl].cost+=_eff(p);m[pl].n++;if(!m[pl].depts[dp])m[pl].depts[dp]={cost:0,n:0};m[pl].depts[dp].cost+=_eff(p);m[pl].depts[dp].n++;});return m;};
+  const plHierA=plDeptAgg(A),plHierB=plDeptAgg(B);
+  // legacy dims for PL + BU tables (unchanged)
+  const agg=(list,fn)=>{const m={};list.forEach(p=>{const k=fn(p);m[k]=(m[k]||0)+_eff(p);});return m;};
+  const plA=agg(A,p=>p.pl_line),plB=agg(B,p=>p.pl_line);
+  const buA={},buB={};buKeys.forEach(k=>{buA[k]=A.reduce((t,p)=>t+_buAmt(p,k),0);buB[k]=B.reduce((t,p)=>t+_buAmt(p,k),0);});
+  const allocChanged=stayed.filter(x=>buKeys.some(k=>((x.a.alloc&&x.a.alloc[k])||0)!==((x.b.alloc&&x.b.alloc[k])||0)))
+    .map(x=>({name:x.b.name,emp_type:x.b.emp_type,
+      from:buKeys.map(k=>((x.a.alloc&&x.a.alloc[k])||0)).join('/'),
+      to:buKeys.map(k=>((x.b.alloc&&x.b.alloc[k])||0)).join('/')}));
+  const tA=A.reduce((t,p)=>t+_eff(p),0),tB=B.reduce((t,p)=>t+_eff(p),0);
+  return {nA,nB,people,typeChanged,entered,left,stayedCount:stayed.length,
+    deptA6,deptB6,plHierA,plHierB,plA,plB,buA,buB,buKeys,allocChanged,tA,tB,
+    hcA:A.length,hcB:B.length,byName,idCovA,idCovB};
+}
+function _dTable(title,kA,kB,labelHdr,nA,nB){
+  const keys=[...new Set([...Object.keys(kA),...Object.keys(kB)])].sort();
+  let tA=0,tB=0;
+  let rows=keys.map(k=>{
+    const a=kA[k]||0,b=kB[k]||0,d=b-a;tA+=a;tB+=b;
+    const col=Math.abs(d)<5e5?'var(--dim)':(d>0?'var(--red)':'var(--teal)');
+    return `<tr><td class="left">${k}</td><td class="num">${fmtMl(a)}</td><td class="num">${fmtMl(b)}</td><td class="num" style="color:${col};font-weight:600">${d>0?'+':''}${(d/1e6).toFixed(1)}</td></tr>`;
+  }).join('');
+  const td=tB-tA;
+  rows+=`<tr class="cmp-total"><td class="left">TỔNG</td><td class="num">${fmtMl(tA)}</td><td class="num">${fmtMl(tB)}</td><td class="num" style="color:${td>0?'var(--red)':'var(--teal)'}">${td>0?'+':''}${(td/1e6).toFixed(1)}</td></tr>`;
+  return `<div class="cmp-block"><div class="cmp-h">${title}</div><table class="cmp-t"><tr><th class="left">${labelHdr}</th><th>${nA||'A'}</th><th>${nB||'B'}</th><th>Δ (tr)</th></tr>${rows}</table></div>`;
+}
+function _plDeptTable(r){
+  const A=r.plHierA,B=r.plHierB;
+  const plKeys=[...new Set([...Object.keys(A),...Object.keys(B)])].sort();
+  const num=(v)=>v?fmtMl(v):'—';
+  const cellD=(dv,col)=>`<td class="num" style="color:${col};font-weight:600">${dv>0?'+':''}${(dv/1e6).toFixed(1)}</td>`;
+  const cellDN=(dv,col)=>`<td class="num" style="color:${col};font-weight:600">${dv>0?'+':''}${dv}</td>`;
+  const colc=d=>Math.abs(d)<5e5?'var(--dim)':(d>0?'var(--red)':'var(--teal)');
+  const coln=d=>d>0?'var(--red)':d<0?'var(--teal)':'var(--dim)';
+  let tcA=0,tnA=0,tcB=0,tnB=0;
+  let rows='';
+  plKeys.forEach(pl=>{
+    const a=A[pl]||{cost:0,n:0,depts:{}},b=B[pl]||{cost:0,n:0,depts:{}};
+    tcA+=a.cost;tnA+=a.n;tcB+=b.cost;tnB+=b.n;
+    const avA=a.n?a.cost/a.n:null,avB=b.n?b.cost/b.n:null;
+    const dC=b.cost-a.cost,dN=b.n-a.n,dAv=(avA!=null&&avB!=null)?avB-avA:(avB!=null?avB:(avA!=null?-avA:0));
+    // L1 = PL line (đậm)
+    rows+=`<tr class="pl-l1"><td class="left">${pl}</td>
+      <td class="num">${num(a.cost)}</td><td class="num">${a.n||'—'}</td><td class="num">${avA!=null?fmtMl(avA):'—'}</td>
+      <td class="num">${num(b.cost)}</td><td class="num">${b.n||'—'}</td><td class="num">${avB!=null?fmtMl(avB):'—'}</td>
+      ${cellD(dC,colc(dC))}${cellDN(dN,coln(dN))}${cellD(dAv,colc(dAv))}</tr>`;
+    // L2 = dept con (chỉ hiện nếu PL có >1 dept, hoặc luôn hiện để drill — hiện luôn cho minh bạch)
+    const dKeys=[...new Set([...Object.keys(a.depts),...Object.keys(b.depts)])].sort();
+    dKeys.forEach(dp=>{
+      const da=a.depts[dp]||{cost:0,n:0},db=b.depts[dp]||{cost:0,n:0};
+      const dav=da.n?da.cost/da.n:null,dbv=db.n?db.cost/db.n:null;
+      const ddC=db.cost-da.cost,ddN=db.n-da.n,ddAv=(dav!=null&&dbv!=null)?dbv-dav:(dbv!=null?dbv:(dav!=null?-dav:0));
+      rows+=`<tr class="pl-l2"><td class="left">↳ ${dp}</td>
+        <td class="num">${num(da.cost)}</td><td class="num">${da.n||'—'}</td><td class="num">${dav!=null?fmtMl(dav):'—'}</td>
+        <td class="num">${num(db.cost)}</td><td class="num">${db.n||'—'}</td><td class="num">${dbv!=null?fmtMl(dbv):'—'}</td>
+        ${cellD(ddC,colc(ddC))}${cellDN(ddN,coln(ddN))}${cellD(ddAv,colc(ddAv))}</tr>`;
+    });
+  });
+  const avTA=tnA?tcA/tnA:0,avTB=tnB?tcB/tnB:0;
+  rows+=`<tr class="cmp-total"><td class="left">TỔNG</td>
+    <td class="num">${fmtMl(tcA)}</td><td class="num">${tnA}</td><td class="num">${fmtMl(avTA)}</td>
+    <td class="num">${fmtMl(tcB)}</td><td class="num">${tnB}</td><td class="num">${fmtMl(avTB)}</td>
+    ${cellD(tcB-tcA,tcB-tcA>0?'var(--red)':'var(--teal)')}${cellDN(tnB-tnA,tnB-tnA>0?'var(--red)':'var(--teal)')}${cellD(avTB-avTA,avTB-avTA>0?'var(--red)':'var(--teal)')}</tr>`;
+  return `<div class="cmp-block"><div class="cmp-h">Δ P&L line › phòng ban (cost · số người active · TB/người)</div>
+    <div style="overflow-x:auto"><table class="cmp-t cmp-wide"><tr>
+      <th class="left" rowspan="2">P&L line › Dept</th><th colspan="3" style="text-align:center;border-bottom:1px solid var(--border2)">${r.nA}</th><th colspan="3" style="text-align:center;border-bottom:1px solid var(--border2)">${r.nB}</th><th colspan="3" style="text-align:center;border-bottom:1px solid var(--border2)">Δ</th></tr>
+      <tr><th>cost</th><th>#ng</th><th>TB</th><th>cost</th><th>#ng</th><th>TB</th><th>cost</th><th>#ng</th><th>TB</th></tr>
+      ${rows}</table></div></div>`;
+}
+function _dept6Table(r){
+  const keys=[...new Set([...Object.keys(r.deptA6),...Object.keys(r.deptB6)])].sort();
+  const A=r.deptA6,B=r.deptB6;
+  const cell=(v,unit)=>v==null?'—':(unit==='n'?v:fmtMl(v));
+  let tcA=0,tnA=0,tcB=0,tnB=0;
+  let rows=keys.map(k=>{
+    const a=A[k]||{cost:0,n:0},b=B[k]||{cost:0,n:0};
+    tcA+=a.cost;tnA+=a.n;tcB+=b.cost;tnB+=b.n;
+    const avA=a.n?a.cost/a.n:null,avB=b.n?b.cost/b.n:null;
+    const dCost=b.cost-a.cost,dN=b.n-a.n,dAv=(avA!=null&&avB!=null)?avB-avA:(avB!=null?avB:(avA!=null?-avA:0));
+    const cc=Math.abs(dCost)<5e5?'var(--dim)':(dCost>0?'var(--red)':'var(--teal)');
+    const nc=dN>0?'var(--red)':dN<0?'var(--teal)':'var(--dim)';
+    const ac=Math.abs(dAv)<5e5?'var(--dim)':(dAv>0?'var(--red)':'var(--teal)');
+    return `<tr><td class="left">${k}</td>
+      <td class="num">${a.n?fmtMl(a.cost):'—'}</td><td class="num">${a.n||'—'}</td><td class="num">${avA!=null?fmtMl(avA):'—'}</td>
+      <td class="num">${b.n?fmtMl(b.cost):'—'}</td><td class="num">${b.n||'—'}</td><td class="num">${avB!=null?fmtMl(avB):'—'}</td>
+      <td class="num" style="color:${cc};font-weight:600">${dCost>0?'+':''}${(dCost/1e6).toFixed(1)}</td>
+      <td class="num" style="color:${nc};font-weight:600">${dN>0?'+':''}${dN}</td>
+      <td class="num" style="color:${ac};font-weight:600">${dAv>0?'+':''}${(dAv/1e6).toFixed(1)}</td></tr>`;
+  }).join('');
+  const avTA=tnA?tcA/tnA:0,avTB=tnB?tcB/tnB:0;
+  rows+=`<tr class="cmp-total"><td class="left">TỔNG</td>
+    <td class="num">${fmtMl(tcA)}</td><td class="num">${tnA}</td><td class="num">${fmtMl(avTA)}</td>
+    <td class="num">${fmtMl(tcB)}</td><td class="num">${tnB}</td><td class="num">${fmtMl(avTB)}</td>
+    <td class="num" style="color:${tcB-tcA>0?'var(--red)':'var(--teal)'}">${tcB-tcA>0?'+':''}${((tcB-tcA)/1e6).toFixed(1)}</td>
+    <td class="num" style="color:${tnB-tnA>0?'var(--red)':'var(--teal)'}">${tnB-tnA>0?'+':''}${tnB-tnA}</td>
+    <td class="num" style="color:${avTB-avTA>0?'var(--red)':'var(--teal)'}">${avTB-avTA>0?'+':''}${((avTB-avTA)/1e6).toFixed(1)}</td></tr>`;
+  return `<div class="cmp-block"><div class="cmp-h">Δ theo phòng ban (cost · số người active · TB/người)</div>
+    <div style="overflow-x:auto"><table class="cmp-t cmp-wide"><tr>
+      <th class="left" rowspan="2">Dept</th><th colspan="3" style="text-align:center;border-bottom:1px solid var(--border2)">${r.nA}</th><th colspan="3" style="text-align:center;border-bottom:1px solid var(--border2)">${r.nB}</th><th colspan="3" style="text-align:center;border-bottom:1px solid var(--border2)">Δ</th></tr>
+      <tr><th>cost</th><th>#ng</th><th>TB</th><th>cost</th><th>#ng</th><th>TB</th><th>cost</th><th>#ng</th><th>TB</th></tr>
+      ${rows}</table></div></div>`;
+}
+function renderCompareUI(){
+  const el=document.getElementById('ver-compare');if(!el)return;
+  const ix=versionIndex();
+  const opts=ix.map(v=>`<option value="${v.name}">${v.name}</option>`).join('');
+  const deptOpts='<option value="">Dept: tất cả</option>'+Object.keys(DEPT_LABELS).map(d=>`<option value="${d}">${DEPT_LABELS[d]||d}</option>`).join('');
+  const buOpts='<option value="">BU: tất cả</option>'+BUS.map(b=>`<option value="${b.key}">${b.key}</option>`).join('');
+  const etOpts='<option value="">Loại HĐ: tất cả</option><option>FTE</option><option>PRB</option><option>OUT</option>';
+  const selHTML=ix.length>=2?
+    `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span style="font-size:11px;color:var(--sub);font-family:var(--fm)">So sánh phiên bản:</span>
+      <select class="filter-sel" id="cmp-a">${opts}</select>
+      <span style="color:var(--dim)">→</span>
+      <select class="filter-sel" id="cmp-b">${opts}</select>
+      <select class="filter-sel" id="cmp-f-bu" title="Lọc người có phân bổ >0 vào BU này (theo alloc từng phiên bản)">${buOpts}</select>
+      <select class="filter-sel" id="cmp-f-dept">${deptOpts}</select>
+      <select class="filter-sel" id="cmp-f-et">${etOpts}</select>
+      <button class="btn btn-teal" onclick="runCompare()">⇄ So sánh</button>
+    </div><div id="cmp-out" style="margin-top:12px"></div>`
+    :`<span style="font-size:11px;color:var(--dim)">Cần ≥ 2 phiên bản đã lưu để so sánh (hiện có ${ix.length}). Lưu phiên bản ở tab Load Data.</span>`;
+  el.innerHTML=selHTML;
+  if(ix.length>=2){const b=document.getElementById('cmp-b');if(b)b.selectedIndex=ix.length-1;}
+}
+function runCompare(){
+  const a=document.getElementById('cmp-a')?.value,b=document.getElementById('cmp-b')?.value;
+  if(!a||!b)return;
+  if(a===b){alert('Chọn 2 phiên bản khác nhau.');return;}
+  const f={bu:document.getElementById('cmp-f-bu')?.value||'',dept:document.getElementById('cmp-f-dept')?.value||'',et:document.getElementById('cmp-f-et')?.value||''};
+  const r=compareVersions(a,b,f);if(!r){alert('Không đọc được phiên bản.');return;}
+  r.filter=f;CMP_LAST=r;
+  const out=document.getElementById('cmp-out');if(!out)return;
+  const fdesc=[r.filter&&r.filter.bu?'BU='+r.filter.bu:'',r.filter&&r.filter.dept?'Dept='+(DEPT_LABELS[r.filter.dept]||r.filter.dept):'',r.filter&&r.filter.et?'HĐ='+r.filter.et:''].filter(Boolean).join(' · ');
+  // headcount labels count PEOPLE IN SCOPE (after filter) per period
+  const hA=r.hcA,hB=r.hcB;
+  const warnId=r.byName?`<div style="font-size:10px;color:var(--warn);background:var(--warnbg);border-radius:5px;padding:4px 8px;margin-bottom:8px">⚠ Một phần so khớp bằng TÊN+loại HĐ (EMP_ID phủ ${Math.round(r.idCovA*100)}%/${Math.round(r.idCovB*100)}%). Đổi type hoặc trùng tên có thể nhận nhầm — bổ sung EMP_ID để chắc chắn.</div>`:'';
+  const hcHtml=`<div class="cmp-block"><div class="cmp-h">Headcount &amp; tổng chi phí${fdesc?` <span class="dim" style="font-weight:400">— lọc: ${fdesc}</span>`:''}</div>
+    ${warnId}<table class="cmp-t"><tr><th class="left"></th><th>${r.nA} (${hA})</th><th>${r.nB} (${hB})</th><th>Δ</th></tr>
+    <tr><td class="left">Headcount</td><td class="num">${hA}</td><td class="num">${hB}</td><td class="num" style="font-weight:600">${hB-hA>0?'+':''}${hB-hA}</td></tr>
+    <tr><td class="left">Base + Adj</td><td class="num">${fmtMl(r.tA)}</td><td class="num">${fmtMl(r.tB)}</td><td class="num" style="font-weight:600;color:${r.tB-r.tA>0?'var(--red)':'var(--teal)'}">${r.tB-r.tA>0?'+':''}${((r.tB-r.tA)/1e6).toFixed(1)}</td></tr></table></div>`;
+
+  // ── MERGED PEOPLE TABLE: Ra → Ở lại → Vào ──
+  const nLeft=r.people.filter(x=>x.kind==='left').length,nStay=r.people.filter(x=>x.kind==='stay').length,nEnter=r.people.filter(x=>x.kind==='enter').length;
+  const rowHtml=x=>{
+    const tag=x.kind==='left'?'<span class="pchip out">RA</span>':x.kind==='enter'?'<span class="pchip in">VÀO</span>':'';
+    const tch=(x.kind==='stay'&&x.typeA!==x.typeB)?` <span class="pchip tch" title="Đổi loại hợp đồng">${x.typeA}→${x.typeB}</span>`:'';
+    const tp=x.typeB||x.typeA;
+    const idc=x.emp_id?`<span class="dim" style="font-family:var(--fm);font-size:9px">#${x.emp_id}</span>`:(x.byId?'':'<span class="dim" title="Khớp bằng tên">~</span>');
+    const dcol=x.kind==='left'?'var(--red)':x.kind==='enter'?'var(--green)':(x.d>0?'var(--red)':x.d<0?'var(--teal)':'var(--dim)');
+    const rowbg=x.kind==='left'?'style="background:rgba(224,85,85,.05)"':x.kind==='enter'?'style="background:rgba(74,222,128,.05)"':'';
+    return `<tr ${rowbg}><td class="left">${tag}${tag?' ':''}${x.name} <span class="dim">${tp}</span>${tch} ${idc}</td><td class="left dim">${x.dept}</td><td class="num">${x.vA?fmtMl(x.vA):'—'}</td><td class="num">${x.vB?fmtMl(x.vB):'—'}</td><td class="num" style="color:${dcol};font-weight:600">${x.d>0?'+':''}${(x.d/1e6).toFixed(1)}</td></tr>`;
+  };
+  // group subtotals for collapsed view
+  const gSum=k=>{const g=r.people.filter(x=>x.kind===k);return{n:g.length,vA:g.reduce((t,x)=>t+x.vA,0),vB:g.reduce((t,x)=>t+x.vB,0),d:g.reduce((t,x)=>t+x.d,0)};};
+  const gL=gSum('left'),gS=gSum('stay'),gE=gSum('enter');
+  const grpRow=(label,g,col)=>`<tr style="background:${col}"><td class="left" style="font-weight:700">${label} · ${g.n} người</td><td></td><td class="num">${g.vA?fmtMl(g.vA):'—'}</td><td class="num">${g.vB?fmtMl(g.vB):'—'}</td><td class="num" style="font-weight:700;color:${g.d>0?'var(--red)':g.d<0?'var(--teal)':'var(--dim)'}">${g.d>0?'+':''}${(g.d/1e6).toFixed(1)}</td></tr>`;
+  const collapsedRows=grpRow('Ra',gL,'rgba(224,85,85,.06)')+grpRow('Ở lại',gS,'transparent')+grpRow('Vào',gE,'rgba(74,222,128,.06)');
+  const totalRow=`<tr class="cmp-total"><td class="left">TỔNG (toàn bộ ${hA}→${hB} người)</td><td></td><td class="num">${fmtMl(r.tA)}</td><td class="num">${fmtMl(r.tB)}</td><td class="num" style="color:${r.tB-r.tA>0?'var(--red)':'var(--teal)'}">${r.tB-r.tA>0?'+':''}${((r.tB-r.tA)/1e6).toFixed(1)}</td></tr>`;
+  const people=`<div class="cmp-block"><div class="cmp-h" style="display:flex;align-items:center;gap:8px">Δ theo từng người: Ra (${nLeft}) → Ở lại (${nStay}) → Vào (${nEnter})${r.typeChanged.length?` · <span style="color:var(--gold)">${r.typeChanged.length} đổi type</span>`:''}<button class="btn btn-ghost" id="ppl-toggle" style="margin-left:auto;padding:2px 10px;font-size:11px" onclick="togglePeople()">▸ Chi tiết</button></div>
+    <table class="cmp-t" id="ppl-table"><tr><th class="left">Người</th><th class="left">Dept</th><th>${r.nA} (${hA})</th><th>${r.nB} (${hB})</th><th>Δ (tr)</th></tr>
+    <tbody id="ppl-collapsed">${collapsedRows}${totalRow}</tbody>
+    <tbody id="ppl-full" style="display:none">${r.people.map(rowHtml).join('')}${totalRow}</tbody></table></div>`;
+
+  const buT=_dTable('Δ theo BU (allocated base+adj)',r.buA,r.buB,'BU',r.nA,r.nB);
+  const plDeptT=_plDeptTable(r);
+  const _ac=x=>{const F=x.from.split('/'),T=x.to.split('/');return r.buKeys.map((k,i)=>{const ch=F[i]!==T[i];return `<td class="num" style="font-family:var(--fm);${ch?'color:var(--gold);font-weight:700':'color:var(--dim)'}">${ch?F[i]+'→'+T[i]:F[i]}</td>`;}).join('');};
+  const alloc=`<div class="cmp-block"><div class="cmp-h">Đổi tỷ lệ phân bổ — ${r.allocChanged.length} người (${r.nA} → ${r.nB}, %)</div>
+    ${r.allocChanged.length?`<table class="cmp-t"><tr><th class="left">Người</th>${r.buKeys.map(k=>`<th>${k}</th>`).join('')}</tr>${r.allocChanged.map(x=>`<tr><td class="left">${x.name} <span class="dim">${x.emp_type}</span></td>${_ac(x)}</tr>`).join('')}</table>`:'<div class="dim" style="font-size:10px">Không có thay đổi alloc.</div>'}</div>`;
+  out.innerHTML=hcHtml+people+buT+plDeptT+alloc;
+}
+function togglePeople(){
+  const c=document.getElementById('ppl-collapsed'),f=document.getElementById('ppl-full'),btn=document.getElementById('ppl-toggle');
+  if(!c||!f)return;
+  const showFull=f.style.display==='none';
+  f.style.display=showFull?'':'none';c.style.display=showFull?'none':'';
+  if(btn)btn.innerHTML=showFull?'▾ Thu gọn':'▸ Chi tiết';
+}
+function exportAnalysisCSV(){
+  // Toàn bộ Analytics trong 1 file: tổng hợp hiện tại (BU/PL/Dept) + mọi bảng so sánh (nếu đã chạy)
+  const L=[];const push=r=>L.push(r);
+  push('FINAN STAFF COST — ANALYSIS EXPORT,'+new Date().toISOString());
+  push('Phien ban dang lam viec,'+(META.versionName||'(chua dat ten)'));
+  push('');
+  const act=persons.filter(p=>p.status==='active');
+  const buKeys=['SBH_own','SBH_partner','HLB','BU3','CSS'];
+  push('TONG HOP HIEN TAI — ALLOCATED BASE+ADJ THEO BU');push('BU,VND');
+  let gt=0;buKeys.forEach(k=>{const v=act.reduce((t,p)=>t+((p.base||0)+(p.adj||0))*((p.alloc&&p.alloc[k])||0)/100,0);gt+=v;push(k+','+Math.round(v));});
+  push('TONG,'+Math.round(gt));push('');
+  const dims=[['PL LINE',p=>p.pl_line],['DEPT',p=>p.dept_label||p.dept],['LOAI HD',p=>p.emp_type]];
+  dims.forEach(([t,fn])=>{
+    push('TONG HOP HIEN TAI — THEO '+t);push(t+',VND (base+adj)');
+    const m={};act.forEach(p=>{const k=fn(p);m[k]=(m[k]||0)+(p.base||0)+(p.adj||0);});
+    let tt=0;Object.keys(m).sort().forEach(k=>{tt+=m[k];push('"'+k+'",'+Math.round(m[k]));});
+    push('TONG,'+Math.round(tt));push('');
+  });
+  if(CMP_LAST){
+    const r=CMP_LAST;
+    push('====== SO SANH PHIEN BAN: '+r.nA+' -> '+r.nB+' ======');
+    if(r.filter&&(r.filter.bu||r.filter.dept||r.filter.et))push('Filter,'+[r.filter.bu,r.filter.dept,r.filter.et].filter(Boolean).join(' | '));
+    push('Headcount,'+r.hcA+','+r.hcB+','+(r.hcB-r.hcA));
+    push('Base+Adj,'+Math.round(r.tA)+','+Math.round(r.tB)+','+Math.round(r.tB-r.tA));
+    if(r.byName)push('CANH BAO,So khop mot phan bang TEN (EMP_ID phu '+Math.round(r.idCovA*100)+'%/'+Math.round(r.idCovB*100)+'%)');
+    push('');push('DELTA TUNG NGUOI (Ra -> O lai -> Vao),emp_id,dept,type_'+r.nA+',type_'+r.nB+','+r.nA+','+r.nB+',delta');
+    r.people.forEach(x=>push([('"'+(x.kind==='left'?'[RA] ':x.kind==='enter'?'[VAO] ':'')+x.name+'"'),'"'+x.emp_id+'"','"'+x.dept+'"',(x.typeA||''),(x.typeB||''),Math.round(x.vA),Math.round(x.vB),Math.round(x.d)].join(',')));
+    push('TONG,,,,,'+Math.round(r.tA)+','+Math.round(r.tB)+','+Math.round(r.tB-r.tA));
+    const dump=(title,a,b)=>{push('');push(title+','+r.nA+','+r.nB+',delta');let tA2=0,tB2=0;[...new Set([...Object.keys(a),...Object.keys(b)])].sort().forEach(k=>{tA2+=a[k]||0;tB2+=b[k]||0;push('"'+k+'",'+Math.round(a[k]||0)+','+Math.round(b[k]||0)+','+Math.round((b[k]||0)-(a[k]||0)));});push('TONG,'+Math.round(tA2)+','+Math.round(tB2)+','+Math.round(tB2-tA2));};
+    dump('BU',r.buA,r.buB);dump('PL LINE',r.plA,r.plB);
+    // DEPT 6-col
+    push('');push('DEPT,cost_'+r.nA+',#ng_'+r.nA+',TB_'+r.nA+',cost_'+r.nB+',#ng_'+r.nB+',TB_'+r.nB+',dCost,d#ng,dTB');
+    {const A=r.deptA6,B=r.deptB6;let tcA=0,tnA=0,tcB=0,tnB=0;[...new Set([...Object.keys(A),...Object.keys(B)])].sort().forEach(k=>{const a=A[k]||{cost:0,n:0},b=B[k]||{cost:0,n:0};tcA+=a.cost;tnA+=a.n;tcB+=b.cost;tnB+=b.n;const avA=a.n?a.cost/a.n:0,avB=b.n?b.cost/b.n:0;push('"'+k+'",'+Math.round(a.cost)+','+a.n+','+Math.round(avA)+','+Math.round(b.cost)+','+b.n+','+Math.round(avB)+','+Math.round(b.cost-a.cost)+','+(b.n-a.n)+','+Math.round(avB-avA));});push('TONG,'+Math.round(tcA)+','+tnA+','+Math.round(tnA?tcA/tnA:0)+','+Math.round(tcB)+','+tnB+','+Math.round(tnB?tcB/tnB:0)+','+Math.round(tcB-tcA)+','+(tnB-tnA)+','+Math.round((tnB?tcB/tnB:0)-(tnA?tcA/tnA:0)));}
+    push('');push('DOI ALLOC (%),'+r.buKeys.join(','));
+    r.allocChanged.forEach(x=>{const F=x.from.split('/'),T=x.to.split('/');push('"'+x.name+' '+x.emp_type+'",'+r.buKeys.map((k,i)=>F[i]===T[i]?F[i]:(F[i]+'->'+T[i])).join(','));});
+  }else{push('(Chua chay so sanh phien ban — chi co tong hop hien tai)');}
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+L.join('\n')],{type:'text/csv'}));a.download='finan_analysis_'+(META.versionName||'working')+'.csv';a.click();
+}
+function exportCompareCSV(){
+  if(!CMP_LAST){alert('Chưa có kết quả so sánh. Chạy So sánh ở tab Analytics trước.');return;}
+  const r=CMP_LAST;const L=[];
+  L.push(['SO SANH PHIEN BAN',r.nA,'->',r.nB].join(','));
+  L.push(['Headcount',r.hcA,r.hcB,r.hcB-r.hcA].join(','));
+  L.push(['Base+Adj (VND)',r.tA,r.tB,r.tB-r.tA].join(','));
+  L.push('');L.push('DELTA TUNG NGUOI (Ra->O lai->Vao),emp_id,dept,type_'+r.nA+',type_'+r.nB+','+r.nA+','+r.nB+',delta');
+  r.people.forEach(x=>L.push([('"'+(x.kind==='left'?'[RA] ':x.kind==='enter'?'[VAO] ':'')+x.name+'"'),'"'+x.emp_id+'"','"'+x.dept+'"',(x.typeA||''),(x.typeB||''),Math.round(x.vA),Math.round(x.vB),Math.round(x.d)].join(',')));
+  L.push('TONG,,,,,'+Math.round(r.tA)+','+Math.round(r.tB)+','+Math.round(r.tB-r.tA));
+  const dump=(title,a,b)=>{L.push('');L.push(title+','+r.nA+','+r.nB+',delta');[...new Set([...Object.keys(a),...Object.keys(b)])].sort().forEach(k=>L.push([`"${k}"`,a[k]||0,b[k]||0,(b[k]||0)-(a[k]||0)].join(',')));};
+  dump('BU',r.buA,r.buB);dump('PL LINE',r.plA,r.plB);
+  L.push('');L.push('DOI ALLOC,tu,den');
+  r.allocChanged.forEach(x=>L.push([`"${x.name} ${x.emp_type}"`,`"${x.from}"`,`"${x.to}"`].join(',')));
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+L.join('\n')],{type:'text/csv'}));a.download=`compare_${r.nA}_vs_${r.nB}.csv`;a.click();
+}
+
+// ── INIT ──
+loadMD1();
+loadPLList();
+buildHeader();
+const hadSaved=loadState();
+buildTable();
+updateStrip();
+renderLoadData();
+const ind=document.getElementById('save-indicator');
+if(hadSaved&&ind){
+  try{const ts=JSON.parse(localStorage.getItem(LS_KEY))?.ts;if(ts){ind.textContent=`Restored ${new Date(ts).toLocaleString('vi-VN',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'})}`;ind.style.color='var(--teal)';}}catch(e){}
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+</script>
+</body>
+</html>
