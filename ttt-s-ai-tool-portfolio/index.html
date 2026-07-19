@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tool Portfolio · Báo cáo phân tích</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap&subset=latin,latin-ext,vietnamese" rel="stylesheet">
+<style>
+:root{
+  --s-cream:#F7F5EF; --s-cream-warm:#EFEBE0; --s-white:#FFFFFF;
+  --s-green:#00704A; --s-forest:#1E3932; --s-deep:#14261F; --s-green-soft:#D4E9E2;
+  --s-ink:#1E3932; --s-muted:#5C6B66; --s-dim:#637069;
+  --s-line:#DFDBD0; --s-line-dark:#2C4A40;
+  --s-gold:#C9A227; --s-warn:#A6603A; --s-ok:#00704A;
+  --s-serif:'Noto Serif Display',Georgia,serif;
+  --s-sans:'Outfit',system-ui,sans-serif;
+  --s-mono:'DM Mono',ui-monospace,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--s-cream);color:var(--s-ink);font-family:var(--s-sans);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.eyebrow{font-family:var(--s-mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--s-green)}
+.on-green .eyebrow{color:var(--s-green-soft)}
+.meta{font-family:var(--s-mono);font-size:10.5px;color:var(--s-dim)}
+h1{font-family:var(--s-serif);font-size:clamp(30px,5.4vw,52px);font-weight:600;line-height:1.12;letter-spacing:-.015em}
+h2{font-family:var(--s-serif);font-size:clamp(22px,3.4vw,30px);font-weight:600;line-height:1.2}
+h3{font-size:17px;font-weight:600}
+p{max-width:70ch}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:50;background:rgba(247,245,239,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--s-line)}
+.navin{max-width:1120px;margin:0 auto;padding:11px 24px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.navin .brand{font-family:var(--s-mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--s-green);margin-right:auto}
+nav a{font-size:13px;color:var(--s-muted);text-decoration:none;padding:5px 11px;border-radius:999px}
+nav a:hover,nav a:focus-visible{color:var(--s-green);background:var(--s-green-soft);outline:none}
+nav a:focus-visible{box-shadow:0 0 0 3px rgba(0,112,74,.18)}
+
+/* HERO */
+.hero{background:var(--s-forest);color:#fff;padding:64px 0 56px}
+.hero h1{margin:14px 0 18px;max-width:19ch}
+.hero p{color:#CBD8D3;max-width:62ch}
+.hero .stamp{margin-top:26px;font-family:var(--s-mono);font-size:10.5px;color:#8FA8A0}
+.kpirow{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--s-line-dark);margin-top:38px;border-top:1px solid var(--s-line-dark)}
+.kpi{background:var(--s-forest);padding:20px 4px 18px}
+.kpi .n{font-family:var(--s-serif);font-size:38px;font-weight:600;line-height:1;color:#fff}
+.kpi .n.gold{color:var(--s-gold)}
+.kpi .l{font-family:var(--s-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#8FA8A0;margin-top:8px}
+
+/* SECTION */
+section{padding:56px 0;border-bottom:1px solid var(--s-line)}
+section:last-of-type{border-bottom:none}
+.shead{margin-bottom:28px}
+.shead h2{margin:8px 0 10px}
+.shead p{color:var(--s-muted)}
+
+/* SPLIT */
+.split{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--s-line);border-radius:14px;overflow:hidden;margin:30px 0}
+.split .g{background:var(--s-forest);color:#fff;padding:38px 34px;display:flex;flex-direction:column;justify-content:center;text-align:center;align-items:center}
+.split .g h3{font-family:var(--s-serif);font-size:24px;font-weight:600;margin:12px 0 10px}
+.split .g p{color:#CBD8D3;font-size:15px;max-width:34ch}
+.split .c{background:var(--s-white);padding:32px 30px}
+.split.rev .g{order:2}
+.split.rev .c{order:1}
+
+/* CARDS */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:22px}
+.card{border:1px solid var(--s-line);border-radius:14px;background:var(--s-white);padding:20px 22px;box-shadow:none}
+.card .big{font-family:var(--s-serif);font-size:32px;font-weight:600;color:var(--s-green);line-height:1}
+.card h3{margin:10px 0 6px}
+.card p{font-size:14px;color:var(--s-muted);line-height:1.6}
+
+/* NOTE */
+.note{border-left:3px solid var(--s-green);background:var(--s-white);padding:16px 20px;border-radius:0 12px 12px 0;margin:20px 0}
+.note.warn{border-left-color:var(--s-warn);background:#FDF6F1}
+.note.acc{border-left-color:var(--s-gold);background:#FDFAF0}
+.note strong{color:var(--s-ink)}
+.quote{font-family:var(--s-serif);font-style:italic;font-size:17px;border-left:3px solid var(--s-green);background:var(--s-green-soft);padding:16px 20px;border-radius:0 12px 12px 0;margin:22px 0;color:var(--s-forest)}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--s-line);border-radius:14px;background:var(--s-white);margin-top:20px}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:14px}
+thead th{background:var(--s-forest);color:#fff;font-family:var(--s-mono);font-size:11px;font-weight:400;letter-spacing:.1em;text-transform:uppercase;text-align:left;padding:12px 14px;position:sticky;top:0}
+tbody td{padding:11px 14px;border-bottom:1px solid var(--s-line);vertical-align:top}
+tbody tr:nth-child(even){background:var(--s-cream-warm)}
+tbody tr.dimmed{opacity:.22}
+td.num{font-family:var(--s-mono);font-size:12.5px;color:var(--s-dim)}
+.tname{font-weight:600}
+.torg{font-family:var(--s-mono);font-size:10.5px;color:var(--s-dim);display:block;margin-top:2px}
+
+/* CHIP */
+.chip{display:inline-block;font-family:var(--s-mono);font-size:10px;letter-spacing:.06em;padding:2px 8px;border-radius:999px;border:1px solid var(--s-line);color:var(--s-muted);white-space:nowrap}
+.chip.core{background:var(--s-green-soft);border-color:#A9CFC4;color:#004E33}
+.chip.near{background:#FDFAF0;border-color:#E3D49A;color:#7A6414}
+.chip.peri{background:var(--s-cream-warm);border-color:var(--s-line);color:var(--s-muted)}
+.chip.train{background:#fff;border-color:var(--s-line);color:var(--s-dim)}
+.chip.wb{background:#fff;border-color:#A9CFC4;color:var(--s-green)}
+.chip.sc{background:var(--s-forest);border-color:var(--s-forest);color:#fff}
+.chip.hy{background:var(--s-cream-warm);border-color:#C6C0B0;color:var(--s-muted)}
+.st{font-family:var(--s-mono);font-size:11px}
+.st.live{color:var(--s-green)}
+.st.hand{color:var(--s-gold)}
+.st.orph{color:var(--s-warn)}
+.st.blk{color:var(--s-muted)}
+
+/* FILTER */
+.filters{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end;margin-top:20px;padding:16px 18px;border:1px solid var(--s-line);border-radius:14px;background:var(--s-white)}
+.fg{display:flex;flex-direction:column;gap:7px}
+.fg .lb{font-family:var(--s-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--s-dim)}
+.seg{display:flex;border:1px solid var(--s-line);border-radius:999px;overflow:hidden}
+.seg button{font-family:var(--s-sans);font-size:12.5px;padding:6px 14px;border:none;background:#fff;color:var(--s-muted);cursor:pointer;border-right:1px solid var(--s-line)}
+.seg button:last-child{border-right:none}
+.seg button[aria-pressed="true"]{background:var(--s-green);color:#fff}
+.seg button:focus-visible{outline:none;box-shadow:inset 0 0 0 3px rgba(0,112,74,.18)}
+.fcount{margin-left:auto;font-family:var(--s-mono);font-size:11.5px;color:var(--s-dim)}
+
+/* BARS */
+.bars{margin-top:24px;display:flex;flex-direction:column;gap:14px}
+.bar-row{display:grid;grid-template-columns:190px 1fr 64px;gap:14px;align-items:center}
+.bar-lb{font-size:13.5px;color:var(--s-ink)}
+.bar-track{height:22px;background:var(--s-cream-warm);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;background:var(--s-green);border-radius:4px}
+.bar-fill.g2{background:#3E8F6E}
+.bar-fill.g3{background:#7FB3A0}
+.bar-fill.g4{background:#C2D6CE}
+.bar-val{font-family:var(--s-mono);font-size:12.5px;color:var(--s-dim);text-align:right}
+
+/* MATRIX */
+.matrix{display:grid;grid-template-columns:130px 1fr 1fr;border:1px solid var(--s-line);border-radius:14px;overflow:hidden;margin-top:22px;background:var(--s-white)}
+.matrix>div{padding:16px 18px;border-bottom:1px solid var(--s-line);border-right:1px solid var(--s-line)}
+.matrix>div:nth-child(3n){border-right:none}
+.matrix .mh{background:var(--s-forest);color:#fff;font-family:var(--s-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.matrix .mr{background:var(--s-cream-warm);font-family:var(--s-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--s-muted);display:flex;align-items:center}
+.matrix .cellt{font-weight:600;font-size:14px;margin-bottom:5px}
+.matrix .cellb{font-size:13px;color:var(--s-muted);line-height:1.55}
+
+/* ARCH */
+.arch{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-top:22px}
+.arch .a{border:1px solid var(--s-line);border-radius:14px;background:var(--s-white);padding:20px 22px}
+.arch .a.hot{border-color:var(--s-green);border-width:2px}
+.arch .a .tag{font-family:var(--s-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--s-green)}
+.arch .a h3{margin:8px 0 8px}
+.arch .a ul{margin:10px 0 0;padding-left:18px;font-size:13.5px;color:var(--s-muted);line-height:1.65}
+.arch .a .cnt{font-family:var(--s-mono);font-size:11px;color:var(--s-dim);margin-top:12px;padding-top:10px;border-top:1px solid var(--s-line)}
+
+.q3{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:22px}
+.q3 .qq{border:1px solid var(--s-line);border-radius:14px;padding:22px;background:var(--s-white)}
+.q3 .qq .n{font-family:var(--s-serif);font-size:30px;color:var(--s-gold);line-height:1}
+.q3 .qq p{font-size:14.5px;margin-top:10px;color:var(--s-ink)}
+
+footer{background:var(--s-deep);color:#8FA8A0;padding:34px 0;font-family:var(--s-mono);font-size:11px}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+@media(max-width:820px){
+  .split{grid-template-columns:1fr}
+  .split.rev .g{order:0}.split.rev .c{order:0}
+  .kpirow{grid-template-columns:repeat(2,1fr)}
+  .matrix{grid-template-columns:1fr}
+  .matrix>div{border-right:none}
+  .bar-row{grid-template-columns:130px 1fr 54px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media print{
+  body{background:#fff;color:#000}
+  nav,.filters{display:none}
+  .hero,.split .g,thead th,.matrix .mh{background:#fff!important;color:#000!important;border:1px solid #999}
+  .hero p,.split .g p,.kpi .l{color:#333!important}
+  .kpi{background:#fff;border:1px solid #ccc}
+  section{page-break-inside:avoid;border-bottom:1px solid #ccc}
+  footer{background:#fff;color:#000;border-top:1px solid #999}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="navin">
+    <span class="brand" id="brandv">Tool Portfolio</span>
+    <a href="#tongquan">Tổng quan</a>
+    <a href="#domain">Domain</a>
+    <a href="#class">Class</a>
+    <a href="#org">Tổ chức</a>
+    <a href="#archetype">Archetype</a>
+    <a href="#bang">Bảng đầy đủ</a>
+    <a href="#doc">Đọc gì</a>
+  </div>
+</nav>
+
+<header class="hero on-green">
+  <div class="wrap">
+    <div class="eyebrow">Case study · Portfolio review</div>
+    <h1>25 công cụ, 8 tổ chức, một câu hỏi chưa trả lời</h1>
+    <p>Toàn bộ tool đã build trong danh mục — thống kê theo bốn chiều phân tích: <strong style="color:#fff">domain</strong> (lõi tài chính hay ngoại vi), <strong style="color:#fff">design class</strong> (dùng hàng ngày hay để trình bày), <strong style="color:#fff">tổ chức</strong>, và <strong style="color:#fff">archetype</strong> (mẫu kiến trúc lặp lại).</p>
+    <div class="kpirow">
+      <div class="kpi"><div class="n">25</div><div class="l">Tool đã build</div></div>
+      <div class="kpi"><div class="n">48<span style="font-size:20px">%</span></div><div class="l">Thuộc lõi CFO</div></div>
+      <div class="kpi"><div class="n">4</div><div class="l">Archetype lặp lại</div></div>
+      <div class="kpi"><div class="n gold">6</div><div class="l">Workbench / 25</div></div>
+    </div>
+    <div class="stamp" id="stamp"></div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- 1 -->
+<section id="tongquan">
+  <div class="shead">
+    <div class="eyebrow">01 · Khung phân tích</div>
+    <h2>Trục phân loại đặt trước, không đặt sau</h2>
+    <p>Chẩn đoán đúng phải đến trước. Nếu không định nghĩa "lõi" là gì trước khi đếm, mọi con số phía sau chỉ là kể chuyện đã rồi.</p>
+  </div>
+
+  <div class="split">
+    <div class="g">
+      <div class="eyebrow">Định nghĩa</div>
+      <h3>Lõi hay ngoại vi?</h3>
+      <p>Lõi = tool đụng trực tiếp vào P&amp;L, biên lợi nhuận, chi phí, dòng tiền — thay đổi một con số tài chính. Ngoại vi = hạ tầng, meta-tool, đào tạo, vận hành giao hàng.</p>
+    </div>
+    <div class="c">
+      <h3 style="margin-bottom:12px">Bốn chiều được dùng</h3>
+      <div class="note"><strong>Domain</strong> — lõi CFO công nghệ · cận lõi · ngoại vi hạ tầng · ngoại vi đào tạo.</div>
+      <div class="note"><strong>Design class</strong> — Workbench (thao tác lặp lại hàng ngày) · Showcase (người khác xem 1–5 lần) · Hybrid.</div>
+      <div class="note"><strong>Tổ chức</strong> — tool phân bổ về đâu trong danh mục 8+ tổ chức.</div>
+      <div class="note"><strong>Archetype</strong> — mẫu kiến trúc thật sự lặp lại bên dưới lớp vỏ khác nhau.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="domain">
+  <div class="shead">
+    <div class="eyebrow">02 · Chiều thứ nhất</div>
+    <h2>Phân bố theo domain</h2>
+    <p>Gần một nửa danh mục nằm trong lõi tài chính. Con số này nghe hợp lý — cho tới khi soi tiếp bằng chiều thứ hai.</p>
+  </div>
+
+  <div class="bars">
+    <div class="bar-row"><div class="bar-lb">Lõi CFO công nghệ</div><div class="bar-track"><div class="bar-fill" style="width:48%"></div></div><div class="bar-val">12 · 48%</div></div>
+    <div class="bar-row"><div class="bar-lb">Cận lõi</div><div class="bar-track"><div class="bar-fill g2" style="width:16%"></div></div><div class="bar-val">4 · 16%</div></div>
+    <div class="bar-row"><div class="bar-lb">Ngoại vi — hạ tầng &amp; meta</div><div class="bar-track"><div class="bar-fill g3" style="width:20%"></div></div><div class="bar-val">5 · 20%</div></div>
+    <div class="bar-row"><div class="bar-lb">Ngoại vi — đào tạo &amp; sales</div><div class="bar-track"><div class="bar-fill g4" style="width:16%"></div></div><div class="bar-val">4 · 16%</div></div>
+  </div>
+
+  <div class="cards">
+    <div class="card"><div class="big">12</div><h3>Lõi tài chính</h3><p>Cost allocation, margin stack, management reporting, pricing, reconciliation.</p></div>
+    <div class="card"><div class="big">4</div><h3>Cận lõi</h3><p>Customer economics, costing quy trình sản xuất, phân tích khách hàng.</p></div>
+    <div class="card"><div class="big">9</div><h3>Ngoại vi</h3><p>Hạ tầng publish, meta-tool quản trị, tài liệu đào tạo, proposal.</p></div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section id="class">
+  <div class="shead">
+    <div class="eyebrow">03 · Chiều thứ hai</div>
+    <h2>Design class — chỗ con số 48% bắt đầu lung lay</h2>
+  </div>
+
+  <div class="split rev">
+    <div class="g">
+      <div class="eyebrow">Nghịch lý</div>
+      <h3>Tool để xem &gt; tool để dùng</h3>
+      <p>Showcase gấp gần ba lần Workbench. Nhưng Workbench mới là loại được mở lặp lại hàng ngày — và chỉ thứ được dùng lặp lại mới đổi được một con số trên P&amp;L.</p>
+    </div>
+    <div class="c">
+      <div class="bars" style="margin-top:0">
+        <div class="bar-row"><div class="bar-lb">Showcase</div><div class="bar-track"><div class="bar-fill" style="width:68%"></div></div><div class="bar-val">17</div></div>
+        <div class="bar-row"><div class="bar-lb">Workbench</div><div class="bar-track"><div class="bar-fill g2" style="width:24%"></div></div><div class="bar-val">6</div></div>
+        <div class="bar-row"><div class="bar-lb">Hybrid / hạ tầng</div><div class="bar-track"><div class="bar-fill g3" style="width:8%"></div></div><div class="bar-val">2</div></div>
+      </div>
+      <div class="note warn" style="margin-bottom:0"><strong>Đọc chéo hai chiều:</strong> tool lõi tài chính nhưng ở dạng Showcase = đúng nội dung, sai hình thức tiêu thụ. Người xem gật đầu rồi đóng tab.</div>
+    </div>
+  </div>
+
+  <div class="matrix">
+    <div class="mh">Domain × Class</div><div class="mh">Workbench</div><div class="mh">Showcase / Hybrid</div>
+    <div class="mr">Lõi CFO</div>
+    <div><div class="cellt">5 tool</div><div class="cellb">Staff Cost Simulator · COA Registry · NutriNest engine · Revenue reconciliation · (Mini tool VFX — hybrid)</div></div>
+    <div><div class="cellt">7 tool</div><div class="cellb">Margin Stack · BCQT VFX · BCQT Finan · Idealab P&amp;L · SBH Pricing · HLB Rewards · Banking Tầng 1</div></div>
+    <div class="mr">Cận lõi</div>
+    <div><div class="cellt">0 tool</div><div class="cellb">Không có. Toàn bộ mảng customer &amp; costing đang ở dạng trình bày.</div></div>
+    <div><div class="cellt">4 tool</div><div class="cellb">CLV/RFM · IBS ERD/Mockup/Sim · Persona Engine</div></div>
+    <div class="mr">Ngoại vi</div>
+    <div><div class="cellt">3 tool</div><div class="cellb">Architecture Builder · Publisher V7 · Strategic Mind Map</div></div>
+    <div><div class="cellt">6 tool</div><div class="cellb">Digital Twin v2 · Private Portal · AI Training · Quiz · Assortment Training · Proposal HLB</div></div>
+  </div>
+
+  <div class="note acc"><strong>Ô đáng chú ý nhất:</strong> cận lõi × Workbench = 0. Cả mảng kinh tế khách hàng và giá thành sản xuất chưa có công cụ nào được ai đó mở ra dùng thật.</div>
+</section>
+
+<!-- 4 -->
+<section id="org">
+  <div class="shead">
+    <div class="eyebrow">04 · Chiều thứ ba</div>
+    <h2>Phân bố theo tổ chức</h2>
+    <p>Nỗ lực dồn về ba cụm: Finan, VFX và lớp meta của chính mình.</p>
+  </div>
+  <div class="bars">
+    <div class="bar-row"><div class="bar-lb">Finan / SBH</div><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><div class="bar-val">5</div></div>
+    <div class="bar-row"><div class="bar-lb">Meta / hạ tầng cá nhân</div><div class="bar-track"><div class="bar-fill" style="width:80%"></div></div><div class="bar-val">4</div></div>
+    <div class="bar-row"><div class="bar-lb">Idealab &amp; khách hàng</div><div class="bar-track"><div class="bar-fill g2" style="width:80%"></div></div><div class="bar-val">4</div></div>
+    <div class="bar-row"><div class="bar-lb">VFX Auto</div><div class="bar-track"><div class="bar-fill g2" style="width:60%"></div></div><div class="bar-val">3</div></div>
+    <div class="bar-row"><div class="bar-lb">Đào tạo</div><div class="bar-track"><div class="bar-fill g3" style="width:80%"></div></div><div class="bar-val">4</div></div>
+    <div class="bar-row"><div class="bar-lb">Rabity</div><div class="bar-track"><div class="bar-fill g3" style="width:60%"></div></div><div class="bar-val">3</div></div>
+    <div class="bar-row"><div class="bar-lb">Khác (NEG, F5, HSV)</div><div class="bar-track"><div class="bar-fill g4" style="width:40%"></div></div><div class="bar-val">2</div></div>
+  </div>
+  <div class="note"><strong>Điểm trống:</strong> NEG — vai trò advisor về tối ưu lợi nhuận, ba ý tưởng chiến lược đã có, số tool đã build gần bằng không. Nỗ lực và cơ hội đang không khớp nhau.</div>
+</section>
+
+<!-- 5 -->
+<section id="archetype">
+  <div class="shead">
+    <div class="eyebrow">05 · Chiều thứ tư</div>
+    <h2>Archetype — bên dưới 25 cái vỏ chỉ có 4 cái ruột</h2>
+    <p>Đây là chiều phân tích quan trọng nhất, và cũng là chiều dễ bị bỏ qua nhất khi nhìn danh mục theo tổ chức.</p>
+  </div>
+
+  <div class="arch">
+    <div class="a hot">
+      <div class="tag">Archetype A</div>
+      <h3>Cost / margin allocation engine</h3>
+      <ul>
+        <li>Dữ liệu thô → cấu hình rule → phân bổ → bút toán / P&amp;L → xuất file</li>
+        <li>NutriNest kế thừa trực tiếp kiến trúc từ Finan Staff Cost</li>
+        <li>Config-driven deterministic core</li>
+      </ul>
+      <div class="cnt">5 tool · effort cao nhất danh mục</div>
+    </div>
+    <div class="a hot">
+      <div class="tag">Archetype B</div>
+      <h3>Management reporting layer</h3>
+      <ul>
+        <li>P&amp;L nhiều kỳ + bộ lọc segment + chỉ số tài chính</li>
+        <li>Lặp lại nguyên vẹn qua 3 khách hàng khác nhau</li>
+        <li>Chỉ khác nhau ở cây tài khoản và tên cột</li>
+      </ul>
+      <div class="cnt">3 tool · gần như copy-paste kiến trúc</div>
+    </div>
+    <div class="a">
+      <div class="tag">Archetype C</div>
+      <h3>Simulator ra quyết định</h3>
+      <ul>
+        <li>Kéo slider → thấy số đổi → chốt quyết định</li>
+        <li>Luôn thuộc class Showcase, luôn dùng 1–5 lần</li>
+        <li>Giá trị nằm ở khoảnh khắc họp, không ở vận hành</li>
+      </ul>
+      <div class="cnt">5 tool</div>
+    </div>
+    <div class="a">
+      <div class="tag">Archetype D</div>
+      <h3>Meta &amp; hạ tầng</h3>
+      <ul>
+        <li>Publisher, Architecture Builder, Portal, Digital Twin, Mind map</li>
+        <li>Effort rất cao, chỉ một người dùng</li>
+        <li>Không tạo ra con số P&amp;L nào</li>
+      </ul>
+      <div class="cnt">5 tool · nơi tool-building drift trú ngụ</div>
+    </div>
+  </div>
+
+  <div class="quote">Archetype A cộng B là 8 công cụ. Tức là cùng một cỗ máy đã được dựng lại tám lần cho tám bối cảnh. Vấn đề không phải thiếu ý tưởng sản phẩm — sản phẩm đã được build tám lần rồi, chỉ chưa một lần nào được trừu tượng hóa.</div>
+</section>
+
+<!-- 6 -->
+<section id="bang">
+  <div class="shead">
+    <div class="eyebrow">06 · Dữ liệu gốc</div>
+    <h2>Bảng đầy đủ 25 tool</h2>
+    <p>Lọc theo domain hoặc class. Dòng không khớp bộ lọc được làm mờ chứ không bị ẩn — để giữ nguyên hình dạng danh mục.</p>
+  </div>
+
+  <div class="filters">
+    <div class="fg">
+      <span class="lb">Domain</span>
+      <div class="seg" id="fdom">
+        <button data-v="all" aria-pressed="true">Tất cả</button>
+        <button data-v="core" aria-pressed="false">Lõi</button>
+        <button data-v="near" aria-pressed="false">Cận lõi</button>
+        <button data-v="peri" aria-pressed="false">Ngoại vi</button>
+      </div>
+    </div>
+    <div class="fg">
+      <span class="lb">Class</span>
+      <div class="seg" id="fcls">
+        <button data-v="all" aria-pressed="true">Tất cả</button>
+        <button data-v="wb" aria-pressed="false">Workbench</button>
+        <button data-v="sc" aria-pressed="false">Showcase</button>
+        <button data-v="hy" aria-pressed="false">Hybrid</button>
+      </div>
+    </div>
+    <span class="fcount" id="fcount">25 / 25 tool</span>
+  </div>
+
+  <div class="tbl-wrap">
+    <table id="tbl">
+      <thead><tr>
+        <th style="width:36px">#</th><th>Công cụ</th><th style="width:100px">Class</th><th style="width:180px">Domain</th><th style="width:130px">Trạng thái</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 7 -->
+<section id="doc">
+  <div class="shead">
+    <div class="eyebrow">07 · Kết luận</div>
+    <h2>Ba điều bảng này nói ra</h2>
+  </div>
+
+  <div class="split">
+    <div class="g">
+      <div class="eyebrow">Câu hỏi chốt</div>
+      <h3>Tử số thật của danh mục</h3>
+      <p>Trong 25 công cụ, có bao nhiêu cái đang được một người <em>không phải mình</em> mở ra ít nhất một lần mỗi tuần? Con số đó — không phải con số 25 — mới là quy mô thật.</p>
+    </div>
+    <div class="c">
+      <div class="note"><strong>1 · Sản phẩm đã tồn tại, chỉ chưa được đặt tên.</strong> Tám lần dựng lại cùng một engine phân bổ và báo cáo là bằng chứng số cho thấy đây là sản phẩm lặp lại được, không phải chuỗi dự án bespoke.</div>
+      <div class="note warn"><strong>2 · Cụm meta không có ai bấm nút.</strong> Năm công cụ hạ tầng, effort rất cao, người dùng duy nhất là chính mình. Không có liên kết quyết định nào gắn vào.</div>
+      <div class="note acc"><strong>3 · Tỷ lệ lõi 48% bị lệch về Showcase.</strong> Đúng nội dung, sai hình thức tiêu thụ. Tool trình bày tạo ấn tượng; tool vận hành mới đổi được con số.</div>
+    </div>
+  </div>
+
+  <div class="q3">
+    <div class="qq"><div class="n">01</div><p>Ai dùng con số này, đến tay ai, làm gì với nó? Cần một cái tên cụ thể.</p></div>
+    <div class="qq"><div class="n">02</div><p>Trước khi có tool, quyết định đó được ra như thế nào? Đó là baseline.</p></div>
+    <div class="qq"><div class="n">03</div><p>Sai 10% thì hậu quả là gì, ai chịu? Đó là chi phí của quyết định sai.</p></div>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <span>Tool Portfolio · Báo cáo phân tích danh mục công cụ</span>
+    <span id="footstamp"></span>
+  </div>
+</footer>
+
+<script>
+const APP_VERSION='v1.0';
+const APP_RELEASE='19/07/2026 · Scope: 4 chiều phân tích · 25 tool · Siren theme';
+document.getElementById('brandv').textContent='Tool Portfolio '+APP_VERSION;
+document.getElementById('stamp').textContent='Bản '+APP_VERSION+' — '+APP_RELEASE;
+document.getElementById('footstamp').textContent=APP_VERSION+' · '+APP_RELEASE;
+
+const DATA=[
+ [1,'VFX Margin Stack Simulator','4 tab: Dashboard / CM KD xe / SR Force / XDV','VFX Auto','sc','core','Lõi — margin architecture','Kiến trúc chốt, build hoãn','hand'],
+ [2,'VFX BCQT Management Report','Báo cáo quản trị 5 tháng','VFX Auto','sc','core','Lõi — reporting','Live','live'],
+ [3,'VFX Mini Tool Simulator','Cấu hình giá VinFast cho TVBH','VFX Auto','hy','core','Lõi — deal-level margin','Đã triển khai Phase 1','live'],
+ [4,'Finan Staff Cost Simulator v2.1','Alloc + journal entry + budget compare','Finan','wb','core','Lõi — cost allocation','Live · effort cao nhất','live'],
+ [5,'Finan COA Registry v3.1','Grouped + segment filter','Finan','wb','core','Lõi — data model tài chính','Live · chuẩn design','live'],
+ [6,'BCQT Finan 2026','Báo cáo quản trị','Finan','sc','core','Lõi — reporting','Live','live'],
+ [7,'Idealab P&L Forecast','Dự báo P&L nội bộ','Idealab','hy','core','Lõi — P&L nội bộ','Live','live'],
+ [8,'NutriNest Cost Allocation Engine','Org chart + bridge analysis + SAP export','Idealab · NutriNest','wb','core','Lõi — cost allocation','Live · anchor client','live'],
+ [9,'SBH Pricing / Profit Simulation','Mô phỏng chính sách giá','Finan / SBH','sc','core','Lõi — pricing & profit','Live · trình BOD','live'],
+ [10,'SBH × HLB Merchant Rewards Simulator','4 tier, ROI, cost per merchant','SBH / F5','sc','core','Lõi — unit economics','Live','live'],
+ [11,'Banking Management Report Tầng 1','P&L 3 kỳ + segment + ratios + BS','Khách đào tạo','sc','core','Lõi — reporting','Tầng 1 xong','hand'],
+ [12,'Rabity Revenue Reconciliation Tool','Subset-sum matching','Rabity','wb','core','Lõi — reconciliation','Kiến trúc xong, chưa build','orph'],
+ [13,'Rabity CLV/RFM + 31-store simulator','Phân tầng khách hàng','Rabity','sc','near','Cận lõi — customer economics','Bán live','hand'],
+ [14,'IBS ERD / Mockup / Simulation','erd-v2 · mockup · sim','Idealab · IBS','sc','near','Cận lõi — costing & process','Blocked chờ input','blk'],
+ [15,'Persona Engine DA','Phân tích chân dung khách hàng','Idealab','sc','near','Cận lõi — customer analytics','Live','live'],
+ [16,'Architecture Builder','4 tier · canvas / list / gantt / finance','Idealab','wb','peri','Ngoại vi — delivery PM','Live · nội bộ','orph'],
+ [17,'Digital Twin Lab Publisher V7','Publish + quản lý links','Meta','wb','peri','Ngoại vi — hạ tầng','Live · 1 người dùng','orph'],
+ [18,'Digital Twin v2','System prompt dạng HTML','Meta','sc','peri','Ngoại vi — meta / brain','Live','orph'],
+ [19,'Private Portal','Cloudflare Pages + Zero Trust','Meta','hy','peri','Ngoại vi — hạ tầng','Live','live'],
+ [20,'AI Training Day 1','Chương trình 6 giờ, 100 học viên','Đào tạo','sc','peri','Ngoại vi — đào tạo','Live','live'],
+ [21,'Quiz CEO Group Financial','Bài kiểm tra tài chính','Đào tạo','sc','peri','Ngoại vi — đào tạo','Live','live'],
+ [22,'Assortment Planning Training + Founder Interview','Training + discovery guide','Rabity · Đào tạo','sc','peri','Ngoại vi — đào tạo / discovery','Live','live'],
+ [23,'Break-even Simulator','Mô phỏng điểm hòa vốn','Đào tạo','sc','peri','Ngoại vi — đào tạo','Live','live'],
+ [24,'SBH–HLB Proposal','Đề xuất hợp tác','SBH','sc','peri','Ngoại vi — sales collateral','Đã gửi','hand'],
+ [25,'Strategic Mind Map','Quản trị danh mục cá nhân','Meta','wb','peri','Ngoại vi — self-management','Live','live']
+];
+const CLS={wb:'Workbench',sc:'Showcase',hy:'Hybrid'};
+const STL={live:'● Live',hand:'◐ Handed',orph:'○ Orphan',blk:'◼ Blocked'};
+
+const tb=document.getElementById('tbody');
+tb.innerHTML=DATA.map(r=>`<tr data-dom="${r[5]}" data-cls="${r[4]}">
+ <td class="num">${String(r[0]).padStart(2,'0')}</td>
+ <td><span class="tname">${r[1]}</span><span class="torg">${r[2]} · ${r[3]}</span></td>
+ <td><span class="chip ${r[4]}">${CLS[r[4]]}</span></td>
+ <td><span class="chip ${r[5]}">${r[6]}</span></td>
+ <td><span class="st ${r[8]}">${STL[r[8]]}</span><span class="torg">${r[7]}</span></td>
+</tr>`).join('');
+
+let fDom='all',fCls='all';
+function apply(){
+  let n=0;
+  document.querySelectorAll('#tbody tr').forEach(tr=>{
+    const ok=(fDom==='all'||tr.dataset.dom===fDom)&&(fCls==='all'||tr.dataset.cls===fCls);
+    tr.classList.toggle('dimmed',!ok);
+    if(ok)n++;
+  });
+  document.getElementById('fcount').textContent=n+' / 25 tool khớp bộ lọc';
+}
+function bind(id,setter){
+  const g=document.getElementById(id);
+  g.addEventListener('click',e=>{
+    const b=e.target.closest('button'); if(!b)return;
+    g.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false'));
+    b.setAttribute('aria-pressed','true');
+    setter(b.dataset.v); apply();
+  });
+}
+bind('fdom',v=>fDom=v);
+bind('fcls',v=>fCls=v);
+apply();
+</script>
+</body>
+</html>
