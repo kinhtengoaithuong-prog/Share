@@ -1,0 +1,1503 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Org Chart & Phân bổ lương GT · NutriNest</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Serif+Display&family=Outfit:wght@300;400;500;600;700&display=swap');
+:root{--ink:#0B1826;--pan:#101f33;--surface:#16263b;--s2:#1d3450;--bd:#25405f;--bd2:#3a5a82;--tx:#E8EDF4;--sub:#9DB2CC;--dim:#5d7595;--plat:#C8A96E;--gr:#3BC871;--rd:#E05555;--am:#E0A23B;--te:#46C4B8;--pu:#9B8CFF;--fh:'Outfit',sans-serif;--fm:'DM Mono',monospace;--fd:'DM Serif Display',serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--fh);background:var(--ink);color:var(--tx);font-size:13.5px;line-height:1.45;overflow:hidden}
+
+body[data-t="light"]{--ink:#F4F6F8;--pan:#EBEFF3;--surface:#FFFFFF;--s2:#E2E8EF;--bd:#D3DBE3;--bd2:#B8C4D0;--tx:#152030;--sub:#5A6B80;--dim:#8A9AAC;--plat:#8A6A22;--gr:#1F8A4C;--rd:#C0392B;--am:#B37400;--te:#0E7C72;--pu:#5B4CC4}
+body[data-t="light"] th{background:#E2E8EF}
+body[data-t="light"] tr.rg td{background:#DCE4EC!important}
+body[data-t="light"] tr.tot td{background:rgba(138,106,34,.12)!important}
+body[data-t="light"] tr:hover td{background:rgba(138,106,34,.05)}
+body[data-t="light"] .top{background:linear-gradient(135deg,#EBEFF3,#FFFFFF)}
+body[data-t="light"] .btn-g{color:#fff}
+body[data-t="light"] .in:focus,body[data-t="light"] .srch:focus,body[data-t="light"] .sel:focus{background:#fff}
+body[data-t="light"] ::-webkit-scrollbar-track{background:#EBEFF3}
+.app{display:flex;flex-direction:column;height:100vh}
+/* top */
+.top{background:linear-gradient(135deg,#0B1826,#16263b);border-bottom:1px solid var(--bd);padding:11px 20px;display:flex;align-items:center;gap:16px;flex-shrink:0}
+.brand{font-family:var(--fd);font-size:16px;white-space:nowrap}
+.brand span{color:var(--plat)}
+.steps{display:flex;gap:3px;margin-left:8px}
+.stp{padding:6px 12px;border-radius:6px;font-size:12px;color:var(--sub);cursor:pointer;display:flex;gap:6px;align-items:center;white-space:nowrap}
+.stp:hover{background:var(--surface);color:var(--tx)}
+.stp.on{background:rgba(200,169,110,.14);color:var(--plat);font-weight:600}
+.stp .n{font-family:var(--fm);font-size:10px;opacity:.7}
+.tools{margin-left:auto;display:flex;gap:7px;align-items:center}
+.btn{background:none;border:1px solid var(--bd2);color:var(--tx);border-radius:6px;padding:6px 12px;font-family:var(--fh);font-size:11.5px;font-weight:500;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--plat);color:var(--plat)}
+.btn-g{background:var(--plat);border-color:var(--plat);color:var(--ink);font-weight:600}
+.btn-g:hover{background:#d9bd87}
+.btn-s{padding:4px 8px;font-size:10.5px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.sv{font-family:var(--fm);font-size:10.5px;color:var(--dim);white-space:nowrap}
+/* body */
+.body{display:flex;flex:1;min-height:0}
+.side{width:var(--sw,20%);min-width:200px;max-width:600px;background:var(--pan);border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0}
+.sh{padding:11px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px}
+.sh h3{font-size:13px;flex:1}
+.stog{display:flex;gap:2px;background:var(--ink);border-radius:6px;padding:2px}
+.stg{padding:4px 10px;border-radius:4px;font-size:11px;color:var(--sub);cursor:pointer;border:none;background:none;font-family:var(--fh)}
+.stg.on{background:var(--s2);color:var(--plat);font-weight:600}
+.sb{flex:1;overflow-y:auto;padding:12px 14px}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0}
+.rsz{width:5px;background:var(--bd);cursor:col-resize;flex-shrink:0;position:relative;transition:background .12s}
+.rsz:hover,.rsz.drag{background:var(--plat)}
+.rsz::after{content:'';position:absolute;left:-3px;right:-3px;top:0;bottom:0}
+.mh{padding:11px 18px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:12px;flex-shrink:0}
+.mh h2{font-family:var(--fd);font-size:17px;font-weight:400}
+.mh .d{font-size:11.5px;color:var(--sub)}
+.vtog{margin-left:auto;display:flex;gap:2px;background:var(--surface);border-radius:7px;padding:2px}
+.vt{padding:6px 13px;border-radius:5px;font-size:11.5px;color:var(--sub);cursor:pointer;border:none;background:none;font-family:var(--fh);white-space:nowrap}
+.vt:hover{color:var(--tx)}
+.vt.on{background:rgba(200,169,110,.16);color:var(--plat);font-weight:600}
+.mb{flex:1;overflow:auto;padding:0}
+/* table */
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{font-family:var(--fm);font-size:9px;letter-spacing:.5px;text-transform:uppercase;color:var(--sub);text-align:right;padding:9px 10px;background:#13233a;position:sticky;top:0;z-index:3;border-bottom:1px solid var(--bd2);white-space:nowrap}
+th.l{text-align:left}
+td{padding:6px 10px;border-bottom:1px solid rgba(37,64,95,.5);text-align:right;font-family:var(--fm);vertical-align:top}
+td.l{text-align:left;font-family:var(--fh)}
+tr:hover td{background:rgba(200,169,110,.045)}
+tr.rg td{background:var(--s2)!important;color:var(--plat);font-family:var(--fm);font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;padding:7px 10px;position:sticky;top:33px;z-index:2}
+tr.tot td{background:rgba(200,169,110,.1)!important;color:var(--plat);font-weight:600;border-top:1px solid var(--bd2)}
+.nm{color:var(--sub)}
+.ppl{font-size:10px;color:var(--dim);font-family:var(--fm)}
+.pchip{display:inline-block;font-size:10px;padding:1px 5px;border-radius:3px;margin:1px 1px 0 0;font-family:var(--fh);cursor:pointer;white-space:nowrap}
+.pchip:hover{filter:brightness(1.35)}
+.in{background:transparent;border:1px solid transparent;color:var(--tx);border-radius:4px;padding:3px 6px;font-family:var(--fm);font-size:11.5px;text-align:right;width:110px}
+.in:hover{border-color:var(--bd2)}
+.in:focus{outline:none;border-color:var(--plat);background:var(--ink)}
+.in.ov{color:var(--am);background:rgba(224,162,59,.1);border-color:rgba(224,162,59,.35)}
+/* tree */
+.tree{padding:12px 16px}
+.tn{display:flex;align-items:center;gap:9px;padding:6px 9px;border-radius:6px;font-size:12px;cursor:pointer;border-left:2px solid transparent;margin-bottom:1px}
+.tn:hover{background:var(--surface)}
+.tn.sel{background:rgba(200,169,110,.13);border-left-color:var(--plat)}
+.tdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.trole{font-family:var(--fm);font-size:9.5px;letter-spacing:.5px;width:46px;flex-shrink:0}
+.tnm{min-width:160px}
+.tcd{font-family:var(--fm);font-size:10px;color:var(--dim);width:62px}
+.tnp{font-family:var(--fm);font-size:10px;color:var(--te);width:52px}
+.tct{font-family:var(--fm);font-size:11px;color:var(--sub);margin-left:auto}
+.tpr{font-family:var(--fm);font-size:10px;color:var(--plat);width:118px;text-align:right}
+.tgrp{font-family:var(--fm);font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;color:var(--plat);padding:9px 9px 5px;border-top:1px solid var(--bd);margin-top:6px}
+/* sidebar widgets */
+.fg{margin-bottom:16px}
+.fl{font-family:var(--fm);font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.srch{width:100%;background:var(--ink);border:1px solid var(--bd2);color:var(--tx);border-radius:6px;padding:7px 10px;font-size:12px;font-family:var(--fh)}
+.srch:focus{outline:none;border-color:var(--plat)}
+.sel{width:100%;background:var(--ink);border:1px solid var(--bd2);color:var(--tx);border-radius:6px;padding:6px 9px;font-size:12px;font-family:var(--fh)}
+.sel:focus{outline:none;border-color:var(--plat)}
+.ck{display:flex;align-items:center;gap:7px;padding:4px 6px;border-radius:5px;font-size:11.5px;cursor:pointer}
+.ck:hover{background:var(--surface)}
+.ck input{accent-color:var(--plat)}
+.kv{display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px solid rgba(37,64,95,.5)}
+.kv .k{color:var(--sub)}
+.kv .v{font-family:var(--fm);color:var(--tx)}
+.card{background:var(--surface);border:1px solid var(--bd);border-radius:8px;padding:11px 12px;margin-bottom:10px}
+.card h4{font-size:12.5px;margin-bottom:7px;display:flex;align-items:center;gap:6px}
+.mini{font-size:11px;color:var(--sub);line-height:1.5}
+.st{background:var(--surface);border:1px solid var(--bd);border-radius:7px;padding:9px 11px;margin-bottom:7px}
+.st .l{font-family:var(--fm);font-size:8.5px;letter-spacing:1px;text-transform:uppercase;color:var(--sub)}
+.st .v{font-family:var(--fd);font-size:17px;color:var(--plat);margin-top:2px}
+.st.bad{border-color:rgba(224,85,85,.4)}.st.bad .v{color:var(--rd)}
+.st.ok{border-color:rgba(59,200,113,.35)}.st.ok .v{color:var(--gr)}
+.note{padding:9px 12px;border-radius:7px;font-size:11.5px;line-height:1.5;margin-bottom:10px}
+.note.i{background:rgba(70,196,184,.08);border:1px solid rgba(70,196,184,.28);color:#a8e0d8}
+.note.i b{color:var(--te)}
+.note.w{background:rgba(224,162,59,.08);border:1px solid rgba(224,162,59,.3);color:#e8cfa0}
+.note.w b{color:var(--am)}
+.note.e{background:rgba(224,85,85,.08);border:1px solid rgba(224,85,85,.35);color:#f0b0b0}
+.note.e b{color:var(--rd)}
+.note.g{background:rgba(59,200,113,.08);border:1px solid rgba(59,200,113,.3);color:#a8d8bd}
+.note.g b{color:var(--gr)}
+.bnr{margin:12px 18px 0;padding:9px 13px;border-radius:7px;font-size:12px}
+.lnk{color:var(--te);cursor:pointer;text-decoration:underline}
+.empty{padding:60px 20px;text-align:center;color:var(--sub)}
+
+.cx{cursor:pointer;user-select:none;color:var(--plat);font-family:var(--fm);font-size:10px;width:14px;display:inline-block}
+.msel{max-height:180px;overflow-y:auto;border:1px solid var(--bd2);border-radius:6px;padding:4px;background:var(--ink)}
+.msel .ck{font-size:11.5px;padding:3px 5px}
+.mbar{display:flex;gap:5px;margin-bottom:5px}
+.mbar button{flex:1;background:var(--surface);border:1px solid var(--bd);color:var(--sub);border-radius:4px;padding:3px 6px;font-size:10px;cursor:pointer;font-family:var(--fh)}
+.mbar button:hover{border-color:var(--plat);color:var(--plat)}
+.chipbar{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.fchip{background:rgba(200,169,110,.15);border:1px solid var(--plat);color:var(--plat);border-radius:12px;padding:2px 8px;font-size:10.5px;display:flex;align-items:center;gap:4px}
+.fchip .x{cursor:pointer;font-size:12px;line-height:1}
+tr.sub td{background:rgba(70,196,184,.08)!important;color:var(--te);font-family:var(--fm);font-size:10px;font-weight:600}
+.sumtbl td{padding:5px 9px}
+.hidden{display:none}
+
+/* dataset manager */
+.dsw{padding:14px 18px}
+.dsg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+@media(max-width:1100px){.dsg{grid-template-columns:1fr}}
+.dsc{background:var(--surface);border:1px solid var(--bd);border-radius:9px;overflow:hidden}
+.dsc.act{border-color:var(--plat)}
+.dsh{padding:9px 12px;background:#13233a;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:7px}
+body[data-t="light"] .dsh{background:#E2E8EF}
+.dsh h4{font-size:12.5px;flex:1}
+.dsb{padding:10px 12px;max-height:230px;overflow:auto}
+.dsi{padding:8px 9px;border-radius:6px;border:1px solid var(--bd);margin-bottom:6px;cursor:pointer;font-size:11.5px}
+.dsi:hover{border-color:var(--bd2)}
+.dsi.on{border-color:var(--plat);background:rgba(200,169,110,.09)}
+.dsi .r1{display:flex;align-items:center;gap:6px;margin-bottom:2px}
+.dsi .nm{flex:1;font-weight:500}
+.dsi .r2{font-family:var(--fm);font-size:9.5px;color:var(--dim);display:flex;gap:8px}
+.per{font-family:var(--fm);font-size:9.5px;padding:1px 6px;border-radius:3px;background:rgba(70,196,184,.15);color:var(--te);border:1px solid rgba(70,196,184,.3)}
+.per.mis{background:rgba(224,85,85,.15);color:var(--rd);border-color:rgba(224,85,85,.4)}
+.dact{display:flex;gap:4px;margin-left:auto}
+.dact span{cursor:pointer;font-size:11px;color:var(--dim);padding:1px 4px;border-radius:3px}
+.dact span:hover{color:var(--plat);background:var(--s2)}
+.dact .del:hover{color:var(--rd)}
+.dsf{padding:8px 12px;border-top:1px solid var(--bd);display:flex;gap:6px}
+.pbar{display:flex;align-items:center;gap:10px;padding:11px 18px;background:var(--surface);border-bottom:1px solid var(--bd);flex-wrap:wrap}
+.psel{display:flex;gap:5px;align-items:center}
+.psel select{background:var(--ink);border:1px solid var(--bd2);color:var(--tx);border-radius:5px;padding:4px 8px;font-family:var(--fm);font-size:11.5px}
+.lock{padding:4px 10px;border-radius:5px;font-family:var(--fm);font-size:10.5px;display:flex;align-items:center;gap:5px}
+.lock.ok{background:rgba(59,200,113,.12);color:var(--gr);border:1px solid rgba(59,200,113,.3)}
+.lock.err{background:rgba(224,85,85,.12);color:var(--rd);border:1px solid rgba(224,85,85,.4)}
+.dlg{position:fixed;inset:0;background:rgba(5,10,18,.82);display:flex;align-items:center;justify-content:center;z-index:90}
+.dbox{background:var(--surface);border:1px solid var(--bd2);border-radius:12px;width:400px;max-width:92vw}
+.dbh{padding:13px 16px;border-bottom:1px solid var(--bd);font-size:14px;font-weight:600}
+.dbb{padding:16px}
+.dbf{padding:12px 16px;border-top:1px solid var(--bd);display:flex;gap:7px;justify-content:flex-end}
+.fld{margin-bottom:12px}
+.fld label{display:block;font-family:var(--fm);font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--dim);margin-bottom:5px}
+.fld input,.fld select{width:100%;background:var(--ink);border:1px solid var(--bd2);color:var(--tx);border-radius:6px;padding:7px 10px;font-size:12.5px;font-family:var(--fh)}
+.fld input:focus,.fld select:focus{outline:none;border-color:var(--plat)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-track{background:var(--ink)}
+::-webkit-scrollbar-thumb{background:var(--bd);border-radius:5px}::-webkit-scrollbar-thumb:hover{background:var(--bd2)}
+</style></head><body data-t="dark">
+<div class="app">
+  <div class="top">
+    <div class="brand">ideaLAB <span>×</span> NutriNest</div>
+    <div class="steps" id="steps"></div>
+    <div class="tools" id="tools"></div>
+  </div>
+  <div class="body">
+    <div class="side" id="side"><div class="sh" id="sh"></div><div class="sb" id="sb"></div></div>
+    <div class="rsz" id="rsz"></div>
+    <div class="main"><div class="mh" id="mh"></div><div class="mb" id="mb"></div></div>
+  </div>
+</div>
+<div id="dlg"></div>
+<script>const SEED={"npps": [{"code": "C00001", "name": "CÔNG TY CP XNK LAGER BEER VIỆT NAM", "region": "HÀ NỘI METRO", "province": "HÀ NỘI", "revenue": 0}, {"code": "C00002", "name": "CTY TNHH DV & TM PHÚ MINH CƯỜNG", "region": "HÀ NỘI METRO", "province": "HÀ NỘI", "revenue": 0}, {"code": "C00003", "name": "CÔNG TY TNHH THƯƠNG MẠI XUẤT NHẬP KHẨU QAH", "region": "HÀ NỘI METRO", "province": "HÀ NỘI", "revenue": 0}, {"code": "C00004", "name": "HỘ KINH DOANH ĐÀO THỊ LAN THU", "region": "HÀ NỘI METRO", "province": "HÀ NỘI", "revenue": 0}, {"code": "C00008", "name": "CÔNG TY TNHH TM HÙNG THẮNG", "region": "HÀ NỘI METRO", "province": "HÀ NỘI", "revenue": 0}, {"code": "C00005", "name": "CÔNG TY TNHH THƯƠNG MẠI ÁNH NHÂN", "region": "ĐỒNG BẰNG SÔNG HỒNG", "province": "HÀ NAM", "revenue": 0}, {"code": "C01850", "name": "CÔNG TY TNHH THƯƠNG MẠI DƯỢC THANH BÌNH", "region": "ĐỒNG BẰNG SÔNG HỒNG", "province": "QUẢNG NINH 1", "revenue": 0}, {"code": "C00154", "name": "HỘ KINH DOANH PHẠM THỊ NHUNG", "region": "ĐỒNG BẰNG SÔNG HỒNG", "province": "QUẢNG NINH", "revenue": 0}, {"code": "C00020", "name": "CÔNG TY TNHH MTV HẢI AN MC", "region": "ĐỒNG BẰNG SÔNG HỒNG", "province": "QUẢNG NINH 2", "revenue": 0}, {"code": "C00025", "name": "CÔNG TY TNHH PHÁT TRIỂN ĐẦU TƯ THƯƠNG MẠI VÀ DỊCH VỤ QUANG ANH", "region": "ĐỒNG BẰNG SÔNG HỒNG", "province": "NINH BÌNH", "revenue": 0}, {"code": "C01857", "name": "CÔNG TY CỔ PHẦN DỊCH VỤ THƯƠNG MẠI PHONG QUYÊN", "region": "ĐỒNG BẰNG SÔNG HỒNG", "province": "HẢI PHÒNG", "revenue": 0}, {"code": "C00011", "name": "CÔNG TY TNHH TM ANH ANH", "region": "ĐỒNG BẰNG SÔNG HỒNG", "province": "HẢI DƯƠNG", "revenue": 0}, {"code": "C00017", "name": "HỘ KINH DOANH TRẦN OANH", "region": "ĐỒNG BẰNG SÔNG HỒNG", "province": "HẢI DƯƠNG", "revenue": 0}, {"code": "C00024", "name": "CÔNG TY TNHH SX&TM DỊCH VỤ ANH TÙNG", "region": "ĐỒNG BẰNG SÔNG HỒNG", "province": "THÁI BÌNH", "revenue": 0}, {"code": "C00022", "name": "CÔNG TY TNHH XNK E&B VIỆT NAM", "region": "ĐỒNG BẰNG SÔNG HỒNG", "province": "HƯNG YÊN", "revenue": 0}, {"code": "C01541", "name": "CÔNG TY TNHH ĐẦU TƯ DỊCH VỤ VÀ THƯƠNG MẠI TUẤN TÚ", "region": "ĐỒNG BẰNG SÔNG HỒNG", "province": "NAM ĐỊNH", "revenue": 0}, {"code": "C00006", "name": "HỘ KINH DOANH NGỌC ANH BẮC NINH", "region": "ĐÔNG BẮC", "province": "BẮC NINH", "revenue": 0}, {"code": "C00029", "name": "HỘ KINH DOANH NGUYỄN THANH TÙNG", "region": "ĐÔNG BẮC", "province": "BẮC GIANG", "revenue": 0}, {"code": "C00035", "name": "CÔNG TY TNHH DV&TM TUẤN HÀ", "region": "ĐÔNG BẮC", "province": "THÁI NGUYÊN", "revenue": 0}, {"code": "C00036", "name": "HỘ KINH DOANH PHẠM TUẤN QUỲNH", "region": "ĐÔNG BẮC", "province": "PHÚ THỌ", "revenue": 0}, {"code": "C01843", "name": "CÔNG TY TNHH PHÂN PHỐI VÀ DỊCH VỤ HÀ LINH", "region": "ĐÔNG BẮC", "province": "PHÚ THỌ", "revenue": 0}, {"code": "C01513", "name": "CÔNG TY TNHH ĐẦU TƯ KINH DOANH THƯƠNG MẠI MẠNH THẮNG", "region": "ĐÔNG BẮC", "province": "GT LẠNG SƠN", "revenue": 0}, {"code": "C01626", "name": "CÔNG TY TNHH THƯƠNG MẠI VÀ XUẤT NHẬP KHẨU NGỌC PHÁT", "region": "ĐÔNG BẮC", "province": "VĨNH PHÚC", "revenue": 0}, {"code": "C01621", "name": "HỘ KINH DOANH NGÔ THỊ QUÝ", "region": "ĐÔNG BẮC", "province": "TUYÊN QUANG", "revenue": 0}, {"code": "C01542", "name": "CÔNG TY TNHH QA PHARMA", "region": "BẮC TRUNG BỘ", "province": "THANH HÓA", "revenue": 0}, {"code": "C01525", "name": "CÔNG TY TNHH ĐẦU TƯ VÀ THƯƠNG MẠI TỔNG HỢP CHÂU ANH", "region": "BẮC TRUNG BỘ", "province": "QUẢNG BÌNH", "revenue": 0}, {"code": "C01852", "name": "CÔNG TY TNHH THƯƠNG MẠI KL NAM KHÁNH", "region": "BẮC TRUNG BỘ", "province": "QUẢNG BÌNH", "revenue": 0}, {"code": "C00042", "name": "HỘ KINH DOANH NGUYỄN THẾ THÁM", "region": "BẮC TRUNG BỘ", "province": "QUẢNG TRỊ", "revenue": 0}, {"code": "C00043", "name": "CÔNG TY TNHH NÔNG NGHIỆP HỢP TÍN THÀNH", "region": "BẮC TRUNG BỘ", "province": "THỪA THIÊN HUẾ", "revenue": 0}, {"code": "C00046", "name": "CÔNG TY TNHH LINH TRUNG.CO", "region": "BẮC TRUNG BỘ", "province": "NGHỆ AN", "revenue": 0}, {"code": "C01879", "name": "CÔNG TY TNHH THƯƠNG MẠI VÀ DỊCH VỤ 3T&3B", "region": "BẮC TRUNG BỘ", "province": "HÀ TĨNH", "revenue": 0}, {"code": "C00047", "name": "HỘ KINH DOANH QUANG KHẢI", "region": "NAM TRUNG BỘ", "province": "PHÚ YÊN", "revenue": 0}, {"code": "C01477", "name": "CTY TNHH TM NGỌC PHƯƠNG ANH", "region": "NAM TRUNG BỘ", "province": "KHÁNH HÒA", "revenue": 0}, {"code": "C01509", "name": "CÔNG TY TNHH ATV KHÁNH HÒA", "region": "NAM TRUNG BỘ", "province": "KHÁNH HÒA", "revenue": 0}, {"code": "C01622", "name": "CÔNG TY TNHH MỘT THÀNH VIÊN PT PHƯỚC TÍN", "region": "NAM TRUNG BỘ", "province": "QUẢNG NGÃI", "revenue": 0}, {"code": "C00050", "name": "CTY TNHH MTV THIỆN HƯNG THỊNH", "region": "NAM TRUNG BỘ", "province": "ĐÀ NẴNG", "revenue": 0}, {"code": "C00060", "name": "HỘ KINH DOANH CỬA HÀNG VÂN TRANG", "region": "NAM TRUNG BỘ", "province": "QUẢNG NAM", "revenue": 0}, {"code": "C00054", "name": "CÔNG TY TNHH NGUYÊN HÙNG", "region": "NAM TRUNG BỘ", "province": "QUẢNG NAM", "revenue": 0}, {"code": "C00058", "name": "CÔNG TY TNHH KINH DOANH TỔNG HỢP PHÚ AN", "region": "NAM TRUNG BỘ", "province": "BÌNH ĐỊNH", "revenue": 0}, {"code": "C00055", "name": "HỘ KINH DOANH NHÀ PHÂN PHỐI THIÊN PHƯƠNG", "region": "NAM TRUNG BỘ", "province": "BÌNH ĐỊNH 2", "revenue": 0}, {"code": "C00053", "name": "HỘ KINH DOANH - NHÀ PHÂN PHỐI NHƯ Ý", "region": "NAM TRUNG BỘ", "province": "NINH THUẬN", "revenue": 0}, {"code": "C01530", "name": "CÔNG TY TNHH PHÂN PHỐI HẢI SƠN", "region": "NAM TRUNG BỘ", "province": "BÌNH THUẬN", "revenue": 0}, {"code": "C00061", "name": "DOANH NGHIỆP TN THƯƠNG MẠI DỊCH VỤ NGUYỄN TRƯỜNG", "region": "NAM TRUNG BỘ", "province": "BÌNH THUẬN", "revenue": 0}, {"code": "C01855", "name": "CÔNG TY TNHH GIA PHÚC LA GI", "region": "NAM TRUNG BỘ", "province": "BÌNH THUẬN", "revenue": 0}, {"code": "C01615", "name": "CÔNG TY TNHH MỘT THÀNH VIÊN ĐỨC THANH PDP", "region": "TÂY NGUYÊN", "province": "KONTUM", "revenue": 0}, {"code": "C00062", "name": "CÔNG TY TNHH MTV THÙY DUNG GIA LAI", "region": "TÂY NGUYÊN", "province": "GIA LAI", "revenue": 0}, {"code": "C00063", "name": "DNTN ĐẶNG THÁI", "region": "TÂY NGUYÊN", "province": "ĐÀ LẠT", "revenue": 0}, {"code": "C01613", "name": "CÔNG TY TNHH PNT MAI VÀNG", "region": "TÂY NGUYÊN", "province": "LÂM ĐỒNG", "revenue": 0}, {"code": "C01870", "name": "CÔNG TY TNHH THƯƠNG MẠI & DỊCH VỤ TOÀN PHÁT LĐ", "region": "TÂY NGUYÊN", "province": "LÂM ĐỒNG", "revenue": 0}, {"code": "C01540", "name": "CÔNG TY TNHH TÂM BÌNH AN KHÊ", "region": "TÂY NGUYÊN", "province": "GIA LAI", "revenue": 0}, {"code": "C00067", "name": "CTY TNHH TM - DV NHẬT TIẾN CS", "region": "TÂY NGUYÊN", "province": "CHƯ SÊ", "revenue": 0}, {"code": "C01624", "name": "CÔNG TY TNHH TM DV HẠNH NGUYÊN", "region": "TÂY NGUYÊN", "province": "ĐẮK LẮK", "revenue": 0}, {"code": "C01620", "name": "CÔNG TY TNHH PHÂN PHỐI MINH TOÀN", "region": "TÂY NGUYÊN", "province": "ĐẮK LẮK", "revenue": 0}, {"code": "C00071", "name": "CÔNG TY TNHH MTV DV & TM TRIỆU ĐẠT (NPP TRIỆU ĐẠT)", "region": "ĐÔNG NAM BỘ", "province": "ĐĂK NÔNG", "revenue": 0}, {"code": "C01785", "name": "CÔNG TY TNHH MTV AN DUYÊN", "region": "ĐÔNG NAM BỘ", "province": "ĐĂK NÔNG", "revenue": 0}, {"code": "C00077", "name": "CTY TNHH NPP HỒNG HẠNH", "region": "ĐÔNG NAM BỘ", "province": "TÂY NINH", "revenue": 0}, {"code": "C00078", "name": "CTY TNHH TM BẠCH MAI", "region": "ĐÔNG NAM BỘ", "province": "BÀ RỊA - VŨNG TÀU", "revenue": 0}, {"code": "C01848", "name": "CÔNG TY TNHH MỘT THÀNH VIÊN THƯƠNG MẠI DỊCH VỤ SẢN XUẤT HÙNG MẠNH", "region": "ĐÔNG NAM BỘ", "province": "BÌNH PHƯỚC 1", "revenue": 0}, {"code": "C01832", "name": "CÔNG TY TNHH XUÂN PHÚC BP", "region": "ĐÔNG NAM BỘ", "province": "BÌNH PHƯỚC 2", "revenue": 0}, {"code": "C01644", "name": "CÔNG TY TNHH THƯƠNG MẠI QUÂN LỘC PHÁT", "region": "ĐÔNG NAM BỘ", "province": "BIÊN HÒA", "revenue": 0}, {"code": "C01877", "name": "CÔNG TY TNHH TRƯỜNG TÂM PHÁT", "region": "ĐÔNG NAM BỘ", "province": "LONG KHÁNH", "revenue": 0}, {"code": "C00092", "name": "CÔNG TY TNHH TM DV PHÂN PHỐI THỰC PHẨM NGÔ GIA", "region": "ĐÔNG NAM BỘ", "province": "BÌNH DƯƠNG 1", "revenue": 0}, {"code": "C01876", "name": "CÔNG TY TNHH THƯƠNG MẠI TỔNG HỢP VY VY", "region": "ĐÔNG NAM BỘ", "province": "BÌNH DƯƠNG 2", "revenue": 0}, {"code": "C01853", "name": "CÔNG TY TNHH SẢN XUẤT THƯƠNG MẠI PHÚ GIANG", "region": "ĐÔNG NAM BỘ", "province": "BÌNH DƯƠNG 3", "revenue": 0}, {"code": "C00099", "name": "CTY TNHH TM DV ĐT SƠN VINH", "region": "TPHCM", "province": "HCM", "revenue": 0}, {"code": "C01507", "name": "CÔNG TY TNHH SONG LONG VĨNH PHÁT", "region": "TPHCM", "province": "HCM", "revenue": 0}, {"code": "C00101", "name": "CTY TNHH XUẤT NHẬP KHẨU H&P", "region": "TPHCM", "province": "HCM", "revenue": 0}, {"code": "C00102", "name": "CN CTY CP XNK & ĐT CHỢ LỚN - TTTM CHOLIMEX", "region": "TPHCM", "province": "HCM", "revenue": 0}, {"code": "C00103", "name": "HKD CH YẾN - SÂM AN PHÚC", "region": "TPHCM", "province": "HCM", "revenue": 0}, {"code": "C00155", "name": "HỘ KINH DOANH PHAN CHÂU TUẤN", "region": "TPHCM", "province": "HCM", "revenue": 0}, {"code": "C00105", "name": "CTY TNHH SỨC SỐNG VÀNG", "region": "TPHCM", "province": "HCM", "revenue": 0}, {"code": "C01827", "name": "CÔNG TY TNHH TÚ QUYÊN KHANG", "region": "TPHCM", "province": "HCM", "revenue": 0}, {"code": "C00107", "name": "CÔNG TY TNHH THƯƠNG MẠI TRÍ VIỆT", "region": "MEKONG1", "province": "BẾN TRE", "revenue": 0}, {"code": "C00108", "name": "CTY TNHH MTV V&C NGỌC CHÂU ", "region": "MEKONG1", "province": "VĨNH LONG", "revenue": 0}, {"code": "C01617", "name": "CÔNG TY TNHH THỰC PHẨM HUỲNH TẤN PHÁT", "region": "MEKONG1", "province": "ĐỒNG THÁP", "revenue": 0}, {"code": "C01614", "name": "CÔNG TY TNHH MTV TRUNG NHẬT HUY", "region": "MEKONG1", "province": "LONG AN", "revenue": 0}, {"code": "C01531", "name": "CÔNG TY TRÁCH NHIỆM HỮU HẠN THƯƠNG MẠI DỊCH VỤ MỸ KIM TG", "region": "MEKONG1", "province": "TIỀN GIANG", "revenue": 0}, {"code": "C01616", "name": "CÔNG TY TNHH PHÚC NGỌC 2020", "region": "MEKONG1", "province": "TRÀ VINH", "revenue": 0}, {"code": "C01636", "name": "CÔNG TY TNHH DUYÊN HÙNG AG", "region": "MEKONG2", "province": "AN GIANG", "revenue": 0}, {"code": "C00127", "name": "HỘ KINH DOANH NHÀ PHÂN PHỐI HẢI ANH", "region": "MEKONG2", "province": "AN GIANG", "revenue": 0}, {"code": "C01849", "name": "CÔNG TY TNHH MTV TM DV ĐT KHANG THỊNH", "region": "MEKONG2", "province": "CÀ MAU", "revenue": 0}, {"code": "C01629", "name": "CÔNG TY TNHH BÁCH HÓA TỔNG HỢP HOÀNG KIẾM", "region": "MEKONG2", "province": "CẦN THƠ", "revenue": 0}, {"code": "C01642", "name": "CÔNG TY TNHH TM HỒNG THẮM", "region": "MEKONG2", "province": "HẬU GIANG", "revenue": 0}, {"code": "C00125", "name": "CÔNG TY TNHH THƯƠNG MẠI SHIBA", "region": "MEKONG2", "province": "KIÊN GIANG", "revenue": 0}, {"code": "C01503", "name": "HỘ KINH DOANH NHÀ PHÂN PHỐI TẬP MAI", "region": "MEKONG2", "province": "KIÊN GIANG 1", "revenue": 0}, {"code": "C01515", "name": "CÔNG TY TNHH TM MTV HOÀNG KIM", "region": "MEKONG2", "province": "SÓC TRĂNG", "revenue": 0}, {"code": "C01608", "name": "HỘ KINH DOANH ĐINH CHÍ DỮ", "region": "MEKONG2", "province": "BẠC LIÊU", "revenue": 0}], "employees": [{"code": "NN-024", "name": "Vũ Hữu Thượng", "pos": "GĐKD_GT", "region": "MEKONG2", "scope": "ALL", "npps": ["C00001", "C00002", "C00003", "C00004", "C00005", "C00006", "C00008", "C00011", "C00017", "C00020", "C00022", "C00024", "C00025", "C00029", "C00035", "C00036", "C00042", "C00043", "C00046", "C00047", "C00050", "C00053", "C00054", "C00055", "C00058", "C00060", "C00061", "C00062", "C00063", "C00067", "C00071", "C00077", "C00078", "C00092", "C00099", "C00101", "C00102", "C00103", "C00105", "C00107", "C00108", "C00125", "C00127", "C00154", "C00155", "C01477", "C01503", "C01507", "C01509", "C01513", "C01515", "C01525", "C01530", "C01531", "C01540", "C01541", "C01542", "C01608", "C01613", "C01614", "C01615", "C01616", "C01617", "C01620", "C01621", "C01622", "C01624", "C01626", "C01629", "C01636", "C01642", "C01644", "C01785", "C01827", "C01832", "C01843", "C01848", "C01849", "C01850", "C01852", "C01853", "C01855", "C01857", "C01870", "C01876", "C01877", "C01879"], "luong": 48392308, "thuong": 0, "bhxh": 2293900, "bhyt": 393240, "bhtn": 131080, "kpcd": 262160, "role": "GĐKD"}, {"code": "NN-007", "name": "Phan Thanh Phiên", "pos": "ASM", "region": "NAM TRUNG BỘ", "scope": "REGION", "npps": ["C00047", "C00050", "C00053", "C00054", "C00055", "C00058", "C00060", "C00061", "C01477", "C01509", "C01530", "C01622", "C01855"], "luong": 23761539, "thuong": 0, "bhxh": 1402450, "bhyt": 240420, "bhtn": 80140, "kpcd": 160280, "role": "ASM"}, {"code": "NA-058", "name": "Bùi Minh Việt", "pos": "ASM", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "REGION", "npps": ["C00005", "C00011", "C00017", "C00020", "C00022", "C00024", "C00025", "C00154", "C01541", "C01850", "C01857"], "luong": 19561539, "thuong": 0, "bhxh": 1402450, "bhyt": 240420, "bhtn": 80140, "kpcd": 160280, "role": "ASM"}, {"code": "NN-589", "name": "Trần Quốc Quân", "pos": "ASM_GT", "region": "ĐÔNG NAM BỘ", "scope": "REGION", "npps": ["C00071", "C00077", "C00078", "C00092", "C01644", "C01785", "C01832", "C01848", "C01853", "C01876", "C01877"], "luong": 22207265, "thuong": 0, "bhxh": 1402450, "bhyt": 240420, "bhtn": 80140, "kpcd": 160280, "role": "ASM"}, {"code": "NN-027", "name": "Nguyễn Thị Thủy", "pos": "ASM", "region": "TÂY NGUYÊN", "scope": "REGION", "npps": ["C00062", "C00063", "C00067", "C01540", "C01613", "C01615", "C01620", "C01624", "C01870"], "luong": 23761539, "thuong": 100000, "bhxh": 1402450, "bhyt": 240420, "bhtn": 80140, "kpcd": 160280, "role": "ASM"}, {"code": "NA-278", "name": "Trần Đăng Thuấn", "pos": "ASM", "region": "ĐÔNG BẮC", "scope": "REGION", "npps": ["C00006", "C00029", "C00035", "C00036", "C01513", "C01621", "C01626", "C01843"], "luong": 18146154, "thuong": 0, "bhxh": 1402450, "bhyt": 240420, "bhtn": 80140, "kpcd": 160280, "role": "ASM"}, {"code": "NN-323", "name": "Nguyễn Tuấn Huy", "pos": "ASM", "region": "BẮC TRUNG BỘ", "scope": "REGION", "npps": ["C00042", "C00043", "C00046", "C01525", "C01542", "C01852", "C01879"], "luong": 20146154, "thuong": 0, "bhxh": 1402450, "bhyt": 240420, "bhtn": 80140, "kpcd": 160280, "role": "ASM"}, {"code": "NN-269", "name": "Lê Văn Mát", "pos": "ASM_GT", "region": "MEKONG1", "scope": "REGION", "npps": ["C00107", "C00108", "C01531", "C01614", "C01616", "C01617"], "luong": 32561539, "thuong": 0, "bhxh": 1402450, "bhyt": 240420, "bhtn": 80140, "kpcd": 160280, "role": "ASM"}, {"code": "NN-002", "name": "Võ Hùng Tiềm", "pos": "ASM", "region": "HÀ NỘI METRO", "scope": "REGION", "npps": ["C00001", "C00002", "C00003", "C00004", "C00008"], "luong": 20158161, "thuong": 0, "bhxh": 1402450, "bhyt": 240420, "bhtn": 80140, "kpcd": 160280, "role": "ASM"}, {"code": "NB-085", "name": "Bùi Thanh Liêm", "pos": "GSBH_GT", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "REGION", "npps": ["C00011", "C00017"], "luong": 9900000, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-387", "name": " Huỳnh Văn Sang ", "pos": "GSBH_GT", "region": "NAM TRUNG BỘ", "scope": "REGION", "npps": ["C00054", "C00060"], "luong": 12059066, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "PG-192", "name": "Võ Thị Thùy Trang", "pos": "PG_Fulltime_GT", "region": "NAM TRUNG BỘ", "scope": "REGION", "npps": ["C00054", "C00060"], "luong": 5847692, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "PG"}, {"code": "NN-992", "name": "Nguyễn Trần Vũ Linh", "pos": "GSBH", "region": "NAM TRUNG BỘ", "scope": "REGION", "npps": ["C00055", "C00058"], "luong": 18284615, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-451", "name": "Võ Văn Chính", "pos": "GSBH", "region": "NAM TRUNG BỘ", "scope": "REGION", "npps": ["C00053", "C01530"], "luong": 15984615, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-888", "name": "Ngô Trần Văn Tâm", "pos": "GSBH_GT", "region": "NAM TRUNG BỘ", "scope": "REGION", "npps": ["C00061", "C01855"], "luong": 11353846, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-998", "name": "Nguyễn Thị Hoài", "pos": "GSBH_GT", "region": "TÂY NGUYÊN", "scope": "REGION", "npps": ["C00063", "C01613"], "luong": 15600000, "thuong": 100000, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-177", "name": "Lê Thị Chung", "pos": "GSBH", "region": "TÂY NGUYÊN", "scope": "REGION", "npps": ["C00067", "C01540"], "luong": 12984615, "thuong": 100000, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-803", "name": "Lục Văn Tự", "pos": "GSBH_GT", "region": "ĐÔNG NAM BỘ", "scope": "REGION", "npps": ["C00071", "C01785"], "luong": 3773077, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NN-173", "name": "Huỳnh Minh Thế", "pos": "GSBH", "region": "TPHCM", "scope": "REGION", "npps": ["C00103", "C00155"], "luong": 17638461, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NN-005", "name": "Phạm Văn Tuyền", "pos": "GSBH", "region": "HÀ NỘI METRO", "scope": "DIRECT", "npps": ["C00001"], "luong": 11555846, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "GSBH"}, {"code": "NA-103", "name": "Nguyễn Thị Nhung", "pos": "NVKD", "region": "HÀ NỘI METRO", "scope": "DIRECT", "npps": ["C00001"], "luong": 9726000, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-077", "name": "Trương Bích Ngọc", "pos": "NVKD_GT", "region": "HÀ NỘI METRO", "scope": "DIRECT", "npps": ["C00001"], "luong": 0, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "NVKD"}, {"code": "NA-048", "name": "Lê Mai Hương", "pos": "GSBH", "region": "HÀ NỘI METRO", "scope": "DIRECT", "npps": ["C00002"], "luong": 8203846, "thuong": 100000, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-865", "name": "Ngô Thị Oanh", "pos": "NVKD_GT", "region": "HÀ NỘI METRO", "scope": "DIRECT", "npps": ["C00002"], "luong": 0, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "NVKD"}, {"code": "NN-377", "name": "Tô Văn Kiên", "pos": "GSBH", "region": "HÀ NỘI METRO", "scope": "DIRECT", "npps": ["C00003"], "luong": 4832500, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NN-409", "name": "Hà Thị Bích Ngọc", "pos": "NVKD_GT", "region": "HÀ NỘI METRO", "scope": "DIRECT", "npps": ["C00003"], "luong": 7683060, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-044", "name": "Lê Thị Phương Nga", "pos": "NVKD_GT", "region": "HÀ NỘI METRO", "scope": "DIRECT", "npps": ["C00004"], "luong": 9616769, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-178", "name": "Trần Văn Minh", "pos": "GSBH_GT", "region": "HÀ NỘI METRO", "scope": "DIRECT", "npps": ["C00008"], "luong": 17408295, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NN-202", "name": "Lương Mạnh Tuấn", "pos": "NVKD_GT", "region": "HÀ NỘI METRO", "scope": "DIRECT", "npps": ["C00008"], "luong": 11330539, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NN-786", "name": "Phạm Trung Kiên", "pos": "NVKD_GT", "region": "HÀ NỘI METRO", "scope": "DIRECT", "npps": ["C00008"], "luong": 10617187, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-163", "name": "Vũ Thị Thu Hòa", "pos": "GSBH_GT", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "DIRECT", "npps": ["C00005"], "luong": 9638462, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "GSBH"}, {"code": "NA-009", "name": "Mạc Thị Hồng Nhung", "pos": "GSBH", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "DIRECT", "npps": ["C01850"], "luong": 7784615, "thuong": 100000, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-979", "name": "Đỗ Như Ngọc", "pos": "NVKD_GT", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "DIRECT", "npps": ["C01850"], "luong": 10000000, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-794", "name": "Nguyễn Thị Ánh", "pos": "NVKD_GT", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "DIRECT", "npps": ["C01850"], "luong": 10912000, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-101", "name": "Vũ Chí Chung", "pos": "GSBH_GT", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "DIRECT", "npps": ["C00154"], "luong": 3480769, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-750", "name": "Trần Thị Huyền Trang", "pos": "NVKD_GT", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "DIRECT", "npps": ["C00154"], "luong": 5030770, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-120", "name": "Vũ Hà Thu", "pos": "NVKD_GT", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "DIRECT", "npps": ["C00154"], "luong": 0, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "NVKD"}, {"code": "NA-556", "name": "Hoàng Thị Hòa", "pos": "NVKD_GT", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "DIRECT", "npps": ["C00020"], "luong": 5796154, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-970", "name": "Nguyễn Thị Mai", "pos": "GSBH_GT", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "DIRECT", "npps": ["C00025"], "luong": 9900000, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NB-115", "name": "Phạm Thị Huyền Trang", "pos": "NVKD_GT", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "DIRECT", "npps": ["C00025"], "luong": 9467308, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-287", "name": "Nguyễn Duy Linh", "pos": "NVKD_GT", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "DIRECT", "npps": ["C00025"], "luong": 7465385, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NN-855", "name": "Mai Xuân Huy Hoàng", "pos": "GSBH_GT", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "DIRECT", "npps": ["C01857"], "luong": 11100000, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-832", "name": "Nguyễn Thị Thu Hậu", "pos": "NVKD_GT", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "DIRECT", "npps": ["C01857"], "luong": 8401923, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-062", "name": "Nguyễn Hoàng Anh", "pos": "NVKD_GT", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "DIRECT", "npps": ["C00011"], "luong": 8678846, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-003", "name": "Lê Công Duy", "pos": "NVKD_GT", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "DIRECT", "npps": ["C00011"], "luong": 7740385, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-144", "name": "Nguyễn Thị Thanh Nhàn", "pos": "NVKD_GT", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "DIRECT", "npps": ["C00017"], "luong": 4498077, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "PG-945", "name": "Đỗ Thị Minh Nguyệt", "pos": "PG_Fulltime_GT", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "DIRECT", "npps": ["C00017"], "luong": 6766923, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "NA-544", "name": "Vũ Chí Công", "pos": "GSBH_GT", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "DIRECT", "npps": ["C00024"], "luong": 15700000, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-016", "name": "Đức Minh Công", "pos": "NVKD_GT", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "DIRECT", "npps": ["C00024"], "luong": 10234616, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-632", "name": "Vũ Thị Dinh", "pos": "NVKD_GT", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "DIRECT", "npps": ["C00024"], "luong": 12012616, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-995", "name": "Nguyễn Trường Giang", "pos": "GSBH_GT", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "DIRECT", "npps": ["C00022"], "luong": 9434615, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-282", "name": "Chử Thị Thu", "pos": "NVKD_GT", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "DIRECT", "npps": ["C00022"], "luong": 7398077, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-016", "name": "Nguyễn Thị Thanh Thảo", "pos": "NVKD_GT", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "DIRECT", "npps": ["C00022"], "luong": 8634616, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-601", "name": "Lê Thanh Tú", "pos": "GSBH_GT", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "DIRECT", "npps": ["C01541"], "luong": 14600000, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-675", "name": "Phạm Văn Dĩnh", "pos": "NVKD_GT", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "DIRECT", "npps": ["C01541"], "luong": 9634616, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-835", "name": "Trần Thị Huế", "pos": "NVKD_GT", "region": "ĐỒNG BẰNG SÔNG HỒNG", "scope": "DIRECT", "npps": ["C01541"], "luong": 9734616, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-899", "name": "Mai Thị Mến", "pos": "GSBH_GT", "region": "ĐÔNG BẮC", "scope": "DIRECT", "npps": ["C00006"], "luong": 8076923, "thuong": 100000, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NN-960", "name": "Trần Văn Phong", "pos": "NVKD_GT", "region": "ĐÔNG BẮC", "scope": "DIRECT", "npps": ["C00006"], "luong": 6405770, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-512", "name": "Nguyễn Văn Vũ", "pos": "GSBH", "region": "ĐÔNG BẮC", "scope": "DIRECT", "npps": ["C00029"], "luong": 14600000, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-513", "name": "Nguyễn Thị Hồng", "pos": "NVKD", "region": "ĐÔNG BẮC", "scope": "DIRECT", "npps": ["C00029"], "luong": 10201923, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-054", "name": "Nguyễn Văn Thái", "pos": "NVKD_GT", "region": "ĐÔNG BẮC", "scope": "DIRECT", "npps": ["C00029"], "luong": 9701923, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-539", "name": "Dương Thị Bắc", "pos": "NVKD_GT", "region": "ĐÔNG BẮC", "scope": "DIRECT", "npps": ["C00029"], "luong": 10234616, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "PG-984", "name": "Nguyễn Thị Dinh", "pos": "PG_Fulltime_GT", "region": "ĐÔNG BẮC", "scope": "DIRECT", "npps": ["C00029"], "luong": 6747692, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "PG-915", "name": "Nguyễn Thị Hiền", "pos": "PG_Fulltime_GT", "region": "ĐÔNG BẮC", "scope": "DIRECT", "npps": ["C00029"], "luong": 6747692, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "NA-759", "name": "Trịnh Minh Thắng", "pos": "GSBH_GT", "region": "ĐÔNG BẮC", "scope": "DIRECT", "npps": ["C00035"], "luong": 7769231, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-768", "name": "Trần Thị Mai Thu", "pos": "NVKD_GT", "region": "ĐÔNG BẮC", "scope": "DIRECT", "npps": ["C00035"], "luong": 6734616, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-783", "name": "Phan Thị Hạnh", "pos": "NVKD_GT", "region": "ĐÔNG BẮC", "scope": "DIRECT", "npps": ["C00035"], "luong": 6500000, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-162", "name": "Nguyễn Thị Hương", "pos": "NVKD_GT", "region": "ĐÔNG BẮC", "scope": "DIRECT", "npps": ["C01843"], "luong": 5063462, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "NVKD"}, {"code": "NB-161", "name": "Nguyễn Thị Tuyến", "pos": "NVKD_GT", "region": "ĐÔNG BẮC", "scope": "DIRECT", "npps": ["C01843"], "luong": 4828847, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "NVKD"}, {"code": "NA-784", "name": "Bùi Văn Trung", "pos": "GSBH_GT", "region": "ĐÔNG BẮC", "scope": "DIRECT", "npps": ["C01626"], "luong": 8100000, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-922", "name": "Nguyễn Đăng Tùng", "pos": "NVKD_GT", "region": "ĐÔNG BẮC", "scope": "DIRECT", "npps": ["C01626"], "luong": 5734616, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-158", "name": "Bùi Xuân Tâm", "pos": "GSBH_GT", "region": "ĐÔNG BẮC", "scope": "DIRECT", "npps": ["C01621"], "luong": 5476923, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "GSBH"}, {"code": "NB-170", "name": "Lành Thị Cúc", "pos": "NVKD_GT", "region": "ĐÔNG BẮC", "scope": "DIRECT", "npps": ["C01621"], "luong": 5098077, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "NVKD"}, {"code": "NA-826", "name": "Nguyễn Khắc Lực", "pos": "GSBH_GT", "region": "BẮC TRUNG BỘ", "scope": "DIRECT", "npps": ["C01542"], "luong": 15200000, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-074", "name": "Nguyễn Thị Duyên", "pos": "NVKD_GT", "region": "BẮC TRUNG BỘ", "scope": "DIRECT", "npps": ["C01542"], "luong": 10234616, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-939", "name": "Trịnh Thị Thu", "pos": "NVKD_GT", "region": "BẮC TRUNG BỘ", "scope": "DIRECT", "npps": ["C01542"], "luong": 10234616, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-184", "name": "Hồ Sỹ Đồng", "pos": "NVKD_GT", "region": "BẮC TRUNG BỘ", "scope": "DIRECT", "npps": ["C01542"], "luong": 6803846, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "NVKD"}, {"code": "NB-049", "name": "Dương Hồng Nam", "pos": "GSBH_GT", "region": "BẮC TRUNG BỘ", "scope": "DIRECT", "npps": ["C01525"], "luong": 10576923, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-876", "name": "Đinh Thị Thu Huyền", "pos": "NVKD_GT", "region": "BẮC TRUNG BỘ", "scope": "DIRECT", "npps": ["C01852"], "luong": 4361538, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-171", "name": "Võ Thị Mỹ Nga", "pos": "NVKD_GT", "region": "BẮC TRUNG BỘ", "scope": "DIRECT", "npps": ["C01852"], "luong": 5698077, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "NVKD"}, {"code": "NA-538", "name": "Trần Đình Định", "pos": "GSBH_GT", "region": "BẮC TRUNG BỘ", "scope": "DIRECT", "npps": ["C00042"], "luong": 7800000, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-691", "name": "Trần Thị Thu Huyền", "pos": "NVKD_GT", "region": "BẮC TRUNG BỘ", "scope": "DIRECT", "npps": ["C00042"], "luong": 6634616, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-067", "name": "Ngô Thị Hoa", "pos": "NVKD_GT", "region": "BẮC TRUNG BỘ", "scope": "DIRECT", "npps": ["C00042"], "luong": 6634616, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "PG-927", "name": "Nguyễn Thị Thương", "pos": "PG_Fulltime_GT", "region": "BẮC TRUNG BỘ", "scope": "DIRECT", "npps": ["C00042"], "luong": 6766923, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "NA-530", "name": "Nguyễn Văn Trí Thông", "pos": "GSBH_GT", "region": "BẮC TRUNG BỘ", "scope": "DIRECT", "npps": ["C00043"], "luong": 7769231, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "PG-877", "name": "Nguyễn Thị Bích Chi", "pos": "NVKD_GT", "region": "BẮC TRUNG BỘ", "scope": "DIRECT", "npps": ["C00043"], "luong": 4384616, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "PG-958", "name": "Trần Thị Thanh Tâm", "pos": "PG_Fulltime_GT", "region": "BẮC TRUNG BỘ", "scope": "DIRECT", "npps": ["C00043"], "luong": 7213846, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "NA-643", "name": "Nguyễn Hồng Hợp", "pos": "GSBH_GT", "region": "BẮC TRUNG BỘ", "scope": "DIRECT", "npps": ["C00046"], "luong": 15600000, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-678", "name": "Trần Hồng Hạnh", "pos": "NVKD_GT", "region": "BẮC TRUNG BỘ", "scope": "DIRECT", "npps": ["C00046"], "luong": 14252616, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-028", "name": "Nguyễn Thị Hạnh", "pos": "NVKD_GT", "region": "BẮC TRUNG BỘ", "scope": "DIRECT", "npps": ["C00046"], "luong": 10201923, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-178", "name": "Nguyễn Thị Hồng Nhung", "pos": "NVKD_GT", "region": "BẮC TRUNG BỘ", "scope": "DIRECT", "npps": ["C01879"], "luong": 5298077, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "NVKD"}, {"code": "NB-179", "name": "Võ Thị Thanh", "pos": "NVKD_GT", "region": "BẮC TRUNG BỘ", "scope": "DIRECT", "npps": ["C01879"], "luong": 4946154, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "NVKD"}, {"code": "NN-016", "name": "Nguyễn Thanh Sang", "pos": "GSBH_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00047"], "luong": 16979962, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NN-052", "name": "Nguyễn Ngọc Minh", "pos": "NVKD_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00047"], "luong": 11041923, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NN-208", "name": "Hồ Quốc Luân", "pos": "NVKD_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00047"], "luong": 11930615, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "PG-970", "name": "Văn Thị Diễm", "pos": "PG_Fulltime_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00047"], "luong": 6747692, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "PG-426", "name": "Huỳnh Thị Mỹ Chi", "pos": "PG_Parttime_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00047"], "luong": 6747692, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "PG-683", "name": "Phạm Thị Kim Hồng", "pos": "PG_Parttime_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00047"], "luong": 10971541, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "PG"}, {"code": "PG-639", "name": "Lê Thị Kim Hòa", "pos": "PG_Parttime_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00047"], "luong": 6747692, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "NA-838", "name": "Nguyễn Anh Việt", "pos": "GSBH_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C01477"], "luong": 11600000, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-363", "name": "Mai Xuân Thịnh", "pos": "NVKD_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C01477"], "luong": 7234616, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-917", "name": "Nguyễn Xuân Hoài", "pos": "NVKD_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C01477"], "luong": 7234616, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-099", "name": "Võ Văn Hiệp", "pos": "NVKD_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C01509"], "luong": 10408000, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NN-012", "name": "Nguyễn Đức Duy", "pos": "GSBH_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C01622"], "luong": 12553846, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NN-013", "name": "Phan Thị Thùy", "pos": "NVKD_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C01622"], "luong": 10201923, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NN-491", "name": "Nguyễn Thanh Tuấn", "pos": "NVKD_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C01622"], "luong": 10201923, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NN-253", "name": "Đinh Tấn Đạt", "pos": "NVKD_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C01622"], "luong": 8434616, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "PG-071", "name": "Thạch Thị Thu Thúy", "pos": "PG_Parttime_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C01622"], "luong": 7194615, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "PG-736", "name": "Trương Thị Thu", "pos": "PG_Parttime_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C01622"], "luong": 0, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "PG"}, {"code": "NN-008", "name": "Huỳnh Viết Thắng", "pos": "GSBH", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00050"], "luong": 8938462, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NN-204", "name": "Hồ Quảng Thành", "pos": "NVKD", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00050"], "luong": 7730770, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NN-057", "name": "Lê Thị My My", "pos": "NVKD", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00050"], "luong": 9466097, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NN-474", "name": "Nguyễn Kim Tuyến", "pos": "NVKD", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00050"], "luong": 10117307, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "PG-061", "name": "Lê Thị Thúy Hường", "pos": "PG_FULL", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00050"], "luong": 4130385, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "NN-011", "name": "Nguyễn Văn Thái", "pos": "NVKD", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00060"], "luong": 11080440, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NN-187", "name": "Lê Thị Nghĩa", "pos": "NVKD", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00060"], "luong": 0, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "NVKD"}, {"code": "PG-541", "name": "Trần Thị Bích Hận", "pos": "PG_PTIME", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00060"], "luong": 6747692, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "NN-457", "name": "Trần Văn Phước", "pos": "NVKD", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00054"], "luong": 8134616, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "PG-901", "name": "Văn Thùy Như Hiếu", "pos": "PG_Parttime_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00054"], "luong": 0, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "PG"}, {"code": "NN-905", "name": "Nguyễn Thị Mai Trinh", "pos": "NVKD_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00058"], "luong": 10201923, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-291", "name": "Nguyễn Diệp Thị Thanh Hương", "pos": "NVKD_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00058"], "luong": 10169231, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "PG-964", "name": "Lê Tiểu Bình", "pos": "PG_Parttime_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00058"], "luong": 7213846, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "PA-010", "name": "Đoàn Thị Thanh Thịnh", "pos": "PG_Fulltime_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00058"], "luong": 7213846, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "NA-491", "name": "Nguyễn Đình Thắng", "pos": "NVKD_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00055"], "luong": 11878539, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NN-635", "name": "Nguyễn Thị Thanh Hồng", "pos": "NVKD_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00055"], "luong": 11946923, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "PG-997", "name": "Đinh Thị Thu Thảo", "pos": "PG_Fulltime_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00055"], "luong": 7213846, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "PG-969", "name": "Phạm Thị Hạt", "pos": "PG_Fulltime_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00055"], "luong": 7213846, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "NA-837", "name": "Đào Lê Quốc", "pos": "NVKD_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00053"], "luong": 9484616, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-529", "name": "Huỳnh Quốc Đạt", "pos": "NVKD_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C01530"], "luong": 10134616, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-059", "name": "Dương Ngọc Long", "pos": "NVKD_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C00061"], "luong": 8401923, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-052", "name": "Trần Thị Thêm", "pos": "NVKD_GT", "region": "NAM TRUNG BỘ", "scope": "DIRECT", "npps": ["C01855"], "luong": 0, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "NVKD"}, {"code": "NA-023", "name": "Phạm Thái Hòa", "pos": "GSBH_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C01615"], "luong": 9269231, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-565", "name": "Nguyễn Thị Lương Giang", "pos": "NVKD", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C01615"], "luong": 8515385, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-035", "name": "Võ Thị Thanh Mai", "pos": "GSBH_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C00062"], "luong": 13569231, "thuong": 100000, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NN-322", "name": "Lê Thị Bích Tuyền", "pos": "NVKD_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C00062"], "luong": 12482616, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-693", "name": "Nguyễn Thị Mi", "pos": "NVKD_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C00062"], "luong": 10234616, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-087", "name": "Hoàng Thị Năm", "pos": "NVKD_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C00062"], "luong": 10000000, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "PG-972", "name": "Vũ Thị Bích Hồng", "pos": "PG_Fulltime_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C00062"], "luong": 7252308, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "PG-648", "name": "Nguyễn Thị Út", "pos": "PG_Fulltime_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C00062"], "luong": 0, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "PG"}, {"code": "PG-492", "name": "Hoàng Mai Thùy Duyên", "pos": "PG_Fulltime_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C00062"], "luong": 7252308, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "PG-768", "name": "Nguyễn Thị Bảo Ngọc", "pos": "PG_Fulltime_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C00062"], "luong": 7252308, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "PG-726", "name": "Trương Thị Mỹ Linh", "pos": "PG_Fulltime_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C00062"], "luong": 7252308, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "PG-790", "name": "Lê Thị Hoàng Oanh", "pos": "PG_Fulltime_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C00062"], "luong": 7252308, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "PG-959", "name": "Nguyễn Thị Thanh Thảo", "pos": "PG_Fulltime_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C00062"], "luong": 7252308, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "PG-960", "name": "Nguyễn Thị Kim Dung", "pos": "PG_Fulltime_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C00062"], "luong": 7252308, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "PG-961", "name": "Phạm Thị Bích", "pos": "PG_Fulltime_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C00062"], "luong": 7252308, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "PG-988", "name": "Trần Thị Thu Thủy", "pos": "PG_Fulltime_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C00062"], "luong": 7252308, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "NB-029", "name": "Bùi Thị Cát Tiên", "pos": "NVKD_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C00063"], "luong": 8401923, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-990", "name": "Bùi Thị Ngọc Thúy", "pos": "NVKD_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C00063"], "luong": 11191231, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-088", "name": "Lê Thị Thùy Dung", "pos": "NVKD_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C01613"], "luong": 8401923, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "PG-420", "name": "Lưu Thị Phúc Nguyên", "pos": "PG_Fulltime_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C01613"], "luong": 7194615, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "NA-334", "name": "Hoàng Thị Mỹ Kỳ", "pos": "NVKD_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C01613"], "luong": 11760616, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "PG-645", "name": "Huỳnh Lan Nhi", "pos": "PG_Fulltime_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C01613"], "luong": 7194615, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "NB-105", "name": "Nguyễn Thị Kim Trang", "pos": "GSBH_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C01870"], "luong": 16911538, "thuong": 100000, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-676", "name": "Văn Thị Thanh Nhàn", "pos": "NVKD_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C01870"], "luong": 10234616, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-053", "name": "Đỗ Thị Diệu My", "pos": "NVKD_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C01540"], "luong": 6934616, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-083", "name": "Nguyễn Thị Thu Thủy", "pos": "NVKD_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C00067"], "luong": 7084615, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NN-866", "name": "Lê Thị Hoàng Anh", "pos": "GSBH_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C01624"], "luong": 12053846, "thuong": 100000, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NB-038", "name": "Phạm Thị Diễm My", "pos": "NVKD_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C01624"], "luong": 9530770, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-146", "name": "Phạm Thế Anh", "pos": "NVKD_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C01624"], "luong": 7667308, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "PG-962", "name": "H En Ni Mlô", "pos": "PG_Fulltime_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C01624"], "luong": 7194615, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "PG-989", "name": "Nguyễn Thị Thùy Linh", "pos": "PG_Fulltime_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C01624"], "luong": 7194615, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "PG-543", "name": "Lê Thị Thanh Tâm", "pos": "PG_PTIME", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C01624"], "luong": 7871538, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "NA-344", "name": "Huỳnh Thị Lan Phương", "pos": "GSBH_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C01620"], "luong": 10117307, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "GSBH"}, {"code": "NB-106", "name": "Đặng Thị Thùy", "pos": "NVKD_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C01620"], "luong": 0, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "NVKD"}, {"code": "PG-983", "name": "Lê Thảo Nguyên", "pos": "PG_Fulltime_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C01620"], "luong": 6863076, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "PG-968", "name": "Nguyễn Thị Ý", "pos": "PG_Fulltime_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C01620"], "luong": 6863076, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "PG-929", "name": "Đinh Thị Thanh Hằng", "pos": "PG_Fulltime_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C01620"], "luong": 6863076, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "PG-956", "name": "Huỳnh Thị Thanh Ngân", "pos": "PG_Fulltime_GT", "region": "TÂY NGUYÊN", "scope": "DIRECT", "npps": ["C01620"], "luong": 7871538, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "NA-677", "name": "Hồ Thị Thu Thảo", "pos": "NVKD_GT", "region": "ĐÔNG NAM BỘ", "scope": "DIRECT", "npps": ["C00071"], "luong": 8836461, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-901", "name": "Nguyễn Văn Chức", "pos": "NVKD_GT", "region": "ĐÔNG NAM BỘ", "scope": "DIRECT", "npps": ["C01785"], "luong": 5003846, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "PG-876", "name": "Nguyễn Thị Mai Hoa", "pos": "PG_Parttime_GT", "region": "ĐÔNG NAM BỘ", "scope": "DIRECT", "npps": ["C01785"], "luong": 6990384, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "NA-967", "name": "Phan Chí Hiếu", "pos": "GSBH_GT", "region": "ĐÔNG NAM BỘ", "scope": "DIRECT", "npps": ["C00077"], "luong": 11076923, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NN-749", "name": "Nguyễn Quốc Hiền", "pos": "NVKD_GT", "region": "ĐÔNG NAM BỘ", "scope": "DIRECT", "npps": ["C00077"], "luong": 7234616, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-590", "name": "Phan Thanh Khiêm", "pos": "NVKD_GT", "region": "ĐÔNG NAM BỘ", "scope": "DIRECT", "npps": ["C00077"], "luong": 7201923, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-017", "name": "Mai Thành Luân", "pos": "GSBH_GT", "region": "ĐÔNG NAM BỘ", "scope": "DIRECT", "npps": ["C00078"], "luong": 12200000, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NB-055", "name": "Nguyễn Thị Hồng Vân", "pos": "NVKD", "region": "ĐÔNG NAM BỘ", "scope": "DIRECT", "npps": ["C00078"], "luong": 7817307, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-947", "name": "Phạm Thị Thanh Tuyền", "pos": "NVKD", "region": "ĐÔNG NAM BỘ", "scope": "DIRECT", "npps": ["C00078"], "luong": 6696153, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-150", "name": "Hoàng Minh Phi", "pos": "GSBH_GT", "region": "ĐÔNG NAM BỘ", "scope": "DIRECT", "npps": ["C01848"], "luong": 11538462, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NB-140", "name": "Vũ Quang Minh", "pos": "NVKD_GT", "region": "ĐÔNG NAM BỘ", "scope": "DIRECT", "npps": ["C01848"], "luong": 3857692, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-173", "name": "Cao Văn Hòa", "pos": "NVKD_GT", "region": "ĐÔNG NAM BỘ", "scope": "DIRECT", "npps": ["C01848"], "luong": 6026923, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-180", "name": "Nguyễn Văn Hải", "pos": "GSBH_GT", "region": "ĐÔNG NAM BỘ", "scope": "DIRECT", "npps": ["C01832"], "luong": 7626923, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "GSBH"}, {"code": "NB-181", "name": "Đỗ Mạnh Hùng", "pos": "NVKD_GT", "region": "ĐÔNG NAM BỘ", "scope": "DIRECT", "npps": ["C01832"], "luong": 4176923, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "NVKD"}, {"code": "NN-667", "name": "Vũ Đình Thành", "pos": "GSBH_GT", "region": "ĐÔNG NAM BỘ", "scope": "DIRECT", "npps": ["C01644"], "luong": 15700000, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NN-919", "name": "Hà Anh Tú", "pos": "NVKD_GT", "region": "ĐÔNG NAM BỘ", "scope": "DIRECT", "npps": ["C01644"], "luong": 10051923, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-030", "name": "Võ Thị Hồng Diễm", "pos": "NVKD_GT", "region": "ĐÔNG NAM BỘ", "scope": "DIRECT", "npps": ["C01644"], "luong": 12157923, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NN-415", "name": "Trần Thanh Hòa", "pos": "GSBH_GT", "region": "ĐÔNG NAM BỘ", "scope": "DIRECT", "npps": ["C01877"], "luong": 15700000, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-477", "name": "Trịnh Huỳnh Thanh Hải", "pos": "NVKD_GT", "region": "ĐÔNG NAM BỘ", "scope": "DIRECT", "npps": ["C01877"], "luong": 8434616, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-952", "name": "Thị Thu Trang", "pos": "NVKD_GT", "region": "ĐÔNG NAM BỘ", "scope": "DIRECT", "npps": ["C01877"], "luong": 12014616, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-959", "name": "Trần Khánh Băng", "pos": "GSBH_GT", "region": "ĐÔNG NAM BỘ", "scope": "DIRECT", "npps": ["C00092"], "luong": 4626923, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NB-157", "name": "Nguyễn Ích Quang", "pos": "NVKD_GT", "region": "ĐÔNG NAM BỘ", "scope": "DIRECT", "npps": ["C00092"], "luong": 4813461, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-147", "name": "Hoàng Văn Phú", "pos": "GSBH_GT", "region": "ĐÔNG NAM BỘ", "scope": "DIRECT", "npps": ["C01876"], "luong": 6942307, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NB-130", "name": "Lê Thị Kiều Trang", "pos": "GSBH_GT", "region": "ĐÔNG NAM BỘ", "scope": "DIRECT", "npps": ["C01853"], "luong": 8603846, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "GSBH"}, {"code": "NB-153", "name": "Trần Thị Thúy Kiều", "pos": "NVKD_GT", "region": "ĐÔNG NAM BỘ", "scope": "DIRECT", "npps": ["C01853"], "luong": 4394230, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "NVKD"}, {"code": "NB-168", "name": "Nguyễn Thị Xuân Mai", "pos": "NVKD_GT", "region": "ĐÔNG NAM BỘ", "scope": "DIRECT", "npps": ["C01853"], "luong": 3942308, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "NVKD"}, {"code": "NA-554", "name": "Nguyễn Lê Hoàng Phúc", "pos": "GSBH_GT", "region": "TPHCM", "scope": "DIRECT", "npps": ["C00099"], "luong": 14161539, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NB-057", "name": "Võ Minh Hải", "pos": "NVKD_GT", "region": "TPHCM", "scope": "DIRECT", "npps": ["C00099"], "luong": 9124462, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-642", "name": "Văn Thị Thu Thoa", "pos": "NVKD_GT", "region": "TPHCM", "scope": "DIRECT", "npps": ["C00099"], "luong": 11647616, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NN-266", "name": "Hồ Thị Quỳnh Triều", "pos": "GSBH_GT", "region": "TPHCM", "scope": "DIRECT", "npps": ["C00101"], "luong": 19403846, "thuong": 100000, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NN-265", "name": "Hoàng Thị Phượng", "pos": "NVKD_GT", "region": "TPHCM", "scope": "DIRECT", "npps": ["C00101"], "luong": 14861616, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NN-687", "name": "Vũ Thị Huyền", "pos": "NVKD_GT", "region": "TPHCM", "scope": "DIRECT", "npps": ["C00101"], "luong": 14843616, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-064", "name": "Nguyễn Thị Liên", "pos": "NVKD_GT", "region": "TPHCM", "scope": "DIRECT", "npps": ["C00101"], "luong": 18608231, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "PG-947", "name": "Trần Thị Thùy Quyên", "pos": "PG_Fulltime_GT", "region": "TPHCM", "scope": "DIRECT", "npps": ["C00101"], "luong": 7473462, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "NA-882", "name": "Nguyễn Thị Ngọc Thạnh", "pos": "GSBH_GT", "region": "TPHCM", "scope": "DIRECT", "npps": ["C00102"], "luong": 15361538, "thuong": 100000, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NB-051", "name": "Trần Thanh Đăng", "pos": "NVKD_GT", "region": "TPHCM", "scope": "DIRECT", "npps": ["C00102"], "luong": 11451616, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-928", "name": "Bùi Đức Linh", "pos": "NVKD_GT", "region": "TPHCM", "scope": "DIRECT", "npps": ["C00102"], "luong": 10538616, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-061", "name": "Võ Minh Sáng", "pos": "NVKD_GT", "region": "TPHCM", "scope": "DIRECT", "npps": ["C00102"], "luong": 11346616, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-232", "name": "Nguyễn Trọng Nhân", "pos": "NVKD_GT", "region": "TPHCM", "scope": "DIRECT", "npps": ["C00103"], "luong": 12549923, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-730", "name": "Nguyễn Hồng Ân", "pos": "NVKD_GT", "region": "TPHCM", "scope": "DIRECT", "npps": ["C00103"], "luong": 12787616, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NN-188", "name": "Phan Thị Mộng Tranh", "pos": "NVKD_GT", "region": "TPHCM", "scope": "DIRECT", "npps": ["C00155"], "luong": 12330923, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NN-189", "name": "Trương Thiên Nghĩa", "pos": "GSBH", "region": "TPHCM", "scope": "DIRECT", "npps": ["C00105"], "luong": 23446153, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NN-727", "name": "Phạm Hải Hoàn", "pos": "NVKD", "region": "TPHCM", "scope": "DIRECT", "npps": ["C00105"], "luong": 19163616, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-183", "name": "Lương Thị Thu Thủy", "pos": "NVKD_GT", "region": "TPHCM", "scope": "DIRECT", "npps": ["C00105"], "luong": 17110230, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "NVKD"}, {"code": "NB-117", "name": "Võ Thị Thúy Vân", "pos": "NVKD_GT", "region": "TPHCM", "scope": "DIRECT", "npps": ["C00105"], "luong": 0, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "NVKD"}, {"code": "NB-069", "name": "Phạm Minh Hiếu", "pos": "GSBH_GT", "region": "TPHCM", "scope": "DIRECT", "npps": ["C01827"], "luong": 14337821, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NB-149", "name": "Nguyễn Đỗ Minh Hải", "pos": "NVKD_GT", "region": "TPHCM", "scope": "DIRECT", "npps": ["C01827"], "luong": 7893025, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-114", "name": "Phan Văn Trường", "pos": "NVKD_GT", "region": "TPHCM", "scope": "DIRECT", "npps": ["C01827"], "luong": 0, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "NVKD"}, {"code": "NB-185", "name": "Nguyễn Thị Nhiên", "pos": "NVKD_GT", "region": "TPHCM", "scope": "DIRECT", "npps": ["C01827"], "luong": 8198384, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "NVKD"}, {"code": "NA-341", "name": "Đặng Thị Thu Liễu", "pos": "GSBH_GT", "region": "MEKONG1", "scope": "DIRECT", "npps": ["C00107"], "luong": 15676923, "thuong": 100000, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NN-045", "name": "Nguyễn Thái Nguyên", "pos": "NVKD_GT", "region": "MEKONG1", "scope": "DIRECT", "npps": ["C00107"], "luong": 12207923, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NN-678", "name": "Hà Hữu Tình", "pos": "GSBH_GT", "region": "MEKONG1", "scope": "DIRECT", "npps": ["C00108"], "luong": 16107692, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-774", "name": "Huỳnh Mãnh Lực", "pos": "NVKD_GT", "region": "MEKONG1", "scope": "DIRECT", "npps": ["C00108"], "luong": 12602616, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-871", "name": "Nguyễn Hoàng Tú", "pos": "GSBH_GT", "region": "MEKONG1", "scope": "DIRECT", "npps": ["C01617"], "luong": 15676923, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NN-818", "name": "Huỳnh Thị Cẩm Linh", "pos": "NVKD_GT", "region": "MEKONG1", "scope": "DIRECT", "npps": ["C01617"], "luong": 11913923, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-887", "name": "Trần Hữu Tâm", "pos": "NVKD_GT", "region": "MEKONG1", "scope": "DIRECT", "npps": ["C01617"], "luong": 11948616, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-032", "name": "Nguyễn Minh Hiếu", "pos": "NVKD_GT", "region": "MEKONG1", "scope": "DIRECT", "npps": ["C01617"], "luong": 10234616, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-293", "name": "Võ Xuân An", "pos": "GSBH_GT", "region": "MEKONG1", "scope": "DIRECT", "npps": ["C01614"], "luong": 12569231, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-771", "name": "Lê Nguyễn Hoàng Vy", "pos": "NVKD_GT", "region": "MEKONG1", "scope": "DIRECT", "npps": ["C01614"], "luong": 8317307, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-756", "name": "Nguyễn Dũng Chinh", "pos": "NVKD_GT", "region": "MEKONG1", "scope": "DIRECT", "npps": ["C01614"], "luong": 7230770, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-931", "name": "Ngô Thị Kiều Mi", "pos": "NVKD_GT", "region": "MEKONG1", "scope": "DIRECT", "npps": ["C01614"], "luong": 10692616, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-499", "name": "Ngô Thảo Nguyên", "pos": "GSBH_GT", "region": "MEKONG1", "scope": "DIRECT", "npps": ["C01531"], "luong": 15200000, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NB-078", "name": "Lê Thanh Vũ", "pos": "NVKD_GT", "region": "MEKONG1", "scope": "DIRECT", "npps": ["C01531"], "luong": 10909000, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-648", "name": "Nguyễn Thị Diễm My", "pos": "NVKD_GT", "region": "MEKONG1", "scope": "DIRECT", "npps": ["C01531"], "luong": 10650616, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-063", "name": "Huỳnh Trung Hiếu", "pos": "NVKD_GT", "region": "MEKONG1", "scope": "DIRECT", "npps": ["C01531"], "luong": 10409000, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-804", "name": "Nguyễn Văn Sang", "pos": "GSBH_GT", "region": "MEKONG1", "scope": "DIRECT", "npps": ["C01616"], "luong": 16700000, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-810", "name": "Nguyễn Minh Tiến", "pos": "NVKD_GT", "region": "MEKONG1", "scope": "DIRECT", "npps": ["C01616"], "luong": 12422923, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-097", "name": "Đặng Thị Hồng Thắm", "pos": "GSBH_GT", "region": "MEKONG2", "scope": "DIRECT", "npps": ["C01636"], "luong": 20076923, "thuong": 100000, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NB-142", "name": "Dương Tấn Tài", "pos": "NVKD_GT", "region": "MEKONG2", "scope": "DIRECT", "npps": ["C01636"], "luong": 8434616, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "PG-995", "name": "Võ Thị Kim Hoàng", "pos": "PG_Fulltime_GT", "region": "MEKONG2", "scope": "DIRECT", "npps": ["C01636"], "luong": 7156154, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "PG-996", "name": "Bùi Thị Yến Phương", "pos": "PG_Fulltime_GT", "region": "MEKONG2", "scope": "DIRECT", "npps": ["C01636"], "luong": 7201923, "thuong": 0, "bhxh": 929250, "bhyt": 159300, "bhtn": 53100, "kpcd": 106200, "role": "PG"}, {"code": "NB-154", "name": "Huỳnh Hải Đăng", "pos": "GSBH_GT", "region": "MEKONG2", "scope": "DIRECT", "npps": ["C01849"], "luong": 0, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "GSBH"}, {"code": "NB-155", "name": "Nguyễn Duy Tân", "pos": "NVKD_GT", "region": "MEKONG2", "scope": "DIRECT", "npps": ["C01849"], "luong": 0, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "NVKD"}, {"code": "NA-963", "name": "Lê Phước Duy", "pos": "GSBH_GT", "region": "MEKONG2", "scope": "DIRECT", "npps": ["C01629"], "luong": 12576923, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NA-981", "name": "Nguyễn Quốc Gia", "pos": "NVKD_GT", "region": "MEKONG2", "scope": "DIRECT", "npps": ["C01629"], "luong": 9419231, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-125", "name": "Đặng Thị Diệu Trang", "pos": "NVKD_GT", "region": "MEKONG2", "scope": "DIRECT", "npps": ["C01629"], "luong": 9015385, "thuong": 100000, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NB-082", "name": "Nguyễn Đăng Duy", "pos": "GSBH_GT", "region": "MEKONG2", "scope": "DIRECT", "npps": ["C01642"], "luong": 7923077, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NB-090", "name": "Nguyễn Văn Thình", "pos": "NVKD_GT", "region": "MEKONG2", "scope": "DIRECT", "npps": ["C01642"], "luong": 1236834, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "NVKD"}, {"code": "NB-187", "name": "Lê Văn Nữa", "pos": "NVKD_GT", "region": "MEKONG2", "scope": "DIRECT", "npps": ["C01642"], "luong": 5300000, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "NVKD"}, {"code": "NA-142", "name": "Nguyễn Trí Hải", "pos": "GSBH", "region": "MEKONG2", "scope": "DIRECT", "npps": ["C00125"], "luong": 8603846, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NN-897", "name": "Lê Trung Thanh", "pos": "GSBH_GT", "region": "MEKONG2", "scope": "DIRECT", "npps": ["C01515"], "luong": 8100000, "thuong": 0, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NB-123", "name": "Lâm Tâm Như", "pos": "NVKD_GT", "region": "MEKONG2", "scope": "DIRECT", "npps": ["C01515"], "luong": 4496154, "thuong": 0, "bhxh": 948500, "bhyt": 162600, "bhtn": 54200, "kpcd": 108400, "role": "NVKD"}, {"code": "NA-746", "name": "Ngô Hồng Thẩm", "pos": "GSBH_GT", "region": "MEKONG2", "scope": "DIRECT", "npps": ["C01608"], "luong": 8100000, "thuong": 100000, "bhxh": 971250, "bhyt": 166500, "bhtn": 55500, "kpcd": 111000, "role": "GSBH"}, {"code": "NB-174", "name": "Lê Thị Ngân", "pos": "NVKD_GT", "region": "MEKONG2", "scope": "DIRECT", "npps": ["C01608"], "luong": 5232693, "thuong": 0, "bhxh": 0, "bhyt": 0, "bhtn": 0, "kpcd": 0, "role": "NVKD"}]};</script>
+<script>const LS='idealab_gt_v2';
+let step=2, RULE='equal_split', ovr={}, ORG={npps:[],employees:[]};
+let view='matrix', mMode='cost', panel='filter', selEmp=null, selNpp=null;
+let fRegions=[], fRoles=[], fSrch='';           // multi-select
+let collapsed={};                                // {groupKey:true}
+let theme='dark', sumBy='region';
+let DS=[];                      // datasets: {id,type,period,name,file,at,rows,data}
+let ACT={pay:null,org:null,rev:null};   // id đang active
+let pend=null;                  // dialog nạp đang chờ xác nhận kỳ
+let SRC={pay:'seed',org:'seed',rev:'none'};
+let jeMode='detail';        // detail | group | full
+let dp13Rate=9;
+let cmpA=null,cmpB=null,cmpView='bridge';   // so sánh kỳ
+function setCmp(k,v){if(k==='a')cmpA=v;else cmpB=v;R();}
+function setCmpV(v){cmpView=v;R();}             // % dự phòng thưởng T13 (0 = tắt)
+function setDp(v){dp13Rate=Math.max(0,Math.min(100,parseFloat(v)||0));applyDs();R();save();}
+let pvSum='region';         // region | comp | role
+let sideW=20;                                  // % chiều rộng panel
+function inF(arr,v){return arr.length===0||arr.includes(v);}
+function togF(arr,v){const i=arr.indexOf(v);i>=0?arr.splice(i,1):arr.push(v);R();}
+function allF(arr,vals){arr.length=0;vals.forEach(v=>arr.push(v));R();}
+function noneF(arr){arr.length=0;R();}
+function togC(k){collapsed[k]=!collapsed[k];R();}
+function setTheme(){theme=theme==='dark'?'light':'dark';document.body.setAttribute('data-t',theme);R();save();}
+function setSum(s){sumBy=s;R();}
+function setJe(m){jeMode=m;R();save();}
+function setPv(s){pvSum=s;R();}
+const ROLES=['GĐKD','ASM','GSBH','NVKD','PG'];
+const RC={'GĐKD':'#E0A23B','ASM':'#46C4B8','GSBH':'#9B8CFF','NVKD':'#9DB2CC','PG':'#5d7595'};
+const COMPS=[{f:'luong',l:'Lương',dr:'641101',cr:'334101',ce:'A0101'},{f:'thuong',l:'Thưởng lễ',dr:'641101',cr:'334101',ce:'A0503'},{f:'bhxh',l:'BHXH',dr:'641101',cr:'338301',ce:'A0202'},{f:'bhyt',l:'BHYT',dr:'641101',cr:'338401',ce:'A0201'},{f:'bhtn',l:'BHTN',dr:'641101',cr:'338601',ce:'A0203'},{f:'kpcd',l:'KPCĐ',dr:'641101',cr:'338201',ce:'A0301'},
+ {f:'dp13',l:'Dự phòng T13',dr:'641101',cr:'335801',ce:'A0504'}];
+const ACC={'641101':'CP nhân viên bán hàng','334101':'Phải trả NLĐ','338301':'BHXH phải nộp','338401':'BHYT phải nộp','338601':'BHTN phải nộp','338201':'KPCĐ phải nộp','335801':'CP phải trả — dự phòng T13'};
+const fmt=n=>Math.round(n||0).toLocaleString('vi-VN');
+const fmtK=n=>{n=Math.round(n||0);return n>=1e6?(n/1e6).toFixed(1)+'tr':n>=1e3?(n/1e3).toFixed(0)+'k':n+'';};
+const clone=o=>JSON.parse(JSON.stringify(o));
+
+function boot(){try{const r=localStorage.getItem(LS);if(r){const s=JSON.parse(r);ORG=s.ORG;RULE=s.RULE||'equal_split';ovr=s.ovr||{};step=s.step||2;theme=s.theme||'dark';SRC=s.SRC||SRC;jeMode=s.jeMode||'detail';DS=s.DS||[];ACT=s.ACT||{pay:null,org:null,rev:null};}else ORG=clone(SEED);}catch(e){ORG=clone(SEED);}
+ if(!ORG.employees||!ORG.employees.length)ORG=clone(SEED);
+ if(!DS.length){
+  const pay=SEED.employees.map(e=>{const o={code:e.code,name:e.name,pos:e.pos,region:e.region};COMPS.forEach(c=>o[c.f]=e[c.f]);return o;});
+  const org={npps:clone(SEED.npps),employees:SEED.employees.map(e=>({code:e.code,name:e.name,pos:e.pos,region:e.region,npps:clone(e.npps)}))};
+  const d1={id:uid(),type:'pay',period:'2026-02',name:'Bảng lương GT T2/2026',file:'(mẫu nhúng)',at:Date.now(),rows:pay.length,data:pay};
+  const d2={id:uid(),type:'org',period:'2026-02',name:'Org Chart GT T2/2026',file:'(mẫu nhúng)',at:Date.now(),rows:SEED.npps.length,data:org};
+  DS=[d1,d2];ACT={pay:d1.id,org:d2.id,rev:null};
+ }
+ try{document.body.setAttribute('data-t',theme);}catch(e){}
+ R();}
+function save(){try{localStorage.setItem(LS,JSON.stringify({ORG,RULE,ovr,step,theme,SRC,jeMode,DS,ACT}));flag('✓ '+new Date().toLocaleTimeString('vi-VN'));}catch(e){flag('⚠ tự lưu tắt');}}
+function flag(m){const e=document.getElementById('sv');if(e)e.textContent=m;}
+
+// ── ENGINE ──
+function roleOf(e){if(e.role)return e.role;const p=(e.pos||'').toUpperCase();if(p.includes('GĐKD')||p.includes('GDKD'))return 'GĐKD';if(p.includes('ASM'))return 'ASM';if(p.includes('PG'))return 'PG';if(p.includes('GSBH')||p.startsWith('GS'))return 'GSBH';return 'NVKD';}
+function cov(e){if(e.scope==='ALL')return ORG.npps.map(n=>n.code);if(e.scope==='REGION')return ORG.npps.filter(n=>n.region===e.region).map(n=>n.code);return e.npps||[];}
+function rev(c){const n=ORG.npps.find(x=>x.code===c);return n?(+n.revenue||0):0;}
+function cost(e){return COMPS.reduce((s,c)=>s+(+e[c.f]||0),0);}
+function mat(){const M={};ORG.employees.forEach(e=>{const L=cov(e);if(!L.length){M[e.code]=[];return;}
+ if(RULE==='revenue_weighted'){const t=L.reduce((s,n)=>s+rev(n),0);
+   M[e.code]= t>0 ? L.map(n=>({npp:n,pct:rev(n)/t*100})) : L.map(n=>({npp:n,pct:100/L.length}));}
+ else M[e.code]=L.map(n=>({npp:n,pct:100/L.length}));});return M;}
+// Ma trận NPP × role: chi phí + danh sách người
+function grid(){const M=mat(),G={};
+ ORG.npps.forEach(n=>{G[n.code]={};ROLES.forEach(r=>G[n.code][r]={cost:0,ppl:[]});});
+ ORG.employees.forEach(e=>{const r=roleOf(e),c=cost(e);
+   (M[e.code]||[]).forEach(a=>{if(!G[a.npp])return;G[a.npp][r].cost+=c*a.pct/100;G[a.npp][r].ppl.push({code:e.code,name:e.name,amt:c*a.pct/100});});});
+ return G;}
+function alloc(){const M=mat(),R={};ORG.npps.forEach(n=>{R[n.code]={};COMPS.forEach(c=>R[n.code][c.f]=0);});
+ ORG.employees.forEach(e=>(M[e.code]||[]).forEach(a=>{if(!R[a.npp])return;COMPS.forEach(c=>R[a.npp][c.f]+=(+e[c.f]||0)*a.pct/100);}));
+ Object.keys(ovr).forEach(k=>{const[n,f]=k.split('|');if(R[n])R[n][f]=ovr[k];});return R;}
+function isOv(n,f){return (n+'|'+f) in ovr;}
+function JE(){
+ const R=alloc(),L=[];
+ if(jeMode==='detail'){
+  ORG.npps.forEach(n=>COMPS.forEach(c=>{const v=R[n.code][c.f];if(Math.abs(v)<0.5)return;
+   L.push({lab:c.l,f:c.f,npp:n.code,name:n.name,dr:c.dr,cr:c.cr,ce:c.ce,amt:v});}));
+ }else if(jeMode==='group'){
+  // gộp theo tài khoản Có (đúng kế toán): lương+thưởng -> 334101; từng quỹ BH riêng
+  ORG.npps.forEach(n=>{
+   const byCr={};
+   COMPS.forEach(c=>{const v=R[n.code][c.f];if(Math.abs(v)<0.5)return;
+    const k=c.dr+'|'+c.cr;
+    if(!byCr[k])byCr[k]={dr:c.dr,cr:c.cr,amt:0,parts:[]};
+    byCr[k].amt+=v;byCr[k].parts.push(c.l);});
+   Object.values(byCr).forEach(g=>{
+    L.push({lab:g.cr==='334101'?'Lương & thưởng':(ACC[g.cr]||g.cr),f:'grp',npp:n.code,name:n.name,
+     dr:g.dr,cr:g.cr,ce:'',amt:g.amt,parts:g.parts.join(' + ')});});
+  });
+ }else{
+  // full: 1 dòng tổng chi phí / NPP (Nợ 641101, Có 334101) — đơn giản nhất
+  ORG.npps.forEach(n=>{const v=COMPS.reduce((s,c)=>s+R[n.code][c.f],0);if(Math.abs(v)<0.5)return;
+   L.push({lab:'Tổng chi phí nhân sự',f:'all',npp:n.code,name:n.name,dr:'641101',cr:'334101',ce:'',amt:v,
+    parts:COMPS.map(c=>c.l).join(' + ')});});
+ }
+ return{lines:L,tot:L.reduce((s,l)=>s+l.amt,0),R};
+}
+function srcTot(){const t={};COMPS.forEach(c=>t[c.f]=ORG.employees.reduce((s,e)=>s+(+e[c.f]||0),0));return t;}
+function regions(){return [...new Set(ORG.npps.map(n=>n.region))].sort();}
+
+// ── OPS ──
+function setScope(c,s){const e=ORG.employees.find(x=>x.code===c);if(!e)return;e.scope=s;if(s==='DIRECT'&&!(e.npps||[]).length)e.npps=[ORG.npps[0].code];R();save();}
+function setRegion(c,rg){const e=ORG.employees.find(x=>x.code===c);e.region=rg;R();save();}
+function togNpp(c,n){const e=ORG.employees.find(x=>x.code===c);e.npps=e.npps||[];const i=e.npps.indexOf(n);i>=0?e.npps.splice(i,1):e.npps.push(n);R();save();}
+function allRegion(c,rg){const e=ORG.employees.find(x=>x.code===c);e.npps=ORG.npps.filter(n=>n.region===rg).map(n=>n.code);R();save();}
+function setRev(c,v){const n=ORG.npps.find(x=>x.code===c);n.revenue=Math.round(parseFloat((v||'').replace(/[^\d.-]/g,''))||0);R();save();}
+function setOv(n,f,v){ovr[n+'|'+f]=Math.round(parseFloat((v||'').replace(/[^\d.-]/g,''))||0);R();save();}
+function rstOv(n,f){delete ovr[n+'|'+f];R();save();}
+function rstAll(){ovr={};R();save();}
+function setRule(r){RULE=r;R();save();}
+function go(s){step=s;selEmp=null;selNpp=null;R();save();}
+function setView(v){view=v;panel=v==='tree'?'edit':'filter';R();}
+function setMode(m){mMode=m;R();}
+function setPanel(p){panel=p;R();}
+function pickEmp(c){selEmp=c;selNpp=null;panel='edit';R();}
+function pickNpp(c){selNpp=c;selEmp=null;panel='edit';R();}
+function clearSel(){selEmp=null;selNpp=null;panel='filter';R();}
+
+// ── IO ──
+function pick(){document.getElementById('fi').click();}
+function onFile(ev){const f=ev.target.files[0];if(!f)return;const rd=new FileReader();
+ rd.onload=e=>{try{const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});const o=parseOrg(wb);
+  if(!o.employees.length)throw new Error('Không thấy dữ liệu NV');ORG=o;ovr={};step=2;R();save();flag('✓ '+o.employees.length+' NV · '+o.npps.length+' NPP');}
+  catch(x){alert('Lỗi: '+x.message);}};rd.readAsArrayBuffer(f);ev.target.value='';}
+function parseOrg(wb){
+ const sh=wb.SheetNames.find(n=>/chi ti[eế]t l[uư][oơ]ng/i.test(n))||wb.SheetNames[0];
+ const rows=XLSX.utils.sheet_to_json(wb.Sheets[sh],{header:1,raw:true,defval:null});
+ let hi=-1;for(let i=0;i<Math.min(rows.length,30);i++){const L=(rows[i]||[]).map(c=>(c==null?'':c.toString().toLowerCase()));
+  if(L.some(c=>c.includes('mã nv'))&&L.some(c=>c.includes('mã sap'))){hi=i;break;}}
+ if(hi<0)throw new Error('Không thấy tiêu đề "Mã NV"/"Mã SAP"');
+ const H=rows[hi].map(c=>(c==null?'':c.toString().toLowerCase()));
+ const F=(...k)=>H.findIndex(h=>k.some(x=>h.includes(x)));
+ const I={time:F('thời gian'),sap:F('mã sap'),cust:F('tên khách'),reg:F('khu vực'),nv:F('mã nv'),nm:F('họ và tên'),pos:F('chức vụ'),
+  luong:F('cp lương'),thuong:F('thưởng lễ'),bhxh:H.findIndex(h=>h.includes('bhxh')&&h.includes('17')),
+  bhyt:H.findIndex(h=>h.includes('bhyt')&&h.includes('3%')),bhtn:H.findIndex(h=>h.includes('bhtn')&&h.includes('1%')),kpcd:H.findIndex(h=>h.includes('kpcđ')||h.includes('kpcd'))};
+ const num=v=>{if(v==null)return 0;if(typeof v==='number')return v;const n=parseFloat(v.toString().replace(/[^\d.-]/g,''));return isNaN(n)?0:n;};
+ const cnt={};for(let i=hi+1;i<rows.length;i++){const r=rows[i];if(!r||!r[I.nv])continue;const t=r[I.time];if(t)cnt[t]=(cnt[t]||0)+1;}
+ const per=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a])[0];
+ const nM={},eM={};
+ for(let i=hi+1;i<rows.length;i++){const r=rows[i];if(!r||!r[I.nv]||!r[I.sap])continue;if(per&&r[I.time]!==per)continue;
+  const sap=r[I.sap].toString().trim();
+  if(!nM[sap])nM[sap]={code:sap,name:(r[I.cust]||'').toString(),region:(r[I.reg]||'').toString(),revenue:0};
+  const nv=r[I.nv].toString().trim();
+  if(!eM[nv])eM[nv]={code:nv,name:(r[I.nm]||'').toString(),pos:(r[I.pos]||'').toString(),region:(r[I.reg]||'').toString(),npps:[],luong:0,thuong:0,bhxh:0,bhyt:0,bhtn:0,kpcd:0};
+  const e=eM[nv];if(!e.npps.includes(sap))e.npps.push(sap);
+  COMPS.forEach(c=>{if(I[c.f]>=0)e[c.f]+=num(r[I[c.f]]);});}
+ const npps=Object.values(nM);
+ const employees=Object.values(eM).map(e=>{COMPS.forEach(c=>e[c.f]=Math.round(e[c.f]));
+  const n=e.npps.length;e.scope=n>=npps.length*0.9?'ALL':(n>1?'REGION':'DIRECT');
+  const p=(e.pos||'').toUpperCase();
+  e.role=p.includes('GĐKD')||p.includes('GDKD')?'GĐKD':p.includes('ASM')?'ASM':p.includes('PG')?'PG':(p.includes('GSBH')||p.startsWith('GS'))?'GSBH':'NVKD';
+  return e;}).sort((a,b)=>b.npps.length-a.npps.length);
+ return{npps,employees};}
+function xls(){const J=JE();const MD={detail:'Chi tiết',group:'Gộp theo tài khoản',full:'Gộp toàn bộ'};
+ const d=[['NutriNest — Phân bổ lương GT'],['Rule: '+RULE+' · Book: '+MD[jeMode]+' · '+J.lines.length+' dòng'],[],['Bút toán','NPP','Mã','Nợ','Có','Gồm/CE','Số tiền']];
+ J.lines.forEach(l=>d.push([l.lab,l.name,l.npp,l.dr,l.cr,(jeMode==='detail'?l.ce:(l.parts||'')),Math.round(l.amt)]));
+ d.push(['','','','','','TỔNG',Math.round(J.tot)]);
+ const dr={},cr={};J.lines.forEach(l=>{dr[l.dr]=(dr[l.dr]||0)+l.amt;cr[l.cr]=(cr[l.cr]||0)+l.amt;});
+ d.push([],['TÁC ĐỘNG TK'],['TK','Tên','Bên','','','','Tiền']);
+ Object.keys(dr).forEach(k=>d.push([k,ACC[k]||'','Nợ','','','',Math.round(dr[k])]));
+ Object.keys(cr).forEach(k=>d.push([k,ACC[k]||'','Có','','','',Math.round(cr[k])]));
+ const wb=XLSX.utils.book_new(),ws=XLSX.utils.aoa_to_sheet(d);ws['!cols']=[{wch:16},{wch:36},{wch:9},{wch:8},{wch:8},{wch:7},{wch:15}];
+ XLSX.utils.book_append_sheet(wb,ws,'JE');XLSX.writeFile(wb,'JE_GT.xlsx');}
+function saveF(){const b=new Blob([JSON.stringify({ORG,RULE,ovr},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='gt_state.json';a.click();URL.revokeObjectURL(a.href);flag('💾 đã lưu file');}
+function pickS(){document.getElementById('si').click();}
+function onS(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{const s=JSON.parse(e.target.result);ORG=s.ORG;RULE=s.RULE||'equal_split';ovr=s.ovr||{};R();save();}catch(x){alert('Lỗi file');}};r.readAsText(f);ev.target.value='';}
+function rst(){if(!confirm('Về dữ liệu gốc? Mọi chỉnh sửa sẽ mất.'))return;ORG=clone(SEED);RULE='equal_split';ovr={};R();save();}
+
+
+
+// ═══ DATASET REGISTRY ═══
+const PT={pay:'Bảng lương',org:'Org Chart',rev:'Doanh số NPP'};
+const uid=()=>'d'+Date.now()+Math.random().toString(36).slice(2,6);
+function pLabel(p){if(!p)return '—';const[y,m]=p.split('-');return 'T'+(+m)+'/'+y;}
+function dsOf(id){return DS.find(d=>d.id===id);}
+function actDs(t){return ACT[t]?dsOf(ACT[t]):null;}
+function actPeriod(){const p=actDs('pay'),o=actDs('org');return (p&&p.period)||(o&&o.period)||null;}
+// Kỳ khớp nhau?
+function periodOK(){const p=actDs('pay'),o=actDs('org');
+ if(!p||!o)return {ok:true,msg:'Chưa đủ 2 nguồn'};
+ if(p.period!==o.period)return {ok:false,msg:'Bảng lương '+pLabel(p.period)+' ≠ Org chart '+pLabel(o.period)};
+ return {ok:true,msg:'Cùng kỳ '+pLabel(p.period)};
+}
+// Đoán kỳ từ dữ liệu/tên file
+function guessPeriod(rows,fname){
+ const now=new Date();
+ let y=now.getFullYear(),m=now.getMonth()+1;
+ const fs=(fname||'').match(/(20\d{2})[_\-. ]?(0?[1-9]|1[0-2])/);
+ if(fs){y=+fs[1];m=+fs[2];return y+'-'+String(m).padStart(2,'0');}
+ // tìm "Tháng N" trong dữ liệu
+ const txt=JSON.stringify(rows||[]).slice(0,20000);
+ const tm=txt.match(/Th[áa]ng\s*(1[0-2]|[1-9])/);
+ if(tm)m=+tm[1];
+ const ym=txt.match(/(20\d{2})/);if(ym)y=+ym[1];
+ return y+'-'+String(m).padStart(2,'0');
+}
+function addDs(type,period,name,file,data,rows){
+ const d={id:uid(),type,period,name,file:file||'',at:Date.now(),rows:rows||0,data};
+ DS.push(d);ACT[type]=d.id;applyDs();save();return d;
+}
+function pickDs(type,id){
+ const d=dsOf(id);if(!d)return;
+ // chặn cross-period
+ const other=type==='pay'?actDs('org'):type==='org'?actDs('pay'):null;
+ if(other&&other.period!==d.period){
+  if(!confirm('⚠ CHẶN KHÁC KỲ\n\n'+PT[type]+' bạn chọn là '+pLabel(d.period)+
+   '\nnhưng '+PT[other.type]+' đang dùng là '+pLabel(other.period)+
+   '\n\nMap khác kỳ sẽ cho số SAI. Vẫn tiếp tục?'))return;
+ }
+ ACT[type]=id;applyDs();R();save();
+}
+function dupDs(id){
+ const d=dsOf(id);if(!d)return;
+ const n={...clone(d),id:uid(),name:d.name+' (bản sao)',at:Date.now(),dup:true};
+ DS.push(n);ACT[d.type]=n.id;applyDs();R();save();flag('✓ Đã nhân bản → '+n.name);
+}
+function delDs(id){
+ const d=dsOf(id);if(!d)return;
+ if(!confirm('Xoá "'+d.name+'"?'))return;
+ DS=DS.filter(x=>x.id!==id);
+ if(ACT[d.type]===id)ACT[d.type]=(DS.find(x=>x.type===d.type)||{}).id||null;
+ applyDs();R();save();
+}
+function renDs(id){
+ const d=dsOf(id);if(!d)return;
+ const n=prompt('Tên dataset:',d.name);if(n&&n.trim()){d.name=n.trim();R();save();}
+}
+// Ghép pay + org + rev thành ORG
+function applyDs(){
+ const p=actDs('pay'),o=actDs('org'),r=actDs('rev');
+ const npps = o? clone(o.data.npps) : (ORG.npps||[]);
+ if(r){r.data.forEach(x=>{const n=npps.find(y=>y.code===x.code);if(n)n.revenue=x.revenue;});}
+ const payM={};if(p)p.data.forEach(e=>payM[e.code]=e);
+ const orgM={};if(o)o.data.employees.forEach(e=>orgM[e.code]=e);
+ const codes=new Set([...Object.keys(payM),...Object.keys(orgM)]);
+ const emps=[...codes].map(c=>{
+  const P=payM[c]||{},O=orgM[c]||{};
+  const L=(O.npps||[]).slice();
+  const pos=(O.pos||P.pos||'');const U=pos.toUpperCase();
+  // ORG CHART là nguồn chân lý cho region (bảng lương ghi viết tắt, không khớp)
+  const region=O.region||P.region||'';
+  const role=U.includes('GĐKD')||U.includes('GDKD')?'GĐKD':U.includes('ASM')?'ASM':U.includes('PG')?'PG':(U.includes('GSBH')||U.startsWith('GS'))?'GSBH':'NVKD';
+  // scope: DIRECT giữ nguyên danh sách NPP thật từ org chart.
+  // Chỉ dùng ALL khi phủ ~toàn bộ; REGION chỉ khi danh sách đúng bằng NPP của vùng đó.
+  let scope='DIRECT';
+  if(npps.length&&L.length>=npps.length*0.9)scope='ALL';
+  else if(L.length>1){
+   const rn=npps.filter(n=>n.region===region).map(n=>n.code);
+   const same=rn.length===L.length&&rn.every(x=>L.includes(x));
+   scope=same?'REGION':'DIRECT';
+  }
+  const e={code:c,name:P.name||O.name||'',pos,region,npps:L,scope,role};
+  COMPS.forEach(x=>e[x.f]=+P[x.f]||0);
+  // Dự phòng T13: nếu file lương không có cột → tự tính % trên (lương + thưởng)
+  if(!e.dp13&&dp13Rate>0)e.dp13=Math.round((e.luong+e.thuong)*dp13Rate/100);
+  return e;}).sort((a,b)=>b.npps.length-a.npps.length);
+ if(npps.length)ORG={npps,employees:emps};
+ SRC.pay=p?p.name:'seed';SRC.org=o?o.name:'seed';SRC.rev=r?r.name:'none';
+}
+// Dialog xác nhận kỳ
+function askPeriod(type,parsed,fname,rows){
+ const g=guessPeriod(parsed.raw,fname);
+ pend={type,parsed,fname,rows,period:g,
+  name:PT[type]+' '+pLabel(g)};
+ R();
+}
+function dlgOK(){
+ if(!pend)return;
+ const y=document.getElementById('dY').value,m=document.getElementById('dM').value;
+ const nm=document.getElementById('dN').value.trim();
+ const per=y+'-'+String(m).padStart(2,'0');
+ const t=pend.type;
+ // cảnh báo khác kỳ
+ const other=t==='pay'?actDs('org'):t==='org'?actDs('pay'):null;
+ if(other&&other.period!==per){
+  if(!confirm('⚠ KHÁC KỲ\n\nBạn đang nạp '+PT[t]+' kỳ '+pLabel(per)+
+   '\nnhưng '+PT[other.type]+' đang dùng là '+pLabel(other.period)+
+   '\n\nHai nguồn khác kỳ sẽ map SAI. Vẫn nạp?')){return;}
+ }
+ addDs(t,per,nm||(PT[t]+' '+pLabel(per)),pend.fname,pend.parsed.data,pend.rows);
+ pend=null;R();flag('✓ '+nm);
+}
+function dlgX(){pend=null;R();}
+
+// ── RESIZER ──
+function initRsz(){
+ const rz=document.getElementById('rsz'),sd=document.getElementById('side');
+ if(!rz||rz._i)return;rz._i=1;
+ let drag=false;
+ rz.addEventListener('mousedown',e=>{drag=true;rz.classList.add('drag');document.body.style.userSelect='none';e.preventDefault();});
+ window.addEventListener('mousemove',e=>{if(!drag)return;
+  const w=Math.min(600,Math.max(200,e.clientX));
+  sd.style.width=w+'px';sideW=w;});
+ window.addEventListener('mouseup',()=>{if(drag){drag=false;rz.classList.remove('drag');document.body.style.userSelect='';save();}});
+}
+
+// ── TEMPLATE EXPORT ──
+function tplPay(){
+ const d=[[null,'BẢNG LƯƠNG — TEMPLATE (khớp format NutriNest đang dùng)'],
+  ['Tháng','Code','HỌ VÀ TÊN','CHỨC VỤ','Tiền lương  ( Chưa trừ 10.5% BHXH và Thuế TNCN)-','Thưởng lễ tết',
+   'BHXH\n(Trừ NLĐ 8%)-','BHYT\n(Trừ NLĐ 1,5%)-','BHTN\n(Trừ NLĐ 1%)-',
+   'BHXH\n(CTy 17,5%)-','BHYT\n(CTy 3%)-','BHTN\n(CTy 1%)-','KPCĐ\n(CTy 2%)-','Thuế TNCN','Ngày vào làm','KHU VỰC','Nơi làm việc'],
+  ['Tháng 2','NN-024','Vũ Hữu Thượng','GĐKD_GT',48392308,0,1048640,196620,131080,2293900,393240,131080,262160,0,'21/05/2019','','GĐKD_GT'],
+  ['Tháng 2','NN-002','Võ Hùng Tiềm','ASM_GT',20158161,0,641120,120210,80140,1402450,240420,80140,160280,0,'26/06/2018','HN MeTro','ASM'],
+  ['Tháng 2','NN-005','Phạm Văn Tuyền','GSBH_GT',11555846,0,433600,81300,54200,948500,162600,54200,108400,307284,'',' ','GSBH'],
+  [],['GHI CHÚ:'],
+  ['• Cột "Code" = mã nhân viên, phải dạng NN-024 / NA-103. Dòng tổng (KÊNH GT, tên vùng) tool tự bỏ qua.'],
+  ['• Tool CHỈ lấy các cột phần CÔNG TY (CTy 17,5% / 3% / 1% / 2%), KHÔNG lấy phần trừ NLĐ.'],
+  ['• Chức vụ chứa GĐKD → tầng GĐKD; ASM → ASM; GSBH/GS → GSBH; PG → PG; còn lại → NVKD.'],
+  ['• Kỳ (tháng/năm) khai lúc nạp — tool tự đoán từ tên file dạng ..._2026_02.xlsx']];
+ dl(d,'Template_BangLuong.xlsx','Bảng lương',[{wch:9},{wch:10},{wch:22},{wch:13},{wch:30},{wch:12},{wch:13},{wch:13},{wch:13},{wch:13},{wch:13},{wch:13},{wch:13},{wch:11},{wch:12},{wch:14},{wch:12}]);
+}
+function tplOrg(){
+ const d=[[null,null,null,'DỮ LIỆU DATA CHI PHÍ'],[],[],
+  ['Ngày xuất','Số lần phân bổ NPP','Khu vực','Tỉnh/TP','Mã SAP','Tên khách hàng','Note nhân viên PG','Mã NV','Họ và tên','Chức vụ'],
+  ['28/02/2026',87,'HÀ NỘI METRO','HÀ NỘI','C00001','CÔNG TY CP XNK LAGER BEER VIỆT NAM','GĐ','NN-024','Vũ Hữu Thượng','GĐKD_GT'],
+  ['28/02/2026',5,'HÀ NỘI METRO','HÀ NỘI','C00001','CÔNG TY CP XNK LAGER BEER VIỆT NAM','AS','NN-002','Võ Hùng Tiềm','ASM'],
+  ['28/02/2026',0,'HÀ NỘI METRO','HÀ NỘI','C00001','CÔNG TY CP XNK LAGER BEER VIỆT NAM','GS','NN-005','Phạm Văn Tuyền','GSBH'],
+  ['28/02/2026',87,'HÀ NỘI METRO','HÀ NỘI','C00002','CTY TNHH DV & TM PHÚ MINH CƯỜNG','GĐ','NN-024','Vũ Hữu Thượng','GĐKD_GT'],
+  ['28/02/2026',5,'HÀ NỘI METRO','HÀ NỘI','C00002','CTY TNHH DV & TM PHÚ MINH CƯỜNG','AS','NN-002','Võ Hùng Tiềm','ASM'],
+  [],['GHI CHÚ:'],
+  ['• Mỗi dòng = 1 cặp (Nhân viên × NPP). GĐKD phụ trách 87 NPP → 87 dòng.'],
+  ['• "Mã SAP" = mã NPP. "Mã NV" phải khớp cột Code ở bảng lương.'],
+  ['• "Khu vực" ở file này là nguồn chuẩn cho vùng (bảng lương ghi viết tắt nên tool bỏ qua).'],
+  ['• Tool tự suy phạm vi: phủ ~toàn bộ NPP → ALL; đúng bằng NPP của vùng → REGION; còn lại → DIRECT.']];
+ dl(d,'Template_OrgChart.xlsx','Chi tiết lương',[{wch:12},{wch:17},{wch:20},{wch:12},{wch:10},{wch:38},{wch:16},{wch:10},{wch:20},{wch:12}]);
+}
+function tplRev(){
+ const d=[['DOANH SỐ NPP — TEMPLATE NẠP VÀO TOOL'],
+  ['Dùng cho rule "chia theo doanh thu" và cột CP/Doanh thu.'],[],
+  ['Mã NPP','Tên NPP','Doanh thu'],
+  ['C00001','CÔNG TY CP XNK LAGER BEER',1250000000],
+  ['C00002','CTY TNHH PHÚ MINH CƯỜNG',890000000],
+  ['C00003','CÔNG TY TNHH XNK QAH',430000000],
+  [],['GHI CHÚ:'],['• Mã NPP phải khớp với Mã NPP trong Org Chart']];
+ dl(d,'Template_DoanhSo_NPP.xlsx','Doanh so',[{wch:10},{wch:38},{wch:18}]);
+}
+function dl(d,fn,sn,cols){
+ const wb=XLSX.utils.book_new(),ws=XLSX.utils.aoa_to_sheet(d);
+ if(cols)ws['!cols']=cols;
+ XLSX.utils.book_append_sheet(wb,ws,sn);XLSX.writeFile(wb,fn);
+ flag('⬇ đã tải '+fn);
+}
+
+// ── LOADERS ──
+function pickPay(){document.getElementById('fPay').click();}
+function pickOrg(){document.getElementById('fOrg').click();}
+function pickRev(){document.getElementById('fRev').click();}
+function rd(ev,fn){const f=ev.target.files[0];if(!f)return;const r=new FileReader();
+ r.onload=e=>{try{fn(XLSX.read(new Uint8Array(e.target.result),{type:'array'}),f.name);}catch(x){alert('Lỗi: '+x.message);}};
+ r.readAsArrayBuffer(f);ev.target.value='';}
+function hdr(rows,keys,max){
+ for(let i=0;i<Math.min(rows.length,max||30);i++){
+  const L=(rows[i]||[]).map(c=>(c==null?'':c.toString().toLowerCase()));
+  if(keys.every(k=>L.some(c=>c.includes(k))))return i;}
+ return -1;}
+// chọn cột "phần Công ty" — loại mọi cột "Trừ NLĐ"
+function CT(H,key,pct){
+ let i=H.findIndex(h=>h.includes(key)&&h.includes('cty'));
+ if(i>=0)return i;
+ i=H.findIndex(h=>h.includes(key)&&h.includes(pct)&&!h.includes('nlđ')&&!h.includes('trừ'));
+ if(i>=0)return i;
+ return H.findIndex(h=>h.includes(key)&&!h.includes('nlđ')&&!h.includes('trừ'));
+}
+const N=v=>{if(v==null)return 0;if(typeof v==='number')return v;const n=parseFloat(v.toString().replace(/[^\d.-]/g,''));return isNaN(n)?0:n;};
+
+function onPay(ev){rd(ev,(wb,name)=>{
+ const sh=wb.SheetNames.find(n=>/l[uư][oơ]ng/i.test(n))||wb.SheetNames[0];
+ const rows=XLSX.utils.sheet_to_json(wb.Sheets[sh],{header:1,raw:true,defval:null});
+ // header: dòng có (Code|Mã NV) và (Chức vụ)
+ let hi=-1;
+ for(let i=0;i<Math.min(rows.length,25);i++){
+  const L=(rows[i]||[]).map(c=>(c==null?'':c.toString().toLowerCase().replace(/\s+/g,' ')));
+  const hasCode=L.some(c=>c==='code'||c.includes('mã nv'));
+  const hasPos=L.some(c=>c.includes('chức vụ'));
+  if(hasCode&&hasPos){hi=i;break;}
+ }
+ if(hi<0)throw new Error('Không thấy dòng tiêu đề (cần cột "Code"/"Mã NV" + "Chức vụ"). Tải template để xem format.');
+ const H=rows[hi].map(c=>(c==null?'':c.toString().toLowerCase().replace(/\s+/g,' ')));
+ const F=(...k)=>H.findIndex(h=>k.some(x=>h.includes(x)));
+ const EQ=k=>H.findIndex(h=>h.trim()===k);
+ const I={
+  nv: EQ('code')>=0?EQ('code'):F('mã nv','code'),
+  nm: F('họ và tên','họ tên'),
+  pos:F('chức vụ'),
+  reg:F('khu vực'),
+  // Lương: "Tiền lương (...)" hoặc "CP Lương" — tránh nhầm cột thuế
+  luong:H.findIndex(h=>(h.includes('tiền lương')||h.includes('cp lương')||h.trim()==='lương')),
+  thuong:F('thưởng lễ','thưởng'),
+  // CHỈ lấy phần Cty, không lấy phần trừ NLĐ
+  // BẮT BUỘC có "cty" — tránh nhầm sang cột "Trừ NLĐ"
+  bhxh:CT(H,'bhxh','17'), bhyt:CT(H,'bhyt','3%'), bhtn:CT(H,'bhtn','1%'),
+  kpcd:H.findIndex(h=>(h.includes('kpcđ')||h.includes('kpcd'))&&!h.includes('nlđ')),
+  dp13:H.findIndex(h=>h.includes('dự phòng')||h.includes('t13')||h.includes('9%'))};
+ if(I.nv<0)throw new Error('Không thấy cột mã nhân viên ("Code").');
+ // Mã NV hợp lệ: chữ-chữ-gạch-số (NN-024, NA-103). Loại mọi dòng subtotal.
+ const RE=/^[A-Za-zÀ-ỹ]{1,3}[-_]?\d{2,}$/;
+ const pay={};let skipped=0;
+ for(let i=hi+1;i<rows.length;i++){
+  const r=rows[i];if(!r||r[I.nv]==null)continue;
+  const c=r[I.nv].toString().trim();
+  if(!RE.test(c)){skipped++;continue;}          // subtotal / vùng / kênh
+  const p={code:c,name:(I.nm>=0?r[I.nm]:'')||'',pos:(I.pos>=0?r[I.pos]:'')||'',
+   region:(I.reg>=0&&r[I.reg]&&r[I.reg]!==0?r[I.reg]:'').toString()};
+  COMPS.forEach(x=>p[x.f]=Math.round(N(I[x.f]>=0?r[I[x.f]]:0)));
+  pay[c]=p;
+ }
+ const list=Object.values(pay);
+ if(!list.length)throw new Error('Không có dòng nhân viên hợp lệ (mã dạng NN-024).');
+ askPeriod('pay',{data:list,raw:rows.slice(0,60)},name,list.length);
+ if(skipped)setTimeout(()=>flag('ℹ bỏ qua '+skipped+' dòng tổng/nhóm'),50);
+});}
+
+function onOrg(ev){rd(ev,(wb,name)=>{
+ const sh=wb.SheetNames.find(n=>/org|chi ti[eế]t/i.test(n))||wb.SheetNames[0];
+ const rows=XLSX.utils.sheet_to_json(wb.Sheets[sh],{header:1,raw:true,defval:null});
+ let hi=-1;
+ for(let i=0;i<Math.min(rows.length,25);i++){
+  const L=(rows[i]||[]).map(c=>(c==null?'':c.toString().toLowerCase().replace(/\s+/g,' ')));
+  const hasNv=L.some(c=>c.includes('mã nv'));
+  const hasNpp=L.some(c=>c.includes('mã sap')||c.includes('mã npp'));
+  if(hasNv&&hasNpp){hi=i;break;}
+ }
+ if(hi<0)throw new Error('Không thấy tiêu đề (cần "Mã NV" + "Mã SAP"/"Mã NPP"). Tải template.');
+ const H=rows[hi].map(c=>(c==null?'':c.toString().toLowerCase().replace(/\s+/g,' ')));
+ const F=(...k)=>H.findIndex(h=>k.some(x=>h.includes(x)));
+ const I={nv:F('mã nv'),nm:F('họ và tên','họ tên'),pos:F('chức vụ'),
+  npp:F('mã sap','mã npp'),nn:F('tên khách','tên npp'),reg:F('khu vực'),prov:F('tỉnh')};
+ const RE=/^[A-Za-zÀ-ỹ]{1,3}[-_]?\d{2,}$/;
+ const nM={},map={};let skip=0;
+ for(let i=hi+1;i<rows.length;i++){
+  const r=rows[i];if(!r||r[I.nv]==null||r[I.npp]==null)continue;
+  const nv=r[I.nv].toString().trim(),np=r[I.npp].toString().trim();
+  if(!RE.test(nv)||!np||/total|tổng/i.test(np)){skip++;continue;}
+  if(!nM[np])nM[np]={code:np,name:(I.nn>=0?r[I.nn]:'')||'',region:((I.reg>=0?r[I.reg]:'')||'').toString(),revenue:0};
+  if(!map[nv])map[nv]={pos:((I.pos>=0?r[I.pos]:'')||'').toString(),nm:((I.nm>=0?r[I.nm]:'')||'').toString(),
+   reg:((I.reg>=0?r[I.reg]:'')||'').toString(),npps:new Set()};
+  map[nv].npps.add(np);
+ }
+ const npps=Object.values(nM);
+ if(!npps.length)throw new Error('Không có cặp NV–NPP hợp lệ.');
+ const employees=Object.keys(map).map(c=>({code:c,name:map[c].nm,pos:map[c].pos,region:map[c].reg,npps:[...map[c].npps]}));
+ askPeriod('org',{data:{npps,employees},raw:rows.slice(0,60)},name,npps.length);
+});}
+
+function onRev(ev){rd(ev,(wb,name)=>{
+ const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,raw:true,defval:null});
+ const hi=hdr(rows,['mã npp']);
+ if(hi<0)throw new Error('Không thấy cột "Mã NPP".');
+ const H=rows[hi].map(c=>(c==null?'':c.toString().toLowerCase()));
+ const ci=H.findIndex(h=>h.includes('mã npp')),cr=H.findIndex(h=>h.includes('doanh thu')||h.includes('doanh số'));
+ if(cr<0)throw new Error('Không thấy cột "Doanh thu".');
+ const list=[];
+ for(let i=hi+1;i<rows.length;i++){const r=rows[i];if(!r||!r[ci])continue;
+  const c=r[ci].toString().trim();if(/total|tổng/i.test(c))continue;
+  list.push({code:c,revenue:Math.round(N(r[cr]))});}
+ if(!list.length)throw new Error('Không có dòng doanh số.');
+ askPeriod('rev',{data:list,raw:rows.slice(0,60)},name,list.length);
+});}
+
+
+// ═══ DATASET UI ═══
+function dlgHtml(){
+ if(!pend)return '';
+ const[y,m]=pend.period.split('-');
+ return `<div class="dlg" onclick="if(event.target===this)dlgX()"><div class="dbox">
+  <div class="dbh">Xác nhận kỳ — ${PT[pend.type]}</div>
+  <div class="dbb">
+   <div class="note i" style="margin-bottom:12px"><b>File:</b> ${pend.fname}<br/><b>${pend.rows}</b> dòng · kỳ đoán được: <b>${pLabel(pend.period)}</b></div>
+   <div class="fld"><label>Tên phiên bản dữ liệu</label><input id="dN" value="${pend.name}"/></div>
+   <div class="row2">
+    <div class="fld"><label>Năm</label><input id="dY" type="number" value="${y}" min="2020" max="2035"/></div>
+    <div class="fld"><label>Tháng</label>
+     <select id="dM">${Array.from({length:12},(_,i)=>`<option value="${i+1}" ${+m===i+1?'selected':''}>Tháng ${i+1}</option>`).join('')}</select></div>
+   </div>
+   ${(()=>{const o=pend.type==='pay'?actDs('org'):pend.type==='org'?actDs('pay'):null;
+     return o?`<div class="note ${o.period===pend.period?'g':'w'}" style="margin-top:4px">
+      ${o.period===pend.period?'✓':'⚠'} ${PT[o.type]} đang dùng: <b>${pLabel(o.period)}</b>${o.period===pend.period?' — khớp kỳ':' — <b>KHÁC KỲ</b>, map sẽ sai'}</div>`:'';})()}
+  </div>
+  <div class="dbf"><button class="btn" onclick="dlgX()">Huỷ</button><button class="btn btn-g" onclick="dlgOK()">Nạp dữ liệu</button></div>
+ </div></div>`;
+}
+function periodBar(){
+ const p=periodOK();
+ const pd=actDs('pay'),od=actDs('org'),rd=actDs('rev');
+ return `<div class="pbar">
+  <span class="lock ${p.ok?'ok':'err'}">${p.ok?'🔒':'⚠'} ${p.msg}</span>
+  <span style="font-size:11.5px;color:var(--sub)">Bảng lương: <b class="per ${pd&&od&&pd.period!==od.period?'mis':''}">${pd?pLabel(pd.period):'—'}</b></span>
+  <span style="font-size:11.5px;color:var(--sub)">Org chart: <b class="per ${pd&&od&&pd.period!==od.period?'mis':''}">${od?pLabel(od.period):'—'}</b></span>
+  <span style="font-size:11.5px;color:var(--sub)">Doanh số: <b class="per">${rd?pLabel(rd.period):'—'}</b></span>
+  ${!p.ok?`<span style="font-size:11.5px;color:var(--rd);margin-left:auto"><b>Số sẽ SAI</b> — chọn cùng kỳ ở tab ① / ②</span>`:''}
+ </div>`;
+}
+function dsCard(type){
+ const list=DS.filter(d=>d.type===type).sort((a,b)=>b.at-a.at);
+ const act=ACT[type];
+ const loader={pay:'pickPay()',org:'pickOrg()',rev:'pickRev()'}[type];
+ const tpl={pay:'tplPay()',org:'tplOrg()',rev:'tplRev()'}[type];
+ const other=type==='pay'?actDs('org'):type==='org'?actDs('pay'):null;
+ return `<div class="dsc ${act?'act':''}">
+  <div class="dsh"><h4>${PT[type]}</h4><span style="font-family:var(--fm);font-size:9.5px;color:var(--dim)">${list.length} phiên bản</span></div>
+  <div class="dsb">
+   ${list.length?list.map(d=>{
+    const mis=other&&d.id===act&&other.period!==d.period;
+    return `<div class="dsi ${d.id===act?'on':''}" onclick="pickDs('${type}','${d.id}')">
+     <div class="r1"><span class="per ${mis?'mis':''}">${pLabel(d.period)}</span><span class="nm">${d.name}</span>
+      <span class="dact">
+       <span onclick="event.stopPropagation();dupDs('${d.id}')" title="Nhân bản để mô phỏng">⧉</span>
+       <span onclick="event.stopPropagation();renDs('${d.id}')" title="Đổi tên">✎</span>
+       <span class="del" onclick="event.stopPropagation();delDs('${d.id}')" title="Xoá">×</span>
+      </span></div>
+     <div class="r2"><span>${d.rows} dòng</span><span>${d.file||''}</span><span style="margin-left:auto">${new Date(d.at).toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span></div>
+    </div>`;}).join(''):'<div style="color:var(--dim);font-size:11.5px;padding:12px;text-align:center">Chưa có dữ liệu</div>'}
+  </div>
+  <div class="dsf"><button class="btn btn-s" style="flex:1" onclick="${loader}">⬆ Nạp mới</button>
+   <button class="btn btn-s" onclick="${tpl}">⬇ Template</button></div>
+ </div>`;
+}
+function dsPanel(){
+ return `<div class="dsw"><div class="dsg">${dsCard('pay')}${dsCard('org')}${dsCard('rev')}</div>
+ <div class="note i"><b>Quy tắc kỳ:</b> bảng lương và org chart phải <b>cùng kỳ</b> mới map đúng — mỗi org chart chụp tại một thời điểm, mỗi bảng lương cũng vậy. Tool chặn sẵn việc map chéo kỳ.
+ <br/><b>⧉ Nhân bản</b> để tạo kịch bản mô phỏng (vd: org chart T2 giả định thêm 2 ASM) mà không phá bản gốc.</div></div>`;
+}
+
+
+// ═══ EXPORT SAP (Data import) ═══
+const SAP={
+ // cấu hình theo team
+ GT:{sheet:'Data import',ce:{luong:'A0101',thuong:'A0503',bhxh:'A0202',bhyt:'A0201',bhtn:'A0203',kpcd:'A0301',dp13:'A0504'},
+     filter:'(Multiple Items)',rowCE:'A0101',tag:'kênh GT',
+     titles:{luong:'Lương nhân viên kênh GT',thuong:'Thưởng lễ 08/3 nhân viên kênh GT',bhxh:'BHXH (17.5%) kênh GT',
+      bhyt:'BHYT (3%) nhân viên kênh GT',bhtn:'BHTN (1%) nhân viên kênh GT',kpcd:'Kinh phí công đoàn (2%) kênh GT ',dp13:'Dự phòng thưởng tháng 13 kênh GT'}},
+ PG:{sheet:'Data import PG',ce:{luong:'B0210',thuong:'B0210',bhxh:'B0210',bhyt:'B0210',bhtn:'B0210',kpcd:'B0210',dp13:'B0210'},
+     filter:'PG',rowCE:'B0210',tag:'PG kênh GT',
+     titles:{luong:'Lương nhân viên PG kênh GT',thuong:'Thưởng lễ 08/3 nhân viên kênh GT',bhxh:'BHXH (17.5%) PG kênh GT',
+      bhyt:'BHYT (3%) PG kênh GT',bhtn:'BHTN (1%) PG kênh GT',kpcd:'Kinh phí công đoàn (2%) PG kênh GT',dp13:'Dự phòng thưởng tháng 13 PG kênh GT'}}
+};
+const SAPF=['luong','thuong','bhxh','bhyt','bhtn','kpcd','dp13'];
+const SAPCR={luong:334101,thuong:334101,bhxh:338301,bhyt:338401,bhtn:338601,kpcd:338201,dp13:335801};
+const SAPH=['Sum of CP Lương','Sum of Thưởng lễ, tết','Sum of BHXH\n(CTy 17,5%)-','Sum of BHYT\n(CTy 3%)-','Sum of BHTN\n(CTy 1%)-','Sum of KPCĐ\n(CTy 2%)-','Dự phòng thưởng T13'];
+
+// Phân bổ riêng cho 1 nhóm vai trò (PG hay non-PG)
+function allocTeam(isPG){
+ const M=mat(),R={};
+ ORG.npps.forEach(n=>{R[n.code]={};COMPS.forEach(c=>R[n.code][c.f]=0);});
+ ORG.employees.forEach(e=>{
+  const pg=roleOf(e)==='PG';
+  if(pg!==isPG)return;
+  (M[e.code]||[]).forEach(a=>{if(!R[a.npp])return;
+   COMPS.forEach(c=>R[a.npp][c.f]+=(+e[c.f]||0)*a.pct/100);});
+ });
+ // override chỉ áp cho non-PG (đơn giản hoá — override là tổng)
+ return R;
+}
+function sapPeriod(){
+ const p=actPeriod()||'2026-02';const[y,m]=p.split('-');
+ return {y,m,mm:String(+m).padStart(2,'0'),lbl:'tháng '+String(+m).padStart(2,'0')+'/'+y,th:'Tháng '+(+m)};
+}
+function buildSAP(team){
+ const C=SAP[team],P=sapPeriod();
+ const R=allocTeam(team==='PG');
+ const rows=[];
+ // r0: tiêu đề đầy đủ
+ const r0=Array(16).fill(null);r0[8]=P.lbl;
+ SAPF.forEach((f,i)=>r0[9+i]=C.titles[f]+' '+P.lbl);
+ rows.push(r0);
+ // r1: số thứ tự
+ const r1=Array(16).fill(null);SAPF.forEach((f,i)=>r1[9+i]=i+1);rows.push(r1);
+ // r2: tiêu đề rút gọn
+ const r2=Array(16).fill(null);r2[8]=' '+P.lbl+' - ';
+ SAPF.forEach((f,i)=>r2[9+i]=C.titles[f]);rows.push(r2);
+ // r3: Cost Element
+ const r3=Array(16).fill(null);r3[8]=team==='PG'?3:1;
+ SAPF.forEach((f,i)=>r3[9+i]=C.ce[f]);rows.push(r3);
+ // r4: TK Có
+ const r4=Array(16).fill(null);r4[7]='Thời gian';r4[8]=P.th;
+ SAPF.forEach((f,i)=>r4[9+i]=SAPCR[f]);rows.push(r4);
+ // r5: filter
+ const r5=Array(16).fill(null);r5[7]='Note nhân viên PG';r5[8]=C.filter;rows.push(r5);
+ // r6: nhãn SAP
+ const r6=Array(16).fill(null);r6[0]='B1-G/L Acct/BP Code';r6[1]='B3-Remarks';r6[2]='B4';r6[9]='B2-Debit';rows.push(r6);
+ // r7: header
+ rows.push(['GL account','Remarks','Product Group','Costing Group','Customer','Department','Cost Element','Mã SAP','Tên khách hàng',...SAPH]);
+ // data — làm tròn theo largest-remainder để tổng khớp tuyệt đối
+ const list=ORG.npps.filter(np=>SAPF.some(f=>Math.abs(R[np.code][f]||0)>=0.5));
+ const vals={};
+ SAPF.forEach(f=>{
+  const raw=list.map(np=>R[np.code][f]||0);
+  const exact=raw.reduce((s,x)=>s+x,0);
+  const rnd=raw.map(x=>Math.round(x));
+  let diff=Math.round(exact)-rnd.reduce((s,x)=>s+x,0);
+  if(diff!==0&&rnd.length){                       // dồn dư vào dòng lớn nhất
+   let i=rnd.reduce((mx,x,k,arr)=>x>arr[mx]?k:mx,0);
+   rnd[i]+=diff;
+  }
+  vals[f]=rnd;
+ });
+ let n=0;
+ list.forEach((np,i)=>{
+  n++;
+  rows.push([641101, C.titles.luong+' '+P.lbl+' - '+np.name, 'G', null, np.code, 'D06', C.rowCE, np.code, np.name,
+   ...SAPF.map(f=>vals[f][i])]);
+ });
+ return {rows,n,C,P};
+}
+function xlsSAP(){
+ const wb=XLSX.utils.book_new();
+ ['GT','PG'].forEach(t=>{
+  const B=buildSAP(t);
+  if(!B.n)return;
+  const ws=XLSX.utils.aoa_to_sheet(B.rows);
+  ws['!cols']=[{wch:11},{wch:62},{wch:13},{wch:13},{wch:10},{wch:11},{wch:12},{wch:9},{wch:38},
+   {wch:16},{wch:14},{wch:15},{wch:14},{wch:14},{wch:14},{wch:16}];
+  XLSX.utils.book_append_sheet(wb,ws,SAP[t].sheet);
+ });
+ const P=sapPeriod();
+ XLSX.writeFile(wb,'SAP_DataImport_GT_'+P.y+'_'+P.mm+'.xlsx');
+ flag('⬇ Đã xuất file SAP (GT + PG)');
+}
+
+
+// ═══ SO SÁNH KỲ (Bridge) ═══
+// Tính chi phí theo NPP với 1 cặp dataset bất kỳ — không thay đổi state đang dùng
+function calcWith(payId,orgId){
+ const p=dsOf(payId),o=dsOf(orgId);
+ if(!p||!o)return null;
+ const npps=clone(o.data.npps);
+ const payM={};p.data.forEach(e=>payM[e.code]=e);
+ const orgM={};o.data.employees.forEach(e=>orgM[e.code]=e);
+ const codes=new Set([...Object.keys(payM),...Object.keys(orgM)]);
+ const emps=[...codes].map(c=>{
+  const P=payM[c]||{},O=orgM[c]||{};
+  const L=(O.npps||[]).slice();
+  const pos=(O.pos||P.pos||'');const U=pos.toUpperCase();
+  const region=O.region||P.region||'';
+  const role=U.includes('GĐKD')||U.includes('GDKD')?'GĐKD':U.includes('ASM')?'ASM':U.includes('PG')?'PG':(U.includes('GSBH')||U.startsWith('GS'))?'GSBH':'NVKD';
+  const e={code:c,name:P.name||O.name||'',pos,region,npps:L,role};
+  COMPS.forEach(x=>e[x.f]=+P[x.f]||0);
+  if(!e.dp13&&dp13Rate>0)e.dp13=Math.round((e.luong+e.thuong)*dp13Rate/100);
+  return e;});
+ // phân bổ (rule hiện tại)
+ const R={},byRole={},byComp={};
+ npps.forEach(n=>R[n.code]=0);
+ ROLES.forEach(r=>byRole[r]=0);
+ COMPS.forEach(c=>byComp[c.f]=0);
+ emps.forEach(e=>{
+  const L=e.npps;if(!L.length)return;
+  const tot=COMPS.reduce((s,c)=>s+(+e[c.f]||0),0);
+  let parts;
+  if(RULE==='revenue_weighted'){
+   const tr=L.reduce((s,c)=>{const n=npps.find(x=>x.code===c);return s+(n?+n.revenue||0:0);},0);
+   parts= tr>0 ? L.map(c=>{const n=npps.find(x=>x.code===c);return{c,p:(n?+n.revenue||0:0)/tr};}) : L.map(c=>({c,p:1/L.length}));
+  }else parts=L.map(c=>({c,p:1/L.length}));
+  parts.forEach(a=>{if(R[a.c]!==undefined)R[a.c]+=tot*a.p;});
+  byRole[e.role]+=tot;
+  COMPS.forEach(c=>byComp[c.f]+=(+e[c.f]||0));
+ });
+ const T=Object.values(R).reduce((s,v)=>s+v,0);
+ const nmap={};npps.forEach(n=>nmap[n.code]=n);
+ return {R,T,npps,nmap,emps,byRole,byComp,period:p.period,payName:p.name,orgName:o.name};
+}
+// Bridge: tách Δ thành Δorg + Δpay
+function bridge(){
+ if(!cmpA||!cmpB)return null;
+ const A=cmpA,B=cmpB;   // {pay,org}
+ const base=calcWith(A.pay,A.org);      // kỳ gốc
+ const fin =calcWith(B.pay,B.org);      // kỳ so
+ if(!base||!fin)return null;
+ const mixOrg=calcWith(A.pay,B.org);    // lương gốc × org mới → tách Δorg
+ const dOrg=mixOrg.T-base.T;
+ const dPay=fin.T-mixOrg.T;
+ return {base,fin,mixOrg,dOrg,dPay,delta:fin.T-base.T,
+  ok:Math.abs((dOrg+dPay)-(fin.T-base.T))<1};
+}
+function cmpPairs(){
+ // các cặp (pay,org) cùng kỳ có sẵn
+ const per=[...new Set(DS.map(d=>d.period))].sort();
+ return per.map(p=>{
+  const pay=DS.filter(d=>d.type==='pay'&&d.period===p);
+  const org=DS.filter(d=>d.type==='org'&&d.period===p);
+  return {period:p,pay,org,ready:pay.length&&org.length};
+ }).filter(x=>x.ready);
+}
+function autoCmp(){
+ const P=cmpPairs();
+ if(P.length>=2&&!cmpA){
+  cmpA={period:P[P.length-2].period,pay:P[P.length-2].pay[0].id,org:P[P.length-2].org[0].id};
+  cmpB={period:P[P.length-1].period,pay:P[P.length-1].pay[0].id,org:P[P.length-1].org[0].id};
+ }
+}
+
+
+// ─── TAB 7: SO SÁNH KỲ ───
+function cmpPane(){
+ autoCmp();
+ const P=cmpPairs();
+ document.getElementById('mh').innerHTML=`<div><h2>⑦ So sánh kỳ</h2><div class="d">Bóc tách nguyên nhân biến động: bao nhiêu do lương, bao nhiêu do org chart</div></div>
+  <div class="vtog" style="margin-left:auto">
+   <button class="vt ${cmpView==='bridge'?'on':''}" onclick="setCmpV('bridge')">🌉 Bridge</button>
+   <button class="vt ${cmpView==='npp'?'on':''}" onclick="setCmpV('npp')">▦ Theo NPP</button>
+   <button class="vt ${cmpView==='role'?'on':''}" onclick="setCmpV('role')">◱ Theo tầng</button>
+  </div>`;
+ // sidebar
+ document.getElementById('sh').innerHTML=`<h3>Chọn 2 kỳ</h3>`;
+ if(P.length<2){
+  document.getElementById('sb').innerHTML=`<div class="note w"><b>Cần ít nhất 2 kỳ.</b> Hiện có ${P.length} kỳ đủ bộ (bảng lương + org chart).<br/><br/>Nạp thêm dữ liệu kỳ khác ở tab ① và ②.</div>`;
+  document.getElementById('mb').innerHTML=`<div class="empty"><div class="big">Chưa đủ dữ liệu để so sánh</div>
+   <div style="font-size:12.5px">Cần ít nhất <b style="color:var(--plat)">2 kỳ</b>, mỗi kỳ có đủ bảng lương + org chart.<br/>Hiện có: ${P.map(x=>pLabel(x.period)).join(', ')||'chưa có kỳ nào'}</div></div>`;
+  return;
+ }
+ const sel=(k,cur)=>`<select class="sel" onchange="pickCmp('${k}',this.value)">
+  ${P.map(x=>`<option value="${x.period}" ${cur&&cur.period===x.period?'selected':''}>${pLabel(x.period)}</option>`).join('')}</select>`;
+ const b=bridge();
+ document.getElementById('sb').innerHTML=`
+  <div class="fg"><div class="fl">Kỳ gốc (base)</div>${sel('a',cmpA)}</div>
+  <div class="fg"><div class="fl">Kỳ so sánh</div>${sel('b',cmpB)}</div>
+  ${b?`<div class="st"><div class="l">${pLabel(b.base.period)}</div><div class="v" style="font-size:14px">${fmtK(b.base.T)}</div></div>
+  <div class="st"><div class="l">${pLabel(b.fin.period)}</div><div class="v" style="font-size:14px">${fmtK(b.fin.T)}</div></div>
+  <div class="st ${b.delta<0?'ok':'bad'}"><div class="l">Chênh lệch</div><div class="v" style="font-size:14px">${b.delta>0?'+':''}${fmtK(b.delta)}</div>
+   <div style="font-family:var(--fm);font-size:10px;color:var(--dim);margin-top:2px">${(b.delta/b.base.T*100).toFixed(1)}%</div></div>
+  <div class="note ${b.ok?'g':'e'}" style="margin-top:10px">${b.ok?'✓ Bridge tự cân: Δorg + Δlương = Δtổng':'✗ Bridge lệch'}</div>`:''}
+  <div class="note i"><b>Bridge</b> tách chênh lệch thành 2 nhân tố: đổi <b>org chart</b> (ai phụ trách NPP nào) và đổi <b>bảng lương</b> (ai nhận bao nhiêu).</div>`;
+ // main
+ if(!b){document.getElementById('mb').innerHTML='<div class="empty">Chọn 2 kỳ ở panel trái</div>';return;}
+ document.getElementById('mb').innerHTML = cmpView==='bridge'?vBridge(b):cmpView==='npp'?vNpp(b):vRole(b);
+}
+function pickCmp(k,per){
+ const P=cmpPairs().find(x=>x.period===per);if(!P)return;
+ const v={period:per,pay:P.pay[0].id,org:P.org[0].id};
+ if(k==='a')cmpA=v;else cmpB=v;R();
+}
+// Bridge waterfall
+function vBridge(b){
+ const up=b.delta>0;
+ const mx=Math.max(Math.abs(b.base.T),Math.abs(b.fin.T));
+ const bar=(v,col)=>`<div style="height:${Math.max(2,Math.abs(v)/mx*160)}px;background:${col};border-radius:3px 3px 0 0;min-width:70px"></div>`;
+ const pctO=(b.dOrg/Math.abs(b.delta||1)*100), pctP=(b.dPay/Math.abs(b.delta||1)*100);
+ return `<div style="padding:22px 24px">
+  <div class="note ${b.ok?'g':'e'}" style="margin-bottom:18px">
+   <b>${b.ok?'✓ Bridge tự cân khớp':'✗ Lệch'}</b> — chi phí ${pLabel(b.base.period)} → ${pLabel(b.fin.period)}
+   ${up?'tăng':'giảm'} <b>${fmt(Math.abs(b.delta))} đ</b> (${(b.delta/b.base.T*100).toFixed(1)}%).
+   Trong đó <b style="color:var(--pu)">${Math.abs(pctP).toFixed(0)}%</b> do bảng lương đổi, <b style="color:var(--te)">${Math.abs(pctO).toFixed(0)}%</b> do org chart đổi.</div>
+  <div style="display:flex;align-items:flex-end;gap:14px;height:210px;padding:0 10px;border-bottom:1px solid var(--bd2);margin-bottom:10px">
+   <div style="text-align:center">${bar(b.base.T,'var(--sub)')}<div style="font-size:11px;color:var(--sub);margin-top:6px">${pLabel(b.base.period)}</div>
+    <div style="font-family:var(--fm);font-size:11px;color:var(--tx)">${fmtK(b.base.T)}</div></div>
+   <div style="font-size:20px;color:var(--dim);padding-bottom:40px">→</div>
+   <div style="text-align:center">${bar(Math.abs(b.dOrg),'var(--te)')}<div style="font-size:11px;color:var(--te);margin-top:6px">Δ Org chart</div>
+    <div style="font-family:var(--fm);font-size:11px;color:var(--te)">${b.dOrg>0?'+':''}${fmtK(b.dOrg)}</div></div>
+   <div style="font-size:20px;color:var(--dim);padding-bottom:40px">+</div>
+   <div style="text-align:center">${bar(Math.abs(b.dPay),'var(--pu)')}<div style="font-size:11px;color:var(--pu);margin-top:6px">Δ Bảng lương</div>
+    <div style="font-family:var(--fm);font-size:11px;color:var(--pu)">${b.dPay>0?'+':''}${fmtK(b.dPay)}</div></div>
+   <div style="font-size:20px;color:var(--dim);padding-bottom:40px">=</div>
+   <div style="text-align:center">${bar(b.fin.T,'var(--plat)')}<div style="font-size:11px;color:var(--plat);margin-top:6px">${pLabel(b.fin.period)}</div>
+    <div style="font-family:var(--fm);font-size:11px;color:var(--plat)">${fmtK(b.fin.T)}</div></div>
+  </div>
+  <table style="max-width:760px;margin-top:18px"><thead><tr><th class="l">Nhân tố</th><th>Giá trị</th><th>% của Δ</th><th class="l">Ý nghĩa</th></tr></thead><tbody>
+   <tr><td class="l" style="color:var(--sub)">Chi phí ${pLabel(b.base.period)}</td><td>${fmt(b.base.T)}</td><td>—</td>
+    <td class="l" style="color:var(--dim);font-size:11px">${b.base.emps.length} NV · ${b.base.npps.length} NPP</td></tr>
+   <tr><td class="l" style="color:var(--te)">Δ do Org chart</td><td style="color:var(--te)">${b.dOrg>0?'+':''}${fmt(b.dOrg)}</td>
+    <td style="color:var(--te)">${Math.abs(pctO).toFixed(0)}%</td>
+    <td class="l" style="color:var(--dim);font-size:11px">Thay đổi phân công phụ trách NPP</td></tr>
+   <tr><td class="l" style="color:var(--pu)">Δ do Bảng lương</td><td style="color:var(--pu)">${b.dPay>0?'+':''}${fmt(b.dPay)}</td>
+    <td style="color:var(--pu)">${Math.abs(pctP).toFixed(0)}%</td>
+    <td class="l" style="color:var(--dim);font-size:11px">Thay đổi mức lương / nhân sự</td></tr>
+   <tr class="tot"><td class="l">Chi phí ${pLabel(b.fin.period)}</td><td>${fmt(b.fin.T)}</td>
+    <td>${(b.delta/b.base.T*100).toFixed(1)}%</td>
+    <td class="l" style="font-size:11px">${b.fin.emps.length} NV · ${b.fin.npps.length} NPP</td></tr>
+  </tbody></table>
+  <div class="note i" style="margin-top:16px;max-width:760px"><b>Cách đọc:</b> giữ nguyên bảng lương kỳ gốc, chỉ đổi org chart → ra <b>Δ Org chart</b>. Rồi đổi tiếp bảng lương → ra <b>Δ Bảng lương</b>. Hai phần cộng lại đúng bằng tổng chênh lệch — <b>tự đối soát</b>.</div>
+ </div>`;
+}
+// So theo NPP
+function vNpp(b){
+ const codes=[...new Set([...Object.keys(b.base.R),...Object.keys(b.fin.R)])];
+ const rows=codes.map(c=>{
+  const t1=b.base.R[c]||0,t2=b.fin.R[c]||0;
+  const n=b.fin.nmap[c]||b.base.nmap[c]||{};
+  return {c,name:n.name||'',region:n.region||'',t1,t2,d:t2-t1,
+   st:!(c in b.base.R)?'new':!(c in b.fin.R)?'gone':(t1&&Math.abs((t2-t1)/t1)>0.3)?'big':''};
+ }).filter(r=>inF(fRegions,r.region)&&(!fSrch||r.c.toLowerCase().includes(fSrch)||r.name.toLowerCase().includes(fSrch)));
+ rows.sort((x,y)=>Math.abs(y.d)-Math.abs(x.d));
+ const T1=rows.reduce((s,r)=>s+r.t1,0),T2=rows.reduce((s,r)=>s+r.t2,0);
+ const tag=s=>s==='new'?'<span class="fchip" style="border-color:var(--gr);color:var(--gr);background:rgba(59,200,113,.1)">MỚI</span>'
+  :s==='gone'?'<span class="fchip" style="border-color:var(--rd);color:var(--rd);background:rgba(224,85,85,.1)">MẤT</span>'
+  :s==='big'?'<span class="fchip" style="border-color:var(--am);color:var(--am);background:rgba(224,162,59,.1)">±30%</span>':'';
+ return `<div style="padding:10px 18px;border-bottom:1px solid var(--bd);position:sticky;top:0;background:var(--ink);z-index:6;display:flex;gap:10px;align-items:center">
+  <input class="srch" style="width:220px" placeholder="tìm NPP…" value="${fSrch}" oninput="fSrch=this.value.toLowerCase();R()"/>
+  <span style="font-size:11.5px;color:var(--sub);margin-left:auto">${rows.length} NPP · sắp xếp theo mức biến động</span></div>
+ <table><thead><tr><th class="l">Mã</th><th class="l">Nhà phân phối</th><th class="l">Vùng</th>
+  <th>${pLabel(b.base.period)}</th><th>${pLabel(b.fin.period)}</th><th>Δ</th><th>Δ%</th><th class="l">Cờ</th></tr></thead><tbody>
+ ${rows.map(r=>{const p=r.t1?(r.d/r.t1*100):null;
+  return `<tr><td class="l">${r.c}</td><td class="l nm">${r.name.slice(0,32)}</td>
+  <td class="l" style="font-size:11px;color:var(--dim)">${r.region}</td>
+  <td>${fmt(r.t1)}</td><td>${fmt(r.t2)}</td>
+  <td style="color:${r.d>0?'var(--rd)':'var(--gr)'}">${r.d>0?'+':''}${fmt(r.d)}</td>
+  <td style="color:${r.d>0?'var(--rd)':'var(--gr)'}">${p===null?'—':(p>0?'+':'')+p.toFixed(0)+'%'}</td>
+  <td class="l">${tag(r.st)}</td></tr>`;}).join('')}
+ <tr class="tot"><td class="l" colspan="3">TỔNG ${rows.length} NPP</td><td>${fmt(T1)}</td><td>${fmt(T2)}</td>
+  <td style="color:${T2>T1?'var(--rd)':'var(--gr)'}">${T2-T1>0?'+':''}${fmt(T2-T1)}</td>
+  <td>${T1?((T2-T1)/T1*100).toFixed(1)+'%':'—'}</td><td></td></tr>
+ </tbody></table>`;
+}
+// So theo tầng
+function vRole(b){
+ const rows=ROLES.map(r=>{
+  const t1=b.base.byRole[r]||0,t2=b.fin.byRole[r]||0;
+  const n1=b.base.emps.filter(e=>e.role===r).length,n2=b.fin.emps.filter(e=>e.role===r).length;
+  return {r,t1,t2,d:t2-t1,n1,n2};});
+ const T1=rows.reduce((s,x)=>s+x.t1,0),T2=rows.reduce((s,x)=>s+x.t2,0);
+ const mx=Math.max(...rows.map(x=>Math.max(x.t1,x.t2)),1);
+ return `<div style="padding:20px 24px">
+  <div class="note i" style="margin-bottom:16px"><b>Tầng nào là nguồn biến động?</b> So chi phí và headcount từng tầng giữa 2 kỳ.</div>
+  <table style="max-width:900px"><thead><tr><th class="l">Tầng</th><th>Người ${pLabel(b.base.period)}</th><th>Người ${pLabel(b.fin.period)}</th>
+   <th>${pLabel(b.base.period)}</th><th>${pLabel(b.fin.period)}</th><th>Δ</th><th>Δ%</th><th class="l" style="width:180px">Tỷ trọng</th></tr></thead><tbody>
+  ${rows.map(x=>{const p=x.t1?(x.d/x.t1*100):null;
+   return `<tr><td class="l" style="color:${RC[x.r]}">${x.r}</td>
+   <td>${x.n1}</td><td>${x.n2}${x.n2!==x.n1?` <span style="color:${x.n2>x.n1?'var(--rd)':'var(--gr)'};font-size:10px">(${x.n2>x.n1?'+':''}${x.n2-x.n1})</span>`:''}</td>
+   <td>${fmt(x.t1)}</td><td>${fmt(x.t2)}</td>
+   <td style="color:${x.d>0?'var(--rd)':'var(--gr)'}">${x.d>0?'+':''}${fmt(x.d)}</td>
+   <td style="color:${x.d>0?'var(--rd)':'var(--gr)'}">${p===null?'—':(p>0?'+':'')+p.toFixed(0)+'%'}</td>
+   <td class="l"><div style="display:flex;gap:2px;align-items:center">
+    <div style="height:7px;width:${x.t1/mx*70}px;background:var(--dim);border-radius:2px"></div>
+    <div style="height:7px;width:${x.t2/mx*70}px;background:${RC[x.r]};border-radius:2px"></div></div></td></tr>`;}).join('')}
+  <tr class="tot"><td class="l">TỔNG</td><td>${b.base.emps.length}</td><td>${b.fin.emps.length}</td>
+   <td>${fmt(T1)}</td><td>${fmt(T2)}</td>
+   <td style="color:${T2>T1?'var(--rd)':'var(--gr)'}">${T2-T1>0?'+':''}${fmt(T2-T1)}</td>
+   <td>${((T2-T1)/T1*100).toFixed(1)}%</td><td></td></tr>
+  </tbody></table></div>`;
+}
+
+// ═══ RENDER ═══
+const ST=[{n:1,t:'Bảng lương'},{n:2,t:'Org Chart'},{n:3,t:'Configure'},{n:4,t:'Preview'},{n:5,t:'JE'},{n:6,t:'Đối chiếu'},{n:7,t:'So sánh kỳ'}];
+function R(){
+ document.getElementById('steps').innerHTML=ST.map(s=>`<div class="stp ${step===s.n?'on':''}" onclick="go(${s.n})"><span class="n">${s.n}</span>${s.t}</div>`).join('');
+ document.getElementById('tools').innerHTML=`
+  <input type="file" id="fPay" accept=".xlsx" style="display:none" onchange="onPay(event)"/>
+  <input type="file" id="fOrg" accept=".xlsx" style="display:none" onchange="onOrg(event)"/>
+  <input type="file" id="fRev" accept=".xlsx" style="display:none" onchange="onRev(event)"/>
+  <input type="file" id="si" accept=".json" style="display:none" onchange="onS(event)"/>
+  <span class="sv" id="sv"></span>
+  <button class="btn btn-s" onclick="xls()">⬇ JE</button>
+  <button class="btn btn-g btn-s" onclick="xlsSAP()">⬇ SAP</button>
+  <button class="btn btn-s" onclick="saveF()">💾</button>
+  <button class="btn btn-s" onclick="pickS()">📂</button>
+  <button class="btn btn-s" onclick="setTheme()">${theme==='dark'?'☀ Sáng':'☾ Tối'}</button>
+  <button class="btn btn-s" onclick="rst()">↺</button>`;
+ initRsz();
+ document.getElementById('dlg').innerHTML=dlgHtml();
+ if(step===2)org();else if(step===7)cmpPane();else other();
+}
+
+// ─── STEP 2: ORG (matrix / tree) ───
+function org(){
+ document.getElementById('mh').innerHTML=`
+  <div><h2>Org Chart</h2><div class="d">Ai phụ trách NPP nào → chi phí rơi vào đâu. ${ORG.employees.length} nhân sự · ${ORG.npps.length} NPP · ${regions().length} vùng</div></div>
+  <div class="vtog">
+    <button class="vt ${view==='matrix'?'on':''}" onclick="setView('matrix')">▦ Ma trận NPP × Vai trò</button>
+    <button class="vt ${view==='tree'?'on':''}" onclick="setView('tree')">⌥ Cây phân cấp</button>
+  </div>
+  <div class="vtog"><button class="vt on" onclick="pickOrg()">⬆ Nạp Org Chart</button><button class="vt" onclick="tplOrg()">⬇ Template</button></div>`;
+ const ob=periodBar();
+ document.getElementById('mb').innerHTML = ob+(view==='matrix'?vMat():vTree());
+ sidePanel();
+}
+
+function vMat(){
+ const G=grid(), rgs=regions().filter(r=>inF(fRegions,r));
+ const cols=ROLES.filter(r=>inF(fRoles,r));
+ const modeBar=`<div style="padding:9px 18px;display:flex;gap:12px;align-items:center;border-bottom:1px solid var(--bd);position:sticky;top:0;background:var(--ink);z-index:6">
+   <span style="font-family:var(--fm);font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--dim)">Ô hiển thị</span>
+   <div class="vtog" style="margin:0">
+     <button class="vt ${mMode==='cost'?'on':''}" onclick="setMode('cost')">① Số người + chi phí</button>
+     <button class="vt ${mMode==='name'?'on':''}" onclick="setMode('name')">② Tên nhân sự</button>
+   </div>
+   <button class="btn btn-s" onclick="expandAll()">⊕ Mở hết</button>
+   <button class="btn btn-s" onclick="collapseAll()">⊖ Thu hết</button>
+   <span style="margin-left:auto;font-size:11.5px;color:var(--sub)">${mMode==='cost'?'Ô = chi phí tầng đó rót vào NPP':'Ô = tên người phụ trách — bấm để mở Editor'}</span>
+ </div>`;
+ let rows='';
+ rgs.forEach(rg=>{
+  const npps=ORG.npps.filter(n=>n.region===rg && (!fSrch||n.code.toLowerCase().includes(fSrch)||(n.name||'').toLowerCase().includes(fSrch)));
+  if(!npps.length)return;
+  const cl=collapsed['rg_'+rg];
+  const rT=npps.reduce((s,n)=>s+cols.reduce((x,r)=>x+G[n.code][r].cost,0),0);
+  const rV=npps.reduce((s,n)=>s+(+n.revenue||0),0);
+  rows+=`<tr class="rg" onclick="togC('rg_${rg.replace(/'/g,"")}')" style="cursor:pointer"><td class="l" colspan="2"><span class="cx">${cl?'▶':'▼'}</span> ${rg} — ${npps.length} NPP</td>
+   ${cols.map(r=>{const t=npps.reduce((s,n)=>s+G[n.code][r].cost,0);return `<td style="color:${RC[r]}">${t>0?fmt(t):'—'}</td>`;}).join('')}
+   <td style="color:var(--plat)">${fmt(rT)}</td><td>${rV?fmt(rV):'—'}</td><td>${rV>0?(rT/rV*100).toFixed(1)+'%':'—'}</td></tr>`;
+  if(cl)return;
+  npps.forEach(n=>{
+   const g=G[n.code], tot=cols.reduce((s,r)=>s+g[r].cost,0), rv=+n.revenue||0, ra=rv>0?tot/rv*100:null;
+   const cells=cols.map(r=>{const d=g[r];
+    if(!d.ppl.length)return '<td style="color:var(--dim)">—</td>';
+    if(mMode==='cost')return `<td><span style="color:${RC[r]}">${fmt(d.cost)}</span><div class="ppl">${d.ppl.length} người</div></td>`;
+    return `<td class="l">${d.ppl.map(p=>`<span class="pchip" style="background:${RC[r]}22;color:${RC[r]}" onclick="pickEmp('${p.code}')" title="${p.code} · ${fmt(p.amt)}đ">${p.name.split(' ').slice(-2).join(' ')}</span>`).join('')}</td>`;
+   }).join('');
+   const rc = ra===null?'':(ra>15?'var(--rd)':ra>8?'var(--am)':'var(--gr)');
+   rows+=`<tr><td class="l"><span class="lnk" onclick="pickNpp('${n.code}')">${n.code}</span></td>
+    <td class="l nm">${(n.name||'').slice(0,30)}</td>${cells}
+    <td style="color:var(--plat);font-weight:500">${fmt(tot)}</td>
+    <td><input class="in" value="${rv}" onchange="setRev('${n.code}',this.value)"/></td>
+    <td style="color:${rc}">${ra===null?'<span style="color:var(--dim)">—</span>':ra.toFixed(1)+'%'}</td></tr>`;
+  });
+ });
+ const vis=ORG.npps.filter(n=>inF(fRegions,n.region)&&(!fSrch||n.code.toLowerCase().includes(fSrch)||(n.name||'').toLowerCase().includes(fSrch)));
+ const tR={};cols.forEach(r=>tR[r]=vis.reduce((s,n)=>s+G[n.code][r].cost,0));
+ const gT=cols.reduce((s,r)=>s+tR[r],0), gR=vis.reduce((s,n)=>s+(+n.revenue||0),0);
+ return modeBar+`<table><thead><tr><th class="l">Mã</th><th class="l">Nhà phân phối</th>
+  ${cols.map(r=>`<th style="color:${RC[r]}">${r}</th>`).join('')}
+  <th style="color:var(--plat)">Tổng CP</th><th>Doanh thu</th><th>CP/DT</th></tr></thead><tbody>${rows}
+  <tr class="tot"><td class="l" colspan="2">GRAND TOTAL — ${vis.length} NPP${fRegions.length||fSrch?' (đã lọc)':''}</td>
+  ${cols.map(r=>`<td style="color:${RC[r]}">${fmt(tR[r])}</td>`).join('')}
+  <td>${fmt(gT)}</td><td>${gR?fmt(gR):'—'}</td><td>${gR>0?(gT/gR*100).toFixed(1)+'%':'—'}</td></tr></tbody></table>`;
+}
+function expandAll(){collapsed={};R();}
+function collapseAll(){regions().forEach(r=>collapsed['rg_'+r]=true);ORG.employees.forEach(()=>{});R();}
+function vTree(){
+ const byR={};ROLES.forEach(r=>byR[r]=ORG.employees.filter(e=>roleOf(e)===r));
+ const node=(e,d)=>{const L=cov(e),c=cost(e),per=L.length?c/L.length:0,r=roleOf(e);
+  return `<div class="tn ${selEmp===e.code?'sel':''}" style="margin-left:${d*20}px" onclick="pickEmp('${e.code}')">
+   <span class="tdot" style="background:${RC[r]}"></span><span class="trole" style="color:${RC[r]}">${r}</span>
+   <span class="tnm">${e.name}</span><span class="tcd">${e.code}</span>
+   <span class="tnp">${L.length} NPP</span><span class="tct">${fmt(c)} đ</span>
+   <span class="tpr">→ ${fmt(per)}/NPP</span></div>`;};
+ let h='';
+ const bar=`<div style="padding:9px 16px;display:flex;gap:8px;border-bottom:1px solid var(--bd);position:sticky;top:0;background:var(--ink);z-index:5">
+  <button class="btn btn-s" onclick="expandAll()">⊕ Mở hết</button>
+  <button class="btn btn-s" onclick="collapseAllTree()">⊖ Thu hết</button>
+  <span style="margin-left:auto;font-size:11.5px;color:var(--sub)">Bấm node để mở Editor · ${ORG.employees.length} người</span></div>`;
+ if(inF(fRoles,'GĐKD'))byR['GĐKD'].forEach(g=>h+=node(g,0));
+ regions().filter(r=>inF(fRegions,r)).forEach(rg=>{
+  const asms=byR['ASM'].filter(e=>e.region===rg&&inF(fRoles,'ASM'));
+  const subs=ORG.employees.filter(e=>['GSBH','NVKD','PG'].includes(roleOf(e))&&e.region===rg&&inF(fRoles,roleOf(e)));
+  if(!asms.length&&!subs.length)return;
+  const all=[...asms,...subs];
+  const rc=all.reduce((s,e)=>s+cost(e),0);
+  const cl=collapsed['t_'+rg];
+  h+=`<div class="tgrp" onclick="togC('t_${rg.replace(/'/g,"")}')" style="cursor:pointer;display:flex;align-items:center;gap:6px">
+   <span class="cx">${cl?'▶':'▼'}</span>${rg} · ${all.length} người · ${fmt(rc)} đ</div>`;
+  if(cl)return;
+  asms.forEach(x=>h+=node(x,1));
+  subs.forEach(x=>h+=node(x,2));
+ });
+ return bar+`<div class="tree">${h||'<div class="empty">Không có dữ liệu khớp bộ lọc</div>'}</div>`;
+}
+function collapseAllLoad(){const g=new Set();ORG.employees.forEach(e=>g.add(sumBy==="region"?e.region:sumBy==="role"?roleOf(e):e.scope));g.forEach(k=>collapsed["l_"+k]=true);R();}
+function collapseAllPv(){regions().forEach(r=>collapsed['p_'+r]=true);R();}
+function collapseAllTree(){regions().forEach(r=>collapsed['t_'+r]=true);R();}
+
+// ─── SIDEBAR: Editor / Filter ───
+function sidePanel(){
+ document.getElementById('sh').innerHTML=`<h3>${panel==='edit'?'Editor':'Bộ lọc'}</h3>
+  <div class="stog"><button class="stg ${panel==='filter'?'on':''}" onclick="setPanel('filter')">Filter</button>
+  <button class="stg ${panel==='edit'?'on':''}" onclick="setPanel('edit')">Editor</button></div>`;
+ document.getElementById('sb').innerHTML = panel==='edit' ? (selEmp?edEmp():selNpp?edNpp():edNone()) : filt();
+}
+function msel(label,arr,vals,colorMap){
+ return `<div class="fg"><div class="fl">${label} <span style="color:var(--plat)">${arr.length?arr.length+' chọn':'tất cả'}</span></div>
+ <div class="mbar"><button onclick="allF(${arr===fRegions?'fRegions':'fRoles'},${JSON.stringify(vals).replace(/"/g,'&quot;')})">Tất cả</button>
+ <button onclick="noneF(${arr===fRegions?'fRegions':'fRoles'})">Bỏ hết</button></div>
+ <div class="msel">${vals.map(v=>`<label class="ck"><input type="checkbox" ${arr.includes(v)?'checked':''} onchange="togF(${arr===fRegions?'fRegions':'fRoles'},'${v.replace(/'/g,"")}')"/>
+  <span style="${colorMap&&colorMap[v]?'color:'+colorMap[v]:''}">${v}</span></label>`).join('')}</div></div>`;
+}
+function fchips(){
+ const all=[...fRegions.map(r=>({t:r,a:'fRegions'})),...fRoles.map(r=>({t:r,a:'fRoles'}))];
+ if(!all.length&&!fSrch)return '';
+ return `<div class="chipbar">${fSrch?`<span class="fchip">"${fSrch}"<span class="x" onclick="fSrch='';R()">×</span></span>`:''}
+ ${all.map(c=>`<span class="fchip">${c.t}<span class="x" onclick="togF(${c.a},'${c.t.replace(/'/g,"")}')">×</span></span>`).join('')}</div>`;
+}
+function filt(){
+ const G=grid();const orph=ORG.npps.filter(n=>ROLES.every(r=>!G[n.code][r].ppl.length));
+ const noN=ORG.employees.filter(e=>!cov(e).length);
+ const byR={};ROLES.forEach(r=>byR[r]=ORG.employees.filter(e=>roleOf(e)===r).length);
+ return `${fchips()}
+ <div class="fg"><div class="fl">Tìm</div><input class="srch" placeholder="mã / tên NPP…" value="${fSrch}" oninput="fSrch=this.value.toLowerCase();R()"/></div>
+ ${msel('Vùng (region)',fRegions,regions())}
+ ${msel('Vai trò',fRoles,ROLES,RC)}
+ <div class="fg"><div class="fl">Nhân sự theo tầng</div>
+  ${ROLES.map(r=>`<div class="kv"><span class="k" style="color:${RC[r]}">${r}</span><span class="v">${byR[r]}</span></div>`).join('')}</div>
+ <div class="fg"><div class="fl">Kiểm soát</div>
+  <div class="st ${orph.length?'bad':'ok'}"><div class="l">NPP không ai phụ trách</div><div class="v">${orph.length}</div></div>
+  <div class="st ${noN.length?'bad':'ok'}"><div class="l">NV chưa gắn NPP</div><div class="v">${noN.length}</div></div></div>
+ ${orph.length?`<div class="note e"><b>${orph.length} NPP mồ côi</b>: ${orph.slice(0,3).map(o=>o.code).join(', ')}${orph.length>3?'…':''}</div>`:''}
+ <div class="note i"><b>Mẹo:</b> bấm mã NPP / tên nhân sự trong bảng để mở Editor.</div>`;
+}
+function edNone(){return `<div class="note i"><b>Chưa chọn gì.</b> Bấm một <b>node trên cây</b> hoặc <b>mã NPP / tên nhân sự</b> trong ma trận để sửa tại đây.</div>
+ <div class="fg"><div class="fl">Rule phân bổ</div>
+ <select class="sel" onchange="setRule(this.value)">
+  <option value="equal_split" ${RULE==='equal_split'?'selected':''}>Chia đều theo số NPP</option>
+  <option value="revenue_weighted" ${RULE==='revenue_weighted'?'selected':''}>Chia theo doanh thu NPP</option>
+ </select><div class="mini" style="margin-top:6px">${RULE==='equal_split'?'Lương ÷ số NPP phụ trách.':'Lương × (DThu NPP ÷ ΣDThu).'}</div></div>`;}
+function edEmp(){
+ const e=ORG.employees.find(x=>x.code===selEmp);if(!e)return edNone();
+ const r=roleOf(e),L=cov(e),c=cost(e);
+ return `<div class="card"><h4><span class="tdot" style="background:${RC[r]}"></span>${e.name}</h4>
+  <div class="kv"><span class="k">Mã NV</span><span class="v">${e.code}</span></div>
+  <div class="kv"><span class="k">Chức vụ</span><span class="v">${e.pos}</span></div>
+  <div class="kv"><span class="k">Tầng</span><span class="v" style="color:${RC[r]}">${r}</span></div>
+  <div class="kv"><span class="k">Tổng chi phí</span><span class="v">${fmt(c)}</span></div>
+  <div class="kv"><span class="k">Phụ trách</span><span class="v" style="color:var(--te)">${L.length} NPP</span></div>
+  <div class="kv"><span class="k">→ mỗi NPP</span><span class="v" style="color:var(--plat)">${fmt(L.length?c/L.length:0)}</span></div></div>
+ <div class="fg"><div class="fl">Vùng</div>
+  <select class="sel" onchange="setRegion('${e.code}',this.value)">${regions().map(x=>`<option ${e.region===x?'selected':''}>${x}</option>`).join('')}</select></div>
+ <div class="fg"><div class="fl">Phạm vi phụ trách</div>
+  <select class="sel" onchange="setScope('${e.code}',this.value)">
+   <option value="ALL" ${e.scope==='ALL'?'selected':''}>ALL — toàn kênh (${ORG.npps.length} NPP)</option>
+   <option value="REGION" ${e.scope==='REGION'?'selected':''}>REGION — cả vùng ${e.region}</option>
+   <option value="DIRECT" ${e.scope==='DIRECT'?'selected':''}>DIRECT — chọn tay</option>
+  </select></div>
+ ${e.scope==='DIRECT'?`<div class="fg"><div class="fl">Chọn NPP (${(e.npps||[]).length})</div>
+  <button class="btn btn-s" style="width:100%;margin-bottom:6px" onclick="allRegion('${e.code}','${e.region}')">+ Chọn cả vùng ${e.region}</button>
+  <div style="max-height:260px;overflow:auto">
+  ${ORG.npps.filter(n=>!fRegion||n.region===fRegion).map(n=>`<label class="ck"><input type="checkbox" ${(e.npps||[]).includes(n.code)?'checked':''} onchange="togNpp('${e.code}','${n.code}')"/>
+   <span style="font-family:var(--fm);font-size:10px;color:var(--dim)">${n.code}</span><span style="flex:1">${(n.name||'').slice(0,24)}</span></label>`).join('')}
+  </div></div>`:`<div class="note i">Phạm vi <b>${e.scope}</b> → NPP tự động, không cần chọn tay.</div>`}
+ <button class="btn btn-s" style="width:100%" onclick="clearSel()">← Bỏ chọn</button>`;
+}
+function edNpp(){
+ const n=ORG.npps.find(x=>x.code===selNpp);if(!n)return edNone();
+ const G=grid(),g=G[n.code],tot=ROLES.reduce((s,r)=>s+g[r].cost,0),rv=+n.revenue||0;
+ return `<div class="card"><h4>${n.code}</h4>
+  <div class="mini" style="margin-bottom:8px">${n.name}</div>
+  <div class="kv"><span class="k">Vùng</span><span class="v">${n.region}</span></div>
+  <div class="kv"><span class="k">Tổng CP phục vụ</span><span class="v" style="color:var(--plat)">${fmt(tot)}</span></div>
+  <div class="kv"><span class="k">Doanh thu</span><span class="v">${rv?fmt(rv):'chưa nhập'}</span></div>
+  <div class="kv"><span class="k">CP / DThu</span><span class="v" style="color:${rv&&tot/rv*100>15?'var(--rd)':'var(--gr)'}">${rv?(tot/rv*100).toFixed(1)+'%':'—'}</span></div></div>
+ <div class="fg"><div class="fl">Doanh thu NPP</div>
+  <input class="srch" value="${rv}" onchange="setRev('${n.code}',this.value)"/></div>
+ <div class="fg"><div class="fl">Ai đang phục vụ NPP này</div>
+  ${ROLES.map(r=>g[r].ppl.length?`<div style="margin-bottom:7px"><div style="font-family:var(--fm);font-size:9px;letter-spacing:1px;color:${RC[r]};margin-bottom:3px">${r} — ${fmt(g[r].cost)} đ</div>
+   ${g[r].ppl.map(p=>`<div class="kv" style="cursor:pointer" onclick="pickEmp('${p.code}')"><span class="k">${p.name}</span><span class="v">${fmtK(p.amt)}</span></div>`).join('')}</div>`:'').join('')}
+ </div><button class="btn btn-s" style="width:100%" onclick="clearSel()">← Bỏ chọn</button>`;
+}
+
+// ─── OTHER STEPS ───
+function sidePv(J,src){
+ document.getElementById('sh').innerHTML=`<h3>Bộ lọc & Summary</h3><div class="stog"><button class="stg on">Filter</button></div>`;
+ const vis=ORG.npps.filter(n=>inF(fRegions,n.region)&&(!fSrch||n.code.toLowerCase().includes(fSrch)||(n.name||'').toLowerCase().includes(fSrch)));
+ const G=grid();
+ let sum='',tot=0;
+ if(pvSum==='region'){
+  const g={};vis.forEach(n=>{const k=n.region||'—';g[k]=g[k]||{n:0,c:0,r:0};g[k].n++;
+   g[k].c+=COMPS.reduce((s,c)=>s+J.R[n.code][c.f],0);g[k].r+=(+n.revenue||0);});
+  tot=Object.values(g).reduce((s,x)=>s+x.c,0);
+  sum=Object.keys(g).sort((x,y)=>g[y].c-g[x].c).map(k=>`<tr><td class="l" style="color:var(--sub);padding:4px 0">${k}</td>
+   <td style="text-align:right;padding:4px 0">${g[k].n}</td><td style="text-align:right;padding:4px 0">${fmtK(g[k].c)}</td>
+   <td style="text-align:right;padding:4px 0;color:${g[k].r&&g[k].c/g[k].r*100>15?'var(--rd)':'var(--gr)'}">${g[k].r?(g[k].c/g[k].r*100).toFixed(0)+'%':'—'}</td></tr>`).join('');
+ }else if(pvSum==='comp'){
+  tot=COMPS.reduce((s,c)=>s+vis.reduce((x,n)=>x+J.R[n.code][c.f],0),0);
+  sum=COMPS.map(c=>{const v=vis.reduce((x,n)=>x+J.R[n.code][c.f],0);
+   const ok=Math.abs(vis.length===ORG.npps.length?v-src[c.f]:0)<1;
+   return `<tr><td class="l" style="color:var(--sub);padding:4px 0">${c.l}</td>
+   <td colspan="2" style="text-align:right;padding:4px 0">${fmtK(v)}</td>
+   <td style="text-align:right;padding:4px 0;color:${ok?'var(--gr)':'var(--am)'}">${ok?'✓':'~'}</td></tr>`;}).join('');
+ }else{
+  tot=0;const g={};ROLES.forEach(r=>{g[r]=vis.reduce((s,n)=>s+G[n.code][r].cost,0);tot+=g[r];});
+  sum=ROLES.map(r=>`<tr><td class="l" style="color:${RC[r]};padding:4px 0">${r}</td>
+   <td colspan="2" style="text-align:right;padding:4px 0">${fmtK(g[r])}</td>
+   <td style="text-align:right;padding:4px 0;color:var(--dim)">${tot?(g[r]/tot*100).toFixed(0)+'%':''}</td></tr>`).join('');
+ }
+ const nOv=Object.keys(ovr).length;
+ const tSrc=COMPS.reduce((s,c)=>s+src[c.f],0);
+ const tAll=ORG.npps.reduce((s,n)=>s+COMPS.reduce((x,c)=>x+J.R[n.code][c.f],0),0);
+ const ok=Math.abs(tAll-tSrc)<1;
+ document.getElementById('sb').innerHTML=`${fchips()}
+  <div class="st ${ok?'ok':'bad'}"><div class="l">Self-reconcile</div><div class="v" style="font-size:14px">${ok?'✓ KHỚP':'✗ LỆCH '+fmt(tAll-tSrc)}</div></div>
+  ${nOv?`<div class="note w"><b>${nOv} ô đè.</b> <span class="lnk" onclick="rstAll()">↺ về gốc</span></div>`:''}
+  <div class="fg"><div class="fl">Tìm NPP</div><input class="srch" placeholder="mã / tên…" value="${fSrch}" oninput="fSrch=this.value.toLowerCase();R()"/></div>
+  ${msel('Vùng',fRegions,regions())}
+  <div class="fg"><div class="fl">Summary by <span style="color:var(--plat)">${pvSum==='region'?'Vùng':pvSum==='comp'?'Cấu phần':'Tầng vai trò'}</span></div>
+   <div class="mbar" style="margin-bottom:7px">
+    <button onclick="setPv('region')" style="${pvSum==='region'?'border-color:var(--plat);color:var(--plat)':''}">Vùng</button>
+    <button onclick="setPv('comp')" style="${pvSum==='comp'?'border-color:var(--plat);color:var(--plat)':''}">Cấu phần</button>
+    <button onclick="setPv('role')" style="${pvSum==='role'?'border-color:var(--plat);color:var(--plat)':''}">Tầng</button></div>
+   <table class="sumtbl" style="font-size:11.5px"><tbody>${sum}
+   <tr class="tot"><td class="l" style="padding:5px 0">TỔNG</td><td colspan="2" style="text-align:right">${fmtK(tot)}</td><td></td></tr>
+   </tbody></table></div>
+  <div class="note i"><b>Self-reconciliation:</b> tổng phân bổ phải luôn = tổng bảng lương. Nếu lệch → có NV chưa gắn NPP, hoặc ô đè sai.</div>`;
+}
+function sideInfo(s,J){
+ const tS=COMPS.reduce((x,c)=>x+s[c.f],0), tA=ORG.npps.reduce((x,n)=>x+COMPS.reduce((y,c)=>y+J.R[n.code][c.f],0),0);
+ document.getElementById('sb').innerHTML=`
+  <div class="st"><div class="l">Tổng bảng lương</div><div class="v" style="font-size:14px">${fmt(tS)}</div></div>
+  <div class="st"><div class="l">Đã phân bổ</div><div class="v" style="font-size:14px">${fmt(tA)}</div></div>
+  <div class="st ${Math.abs(tA-tS)<1?'ok':'bad'}"><div class="l">Lệch</div><div class="v" style="font-size:14px">${fmt(tA-tS)}</div></div>
+  <div class="fg" style="margin-top:14px"><div class="fl">Rule</div>
+   <select class="sel" onchange="setRule(this.value)">
+    <option value="equal_split" ${RULE==='equal_split'?'selected':''}>Chia đều theo số NPP</option>
+    <option value="revenue_weighted" ${RULE==='revenue_weighted'?'selected':''}>Chia theo doanh thu</option></select></div>
+  ${Object.keys(ovr).length?`<div class="note w"><b>${Object.keys(ovr).length} ô sửa tay.</b> <span class="lnk" onclick="rstAll()">↺ về gốc</span></div>`:''}`;
+}
+function sideLoad(){
+ document.getElementById('sh').innerHTML=`<h3>Bộ lọc & Summary</h3>
+  <div class="stog"><button class="stg on">Filter</button></div>`;
+ const emps=ORG.employees.filter(e=>inF(fRegions,e.region)&&inF(fRoles,roleOf(e))&&(!fSrch||e.code.toLowerCase().includes(fSrch)||(e.name||'').toLowerCase().includes(fSrch)||(e.pos||'').toLowerCase().includes(fSrch)));
+ const key=e=>sumBy==='region'?e.region:sumBy==='role'?roleOf(e):e.scope;
+ const g={};emps.forEach(e=>{const k=key(e)||'—';g[k]=g[k]||{n:0,c:0};g[k].n++;g[k].c+=cost(e);});
+ const tot=emps.reduce((s,e)=>s+cost(e),0);
+ document.getElementById('sb').innerHTML=`${fchips()}
+  <div class="fg"><div class="fl">Tìm nhân sự</div><input class="srch" placeholder="mã / tên / chức vụ…" value="${fSrch}" oninput="fSrch=this.value.toLowerCase();R()"/></div>
+  ${msel('Vùng',fRegions,regions())}
+  ${msel('Vai trò',fRoles,ROLES,RC)}
+  <div class="fg"><div class="fl">Summary by <span style="color:var(--plat)">${sumBy==='region'?'Vùng':sumBy==='role'?'Vai trò':'Phạm vi'}</span></div>
+   <div class="mbar" style="margin-bottom:7px">
+    <button onclick="setSum('region')" style="${sumBy==='region'?'border-color:var(--plat);color:var(--plat)':''}">Vùng</button>
+    <button onclick="setSum('role')" style="${sumBy==='role'?'border-color:var(--plat);color:var(--plat)':''}">Vai trò</button>
+    <button onclick="setSum('scope')" style="${sumBy==='scope'?'border-color:var(--plat);color:var(--plat)':''}">Phạm vi</button></div>
+   <table class="sumtbl" style="font-size:11.5px"><tbody>
+   ${Object.keys(g).sort((x,y)=>g[y].c-g[x].c).map(k=>`<tr><td class="l" style="color:var(--sub);padding:4px 0">${k}</td><td style="padding:4px 0;text-align:right">${g[k].n}</td><td style="padding:4px 0;text-align:right;color:var(--tx)">${fmtK(g[k].c)}</td></tr>`).join('')}
+   <tr class="tot"><td class="l" style="padding:5px 0">TỔNG</td><td style="text-align:right">${emps.length}</td><td style="text-align:right">${fmtK(tot)}</td></tr>
+   </tbody></table></div>`;
+}
+function other(){
+ const T={1:'① Load bảng lương',3:'③ Configure',4:'④ Preview phân bổ',5:'⑤ Journal Entry',6:'⑥ Đối chiếu'};
+ document.getElementById('mh').innerHTML=`<div><h2>${T[step]}</h2><div class="d">${ORG.employees.length} NV · ${ORG.npps.length} NPP · rule: ${RULE}</div></div>
+  ${step===1?`<div class="vtog" style="margin-left:auto"><button class="vt on" onclick="pickPay()">⬆ Nạp bảng lương</button><button class="vt" onclick="tplPay()">⬇ Template</button></div>`:''}
+  ${step===3?`<div class="vtog" style="margin-left:auto"><button class="vt on" onclick="pickRev()">⬆ Nạp doanh số NPP</button><button class="vt" onclick="tplRev()">⬇ Template</button></div>`:''}`;
+ const s=srcTot(),J=JE();
+ if(step===1){sideLoad();}else if(step===4){sidePv(J,s);}else{document.getElementById('sh').innerHTML=`<h3>Thông tin</h3>`;sideInfo(s,J);}
+ const dr={},cr={};J.lines.forEach(l=>{dr[l.dr]=(dr[l.dr]||0)+l.amt;cr[l.cr]=(cr[l.cr]||0)+l.amt;});
+ const tS=COMPS.reduce((x,c)=>x+s[c.f],0), tA=ORG.npps.reduce((x,n)=>x+COMPS.reduce((y,c)=>y+J.R[n.code][c.f],0),0);
+ let b='';
+ if(step===1){
+  const srcB=periodBar()+dsPanel();
+  const cols=ROLES.filter(r=>inF(fRoles,r));
+  const emps=ORG.employees.filter(e=>inF(fRegions,e.region)&&inF(fRoles,roleOf(e))&&
+    (!fSrch||e.code.toLowerCase().includes(fSrch)||(e.name||'').toLowerCase().includes(fSrch)||(e.pos||'').toLowerCase().includes(fSrch)));
+  const grpKey=e=>sumBy==='region'?e.region:sumBy==='role'?roleOf(e):e.scope;
+  const grps={};emps.forEach(e=>{const k=grpKey(e)||'—';(grps[k]=grps[k]||[]).push(e);});
+  let rows='';
+  Object.keys(grps).sort().forEach(k=>{
+   const L=grps[k],cl=collapsed['l_'+k];
+   const st={};COMPS.forEach(c=>st[c.f]=L.reduce((s,e)=>s+(+e[c.f]||0),0));
+   rows+=`<tr class="rg" onclick="togC('l_${k.replace(/'/g,"")}')" style="cursor:pointer">
+    <td class="l" colspan="4"><span class="cx">${cl?'▶':'▼'}</span> ${k} — ${L.length} người</td>
+    <td>${L.reduce((s,e)=>s+cov(e).length,0)}</td>
+    ${COMPS.map(c=>`<td>${fmt(st[c.f])}</td>`).join('')}
+    <td style="color:var(--plat)">${fmt(COMPS.reduce((s,c)=>s+st[c.f],0))}</td></tr>`;
+   if(cl)return;
+   L.forEach(e=>{const r=roleOf(e);
+    rows+=`<tr><td class="l"><span class="lnk" onclick="pickEmp('${e.code}')">${e.code}</span></td>
+     <td class="l nm">${e.name}</td><td class="l"><span style="color:${RC[r]}">${r}</span> <span style="font-size:10px;color:var(--dim)">${e.pos}</span></td>
+     <td class="l" style="font-size:11px;color:var(--dim)">${e.region}</td><td>${cov(e).length}</td>
+     ${COMPS.map(c=>`<td>${fmt(e[c.f])}</td>`).join('')}
+     <td style="color:var(--plat)">${fmt(cost(e))}</td></tr>`;});
+  });
+  const gt={};COMPS.forEach(c=>gt[c.f]=emps.reduce((s,e)=>s+(+e[c.f]||0),0));
+  const bar=`<div style="padding:9px 18px;display:flex;gap:8px;align-items:center;border-bottom:1px solid var(--bd);position:sticky;top:0;background:var(--ink);z-index:6">
+   <span style="font-family:var(--fm);font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--dim)">Nhóm theo</span>
+   <div class="vtog" style="margin:0">
+    <button class="vt ${sumBy==='region'?'on':''}" onclick="setSum('region')">Vùng</button>
+    <button class="vt ${sumBy==='role'?'on':''}" onclick="setSum('role')">Vai trò</button>
+    <button class="vt ${sumBy==='scope'?'on':''}" onclick="setSum('scope')">Phạm vi</button>
+   </div>
+   <button class="btn btn-s" onclick="expandAll()">⊕ Mở hết</button>
+   <button class="btn btn-s" onclick="collapseAllLoad()">⊖ Thu hết</button>
+   <span style="margin-left:auto;font-size:11.5px;color:var(--sub)">${emps.length}/${ORG.employees.length} nhân sự${fRegions.length||fRoles.length||fSrch?' (đã lọc)':''}</span></div>`;
+  b=srcB+bar+`<table><thead><tr><th class="l">Mã NV</th><th class="l">Họ tên</th><th class="l">Vai trò</th><th class="l">Vùng</th><th>NPP</th>
+   ${COMPS.map(c=>`<th>${c.l}</th>`).join('')}<th style="color:var(--plat)">Tổng</th></tr></thead><tbody>${rows}
+   <tr class="tot"><td class="l" colspan="4">GRAND TOTAL — ${emps.length} nhân sự</td>
+   <td>${emps.reduce((s,e)=>s+cov(e).length,0)}</td>
+   ${COMPS.map(c=>`<td>${fmt(gt[c.f])}</td>`).join('')}
+   <td>${fmt(COMPS.reduce((s,c)=>s+gt[c.f],0))}</td></tr></tbody></table>`;
+ }
+ else if(step===3){
+  const nR=ORG.npps.filter(n=>+n.revenue>0).length;
+  b=`<div style="padding:20px 18px;max-width:1000px">
+  <div class="note i"><b>Org chart quyết định AI ăn NPP nào; rule quyết định CHIA BAO NHIÊU.</b> Đổi rule không cần nhập lại org.</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px">
+   <div class="card" style="cursor:pointer;${RULE==='equal_split'?'border-color:var(--plat);background:rgba(200,169,110,.08)':''}" onclick="setRule('equal_split')">
+    <h4 style="${RULE==='equal_split'?'color:var(--plat)':''}">Chia đều theo số NPP</h4>
+    <div class="mini">Lương mỗi người chia đều cho các NPP họ phụ trách. Đây là cách NutriNest đang làm.</div>
+    <div style="font-family:var(--fm);font-size:10px;color:var(--pu);margin-top:6px">lương ÷ số NPP</div></div>
+   <div class="card" style="cursor:pointer;${RULE==='revenue_weighted'?'border-color:var(--plat);background:rgba(200,169,110,.08)':''};${nR?'':'opacity:.55'}" onclick="${nR?"setRule('revenue_weighted')":"pickRev()"}">
+    <h4 style="${RULE==='revenue_weighted'?'color:var(--plat)':''}">Chia theo doanh thu NPP</h4>
+    <div class="mini">NPP doanh số lớn gánh nhiều chi phí quản lý hơn — phản ánh lợi nhuận NPP thật hơn.</div>
+    <div style="font-family:var(--fm);font-size:10px;color:var(--pu);margin-top:6px">lương × (DThu NPP ÷ ΣDThu)</div>
+    ${nR?'':'<div style="font-size:11px;color:var(--am);margin-top:6px">⚠ Cần nạp doanh số NPP trước — bấm để nạp</div>'}</div>
+  </div>
+  <div class="card" style="margin-top:16px">
+   <h4>📊 Dữ liệu doanh số NPP <span style="margin-left:auto;font-family:var(--fm);font-size:10px;color:${nR?'var(--gr)':'var(--dim)'}">${nR}/${ORG.npps.length} NPP có doanh số</span></h4>
+   <div class="mini" style="margin-bottom:9px">Nạp doanh số để bật rule chia theo doanh thu và cột CP/Doanh thu ở ma trận. Sau này còn dùng để tính ngược thưởng theo kết quả NPP.</div>
+   <div style="display:flex;gap:7px">
+    <button class="btn btn-s" onclick="pickRev()">⬆ Nạp doanh số NPP</button>
+    <button class="btn btn-s" onclick="tplRev()">⬇ Tải template</button>
+    <span style="margin-left:auto;font-size:11px;color:var(--sub);align-self:center">${SRC.rev==='none'?'chưa nạp':SRC.rev}</span></div>
+  </div>
+  <div class="note w" style="margin-top:12px">Có thể nhập tay doanh số từng NPP ngay trong <b>ma trận Org Chart</b> (cột Doanh thu).</div>
+  </div>`;
+ }
+ else if(step===4){
+  const rgs=regions().filter(r=>inF(fRegions,r));
+  const src=srcTot();
+  // reconciliation per component
+  const rec={};COMPS.forEach(c=>{
+   const alc=ORG.npps.reduce((x,n)=>x+J.R[n.code][c.f],0);
+   rec[c.f]={src:src[c.f],alc,d:alc-src[c.f],ok:Math.abs(alc-src[c.f])<1};});
+  const allOk=COMPS.every(c=>rec[c.f].ok);
+  const nOv=Object.keys(ovr).length;
+  // banner self-reconcile
+  const bnr=`<div class="bnr note ${allOk?'g':'e'}" style="margin:12px 18px">
+   <b>${allOk?'✓ Tự đối soát: KHỚP':'✗ Tự đối soát: LỆCH'}</b> — tổng phân bổ ${allOk?'=':'≠'} tổng bảng lương.
+   ${COMPS.map(c=>`<span class="fchip" style="${rec[c.f].ok?'border-color:var(--gr);color:var(--gr);background:rgba(59,200,113,.1)':'border-color:var(--rd);color:var(--rd);background:rgba(224,85,85,.1)'}">${c.l} ${rec[c.f].ok?'✓':fmt(rec[c.f].d)}</span>`).join(' ')}
+   ${nOv?` <b style="color:var(--am)">· ${nOv} ô đè</b> <span class="lnk" onclick="rstAll()">↺ về gốc</span>`:''}</div>`;
+  const bar=`<div style="padding:9px 18px;display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--bd);position:sticky;top:0;background:var(--ink);z-index:6">
+   <span style="font-family:var(--fm);font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--dim)">Rule</span>
+   <span class="fchip" style="border-color:var(--pu);color:var(--pu);background:rgba(155,140,255,.1)">${RULE==='equal_split'?'chia đều theo số NPP':'chia theo doanh thu'}</span>
+   <button class="btn btn-s" onclick="expandAll()">⊕ Mở hết</button>
+   <button class="btn btn-s" onclick="collapseAllPv()">⊖ Thu hết</button>
+   <span style="margin-left:auto;font-size:11.5px;color:var(--sub)">Sửa ô bất kỳ — số gốc giữ nguyên, ô vàng = đã đè</span></div>`;
+  let rows='';
+  rgs.forEach(rg=>{
+   const npps=ORG.npps.filter(n=>n.region===rg&&(!fSrch||n.code.toLowerCase().includes(fSrch)||(n.name||'').toLowerCase().includes(fSrch)));
+   if(!npps.length)return;
+   const cl=collapsed['p_'+rg];
+   const st={};COMPS.forEach(c=>st[c.f]=npps.reduce((x,n)=>x+J.R[n.code][c.f],0));
+   const sTot=COMPS.reduce((x,c)=>x+st[c.f],0);
+   const sRev=npps.reduce((x,n)=>x+(+n.revenue||0),0);
+   rows+=`<tr class="rg" onclick="togC('p_${rg.replace(/'/g,"")}')" style="cursor:pointer">
+    <td class="l" colspan="2"><span class="cx">${cl?'▶':'▼'}</span> ${rg} — ${npps.length} NPP</td>
+    ${COMPS.map(c=>`<td>${fmt(st[c.f])}</td>`).join('')}
+    <td style="color:var(--plat)">${fmt(sTot)}</td>
+    <td>${sRev?(sTot/sRev*100).toFixed(1)+'%':'—'}</td></tr>`;
+   if(cl)return;
+   npps.forEach(n=>{
+    const t=COMPS.reduce((x,c)=>x+J.R[n.code][c.f],0);
+    const rv=+n.revenue||0, ra=rv>0?t/rv*100:null;
+    const rc=ra===null?'':(ra>15?'var(--rd)':ra>8?'var(--am)':'var(--gr)');
+    rows+=`<tr><td class="l"><span class="lnk" onclick="pickNpp('${n.code}')">${n.code}</span></td>
+     <td class="l nm">${(n.name||'').slice(0,30)}</td>
+     ${COMPS.map(c=>{const o=isOv(n.code,c.f);
+      return `<td><input class="in ${o?'ov':''}" style="width:98px" value="${Math.round(J.R[n.code][c.f])}" onchange="setOv('${n.code}','${c.f}',this.value)"/>${o?`<span class="lnk" style="font-size:11px" onclick="rstOv('${n.code}','${c.f}')">↺</span>`:''}</td>`;}).join('')}
+     <td style="color:var(--plat);font-weight:500">${fmt(t)}</td>
+     <td style="color:${rc}">${ra===null?'<span style="color:var(--dim)">—</span>':ra.toFixed(1)+'%'}</td></tr>`;});
+  });
+  const vis=ORG.npps.filter(n=>inF(fRegions,n.region)&&(!fSrch||n.code.toLowerCase().includes(fSrch)||(n.name||'').toLowerCase().includes(fSrch)));
+  const gt={};COMPS.forEach(c=>gt[c.f]=vis.reduce((x,n)=>x+J.R[n.code][c.f],0));
+  const gTot=COMPS.reduce((x,c)=>x+gt[c.f],0), gRev=vis.reduce((x,n)=>x+(+n.revenue||0),0);
+  b=bnr+bar+`<table><thead><tr><th class="l">Mã</th><th class="l">Nhà phân phối</th>
+   ${COMPS.map(c=>`<th>${c.l}</th>`).join('')}<th style="color:var(--plat)">Tổng CP</th><th>CP/DT</th></tr></thead><tbody>${rows}
+   <tr class="tot"><td class="l" colspan="2">GRAND TOTAL — ${vis.length} NPP${fRegions.length||fSrch?' (đã lọc)':''}</td>
+   ${COMPS.map(c=>`<td>${fmt(gt[c.f])}</td>`).join('')}
+   <td>${fmt(gTot)}</td><td>${gRev>0?(gTot/gRev*100).toFixed(1)+'%':'—'}</td></tr>
+   <tr class="sub"><td class="l" colspan="2">↳ Đối chiếu bảng lương</td>
+   ${COMPS.map(c=>`<td>${fmt(rec[c.f].src)}</td>`).join('')}
+   <td>${fmt(COMPS.reduce((x,c)=>x+rec[c.f].src,0))}</td><td>—</td></tr>
+   <tr class="sub"><td class="l" colspan="2">↳ Lệch</td>
+   ${COMPS.map(c=>`<td style="color:${rec[c.f].ok?'var(--gr)':'var(--rd)'}">${rec[c.f].ok?'✓ 0':fmt(rec[c.f].d)}</td>`).join('')}
+   <td style="color:${allOk?'var(--gr)':'var(--rd)'}">${allOk?'✓ 0':fmt(gTot-COMPS.reduce((x,c)=>x+rec[c.f].src,0))}</td><td>—</td></tr>
+   </tbody></table>`;
+ }
+ else if(step===5){
+  const g={};J.lines.forEach(l=>(g[l.lab]=g[l.lab]||[]).push(l));
+  const modes=[
+   {k:'detail',t:'Chi tiết',d:'Mỗi cấu phần × mỗi NPP = 1 dòng',n:ORG.npps.length*COMPS.length},
+   {k:'group',t:'Gộp theo tài khoản',d:'Lương+thưởng gộp 334101; mỗi quỹ BH 1 dòng',n:ORG.npps.length*5},
+   {k:'full',t:'Gộp toàn bộ',d:'1 dòng tổng / NPP — đơn giản nhất',n:ORG.npps.length}];
+  const warn = jeMode==='full'
+   ? `<div class="note w" style="margin:0 18px 10px"><b>⚠ Lưu ý kế toán:</b> gộp toàn bộ đẩy cả BHXH/BHYT/BHTN/KPCĐ vào <b>334101</b> — không tách được nghĩa vụ với từng quỹ. Chỉ dùng nếu sổ của bạn hạch toán các quỹ ở bước khác.</div>` : '';
+  const bar=`<div style="padding:10px 18px;border-bottom:1px solid var(--bd);position:sticky;top:0;background:var(--ink);z-index:6">
+   <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
+    <span style="font-family:var(--fm);font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--dim)">Cách book</span>
+    <div class="vtog" style="margin:0">
+     ${modes.map(m=>`<button class="vt ${jeMode===m.k?'on':''}" onclick="setJe('${m.k}')">${m.t}</button>`).join('')}
+    </div>
+    <span style="margin-left:auto;font-size:11.5px;color:var(--sub)">${J.lines.length} dòng · ${fmt(J.tot)} đ</span></div>
+   <div style="font-size:11.5px;color:var(--sub)">${modes.find(m=>m.k===jeMode).d}</div></div>`;
+  const hdr = jeMode==='detail'
+   ? '<tr><th class="l">Cấu phần / NPP</th><th class="l">Mã</th><th>Nợ</th><th>Có</th><th>CE</th><th>Số tiền</th></tr>'
+   : '<tr><th class="l">Bút toán / NPP</th><th class="l">Mã</th><th>Nợ</th><th>Có</th><th class="l">Gồm</th><th>Số tiền</th></tr>';
+  const P=sapPeriod();
+  const nPG=ORG.employees.filter(e=>roleOf(e)==='PG').length;
+  const sapBox=`<div class="note g" style="margin:0 18px 10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+   <div style="flex:1"><b>📤 Xuất file nạp SAP</b> — đúng format <b>Data import</b> của NutriNest: mỗi NPP 1 dòng, 7 cột cấu phần, đủ 6 dòng metadata (Cost Element, TK Có, filter).
+   <br/>Tạo 2 sheet: <b>Data import</b> (${ORG.employees.length-nPG} NV non-PG · CE A0101…) + <b>Data import PG</b> (${nPG} NV PG · CE B0210). Kỳ: <b>${P.lbl}</b>.</div>
+   <div style="display:flex;gap:8px;align-items:center">
+    <span style="font-size:11.5px;color:var(--sub)">Dự phòng T13:</span>
+    <input class="in" style="width:52px;text-align:center" value="${dp13Rate}" onchange="setDp(this.value)"/>
+    <span style="font-size:11.5px;color:var(--sub)">%</span>
+    <button class="btn btn-g" onclick="xlsSAP()">⬇ Xuất SAP Data import</button></div></div>`;
+  b=bar+warn+sapBox+`<table><thead>${hdr}</thead><tbody>
+  ${Object.keys(g).map(k=>{const rs=g[k],sub=rs.reduce((s,l)=>s+l.amt,0);
+   return `<tr class="rg"><td class="l" colspan="5">${k} — ${rs.length} NPP</td><td>${fmt(sub)}</td></tr>`+
+    rs.map(l=>`<tr><td class="l nm">${(l.name||'').slice(0,34)}</td><td class="l">${l.npp}</td>
+     <td style="color:var(--te)">${l.dr}</td><td style="color:var(--pu)">${l.cr}</td>
+     <td class="l" style="color:var(--dim);font-size:10.5px">${jeMode==='detail'?l.ce:(l.parts||'')}</td>
+     <td>${fmt(l.amt)}</td></tr>`).join('');}).join('')}
+  <tr class="tot"><td class="l" colspan="5">TỔNG ${J.lines.length} dòng</td><td>${fmt(J.tot)}</td></tr></tbody></table>`;
+ }
+ else if(step===6){
+  const ok=Math.abs(tA-tS)<1;
+  b=`<div style="padding:18px;max-width:1100px">
+   ${ok?`<div class="note g"><b>✓ Đối chiếu khớp tuyệt đối.</b> Tổng chi phí phân bổ xuống ${ORG.npps.length} NPP = tổng bảng lương. Không thất thoát, không nhân đôi.</div>`
+    :`<div class="note e"><b>✗ Lệch ${fmt(Math.abs(tA-tS))} đ.</b> ${Object.keys(ovr).length?'Do ô sửa tay — kiểm tra lại.':'Có NV chưa gắn NPP. Quay lại Org Chart.'}</div>`}
+   <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:16px">
+    <div><div class="fl" style="margin-bottom:8px">Đối chiếu theo cấu phần</div>
+    <table><thead><tr><th class="l">Cấu phần</th><th>Bảng lương</th><th>Phân bổ</th><th>Lệch</th></tr></thead><tbody>
+    ${COMPS.map(c=>{const a=ORG.npps.reduce((x,n)=>x+J.R[n.code][c.f],0),d=a-s[c.f];
+     return `<tr><td class="l">${c.l}</td><td>${fmt(s[c.f])}</td><td>${fmt(a)}</td><td style="color:${Math.abs(d)<1?'var(--gr)':'var(--rd)'}">${Math.abs(d)<1?'✓ 0':fmt(d)}</td></tr>`;}).join('')}
+    <tr class="tot"><td class="l">TỔNG</td><td>${fmt(tS)}</td><td>${fmt(tA)}</td><td style="color:${ok?'var(--gr)':'var(--rd)'}">${fmt(tA-tS)}</td></tr>
+    </tbody></table></div>
+    <div><div class="fl" style="margin-bottom:8px">Tác động tài khoản</div>
+    <table><tbody>
+    ${Object.keys(dr).sort().map(k=>`<tr><td class="l" style="color:var(--te)">${k}<div style="font-size:11px;color:var(--sub);font-family:var(--fh)">${ACC[k]||''}</div></td><td>${fmt(dr[k])}</td></tr>`).join('')}
+    ${Object.keys(cr).sort().map(k=>`<tr><td class="l" style="color:var(--pu)">${k}<div style="font-size:11px;color:var(--sub);font-family:var(--fh)">${ACC[k]||''}</div></td><td>${fmt(cr[k])}</td></tr>`).join('')}
+    <tr class="tot"><td class="l">ΣNợ = ΣCó</td><td style="color:var(--gr)">${fmt(J.tot)}</td></tr>
+    </tbody></table>
+    <button class="btn btn-g" style="margin-top:14px;width:100%" onclick="xls()">⬇ Xuất bút toán sang Excel</button></div>
+   </div></div>`;}
+ document.getElementById('mb').innerHTML=b;
+}
+boot();
+</script>
+</body></html>
