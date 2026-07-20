@@ -1,0 +1,1932 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ma trận kịch bản — Giáo án AI Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap&subset=latin,latin-ext,vietnamese" rel="stylesheet">
+<style>
+:root{
+  --accent:#0B5D4B; --accent-soft:#E3F0EC; --accent-dim:#6E9A8E;
+  --ink:#16201C; --muted:#5A6560; --dim:#8A938F;
+  --bg:#f4f6f4; --panel:#fff; --line:#DCE2DE; --line-soft:#EAEEEB;
+  --warn:#A6603A; --warn-bg:#FBF2EC;
+  --idea:#0B5D4B; --idea-bg:#E3F0EC;
+  --vidu:#2A5A8C; --vidu-bg:#E4ECF5;
+  --baitap:#8A6210; --baitap-bg:#F7EFD9;
+  --sans:'Outfit',system-ui,sans-serif; --mono:'DM Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13.5px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font-family:inherit;font-size:inherit;color:inherit}
+:focus-visible{outline:none;border-color:var(--accent)!important;box-shadow:0 0 0 3px rgba(11,93,75,.16)!important}
+
+/* ---------- project bar ---------- */
+.projbar{display:flex;align-items:center;gap:8px;padding:7px 14px;background:var(--accent);
+  color:#fff;flex-wrap:wrap;position:sticky;top:0;z-index:70}
+.plabel{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;opacity:.75}
+.psel{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.28);
+  border-radius:6px;padding:4px 9px;font-size:12.5px;max-width:300px}
+.psel option{color:var(--ink);background:#fff}
+.projbar .btn{background:transparent;color:#fff;border-color:rgba(255,255,255,.32)}
+.projbar .btn:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.6)}
+.projbar .btn.dgr{color:#FFD9CC;border-color:rgba(255,190,170,.4)}
+.pdesc{font-size:11.5px;opacity:.8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:40%}
+/* ---------- top bar ---------- */
+.top{position:sticky;top:37px;z-index:60;background:var(--panel);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:11px;padding:8px 14px;flex-wrap:wrap}
+.tname{font-weight:700;font-size:14px;letter-spacing:-.01em}
+.vbadge{font-family:var(--mono);font-size:10px;background:var(--accent);color:#fff;padding:2px 7px;border-radius:4px}
+.stamp{font-family:var(--mono);font-size:10px;color:var(--dim)}
+.spacer{flex:1}
+.pill{font-family:var(--mono);font-size:10.5px;padding:4px 11px;border-radius:999px;opacity:0;transition:opacity .2s;white-space:nowrap}
+.pill.on{opacity:1}
+.pill.ok{background:var(--accent-soft);color:var(--accent)}
+.pill.warn{background:var(--baitap-bg);color:var(--baitap)}
+.pill.err{background:var(--warn-bg);color:var(--warn)}
+.btn{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 11px;cursor:pointer;
+  font-size:12.5px;transition:.13s;white-space:nowrap}
+.btn:hover{border-color:var(--accent-dim)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.pri{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+.btn.pri:hover{background:#094D3E}
+.btn.dgr{color:var(--warn);border-color:#E5CEC0}
+.btn.sm{padding:3px 8px;font-size:11.5px}
+
+/* ---------- tabs ---------- */
+.tabs{display:flex;gap:2px;padding:0 14px;background:var(--panel);border-bottom:1px solid var(--line);
+  position:sticky;top:78px;z-index:55}
+.tab{padding:8px 15px;border:1px solid transparent;border-bottom:none;border-radius:7px 7px 0 0;cursor:pointer;
+  font-size:12.5px;color:var(--muted);background:transparent;margin-bottom:-1px}
+.tab:hover{color:var(--ink)}
+.tab.on{background:var(--bg);border-color:var(--line);color:var(--accent);font-weight:600}
+.hint{padding:7px 14px;background:var(--accent-soft);border-bottom:1px solid var(--line);
+  font-size:11.5px;color:var(--accent)}
+
+/* ---------- toolbar ---------- */
+.tbar{display:flex;gap:8px;align-items:center;padding:9px 14px;flex-wrap:wrap;
+  background:var(--panel);border-bottom:1px solid var(--line)}
+.seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{background:var(--panel);border:none;padding:5px 13px;cursor:pointer;font-size:12.5px;
+  color:var(--muted);border-right:1px solid var(--line)}
+.seg button:last-child{border-right:none}
+.seg button.on{background:var(--accent);color:#fff;font-weight:600}
+.seg.sub button{font-size:11.5px;padding:5px 11px}
+.seg.sub button.on{background:var(--accent-soft);color:var(--accent)}
+.srch{border:1px solid var(--line);border-radius:6px;padding:5px 10px;width:190px;background:var(--panel)}
+.fchips{display:flex;gap:5px;flex-wrap:wrap}
+.fchip{font-size:11.5px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;cursor:pointer;background:var(--panel)}
+.fchip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.fmode{white-space:nowrap}
+.fmode.hidemode{border-color:var(--warn);color:var(--warn)}
+.cnt{font-family:var(--mono);font-size:11px;color:var(--dim)}
+
+/* ---------- shell ---------- */
+.shell{display:flex;height:calc(100vh - 37px - 41px - 37px - 30px - 45px);min-height:440px;overflow:hidden}
+.pane{overflow:auto;position:relative;background:var(--panel);min-width:0}
+.left{flex:0 0 20%;padding:14px;border-right:none}
+.mid{flex:1 1 40%;padding:16px;background:var(--bg)}
+.det{flex:0 0 40%;padding:0;border-left:none;background:var(--panel)}
+.pane.hid{display:none}
+.rsz{flex:0 0 6px;cursor:col-resize;background:var(--line-soft);position:relative;transition:background .12s}
+.rsz:hover,.rsz.act{background:var(--accent-dim)}
+.rsz::after{content:'';position:absolute;left:2px;top:50%;transform:translateY(-50%);
+  width:2px;height:26px;background:var(--line);border-radius:1px}
+.rsz:hover::after,.rsz.act::after{background:#fff}
+.rsz.off{display:none}
+.lempty{color:var(--dim);font-size:12.5px;font-style:italic;padding:20px 4px;text-align:center}
+/* pane toggles in toolbar */
+.ptog{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.ptog button{background:var(--panel);border:none;border-right:1px solid var(--line);padding:5px 10px;
+  cursor:pointer;font-size:11.5px;color:var(--dim)}
+.ptog button:last-child{border-right:none}
+.ptog button.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+
+/* ---------- inspector ---------- */
+.ins h4{margin:0 0 3px;font-size:12.5px;font-weight:600}
+.ins .isub{font-family:var(--mono);font-size:10px;color:var(--dim);margin-bottom:12px}
+.fgrp{margin-bottom:12px}
+.flab{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--dim);display:block;margin-bottom:4px}
+.fin,.fta,.fsel{width:100%;border:1px solid var(--line);border-radius:6px;padding:7px 9px;background:var(--panel);
+  transition:.13s}
+.fta{min-height:52px;resize:none;overflow:hidden;line-height:1.5}
+.fta.lg{min-height:86px}
+.irow{display:flex;gap:7px;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-soft)}
+.asave{font-family:var(--mono);font-size:10.5px;color:var(--dim);transition:color .2s}
+.asave.saved{color:var(--accent)}
+
+/* ---------- LIST view ---------- */
+.grp{margin-bottom:18px}
+.ghd{display:flex;align-items:center;gap:9px;padding:7px 11px;background:var(--panel);
+  border:1px solid var(--line);border-radius:7px 7px 0 0;font-weight:600;font-size:12.5px}
+.gnum{font-family:var(--mono);font-size:10px;background:var(--accent);color:#fff;padding:2px 7px;border-radius:4px}
+.gcnt{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--dim);font-weight:400}
+.rows{border:1px solid var(--line);border-top:none;border-radius:0 0 7px 7px;overflow:hidden;background:var(--panel)}
+.row{display:flex;align-items:flex-start;gap:10px;padding:9px 11px;border-bottom:1px solid var(--line-soft);cursor:pointer}
+.row:last-child{border-bottom:none}
+.row:hover{background:#FAFBFA}
+.row.sel{background:var(--accent-soft)}
+.row.dim{opacity:.22}
+.row.lv3{padding-left:30px;background:#FCFDFC}
+.row.lv3 .rtitle{font-weight:400}
+.row.orph{box-shadow:inset 3px 0 0 var(--warn)}
+.card.lv3{margin-left:14px;border-left:2px solid var(--line)}
+.card.orph{border-left-color:var(--warn)}
+.tchip{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:4px;flex:0 0 auto;margin-top:2px;letter-spacing:.04em}
+.t-idea{background:var(--idea-bg);color:var(--idea)}
+.t-vidu{background:var(--vidu-bg);color:var(--vidu)}
+.t-baitap{background:var(--baitap-bg);color:var(--baitap)}
+.rbody{flex:1;min-width:0}
+.rtitle{font-weight:500;margin-bottom:2px}
+.rtext{font-size:12.5px;color:var(--muted);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.rmiss{font-size:11px;color:var(--warn);font-style:italic;margin-top:3px}
+.rbtns{display:none;gap:4px;flex:0 0 auto}
+.row:hover .rbtns,.row.sel .rbtns{display:flex}
+
+/* ---------- BOARD view ---------- */
+.board{display:flex;gap:12px;align-items:flex-start;overflow-x:auto;padding-bottom:8px}
+.col{flex:0 0 268px;background:var(--panel);border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.colh{padding:9px 11px;border-bottom:1px solid var(--line);font-weight:600;font-size:12.5px;
+  display:flex;align-items:center;gap:8px;background:#FAFBFA}
+.colb{padding:9px;min-height:56px;display:flex;flex-direction:column;gap:7px}
+.card{border:1px solid var(--line);border-radius:7px;padding:9px 10px;cursor:pointer;background:var(--panel)}
+.card:hover{border-color:var(--accent-dim)}
+.card.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.card.dim{opacity:.22}
+.ctitle{font-weight:500;font-size:12.5px;margin:5px 0 3px}
+.ctext{font-size:11.5px;color:var(--muted);overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+
+/* ---------- MINDMAP view ---------- */
+.mmwrap{background:var(--panel);border:1px solid var(--line);border-radius:9px;overflow:auto;position:relative}
+#mm{display:block;cursor:grab}
+#mm.drag{cursor:grabbing}
+.mmbar{position:absolute;top:9px;right:9px;display:flex;gap:5px;z-index:5}
+.mmn{cursor:pointer}
+.mmn text{pointer-events:none;user-select:none}
+.kidlist{display:flex;flex-wrap:wrap;gap:5px}
+.kidlist .depchip{cursor:pointer}
+.kidlist .depchip:hover{background:var(--accent);color:#fff}
+.warnsel{border-color:var(--warn)!important}
+.deplist{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:7px}
+.depchip{display:inline-flex;align-items:center;gap:5px;font-size:11px;background:var(--accent-soft);
+  color:var(--accent);border-radius:5px;padding:3px 4px 3px 7px;max-width:100%}
+.depchip i{font-family:var(--mono);font-size:9px;font-style:normal;opacity:.7}
+.depx{border:none;background:transparent;color:var(--accent);cursor:pointer;font-size:14px;
+  line-height:1;padding:0 3px}
+.depx:hover{color:var(--warn)}
+.depnone{font-size:11.5px;color:var(--dim);font-style:italic}
+.ordrow{display:flex;gap:6px}
+.addnode{margin-top:14px;padding-top:12px;border-top:1px solid var(--line-soft)}
+.addrow{display:flex;flex-wrap:wrap;gap:5px}
+.addt{background:var(--panel);font-weight:500}
+.addkid{background:var(--panel);font-weight:500}
+.addhint{font-size:10.5px;color:var(--dim);font-style:italic;display:block;margin-top:6px}
+.addt:hover{filter:brightness(.9)}
+.totrow{margin-top:14px;padding-top:12px;border-top:1px solid var(--line-soft)}
+.totrow .l{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--dim);display:block;margin-bottom:4px}
+.totrow b{font-family:var(--mono);font-size:17px;color:var(--accent);display:block}
+.totrow .tsub{font-size:11px;color:var(--dim)}
+.ghd{cursor:pointer}
+.ghd:hover{background:var(--accent-soft)}
+.ghd.selb{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
+.lnkopen{display:inline-block;font-size:11px;color:var(--accent);margin-top:5px;text-decoration:none}
+.lnkopen:hover{text-decoration:underline}
+.lnknote{display:block;font-size:10.5px;color:var(--dim);margin-top:5px;font-style:italic}
+.rlink{font-family:var(--mono);font-size:10px;color:var(--accent);margin-top:3px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sllink{margin-bottom:10px}
+.sllink a{display:inline-block;background:var(--accent);color:#fff;border-radius:7px;
+  padding:8px 16px;font-size:13px;text-decoration:none;font-weight:500}
+.sllink a:hover{background:#094D3E}
+.slfile{display:inline-block;background:var(--bg);border:1px solid var(--line);border-radius:7px;
+  padding:7px 14px;font-size:12.5px;font-family:var(--mono);color:var(--muted)}
+/* ---------- slide (detail pane) ---------- */
+.slide{padding:26px 30px;min-height:100%;display:flex;flex-direction:column}
+.slnav{display:flex;align-items:center;gap:7px;padding:9px 14px;border-bottom:1px solid var(--line);
+  position:sticky;top:0;background:var(--panel);z-index:3}
+.slpos{font-family:var(--mono);font-size:10.5px;color:var(--dim)}
+.slblk{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:12px}
+.sltype{display:inline-block;font-family:var(--mono);font-size:9px;padding:3px 9px;border-radius:5px;
+  letter-spacing:.05em;margin-bottom:14px}
+.sltitle{font-size:25px;font-weight:700;line-height:1.24;letter-spacing:-.015em;margin:0 0 18px}
+.slbody{font-size:15.5px;line-height:1.72;white-space:pre-wrap;margin-bottom:22px;flex:1}
+.slbody.empty{color:var(--warn);font-style:italic;font-size:14px}
+.slnote{background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;
+  padding:13px 16px;font-size:13.5px;margin-bottom:14px}
+.slnote .l{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent);display:block;margin-bottom:6px}
+.sldep{border-top:1px solid var(--line-soft);padding-top:14px;margin-top:auto}
+.sldep .l{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--dim);display:block;margin-bottom:7px}
+.sldep a{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;background:var(--bg);
+  border:1px solid var(--line);border-radius:5px;padding:4px 9px;margin:0 5px 5px 0;
+  color:var(--ink);text-decoration:none;cursor:pointer}
+.sldep a:hover{border-color:var(--accent);color:var(--accent)}
+.sldep i{font-family:var(--mono);font-size:9px;font-style:normal;opacity:.6}
+.slsrc{font-family:var(--mono);font-size:10px;color:var(--dim);margin-top:10px}
+.cycwarn{background:var(--warn-bg);color:var(--warn);border:1px solid #E5CEC0;border-radius:7px;
+  padding:8px 12px;margin-bottom:10px;font-size:12.5px}
+
+footer{padding:9px 14px;font-family:var(--mono);font-size:10.5px;color:var(--dim);
+  border-top:1px solid var(--line);background:var(--panel);display:flex;gap:14px;flex-wrap:wrap}
+
+@media(max-width:900px){
+  .shell{flex-direction:column;height:auto;overflow:visible}
+  .pane{flex:1 1 auto!important;width:100%;border-bottom:1px solid var(--line)}
+  .rsz{display:none}
+  .srch{width:130px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="projbar">
+  <span class="plabel">Dự án</span>
+  <select class="psel" id="psel" title="Chuyển sang dự án khác"></select>
+  <button class="btn sm" id="pEdit" title="Sửa tên và mô tả dự án">✎ Sửa</button>
+  <button class="btn sm" id="pNew" title="Tạo dự án mới từ mẫu">+ Dự án</button>
+  <button class="btn sm" id="pDup" title="Nhân bản dự án đang mở">Nhân bản</button>
+  <button class="btn sm dgr" id="pDel" title="Xóa dự án đang mở">Xóa</button>
+  <span class="spacer"></span>
+  <span class="pdesc" id="pdesc"></span>
+</div>
+<div class="top">
+  <span class="tname" id="ptitle">Ma trận kịch bản</span>
+  <span class="vbadge" id="vb"></span>
+  <span class="stamp" id="stamp"></span>
+  <span class="spacer"></span>
+  <span class="pill" id="pill"></span>
+  <button class="btn" id="undoBtn" disabled>↩ Undo (0)</button>
+  <button class="btn" id="expBtn" title="Tải toàn bộ model dạng JSON — import lại được">💾 Export JSON</button>
+  <button class="btn" id="impBtn" title="Nạp file JSON đã export — ghi đè toàn bộ dữ liệu hiện tại">📥 Import</button>
+  <input type="file" id="impFile" accept=".json" style="display:none">
+  <button class="btn pri" id="addBtn">+ Node mới</button>
+</div>
+
+<div class="tabs">
+  <button class="tab on" data-tab="edit">1 · Soạn</button>
+  <button class="tab" data-tab="gap">2 · Rà thiếu</button>
+</div>
+<div class="hint" id="hintTxt"></div>
+
+<div class="tbar">
+  <div class="seg" id="viewSeg">
+    <button data-v="list">List</button>
+    <button data-v="board">Board</button>
+    <button class="on" data-v="mind">Mindmap</button>
+  </div>
+  <div class="seg sub" id="mmSeg">
+    <button class="on" data-m="tier">Theo tầng</button>
+    <button data-m="dep">Theo phụ thuộc</button>
+  </div>
+  <input class="srch" id="q" placeholder="Tìm trong tiêu đề, nội dung…">
+  <div class="fchips" id="tf"></div>
+  <button class="btn sm fmode" id="fmode" title="Đổi cách hiển thị mục bị lọc"></button>
+  <span class="spacer"></span>
+  <div class="ptog" id="ptog">
+    <button class="on" data-p="left" title="Ẩn/hiện vùng soạn">Soạn</button>
+    <button class="on" data-p="mid" title="Ẩn/hiện vùng tổng thể">Tổng thể</button>
+    <button class="on" data-p="det" title="Ẩn/hiện vùng slide">Slide</button>
+  </div>
+  <span class="cnt" id="cnt"></span>
+</div>
+
+<div class="shell" id="shell">
+  <div class="pane left" id="left"></div>
+  <div class="rsz" id="rsz1" title="Kéo để đổi rộng · nhấp đúp để reset"></div>
+  <div class="pane mid" id="right"></div>
+  <div class="rsz" id="rsz2" title="Kéo để đổi rộng · nhấp đúp để reset"></div>
+  <div class="pane det" id="det"></div>
+</div>
+
+<footer>
+  <span id="fstat"></span>
+  <span>Tự động lưu vào máy này (localStorage) · Ctrl+Z để hoàn tác</span>
+  <span id="fver"></span>
+</footer>
+
+<script>
+"use strict";
+/* ============ VERSION — single source ============ */
+var VER = "v2.2";
+var STAMP = "18/07/2026 · Soạn giáo án 6h · 3 vùng kéo được · 3 view · mindmap 2 chế độ · autosave · dependency · link";
+var LS_KEY = "giaoan_matrix_v1";
+
+/* ============ SEED ============ */
+var SEED = {
+  types: [
+    {id:"idea",   label:"Idea",              desc:"điều muốn truyền tải", col:"#0B5D4B", bg:"#E3F0EC", lv:2},
+    {id:"story",  label:"Story",             desc:"câu chuyện dẫn dắt",   col:"#1E6B6B", bg:"#DCEFEF", lv:2},
+    {id:"vidu",   label:"Ví dụ",             desc:"case minh họa",        col:"#2A5A8C", bg:"#E4ECF5", lv:3},
+    {id:"thaoluan",label:"Câu hỏi thảo luận",desc:"ném ra cho lớp bàn",   col:"#7A3E6B", bg:"#F2E6EF", lv:3},
+    {id:"baitap", label:"Bài tập",           desc:"học viên làm",         col:"#8A6210", bg:"#F7EFD9", lv:3}
+  ],
+  blocks: [
+    {id:"b1", num:"TD1", name:"Vùng LÕI", time:"40'", note:"Dùng AI để làm GÌ?"},
+    {id:"b2", num:"TD2", name:"Tư duy CÔNG NGHIỆP", time:"50'", note:"Làm NHƯ THẾ NÀO?"},
+    {id:"b3", num:"TD3", name:"Tư duy PRODUCT", time:"45'", note:"Làm đến MỨC NÀO thì đủ?"},
+    {id:"b4", num:"TD4", name:"Tư duy GIÁ TRỊ", time:"30'", note:"Có ĐÁNG LÀM không?"},
+    {id:"b0", num:"MỞ", name:"Mở đầu", time:"15'", note:"Câu chuyện $60/năm → $150/tháng"},
+    {id:"b5", num:"CHIỀU", name:"Áp vào bài của mình", time:"180'", note:"Chọn → Thiết kế → Build → Gỡ"}
+  ],
+  nodes: [
+    /* --- MỞ --- */
+    {id:"n01", b:"b0", type:"idea", title:"Hành trình $60/năm → $150/tháng",
+     content:"Mua Chatbotapp.ai $60/năm vì tiết kiệm — tiếp cận được ChatGPT, Claude, Gemini, Deepseek cùng lúc. Nghĩ đơn giản: tên lớn thì chắc đều ngon.",
+     insight:"", src:"Bài viết đoạn 1"},
+    {id:"n02", dep:["n01"], b:"b0", type:"idea", title:"Mở lại log chat: 100% là trò chuyện",
+     content:"Nhìn lại toàn bộ log trên tool $60/năm — đều là 'chat chit', đôi khi khá deep nhưng vẫn chỉ là trò chuyện. Chưa từng nghĩ AI có thể LÀM VIỆC.",
+     insight:"Đây là chỗ 3 học viên bỏ cuộc đang đứng. Nói câu này họ sẽ nhận ra mình.", src:"Bài viết đoạn 3"},
+    {id:"n03", dep:["n02"], b:"b0", type:"vidu", title:"Khoảnh khắc thấy Hiếu build module HTML chạy được",
+     content:"Thân Trung Hiếu dùng Claude code ra 1 module giả lập chạy thật bằng HTML. Ngay sau đó xuống tiền mua 3 tài khoản pro.",
+     insight:"Đây là 'khoảnh khắc chuyển pha'. Cần kể chậm — học viên phải thấy được sự khác biệt giữa trước và sau.", src:"Bài viết đoạn 5"},
+    {id:"n04", b:"b0", type:"idea", title:"Không phải Claude nào cũng như Claude nào",
+     content:"Khoảng cách giữa các model của cùng 1 hãng đã rất khác. Ví dụ: ai ra sân cũng sút được bóng vào lưới, nhưng Ronaldo khác cầu thủ Vleague — giá chuyển nhượng chênh hàng ngàn lần.",
+     insight:"", src:"Bài viết đoạn 3"},
+
+    /* --- TD1 VÙNG LÕI --- */
+    {id:"n11", b:"b1", type:"idea", title:"AI là chiếc đèn pin Doraemon",
+     content:"AI không biến bạn thành người khác — nó chỉ phóng đại chân dung của bạn lên. Dùng hiệu quả thì x3, x5, x10; không hiệu quả thì x1. Nhưng chân dung cơ bản không đổi.",
+     insight:"Ẩn dụ mạnh nhất trong bài. Đây là câu trả lời trực tiếp cho 3 câu hỏi 'nghề tôi còn lại gì' trong khảo sát.", src:"Bài viết — Thứ nhất"},
+    {id:"n12", dep:["n11"], b:"b1", type:"idea", title:"Câu hỏi then chốt: dùng AI để làm gì?",
+     content:"Để làm những thứ TRONG ĐỊA HẠT của bạn — thứ bạn quan tâm, muốn làm, đau đáu mỗi ngày, nhưng chưa làm được.",
+     insight:"Đây là câu trả lời cho rào cản lớn nhất: 'không biết bắt đầu từ đâu'.", src:"Bài viết — Thứ nhất"},
+    {id:"n13", dep:["n12"], b:"b1", type:"idea", title:"Nguyên tắc 80/20 Exploitation–Exploration",
+     content:"80% nguồn lực cho khai thác địa hạt của mình, 20% cho khám phá cái mới. Ra khỏi địa hạt thì như chiến binh đơn thương độc mã, học theo kiểu connecting-the-dots rất chậm.",
+     insight:"", src:"Bài viết — Thứ nhất"},
+    {id:"n14", dep:["n13"], b:"b1", type:"vidu", title:"Anh kế toán không tự nhiên code ra hệ thống marketing",
+     content:"Không thể nào một anh kế toán suốt ngày nợ với có lại tự nhiên dùng AI và code ra hệ thống sáng tạo content marketing tự động. Người làm được điều đó vốn đã có máu phát minh sẵn.",
+     insight:"Ví dụ này gần với lớp — 32/56 người làm kế toán. Nhưng cẩn thận giọng: không để họ thấy bị hạ thấp. Nhấn: 'địa hạt của bạn cũng có mỏ vàng riêng'.", src:"Bài viết — Thứ nhất"},
+    {id:"n15", dep:["n12"], b:"b1", type:"baitap", title:"BÀI TẬP: Xác định vùng lõi của bạn",
+     content:"Ba câu, viết ra giấy:\n1. Việc gì bạn làm mà người khác hay hỏi ý kiến bạn?\n2. Việc gì bạn làm nhanh hơn đồng nghiệp mà không cần cố?\n3. Việc gì bạn đau đáu muốn làm tốt hơn nhưng chưa có thời gian?\n\nGiao nhau của 3 câu = vùng lõi.",
+     insight:"Không có bài tập này thì học viên gật đầu rồi quên. Cần 8-10 phút, có chia sẻ 2-3 người.", src:"Đề xuất bổ sung"},
+
+    /* --- TD2 CÔNG NGHIỆP --- */
+    {id:"n21", dep:["n12"], b:"b2", type:"idea", title:"Chạy ăn từng bữa vs Tư duy công nghiệp",
+     content:"Thời nguyên thủy: sáng nào cũng phải lao ra thảo nguyên kiếm thú. Ngừng lao là đói. Cách dùng tool $60/năm chính xác như vậy — hỏi khi cần, mô hình 'ngơi tay là ngơi miệng'.",
+     insight:"Bản hay hơn của 'hỏi AI vs xây công cụ'. Có hình ảnh, có nỗi sợ (đói), có logic tiến hóa → nhớ được sau 1 tuần.", src:"Bài viết — Thứ hai"},
+    {id:"n22", dep:["n21"], b:"b2", type:"idea", title:"Phóng trượt thì cũng nhịn",
+     content:"Muốn có thú thì kỹ năng phóng lao phải tốt. Làm việc với AI giai đoạn đầu đòi hỏi năng lực đặt câu hỏi rất tốt — không biết xây prompt cho ra hồn thì kết quả chả tới đâu.",
+     insight:"Đây CHÍNH XÁC là điều đã xảy ra với 3 học viên bỏ cuộc. Đọc nguyên văn câu này rồi chiếu 3 trích dẫn khảo sát.", src:"Bài viết — Thứ hai"},
+    {id:"n23", dep:["n21"], b:"b2", type:"idea", title:"Ba đặc điểm của tư duy công nghiệp",
+     content:"1. Tạo ra cỗ máy có khả năng tạo kết quả LẶP LẠI, không tạo 'miếng ăn' 1 lần\n2. Mô hình hóa mọi thứ để nhìn thấy mẫu số chung\n3. Chia nhỏ quy trình phức tạp thành nhiều bước để hiểu và cải tiến từng phần",
+     insight:"Ba dòng này là xương sống của cả khóa. Nên in ra, dán lên slide, nhắc lại nhiều lần.", src:"Bài viết — Thứ hai"},
+    {id:"n24", link:"Tôi_nghĩ_gì_khi_nghĩ_về_AI.docx", dep:["n23"], b:"b2", type:"vidu", title:"Tool thiết kế hệ thống — từ 1 bản vẽ thành cỗ máy",
+     content:"Thay vì gửi khách 1 bản vẽ, nghĩ cách tạo tool tạo được nhiều thiết kế với độ phức tạp khác nhau, tái sử dụng cho khách sau. Cấu phần: Nhập liệu → Chỉnh sửa → Hiển thị → Lưu kết quả → Xuất báo cáo. Sau đó gắn thêm 'Finance' cho mỗi node → lên được báo giá ngay sau khi thiết kế xong.",
+     insight:"Case gốc của bài viết. Nhưng đây là case của người làm sản phẩm — lớp 32/56 làm kế toán. CẦN THÊM 1 CASE TÀI CHÍNH.", src:"Bài viết — Thứ hai"},
+    {id:"n25", dep:["n23"], b:"b2", type:"vidu", title:"[TRỐNG] Case tài chính cho TD2",
+     content:"", insight:"CẦN BỔ SUNG: một tool bạn build cho công việc CFO, thể hiện 3 đặc điểm công nghiệp. Gợi ý: staff cost simulator (21 phiên bản), hoặc BCQT từ sổ kế toán.", src:""},
+
+    /* --- TD3 PRODUCT --- */
+    {id:"n31", dep:["n23"], b:"b3", type:"idea", title:"Bốn tiêu chí để đạt level Product",
+     content:"1. Phải có nhu cầu/nỗi đau THẬT — không vẽ công dụng trước rồi tưởng tượng nhu cầu sau\n2. Tính năng VỪA ĐỦ — ít quá thì yếu, nhiều quá thì rườm rà\n3. Tốt gỗ chưa đủ, phải tốt cả nước sơn (UI/UX)\n4. Nghĩ trước về khả năng MỞ RỘNG — tránh hardcode",
+     insight:"", src:"Bài viết — Thứ ba"},
+    {id:"n32", dep:["n31"], b:"b3", type:"idea", title:"Xe thật vs xe trưng bày",
+     content:"Một cái xe thật khác xe trưng bày ở chỗ: ngày mai đổ xăng vào nó phải tự chạy được, người khác cũng lái được — chứ không phải chỉ một mình bạn đẩy thì mới chạy. Khi đó nó là đồ chơi, không phải công cụ làm việc.",
+     insight:"Đây là tiêu chí dự thi số 3: 'ít nhất một người khác đã dùng nó'. Nối hai thứ này lại khi nói về cuộc thi.", src:"Bài viết — Thứ ba"},
+    {id:"n33", dep:["n31"], b:"b3", type:"idea", title:"⚠ Thứ tự ưu tiên: CHẠY ĐÚNG trước, ĐẸP sau",
+     content:"Bài gốc nói 'UI/UX — AI làm phút mốt, sao phải tiết kiệm'. Nhưng với người mới, đuổi theo giao diện = không bao giờ xong phần lõi.",
+     insight:"MÂU THUẪN CẦN GIẢI. Với lớp 100 người không support, phải nói rõ: tiêu chí 4 (tránh hardcode) quan trọng hơn tiêu chí 3 (đẹp) gấp nhiều lần. Không nói rõ → họ làm ngược → bỏ cuộc.", src:"Phân tích bổ sung"},
+    {id:"n34", dep:["n33"], b:"b3", type:"vidu", title:"[TRỐNG] Case một tool hỏng vì hardcode",
+     content:"", insight:"CẦN BỔ SUNG: một tool bạn từng build mà lần đầu hardcode, sau phải sửa. Đây là ví dụ 'đồ chơi → công cụ' cụ thể nhất.", src:""},
+
+    /* --- TD4 GIÁ TRỊ --- */
+    {id:"n41", b:"b4", type:"idea", title:"Công thức giá trị — phép nhân 3 thừa số",
+     content:"Giá trị = Giá trị 1 lần dùng × Số lần dùng trong năm × Số người dùng",
+     insight:"Thứ KHÔNG AI KHÁC trong thị trường đào tạo AI Việt Nam có. Đây là tài chính, là bạn. Nên đặt ở vị trí trang trọng nhất.", src:"Bài viết — Thứ tư"},
+    {id:"n42", dep:["n41"], b:"b4", type:"idea", title:"Sự tàn nhẫn của phép nhân",
+     content:"Bất kỳ thừa số nào bằng 0 thì toàn bộ công sức thành 0. Làm ra sản phẩm không ai dùng (0 lần dùng), hoặc có cũng như không (0 giá trị).",
+     insight:"Đây là công cụ QUYẾT ĐỊNH TRƯỚC KHI LÀM — thay vì làm xong mới biết vô ích. Nối thẳng với standing rule 'ai bấm nút gì khác đi'.", src:"Bài viết — Thứ tư"},
+    {id:"n43", dep:["n41"], b:"b4", type:"idea", title:"Đánh đổi giữa 3 thừa số",
+     content:"Hiếm sản phẩm nào đạt cao cả 3. Quyết định lớn (giá trị cao) thì ít người quyết và ít lần (VD: chiến lược giá — Giám đốc quyết vài lần/năm). Quyết định lặp lại nhiều người (VD: chọn sản phẩm bỏ vào bill) thì giá trị mỗi lần thấp.",
+     insight:"", src:"Bài viết — Thứ tư"},
+    {id:"n44", dep:["n41", "n15"], b:"b4", type:"baitap", title:"BÀI TẬP: Nhân thử 3 thừa số cho bài toán của bạn",
+     content:"Lấy bài toán vừa xác định ở TD1, điền:\n· Giá trị 1 lần dùng = tiết kiệm bao nhiêu giờ, hoặc tránh được sai sót gì?\n· Số lần dùng/năm = ?\n· Số người dùng = ? (bao gồm cả người khác trong phòng ban)\n\nNhân lại. Có thừa số nào = 0 không?",
+     insight:"Đây là bài tập quyết định bài toán nào được chọn build buổi chiều. Cực kỳ quan trọng — nối trực tiếp sang phần chiều.", src:"Đề xuất bổ sung"},
+    {id:"n45", link:"tai-lieu-khoa-hoc-siren.html#p7", dep:["n42"], b:"b4", type:"idea", title:"Nối với tiêu chí chấm cuộc thi",
+     content:"3 tiêu chí đã chốt chính là 3 thừa số: tiết kiệm thời gian đo được (giá trị 1 lần) / đang dùng thật (số lần) / có người khác dùng (số người).",
+     insight:"Nói ra chỗ này để cuộc thi không phải luật rời rạc, mà là hệ quả tự nhiên của tư duy giá trị.", src:"Phân tích bổ sung"},
+
+    /* --- BUỔI CHIỀU --- */
+    {id:"n50", b:"b5", type:"idea", title:"Buổi chiều = chạy lại 4 tư duy trên bài của chính mình",
+     content:"Sáng học 4 tư duy. Chiều dùng đúng 4 tư duy đó để chọn — thiết kế — build — gỡ lỗi trên bài toán thật của mình.",
+     insight:"Nói câu này ngay đầu buổi chiều. Học viên phải thấy chiều không phải phần mới, mà là phần ÁP DỤNG.", src:"Sườn buổi chiều"},
+    {id:"n51", pid:"n50", dep:["n15", "n44"], b:"b5", type:"baitap", title:"P5 · Chọn bài toán bằng TD1 + TD4 (30')",
+     content:"Vùng lõi của tôi là gì → bài toán nào nằm trong đó → nhân thử 3 thừa số → chọn bài có tích lớn nhất.",
+     insight:"", src:"Sườn buổi chiều"},
+    {id:"n52", pid:"n50", dep:["n51", "n23"], b:"b5", type:"baitap", title:"P6 · Thiết kế bằng TD2 (30') — CHƯA CHẠM AI",
+     content:"Chia nhỏ thành các node: Nhập liệu → Xử lý → Hiển thị → Lưu → Xuất. Viết quy tắc ra thành lời.",
+     insight:"Bước quan trọng nhất cả ngày. Nếu để họ mở AI ngay, họ sẽ gõ 'giúp tôi làm báo cáo' và nhận về thứ vô dụng — đúng cái đã xảy ra với 3 người bỏ cuộc.", src:"Sườn buổi chiều"},
+    {id:"n53", pid:"n50", link:"tai-lieu-khoa-hoc-siren.html#p5", dep:["n52"], b:"b5", type:"baitap", title:"P7 · Build (60')",
+     content:"Giờ mới mở AI. Học viên tự build. Không debug từng người.",
+     insight:"Mở đầu bằng câu: '60 phút này không phải để bạn xây xong. Là để bạn tìm ra chỗ mình sẽ kẹt — trong lúc còn có người gỡ.'", src:"Sườn buổi chiều"},
+    {id:"n54", pid:"n50", link:"tai-lieu-khoa-hoc-siren.html#p6", dep:["n53", "n31"], b:"b5", type:"baitap", title:"P8 · Tháo gỡ bằng TD3 (45')",
+     content:"Paste kết quả vào chat. Mỗi lỗi quy về: thiếu tiêu chí nào trong 4 tiêu chí Product? Hardcode? Tính năng thừa? Không ai dùng được ngoài bạn?",
+     insight:"Không hỏi chung chung 'ai sai gì'. Hỏi có khung → mỗi lần trả lời là 1 lần củng cố tư duy.", src:"Sườn buổi chiều"},
+
+    /* --- Câu hỏi học viên cần trả lời --- */
+    {id:"n61", link:"chan-dung-hoc-vien-siren.html#hoi", dep:["n11"], b:"b1", type:"vidu", title:"Câu hỏi HV: CFO truyền thống → AI-powered CFO?",
+     content:"\"Diễn giả chia sẻ 'đóng gói kinh nghiệm' của một CFO truyền thống thành AI-powered CFO: giá trị cốt lõi, lộ trình, competency. 500 giờ đầu tiên nên đầu tư vào đâu?\"",
+     insight:"TD1 trả lời trực tiếp: không có lộ trình thành người khác, chỉ có lộ trình phóng đại chính mình. 500 giờ → 80% địa hạt của mình.", src:"Khảo sát học viên"},
+    {id:"n62", link:"chan-dung-hoc-vien-siren.html#hoi", dep:["n11"], b:"b1", type:"vidu", title:"Câu hỏi HV: vai trò con người để không bị lệ thuộc?",
+     content:"\"Khi AI trợ giúp toàn diện, vai trò con người cần làm gì để vừa khai thác được sức mạnh vừa không bị lệ thuộc, thiếu tư duy phản biện và sáng tạo?\"",
+     insight:"Câu sâu nhất trong khảo sát. TD1 trả lời: vùng lõi là thứ AI không thay được, vì nó chính là bạn.", src:"Khảo sát học viên"},
+    {id:"n63", link:"chan-dung-hoc-vien-siren.html#dau", dep:["n22"], b:"b2", type:"vidu", title:"3 trích dẫn học viên đã thử AI rồi bỏ",
+     content:"· \"Đã thử ChatGPT và Claude nhưng kết quả không chính xác, tốn nhiều thời gian kiểm chứng nên quay lại cách làm cũ.\"\n· \"Có dùng ChatGPT nhưng chưa thật sự thấy hiệu quả, vẫn phải làm thủ công nhiều.\"\n· \"Dùng Copilot nhưng chưa thấy ổn, do chưa đưa ra chính xác quy trình để nó hướng dẫn.\"",
+     insight:"Chiếu ngay sau node 'phóng trượt thì cũng nhịn'. Ba người này đang ngồi trong lớp.", src:"Khảo sát học viên"}
+  ]
+};
+
+/* ============ STATE ============ */
+var S = null, undoStack = [], sel = null, selKind = "node", view = "mind", tab = "edit", filterType = "all", query = "";
+var mmZoom = 1, mmPanX = 0, mmPanY = 0;
+var mmMode = "tier";   /* mindmap sub-mode: tier | dep */
+var filterMode = "dim";  /* how filtered-out items appear: dim | hide */
+/* autosave: debounce timer + guard so one editing burst = one undo snapshot */
+var autoT = null, burstId = null;
+
+var LS_PROJ = "giaoan_projects_v1";   /* {list:[{id,title,desc,owner,updated}], cur:id} */
+var LS_DATA = "giaoan_proj_";          /* + id  → model */
+var PROJ = {list:[], cur:null};
+
+function projMeta(id){
+  for(var i=0;i<PROJ.list.length;i++) if(PROJ.list[i].id===id) return PROJ.list[i];
+  return null;
+}
+function newProjId(){ return "p" + Date.now().toString(36) + Math.random().toString(36).slice(2,5); }
+
+function loadProjects(){
+  try{
+    var raw = localStorage.getItem(LS_PROJ);
+    if(raw){ var d = JSON.parse(raw); if(d && Array.isArray(d.list)){ PROJ = d; if(!PROJ.cur && PROJ.list.length) PROJ.cur = PROJ.list[0].id; } }
+  }catch(e){ console.error("Đọc danh sách dự án lỗi:", e); }
+}
+function saveProjects(){
+  try{ localStorage.setItem(LS_PROJ, JSON.stringify(PROJ)); }
+  catch(e){ console.error("Lưu danh sách dự án lỗi:", e); }
+}
+function touchProject(){
+  var m = projMeta(PROJ.cur);
+  if(m){ m.updated = new Date().toISOString(); saveProjects(); }
+}
+
+function load(){
+  loadProjects();
+
+  /* migrate: a single-project file from an earlier version becomes project #1 */
+  if(!PROJ.list.length){
+    var legacy = null;
+    try{ var raw = localStorage.getItem(LS_KEY); if(raw) legacy = JSON.parse(raw); }
+    catch(e){ console.error("Đọc dữ liệu cũ lỗi:", e); }
+
+    var id = newProjId();
+    var isLegacy = !!(legacy && legacy.nodes && legacy.blocks);
+    PROJ.list = [{id:id,
+      title: isLegacy ? "Giáo án AI Builder" : "Giáo án AI Builder",
+      desc:  isLegacy ? "Chuyển từ bản trước" : "6 giờ · 4 tư duy · seed từ bài viết và khảo sát",
+      updated: new Date().toISOString()}];
+    PROJ.cur = id;
+    saveProjects();
+    S = isLegacy ? legacy : JSON.parse(JSON.stringify(SEED));
+    try{ localStorage.setItem(LS_DATA + id, JSON.stringify(S)); }catch(e){ console.error(e); }
+    if(isLegacy){ try{ localStorage.removeItem(LS_KEY); }catch(e){} }
+    return;
+  }
+
+  try{
+    var d = localStorage.getItem(LS_DATA + PROJ.cur);
+    if(d){ S = JSON.parse(d); if(S && S.nodes && S.blocks) return; }
+  }catch(e){ console.error("Load dự án lỗi:", e); }
+  S = JSON.parse(JSON.stringify(SEED));
+}
+function migrateHierarchy(){
+  /* runs once on data saved before the L0>L1>L2>L3 model existed */
+  var lastL2 = {};   /* block id -> most recent L2 node id while scanning in order */
+  S.nodes.forEach(function(n){
+    if(isL2(n)){ lastL2[n.b] = n.id; n.pid = null; return; }
+    if(isL3(n) && !n.pid){
+      var p = lastL2[n.b];
+      if(p) n.pid = p;          /* nearest Idea/Story above, same block */
+    }
+  });
+}
+function normalize(){
+  if(!Array.isArray(S.types) || !S.types.length) S.types = JSON.parse(JSON.stringify(SEED.types));
+  /* levels: a type saved before the L2/L3 model has no lv — recover it from SEED by id,
+     because defaulting everything to L3 leaves zero valid parents and breaks the picker */
+  var seedLv = {};
+  SEED.types.forEach(function(t){ seedLv[t.id] = t.lv; });
+  S.types.forEach(function(t){
+    if(t.lv === 2 || t.lv === 3) return;
+    t.lv = seedLv[t.id] || 3;
+  });
+  /* a project with no L2 type at all cannot express the hierarchy — restore Idea/Story */
+  if(!S.types.some(function(t){ return t.lv === 2; })){
+    SEED.types.filter(function(t){ return t.lv === 2; }).forEach(function(t){
+      if(!S.types.some(function(x){ return x.id === t.id; })) S.types.unshift(JSON.parse(JSON.stringify(t)));
+      else S.types.forEach(function(x){ if(x.id === t.id) x.lv = 2; });
+    });
+  }
+  var tids = {}; S.types.forEach(function(t){ tids[t.id]=1; });
+  S.nodes.forEach(function(n){ if(!tids[n.type]) n.type = S.types[0].id; });
+  S.nodes.forEach(function(n){
+    if(!Array.isArray(n.dep)) n.dep = [];
+    if(typeof n.link !== "string") n.link = "";
+    if(n.pid === undefined) n.pid = null;
+  });
+  /* drop parent refs that no longer resolve, or that point at a non-L2 node */
+  S.nodes.forEach(function(n){
+    if(!n.pid) return;
+    var p = nodeOf(n.pid);
+    if(!p || !isL2(p) || p.id === n.id) n.pid = null;
+  });
+  migrateHierarchy();
+  /* an L2 node can never have a parent */
+  S.nodes.forEach(function(n){ if(isL2(n)) n.pid = null; });
+  /* drop dangling refs (node deleted) */
+  var ids = {}; S.nodes.forEach(function(n){ ids[n.id]=1; });
+  S.nodes.forEach(function(n){ n.dep = n.dep.filter(function(d){ return ids[d] && d!==n.id; }); });
+}
+function save(){
+  try{
+    localStorage.setItem(LS_DATA + PROJ.cur, JSON.stringify(S));
+    touchProject();
+  }
+  catch(e){ console.error("Lưu lỗi:", e); pill("Không lưu được: "+e.message, "err"); }
+}
+function snap(){
+  undoStack.push(JSON.stringify(S));
+  if(undoStack.length > 45) undoStack.shift();
+  syncUndo();
+}
+function syncUndo(){
+  var b = document.getElementById("undoBtn");
+  b.textContent = "↩ Undo (" + undoStack.length + ")";
+  b.disabled = undoStack.length === 0;
+}
+function undo(){
+  clearTimeout(autoT); autoT = null; burstId = null;
+  if(!undoStack.length) return;
+  S = JSON.parse(undoStack.pop());
+  syncUndo(); save(); render(); pill("Đã hoàn tác", "ok");
+}
+/* force-write any debounced edit immediately (node switch, undo, export, tab change, page close) */
+function flushPending(){
+  if(!autoT) return;
+  clearTimeout(autoT); autoT = null;
+  var t = document.getElementById("e_title");
+  if(!t || !sel) return;
+  var n = nodeOf(sel);
+  if(!n) return;
+  n.title = t.value.trim() || "(chưa đặt tên)";
+  var tv2 = document.getElementById("e_type").value;
+  var bv2 = document.getElementById("e_b").value;
+  if(tv2 && tv2 !== "__new") n.type = tv2;
+  if(bv2 && bv2 !== "__new") n.b = bv2;
+  n.content = document.getElementById("e_content").value;
+  n.insight = document.getElementById("e_insight").value;
+  n.src = document.getElementById("e_src").value;
+  var lk = document.getElementById("e_link");
+  if(lk) n.link = lk.value.trim();
+  save();
+}
+var pillT = null;
+function pill(msg, kind){
+  var p = document.getElementById("pill");
+  p.textContent = msg; p.className = "pill on " + (kind||"ok");
+  clearTimeout(pillT);
+  pillT = setTimeout(function(){ p.className = "pill " + (kind||"ok"); }, 4000);
+}
+
+/* ============ HELPERS ============ */
+function lvOf(id){ var t = typeOf(id); return t.lv || 2; }
+function isL2(n){ return lvOf(n.type) === 2; }
+function isL3(n){ return lvOf(n.type) === 3; }
+function parentOf(n){ return n.pid ? nodeOf(n.pid) : null; }
+function childrenOf(id){ return S.nodes.filter(function(x){ return x.pid === id; }); }
+function isOrphan(n){ return isL3(n) && (!n.pid || !nodeOf(n.pid)); }
+function typeOf(id){ for(var i=0;i<S.types.length;i++) if(S.types[i].id===id) return S.types[i];
+  return {id:id,label:id||"?",desc:"",col:"#5A6560",bg:"#ECEFED"}; }
+function typeLabel(id){ return typeOf(id).label.toUpperCase(); }
+function typeCol(id){ return typeOf(id).col; }
+function typeBg(id){ return typeOf(id).bg; }
+function typeStyleTag(){
+  return '<style id="tdyn">' + S.types.map(function(t){
+    return '.t-'+t.id+'{background:'+t.bg+';color:'+t.col+'}';
+  }).join("") + '</style>';
+}
+function syncTypeStyles(){
+  var old = document.getElementById("tdyn"); if(old) old.remove();
+  document.head.insertAdjacentHTML("beforeend", typeStyleTag());
+}
+function esc(s){ return (s==null?"":String(s)).replace(/[&<>"]/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+function blockOf(id){ for(var i=0;i<S.blocks.length;i++) if(S.blocks[i].id===id) return S.blocks[i]; return null; }
+function nodeOf(id){ for(var i=0;i<S.nodes.length;i++) if(S.nodes[i].id===id) return S.nodes[i]; return null; }
+function isEmpty(n){ return !n.content || !n.content.trim(); }
+function hidden(n){ return filterMode === "hide" && !matches(n); }
+function matches(n){
+  if(filterType!=="all" && n.type!==filterType) return false;
+  if(!query) return true;
+  var q = query.toLowerCase();
+  return (n.title||"").toLowerCase().indexOf(q)>=0
+      || (n.content||"").toLowerCase().indexOf(q)>=0
+      || (n.insight||"").toLowerCase().indexOf(q)>=0;
+}
+
+
+
+
+/* ---------- auto-grow textareas (height follows content & pane width) ---------- */
+function grow(el){
+  if(!el) return;
+  el.style.height = "auto";
+  el.style.height = (el.scrollHeight + 2) + "px";
+}
+function growAll(){
+  document.querySelectorAll("#left .fta").forEach(grow);
+}
+var leftRO = null;
+function watchLeftWidth(){
+  if(leftRO || typeof ResizeObserver === "undefined") return;
+  var host = document.getElementById("left");
+  if(!host) return;
+  var raf = null;
+  leftRO = new ResizeObserver(function(){
+    /* width changed (drag / collapse) → re-measure wrapped text */
+    if(raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(growAll);
+  });
+  leftRO.observe(host);
+}
+
+/* parents first, each followed by its children; orphans at the end */
+function orderTree(ns){
+  var out = [], used = {};
+  ns.forEach(function(n){
+    if(!isL2(n)) return;
+    out.push(n); used[n.id] = 1;
+    ns.forEach(function(k){
+      if(k.pid === n.id && !used[k.id]){ out.push(k); used[k.id] = 1; }
+    });
+  });
+  ns.forEach(function(n){ if(!used[n.id]) out.push(n); });
+  return out;
+}
+/* ---------- hierarchy pickers ---------- */
+function parentOpts(n){
+  /* Idea/Story in the SAME block first — that is the normal case.
+     Other blocks are still offered but clearly marked, so cross-block links are deliberate. */
+  var here = S.nodes.filter(function(x){ return isL2(x) && x.b === n.b; });
+  var out = "";
+  if(here.length){
+    var hb = blockOf(n.b);
+    out += '<optgroup label="'+esc(hb ? hb.num+" · "+hb.name : "Khối này")+'">'
+        + here.map(function(x){
+            return '<option value="'+x.id+'"'+(n.pid===x.id?" selected":"")+'>'
+                 + esc(x.title.length>44 ? x.title.slice(0,43)+"…" : x.title) + '</option>'; }).join("")
+        + '</optgroup>';
+  }
+  S.blocks.forEach(function(b){
+    if(b.id === n.b) return;
+    var arr = S.nodes.filter(function(x){ return isL2(x) && x.b === b.id; });
+    if(!arr.length) return;
+    out += '<optgroup label="↗ '+esc(b.num+" · "+b.name)+' (khác khối)">'
+        + arr.map(function(x){
+            return '<option value="'+x.id+'"'+(n.pid===x.id?" selected":"")+'>'
+                 + esc(x.title.length>44 ? x.title.slice(0,43)+"…" : x.title) + '</option>'; }).join("")
+        + '</optgroup>';
+  });
+  return out;
+}
+function kidChips(n){
+  var ks = childrenOf(n.id);
+  if(!ks.length) return '<span class="depnone">Chưa có node con — thêm Ví dụ / Câu hỏi / Bài tập cho Idea này.</span>';
+  return ks.map(function(k){
+    return '<span class="depchip" data-goto2="'+k.id+'" title="'+esc(k.title)+'">'
+         + '<i>'+esc(typeOf(k.type).label)+'</i>'
+         + esc(k.title.length>24 ? k.title.slice(0,23)+"…" : k.title) + '</span>';
+  }).join("");
+}
+/* ---------- link helpers ---------- */
+function isHttp(u){ return /^https?:\/\//i.test((u||"").trim()); }
+function linkHint(n){
+  var u = (n.link||"").trim();
+  if(!u) return '';
+  if(isHttp(u)) return '<a class="lnkopen" href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">↗ Mở link trong tab mới</a>';
+  return '<span class="lnknote">Không phải đường dẫn web — sẽ hiển thị dạng chữ để bạn tự mở.</span>';
+}
+
+/* ---------- dependency helpers ---------- */
+function depChips(n){
+  if(!n.dep || !n.dep.length) return '<span class="depnone">Chưa nối — node này đứng độc lập</span>';
+  return n.dep.map(function(d){
+    var t = nodeOf(d); if(!t) return "";
+    var b = blockOf(t.b);
+    return '<span class="depchip" title="'+esc(t.title)+'"><i>'+esc(b?b.num:"?")+'</i>'
+         + esc(t.title.length>26 ? t.title.slice(0,25)+"…" : t.title)
+         + '<button class="depx" data-dep="'+d+'" title="Bỏ liên kết">×</button></span>';
+  }).join("");
+}
+function depOpts(n){
+  var blocked = descendantsOf(n.id);   /* cannot depend on things that depend on me */
+  blocked[n.id] = 1;
+  return S.nodes.filter(function(x){
+    return !blocked[x.id] && n.dep.indexOf(x.id) < 0;
+  }).map(function(x){
+    var b = blockOf(x.b);
+    return '<option value="'+x.id+'">'+esc((b?b.num+" · ":"")+x.title)+'</option>';
+  }).join("");
+}
+/* everything that (transitively) depends on id — used to prevent cycles */
+function descendantsOf(id){
+  var out = {}, stack = [id], guard = 0;
+  while(stack.length && guard++ < 3000){
+    var cur = stack.pop();
+    S.nodes.forEach(function(x){
+      if(x.dep && x.dep.indexOf(cur) >= 0 && !out[x.id]){ out[x.id] = 1; stack.push(x.id); }
+    });
+  }
+  return out;
+}
+/* tier = longest prerequisite chain depth; null if cycle detected */
+function computeTiers(){
+  var tier = {}, seen = {}, cyc = false;
+  function depth(id, path){
+    if(tier[id] != null) return tier[id];
+    if(path[id]){ cyc = true; return 0; }
+    path[id] = 1;
+    var n = nodeOf(id), d = 0;
+    if(n && n.dep) n.dep.forEach(function(p){
+      if(nodeOf(p)) d = Math.max(d, depth(p, path) + 1);
+    });
+    delete path[id];
+    tier[id] = d; return d;
+  }
+  S.nodes.forEach(function(n){ depth(n.id, {}); });
+  return {tier:tier, cycle:cyc};
+}
+
+/* ============ INSPECTOR ============ */
+function renderBlockEditor(){
+  var el = document.getElementById("left");
+  var b = blockOf(sel);
+  if(!b){ selKind = "node"; sel = null; renderLeft(); return; }
+  var i = S.blocks.indexOf(b);
+  var cnt = S.nodes.filter(function(n){ return n.b === b.id; }).length;
+
+  el.innerHTML =
+   '<div class="ins">'
+   +'<h4>Sửa khối</h4><div class="isub">'+esc(b.id)+' · '+cnt+' node bên trong</div>'
+   +'<div class="fgrp"><span class="flab">Mã ngắn (hiện trên sơ đồ)</span>'
+     +'<input class="fin" id="b_num" value="'+esc(b.num)+'"></div>'
+   +'<div class="fgrp"><span class="flab">Tên khối</span>'
+     +'<input class="fin" id="b_name" value="'+esc(b.name)+'"></div>'
+   +'<div class="fgrp"><span class="flab">Thời lượng</span>'
+     +'<input class="fin" id="b_time" placeholder="ví dụ: 45\'" value="'+esc(b.time||"")+'"></div>'
+   +'<div class="fgrp"><span class="flab">Ghi chú / câu hỏi khối này trả lời</span>'
+     +'<textarea class="fta" id="b_note">'+esc(b.note||"")+'</textarea></div>'
+   +'<div class="fgrp"><span class="flab">Thứ tự  ('+(i+1)+'/'+S.blocks.length+')</span>'
+     +'<div class="ordrow">'
+       +'<button class="btn sm" id="b_up"'+(i<=0?" disabled":"")+'>↑ Lên</button>'
+       +'<button class="btn sm" id="b_down"'+(i>=S.blocks.length-1?" disabled":"")+'>↓ Xuống</button>'
+     +'</div></div>'
+   +'<div class="irow"><span class="asave" id="asave">Tự động lưu</span>'
+   +'<span class="spacer"></span>'
+   +'<button class="btn" id="b_new">+ Khối</button>'
+   +'<button class="btn" id="b_dup">Nhân bản</button>'
+   +'<button class="btn dgr" id="b_del">Xóa</button></div>'
+   +'<div class="fgrp addnode"><span class="flab">Thêm node vào khối này</span>'
+     +'<div class="addrow">'
+       + S.types.filter(function(t){ return (t.lv||3) === 2; }).map(function(t){
+           return '<button class="btn sm addt" data-type="'+t.id+'" '
+                + 'style="border-color:'+t.col+';color:'+t.col+'" '
+                + 'title="Thêm '+esc(t.label)+' (tầng 2) vào khối này">+ '+esc(t.label)+'</button>'; }).join("")
+       + '<span class="addhint">Node chi tiết (Ví dụ, Câu hỏi, Bài tập) thêm từ trong một Idea/Story.</span>' 
+     +'</div></div>'
+   +'<div class="totrow" id="totrow"></div>'
+   +'</div>';
+
+  renderTotals();
+  growAll();
+
+  function commitB(){
+    b.num = document.getElementById("b_num").value.trim() || "?";
+    b.name = document.getElementById("b_name").value.trim() || "(chưa đặt tên)";
+    b.time = document.getElementById("b_time").value.trim();
+    b.note = document.getElementById("b_note").value;
+    save(); renderRight(); renderTotals();
+    var a = document.getElementById("asave");
+    if(a){ a.textContent = "Đã lưu"; a.classList.add("saved");
+      setTimeout(function(){ if(a.isConnected){ a.textContent="Tự động lưu"; a.classList.remove("saved"); } }, 1800); }
+  }
+  ["b_num","b_name","b_time","b_note"].forEach(function(id){
+    var f = document.getElementById(id);
+    f.oninput = function(){
+      if(f.tagName === "TEXTAREA") grow(f);
+      if(burstId !== b.id){ snap(); burstId = b.id; }
+      var a = document.getElementById("asave");
+      if(a){ a.textContent = "Đang lưu…"; a.classList.remove("saved"); }
+      clearTimeout(autoT);
+      autoT = setTimeout(commitB, 800);
+    };
+    f.onblur = function(){ clearTimeout(autoT); autoT = null; commitB(); };
+  });
+
+  document.getElementById("b_up").onclick = function(){
+    if(i<=0) return; snap(); burstId = null;
+    S.blocks.splice(i,1); S.blocks.splice(i-1,0,b);
+    save(); render(); pill("Đã chuyển khối lên", "ok");
+  };
+  document.getElementById("b_down").onclick = function(){
+    if(i>=S.blocks.length-1) return; snap(); burstId = null;
+    S.blocks.splice(i,1); S.blocks.splice(i+1,0,b);
+    save(); render(); pill("Đã chuyển khối xuống", "ok");
+  };
+  document.getElementById("b_new").onclick = function(){
+    snap(); burstId = null;
+    var nb = {id:"b"+Date.now().toString(36), num:"MỚI", name:"(khối mới)", time:"", note:""};
+    S.blocks.splice(i+1, 0, nb);
+    sel = nb.id; selKind = "block";
+    save(); render(); pill("Đã thêm khối mới", "ok");
+    var f = document.getElementById("b_num"); if(f){ f.focus(); f.select(); }
+  };
+  document.getElementById("b_dup").onclick = function(){
+    flushPending();
+    snap(); burstId = null;
+    var nb = {id:"b"+Date.now().toString(36), num:b.num+"'", name:b.name+" (bản sao)",
+              time:b.time, note:b.note};
+    S.blocks.splice(i+1, 0, nb);
+    /* clone the nodes too — a block without its content is not a copy */
+    var src = S.nodes.filter(function(x){ return x.b === b.id; });
+    var map = {};
+    var clones = src.map(function(x){
+      var c = JSON.parse(JSON.stringify(x));
+      c.id = "n" + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+      c.b = nb.id;
+      map[x.id] = c.id;
+      return c;
+    });
+    /* rewire deps AND parent refs that pointed inside the block; keep external deps as-is */
+    clones.forEach(function(c){
+      c.dep = (c.dep||[]).map(function(d){ return map[d] || d; });
+      if(c.pid && map[c.pid]) c.pid = map[c.pid];
+    });
+    /* insert clones right after the last node of the source block */
+    var lastIdx = -1;
+    S.nodes.forEach(function(x, k){ if(x.b === b.id) lastIdx = k; });
+    var args = [lastIdx+1, 0].concat(clones);
+    Array.prototype.splice.apply(S.nodes, args);
+    sel = nb.id; selKind = "block";
+    save(); render();
+    pill("Đã nhân bản khối và " + clones.length + " node bên trong", "ok");
+    var f = document.getElementById("b_num"); if(f){ f.focus(); f.select(); }
+  };
+  document.querySelectorAll(".addt").forEach(function(btn){
+    btn.onclick = function(){
+      flushPending();
+      snap(); burstId = null;
+      var t = btn.getAttribute("data-type");
+      var nn = {id:"n"+Date.now().toString(36), b:b.id, type:t,
+                title:"(node mới)", content:"", insight:"", src:"", link:"", dep:[]};
+      /* append to the end of this block, preserving block grouping in S.nodes */
+      var lastIdx = -1;
+      S.nodes.forEach(function(x, k){ if(x.b === b.id) lastIdx = k; });
+      S.nodes.splice(lastIdx >= 0 ? lastIdx+1 : S.nodes.length, 0, nn);
+      sel = nn.id; selKind = "node";
+      save(); render();
+      pill("Đã thêm " + typeOf(t).label + " vào " + b.num, "ok");
+      var f = document.getElementById("e_title"); if(f){ f.focus(); f.select(); }
+    };
+  });
+  document.getElementById("b_del").onclick = function(){
+    if(S.blocks.length <= 1){ pill("Phải giữ lại ít nhất một khối", "warn"); return; }
+    var msg = cnt
+      ? 'Xóa khối "'+b.name+'"?\n\n'+cnt+' node bên trong sẽ được chuyển sang khối "'
+        + (S.blocks[i===0?1:i-1].name) + '", KHÔNG bị xóa.\n\nCó thể hoàn tác bằng nút Undo.'
+      : 'Xóa khối "'+b.name+'"? Khối này đang rỗng.\n\nCó thể hoàn tác bằng nút Undo.';
+    if(!confirm(msg)) return;
+    snap(); burstId = null;
+    var fallback = S.blocks[i===0?1:i-1].id;
+    S.nodes.forEach(function(n){ if(n.b === b.id) n.b = fallback; });
+    S.blocks.splice(i,1);
+    sel = null; selKind = "node";
+    save(); render(); pill("Đã xóa khối, node được giữ lại", "warn");
+  };
+}
+
+/* tổng thời lượng: giúp thấy ngay giáo án có vượt 6 giờ không */
+function renderTotals(){
+  var el = document.getElementById("totrow");
+  if(!el) return;
+  var mins = 0, unknown = 0;
+  S.blocks.forEach(function(b){
+    var m = String(b.time||"").match(/(\d+)/);
+    if(m) mins += parseInt(m[1],10); else if(b.time) unknown++;
+  });
+  var h = Math.floor(mins/60), mm = mins%60;
+  el.innerHTML = '<span class="l">Tổng thời lượng các khối</span>'
+    + '<b>' + (h?h+'h ':'') + mm + "'" + '</b>'
+    + '<span class="tsub">' + mins + ' phút' + (unknown? ' · '+unknown+' khối chưa đọc được số' : '') + '</span>';
+}
+
+function renderLeft(){
+  if(selKind === "block" && sel){ renderBlockEditor(); return; }
+  var el = document.getElementById("left");
+  if(!sel){ el.innerHTML = '<div class="lempty">Chọn một node để xem và sửa nội dung.</div>'; return; }
+  var n = nodeOf(sel);
+  if(!n){ sel=null; renderLeft(); return; }
+  var b = blockOf(n.b);
+  var opts = S.blocks.map(function(x){
+    return '<option value="'+x.id+'"'+(x.id===n.b?" selected":"")+'>'+esc(x.num+" · "+x.name)+'</option>'; }).join("");
+  el.innerHTML =
+   '<div class="ins">'
+   +'<h4>Sửa node</h4><div class="isub">'+esc(n.id)+' · '+esc(b?b.num:"?")+'</div>'
+   +'<div class="fgrp"><span class="flab">Tiêu đề</span><input class="fin" id="e_title" value="'+esc(n.title)+'"></div>'
+   +'<div class="fgrp"><span class="flab">Loại</span><select class="fsel" id="e_type">'
+     + S.types.map(function(t){ return '<option value="'+t.id+'"'+(n.type===t.id?" selected":"")+'>'
+         + esc(t.label + (t.desc ? " — "+t.desc : "")) + '</option>'; }).join("")
+     + '<option value="__new">+ Thêm loại mới…</option>'
+   +'</select></div>'
+   +'<div class="fgrp"><span class="flab">Thuộc khối</span><select class="fsel" id="e_b">'+opts
+     +'<option value="__new">+ Thêm khối mới…</option></select></div>'
+   + (isL3(n)
+      ? '<div class="fgrp"><span class="flab">Thuộc Idea / Story (bắt buộc)</span>'
+        + '<select class="fsel'+(isOrphan(n)?" warnsel":"")+'" id="e_pid">'
+        + '<option value="">— chưa chọn —</option>'
+        + parentOpts(n)
+        + '<option value="__newidea">+ Tạo Idea mới trong khối này…</option>'
+        + '</select>'
+        + (isOrphan(n)
+            ? (S.nodes.some(function(x){ return isL2(x) && x.b === n.b; })
+                ? '<span class="lnknote" style="color:var(--warn)">⚠ Chưa thuộc Idea/Story nào — chọn một mục ở trên.</span>'
+                : '<span class="lnknote" style="color:var(--warn)">⚠ Khối này chưa có Idea/Story nào. Dùng “+ Tạo Idea mới” để tạo cha cho node này.</span>')
+            : '')
+        + '</div>'
+      : '<div class="fgrp"><span class="flab">Node con</span>'
+        + '<div class="kidlist">'+kidChips(n)+'</div>'
+        + '<div class="addrow" style="margin-top:8px">'
+        + S.types.filter(function(t){ return (t.lv||3) === 3; }).map(function(t){
+            return '<button class="btn sm addkid" data-type="'+t.id+'" '
+                 + 'style="border-color:'+t.col+';color:'+t.col+'">+ '+esc(t.label)+'</button>'; }).join("")
+        + '</div></div>')
+   +'<div class="fgrp"><span class="flab">Nội dung</span><textarea class="fta lg" id="e_content">'+esc(n.content)+'</textarea></div>'
+   +'<div class="fgrp"><span class="flab">Ghi chú khi dạy</span><textarea class="fta" id="e_insight">'+esc(n.insight)+'</textarea></div>'
+   +'<div class="fgrp"><span class="flab">Nguồn</span><input class="fin" id="e_src" value="'+esc(n.src)+'"></div>'
+   +'<div class="fgrp"><span class="flab">Link tài liệu tham khảo</span>'
+     +'<input class="fin" id="e_link" placeholder="https://… hoặc tên file" value="'+esc(n.link||"")+'">'
+     + linkHint(n)
+   +'</div>'
+   +'<div class="fgrp"><span class="flab">Cần hiểu trước (điều kiện tiên quyết)</span>'
+     +'<div class="deplist" id="depList">'+depChips(n)+'</div>'
+     +'<select class="fsel" id="e_dep"><option value="">+ Thêm node tiên quyết…</option>'+depOpts(n)+'</select>'
+   +'</div>'
+   +'<div class="irow"><span class="asave" id="asave">Tự động lưu</span>'
+   +'<span class="spacer"></span>'
+   +'<button class="btn" id="newN">+ Node</button>'
+   +'<button class="btn" id="dupN">Nhân bản</button>'
+   +'<button class="btn dgr" id="delN">Xóa</button></div>'
+   +'</div>';
+
+  /* ---- autosave: commit fields into model, debounce write + one snapshot per burst ---- */
+  function commit(reRender){
+    n.title = document.getElementById("e_title").value.trim() || "(chưa đặt tên)";
+    var tv = document.getElementById("e_type").value;
+    var bv = document.getElementById("e_b").value;
+    if(tv && tv !== "__new") n.type = tv;
+    if(bv && bv !== "__new") n.b = bv;
+    n.content = document.getElementById("e_content").value;
+    n.insight = document.getElementById("e_insight").value;
+    n.src = document.getElementById("e_src").value;
+    n.link = document.getElementById("e_link").value.trim();
+    save();
+    if(reRender) renderRight();
+    var a = document.getElementById("asave");
+    if(a){ a.textContent = "Đã lưu"; a.classList.add("saved");
+      setTimeout(function(){ if(a.isConnected){ a.textContent="Tự động lưu"; a.classList.remove("saved"); } }, 1800); }
+  }
+  function touch(reRender){
+    /* one undo snapshot per continuous editing burst on this node */
+    if(burstId !== n.id){ snap(); burstId = n.id; }
+    var a = document.getElementById("asave");
+    if(a){ a.textContent = "Đang lưu…"; a.classList.remove("saved"); }
+    clearTimeout(autoT);
+    autoT = setTimeout(function(){ commit(reRender); }, 800);
+  }
+  ["e_title","e_content","e_insight","e_src","e_link"].forEach(function(id){
+    var f = document.getElementById(id);
+    f.oninput = function(){ if(f.tagName === "TEXTAREA") grow(f); touch(true); };
+    f.onblur  = function(){ clearTimeout(autoT); commit(true); };
+  });
+  ["e_type","e_b"].forEach(function(id){
+    document.getElementById(id).onchange = function(){
+      var v = this.value;
+      clearTimeout(autoT); autoT = null;
+
+      if(v === "__new"){
+        if(id === "e_type"){
+          var lbl = prompt("Tên loại mới (ví dụ: Trích dẫn, Hoạt động nhóm):");
+          if(!lbl || !lbl.trim()){ render(); return; }
+          var desc = prompt("Mô tả ngắn (bỏ trống cũng được):") || "";
+          var pal = [["#7A3E6B","#F2E6EF"],["#1E6B6B","#DCEFEF"],["#8C4A2F","#F7E7DE"],
+                     ["#3E5A8C","#E6EAF5"],["#6B5E1E","#F2EEDC"]];
+          var c = pal[S.types.length % pal.length];
+          var nid = "t" + Date.now().toString(36);
+          snap(); burstId = null;
+          S.types.push({id:nid, label:lbl.trim(), desc:desc.trim(), col:c[0], bg:c[1]});
+          n.type = nid;
+          syncTypeStyles(); save(); render();
+          pill('Đã thêm loại "'+lbl.trim()+'"', "ok");
+        } else {
+          var bn = prompt("Tên khối mới (ví dụ: TD5 · Tư duy hệ thống):");
+          if(!bn || !bn.trim()){ render(); return; }
+          var num = prompt("Mã ngắn hiển thị trên sơ đồ (ví dụ: TD5):") || "MỚI";
+          var tm = prompt("Thời lượng (ví dụ: 30'):") || "";
+          var bid = "b" + Date.now().toString(36);
+          snap(); burstId = null;
+          S.blocks.push({id:bid, num:num.trim(), name:bn.trim(), time:tm.trim(), note:""});
+          n.b = bid;
+          save(); render();
+          pill('Đã thêm khối "'+bn.trim()+'"', "ok");
+        }
+        return;
+      }
+
+      snap();
+      burstId = null;
+      commit(false);
+      if(isL2(n)){ n.pid = null; }                 /* L2 never has a parent */
+      else if(!n.pid){ /* became L3 without parent → orphan, flagged in Rà thiếu */ }
+      save();
+      render();
+      pill("Đã lưu", "ok");
+    };
+  });
+  growAll();
+  var psel = document.getElementById("e_pid");
+  if(psel) psel.onchange = function(){
+    clearTimeout(autoT); autoT = null;
+    var v = this.value;
+    if(v === "__newidea"){
+      var t = prompt("Tên Idea mới (sẽ là cha của node này):", "Idea mới");
+      if(!t || !t.trim()){ render(); return; }
+      snap(); burstId = null;
+      var ideaType = (S.types.filter(function(x){ return x.lv === 2; })[0] || {id:"idea"}).id;
+      var np = {id:"n"+Date.now().toString(36), b:n.b, type:ideaType, pid:null,
+                title:t.trim(), content:"", insight:"", src:"", link:"", dep:[]};
+      S.nodes.splice(S.nodes.indexOf(n), 0, np);   /* put the parent just above its child */
+      n.pid = np.id;
+      save(); render();
+      pill('Đã tạo Idea "'+t.trim().slice(0,24)+'" và gắn node vào', "ok");
+      return;
+    }
+    snap(); burstId = null;
+    n.pid = v || null;
+    save(); render();
+    pill(n.pid ? "Đã gắn vào " + (nodeOf(n.pid) ? nodeOf(n.pid).title : "") : "Đã bỏ liên kết cha", n.pid ? "ok" : "warn");
+  };
+  var kl = document.querySelector(".kidlist");
+  if(kl) kl.onclick = function(ev){
+    var t = ev.target.closest("[data-goto2]"); if(!t) return;
+    flushPending(); burstId = null;
+    sel = t.getAttribute("data-goto2"); selKind = "node"; render();
+  };
+  document.querySelectorAll(".addkid").forEach(function(btn){
+    btn.onclick = function(){
+      flushPending(); snap(); burstId = null;
+      var t = btn.getAttribute("data-type");
+      var nn = {id:"n"+Date.now().toString(36), b:n.b, type:t, pid:n.id,
+                title:"(node mới)", content:"", insight:"", src:"", link:"", dep:[]};
+      /* place directly after this parent's existing children */
+      var lastIdx = S.nodes.indexOf(n);
+      S.nodes.forEach(function(x,k){ if(x.pid === n.id) lastIdx = k; });
+      S.nodes.splice(lastIdx+1, 0, nn);
+      sel = nn.id; selKind = "node";
+      save(); render();
+      pill("Đã thêm " + typeOf(t).label + " vào \"" + n.title.slice(0,24) + "\"", "ok");
+      var f = document.getElementById("e_title"); if(f){ f.focus(); f.select(); }
+    };
+  });
+  var dsel = document.getElementById("e_dep");
+  if(dsel) dsel.onchange = function(){
+    var v = this.value; if(!v) return;
+    clearTimeout(autoT); autoT = null;
+    snap(); burstId = null;
+    if(!Array.isArray(n.dep)) n.dep = [];
+    if(n.dep.indexOf(v) < 0) n.dep.push(v);
+    save(); render(); pill("Đã nối điều kiện tiên quyết", "ok");
+  };
+  var dl = document.getElementById("depList");
+  if(dl) dl.onclick = function(ev){
+    var d = ev.target.getAttribute("data-dep"); if(!d) return;
+    clearTimeout(autoT); autoT = null;
+    snap(); burstId = null;
+    n.dep = n.dep.filter(function(x){ return x !== d; });
+    save(); render(); pill("Đã bỏ liên kết", "warn");
+  };
+  document.getElementById("newN").onclick = function(){
+    flushPending();
+    snap(); burstId = null;
+    /* insert into the SAME block, right after this node — keeps teaching order intact */
+    var nn = {id:"n"+Date.now().toString(36), b:n.b, type:n.type,
+              title:"(node mới)", content:"", insight:"", src:"", link:"", dep:[]};
+    S.nodes.splice(S.nodes.indexOf(n)+1, 0, nn);
+    sel = nn.id; selKind = "node";
+    save(); render(); pill("Đã thêm node vào " + (blockOf(n.b) ? blockOf(n.b).num : "khối"), "ok");
+    var t = document.getElementById("e_title"); if(t){ t.focus(); t.select(); }
+  };
+  document.getElementById("dupN").onclick = function(){
+    flushPending();
+    snap(); burstId = null;
+    var c = JSON.parse(JSON.stringify(n));
+    c.id = "n" + Date.now().toString(36);
+    c.title = n.title + " (bản sao)";
+    c.dep = (n.dep||[]).slice();
+    S.nodes.splice(S.nodes.indexOf(n)+1, 0, c);
+    sel = c.id; selKind = "node";
+    save(); render(); pill("Đã nhân bản", "ok");
+  };
+  document.getElementById("delN").onclick = function(){
+    var kids = childrenOf(n.id).length;
+    var msg = 'Xóa node "'+n.title+'"?\n\n'
+      + (kids ? kids+' node con sẽ KHÔNG bị xóa, nhưng sẽ mất cha và hiện ở tab Rà thiếu.\n\n' : '')
+      + 'File JSON đã export trước đó KHÔNG bị ảnh hưởng. Có thể hoàn tác bằng nút Undo.';
+    if(!confirm(msg)) return;
+    snap();
+    var gone = n.id;
+    S.nodes.forEach(function(x){ if(x.pid === gone) x.pid = null; });
+    S.nodes.splice(S.nodes.indexOf(n),1);
+    S.nodes.forEach(function(x){ if(x.dep) x.dep = x.dep.filter(function(d){ return d !== gone; }); });
+    sel = null; save(); render(); pill("Đã xóa node và các liên kết tới nó", "warn");
+  };
+}
+
+/* ============ LIST ============ */
+function renderList(){
+  var out = "";
+  S.blocks.forEach(function(b){
+    var ns = S.nodes.filter(function(n){ return n.b===b.id; });
+    if(!ns.length) return;
+    var vis = ns.filter(matches).length;
+    if(filterMode === "hide" && vis === 0) return;   /* empty group adds nothing when hiding */
+    out += '<div class="grp"><div class="ghd'+(selKind==="block"&&sel===b.id?" selb":"")+'" data-blk="'+b.id+'"><span class="gnum">'+esc(b.num)+'</span>'
+        + esc(b.name) + ' <span style="color:var(--dim);font-weight:400">· '+esc(b.time)+'</span>'
+        + '<span class="gcnt">'+vis+'/'+ns.length+'</span></div><div class="rows">';
+    ns = orderTree(ns);
+    ns.forEach(function(n){
+      if(hidden(n)) return;
+      var d = matches(n) ? "" : " dim";
+      var s = (sel===n.id) ? " sel" : "";
+      out += '<div class="row'+d+s+(isL3(n)?" lv3":"")+(isOrphan(n)?" orph":"")+'" data-id="'+n.id+'">'
+          + '<span class="tchip t-'+n.type+'">'+typeLabel(n.type)+'</span>'
+          + '<div class="rbody"><div class="rtitle">'+esc(n.title)+'</div>'
+          + (isEmpty(n) ? '<div class="rmiss">⚠ Chưa có nội dung</div>'
+                        : '<div class="rtext">'+esc(n.content)+'</div>')
+          + (n.link && n.link.trim() ? '<div class="rlink">🔗 '+esc(n.link.length>44?n.link.slice(0,43)+"…":n.link)+'</div>' : '')
+          + '</div>'
+          + '<div class="rbtns"><button class="btn sm" data-act="up" data-id="'+n.id+'">↑</button>'
+          + '<button class="btn sm" data-act="down" data-id="'+n.id+'">↓</button></div>'
+          + '</div>';
+    });
+    out += '</div></div>';
+  });
+  return out || '<div class="lempty">Chưa có node nào.</div>';
+}
+
+/* ============ BOARD ============ */
+function renderBoard(){
+  var out = '<div class="board">';
+  S.blocks.forEach(function(b){
+    var ns = S.nodes.filter(function(n){ return n.b===b.id; });
+    if(filterMode === "hide" && !ns.filter(matches).length) return;
+    out += '<div class="col"><div class="colh'+(selKind==="block"&&sel===b.id?" selb":"")+'" data-blk="'+b.id+'" style="cursor:pointer"><span class="gnum">'+esc(b.num)+'</span>'
+        + esc(b.name) + '<span class="gcnt">'+ns.length+'</span></div><div class="colb">';
+    ns = orderTree(ns);
+    ns.forEach(function(n){
+      if(hidden(n)) return;
+      var d = matches(n) ? "" : " dim";
+      var s = (sel===n.id) ? " sel" : "";
+      out += '<div class="card'+d+s+(isL3(n)?" lv3":"")+(isOrphan(n)?" orph":"")+'" data-id="'+n.id+'">'
+          + '<span class="tchip t-'+n.type+'">'+typeLabel(n.type)+'</span>'
+          + '<div class="ctitle">'+esc(n.title)+'</div>'
+          + (isEmpty(n) ? '<div class="rmiss">⚠ Chưa có nội dung</div>'
+                        : '<div class="ctext">'+esc(n.content)+'</div>')
+          + (n.link && n.link.trim() ? '<div class="rlink">🔗</div>' : '')
+          + '</div>';
+    });
+    out += '</div></div>';
+  });
+  return out + '</div>';
+}
+
+/* ============ MINDMAP ============ */
+
+
+function renderMind(){
+  var COLW = 300, ROWH = 30, BX = 210, PAD = 26;
+  var rows = 0;
+  var layout = [];
+  S.blocks.forEach(function(b){
+    var ns = orderTree(S.nodes.filter(function(n){ return n.b===b.id && !hidden(n); }));
+    if(!ns.length) return;
+    var start = rows;
+    ns.forEach(function(n){ layout.push({n:n, y: PAD + rows*ROWH + 14}); rows++; });
+    var by = PAD + (start + (ns.length-1)/2)*ROWH + 14;
+    layout.push({b:b, y:by, top: PAD + start*ROWH + 14, bot: PAD + (rows-1)*ROWH + 14});
+  });
+  var H = PAD*2 + rows*ROWH;
+  var W = 120 + BX + COLW + 60;
+  var rootY = H/2;
+
+  /* canvas grows with zoom so scaled content is never clipped */
+  var SW = Math.round(W * mmZoom), SH = Math.round(H * mmZoom);
+  var svg = '<svg id="mm" width="'+SW+'" height="'+SH+'" viewBox="0 0 '+SW+' '+SH+'">';
+  svg += '<g id="mmg" transform="translate('+mmPanX+','+mmPanY+') scale('+mmZoom+')">';
+
+  // edges root -> block
+  layout.filter(function(x){return x.b;}).forEach(function(bl){
+    svg += '<path d="M 108 '+rootY+' C 150 '+rootY+', 165 '+bl.y+', '+BX+' '+bl.y+'" fill="none" stroke="#C8D2CD" stroke-width="1.4"/>';
+  });
+  // edges block -> node
+  layout.filter(function(x){return x.b;}).forEach(function(bl){
+    var ns = S.nodes.filter(function(n){ return n.b===bl.b.id && !hidden(n); });
+    ns.forEach(function(n){
+      var ly = null;
+      for(var i=0;i<layout.length;i++) if(layout[i].n===n) ly = layout[i].y;
+      if(ly==null) return;
+      svg += '<path d="M '+(BX+86)+' '+bl.y+' C '+(BX+120)+' '+bl.y+', '+(BX+130)+' '+ly+', '+(BX+150)+' '+ly+'" fill="none" stroke="#DDE3E0" stroke-width="1.2"/>';
+    });
+  });
+
+  // root
+  svg += '<g><rect x="8" y="'+(rootY-20)+'" width="100" height="40" rx="9" fill="#0B5D4B"/>'
+      + '<text x="58" y="'+(rootY+2)+'" text-anchor="middle" font-family="Outfit" font-size="12.5" font-weight="700" fill="#fff">GIÁO ÁN</text>'
+      + '<text x="58" y="'+(rootY+15)+'" text-anchor="middle" font-family="DM Mono" font-size="9" fill="#9FCBBE">6 giờ</text></g>';
+
+  // blocks
+  layout.filter(function(x){return x.b;}).forEach(function(bl){
+    var bsel = (selKind === "block" && sel === bl.b.id);
+    svg += '<g class="mmn" data-blk="'+bl.b.id+'"><rect x="'+BX+'" y="'+(bl.y-14)+'" width="86" height="28" rx="7" fill="'+(bsel?"#E3F0EC":"#fff")+'" stroke="#0B5D4B" stroke-width="'+(bsel?2:1.3)+'"/>'
+        + '<text x="'+(BX+43)+'" y="'+(bl.y-1)+'" text-anchor="middle" font-family="DM Mono" font-size="9.5" font-weight="500" fill="#0B5D4B">'+esc(bl.b.num)+'</text>'
+        + '<text x="'+(BX+43)+'" y="'+(bl.y+9)+'" text-anchor="middle" font-family="Outfit" font-size="8.5" fill="#5A6560">'+esc(bl.b.time)+'</text></g>';
+  });
+
+  // nodes
+  layout.filter(function(x){return x.n;}).forEach(function(it){
+    var n = it.n, y = it.y, x = BX + 150 + (isL3(n) ? 26 : 0);
+    var on = matches(n), s = (sel===n.id);
+    var op = on ? 1 : .22;
+    var t = n.title.length > 42 ? n.title.slice(0,41)+"…" : n.title;
+    svg += '<g class="mmn" data-id="'+n.id+'" opacity="'+op+'">'
+        + '<rect x="'+x+'" y="'+(y-11)+'" width="'+(COLW - (isL3(n)?26:0))+'" height="23" rx="6" fill="'+(s?typeBg(n.type):"#fff")+'" stroke="'+(s?typeCol(n.type):"#DDE3E0")+'" stroke-width="'+(s?1.8:1)+'"/>'
+        + '<rect x="'+(x+6)+'" y="'+(y-5)+'" width="6" height="11" rx="2" fill="'+typeCol(n.type)+'"/>'
+        + (isEmpty(n) ? '<text x="'+(x+COLW-9)+'" y="'+(y+4)+'" text-anchor="end" font-family="Outfit" font-size="10" fill="#A6603A">⚠</text>' : '')
+        + '<text x="'+(x+19)+'" y="'+(y+4)+'" font-family="Outfit" font-size="11" fill="#16201C">'+esc(t)+'</text>'
+        + '</g>';
+  });
+
+  svg += '</g></svg>';
+  return '<div class="mmwrap"><div class="mmbar">'
+       + '<button class="btn sm" id="zIn">+</button><button class="btn sm" id="zOut">−</button>'
+       + '<button class="btn sm" id="zRst">Reset</button></div>' + svg + '</div>';
+}
+
+
+/* ============ DEPENDENCY VIEW ============ */
+function renderDep(){
+  var r = computeTiers(), tier = r.tier;
+  var warn = r.cycle ? '<div class="cycwarn">⚠ Phát hiện vòng lặp phụ thuộc — kiểm tra lại liên kết.</div>' : '';
+
+  /* group nodes by tier */
+  var tiers = {}, maxT = 0;
+  S.nodes.forEach(function(n){
+    if(hidden(n)) return;
+    var t = tier[n.id] || 0;
+    (tiers[t] = tiers[t] || []).push(n);
+    if(t > maxT) maxT = t;
+  });
+
+  var CW = 232, CH = 26, GAPY = 9, GAPX = 74, PAD = 30;
+  var pos = {}, colH = [];
+  for(var t = 0; t <= maxT; t++){
+    var arr = tiers[t] || [];
+    colH.push(arr.length * (CH + GAPY));
+  }
+  var H = Math.max.apply(null, colH.concat([120])) + PAD*2 + 34;
+  var W = PAD*2 + (maxT+1)*CW + maxT*GAPX;
+
+  for(var t2 = 0; t2 <= maxT; t2++){
+    var arr2 = tiers[t2] || [];
+    var x = PAD + t2*(CW + GAPX);
+    var startY = PAD + 34 + (H - PAD*2 - 34 - arr2.length*(CH+GAPY))/2;
+    arr2.forEach(function(n, i){
+      pos[n.id] = {x:x, y: startY + i*(CH+GAPY), t:t2};
+    });
+  }
+
+  /* canvas grows with zoom so scaled content is never clipped */
+  var SW = Math.round(W * mmZoom), SH = Math.round(H * mmZoom);
+  var svg = '<svg id="mm" width="'+SW+'" height="'+SH+'" viewBox="0 0 '+SW+' '+SH+'">';
+  svg += '<defs><marker id="ar" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">'
+       + '<path d="M0 0 L8 4 L0 8 z" fill="#8FA8A0"/></marker>'
+       + '<marker id="arS" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">'
+       + '<path d="M0 0 L8 4 L0 8 z" fill="#0B5D4B"/></marker></defs>';
+  svg += '<g id="mmg" transform="translate('+mmPanX+','+mmPanY+') scale('+mmZoom+')">';
+
+  /* tier headers */
+  for(var t3 = 0; t3 <= maxT; t3++){
+    var hx = PAD + t3*(CW + GAPX);
+    svg += '<text x="'+(hx+CW/2)+'" y="'+(PAD+6)+'" text-anchor="middle" font-family="DM Mono" font-size="9.5" fill="#8A938F">'
+         + (t3===0 ? 'NỀN TẢNG' : 'TẦNG '+t3) + '</text>';
+  }
+
+  /* edges: prerequisite -> node */
+  S.nodes.forEach(function(n){
+    if(!n.dep || hidden(n)) return;
+    var to = pos[n.id]; if(!to) return;
+    n.dep.forEach(function(d){
+      var from = pos[d]; if(!from) return;
+      var hi = (sel === n.id || sel === d);
+      var x1 = from.x + CW, y1 = from.y + CH/2;
+      var x2 = to.x - 5,    y2 = to.y + CH/2;
+      var mx = (x1 + x2)/2;
+      svg += '<path d="M '+x1+' '+y1+' C '+mx+' '+y1+', '+mx+' '+y2+', '+x2+' '+y2+'" fill="none" '
+           + 'stroke="'+(hi?'#0B5D4B':'#C8D2CD')+'" stroke-width="'+(hi?1.8:1.1)+'" '
+           + 'marker-end="url(#'+(hi?'arS':'ar')+')" opacity="'+(hi?1:.75)+'"/>';
+    });
+  });
+
+  /* node boxes */
+  S.nodes.forEach(function(n){
+    if(hidden(n)) return;
+    var p2 = pos[n.id]; if(!p2) return;
+    var on = matches(n), s2 = (sel === n.id);
+    var t4 = n.title.length > 30 ? n.title.slice(0,29)+'…' : n.title;
+    var b = blockOf(n.b);
+    svg += '<g class="mmn" data-id="'+n.id+'" opacity="'+(on?1:.22)+'">'
+      + '<rect x="'+p2.x+'" y="'+p2.y+'" width="'+CW+'" height="'+CH+'" rx="6" '
+      + 'fill="'+(s2?typeBg(n.type):'#fff')+'" stroke="'+(s2?typeCol(n.type):'#DDE3E0')+'" stroke-width="'+(s2?1.8:1)+'"/>'
+      + '<rect x="'+(p2.x+6)+'" y="'+(p2.y+7)+'" width="5" height="12" rx="2" fill="'+typeCol(n.type)+'"/>'
+      + '<text x="'+(p2.x+17)+'" y="'+(p2.y+12)+'" font-family="Outfit" font-size="10.5" fill="#16201C">'+esc(t4)+'</text>'
+      + '<text x="'+(p2.x+17)+'" y="'+(p2.y+21)+'" font-family="DM Mono" font-size="8" fill="#8A938F">'+esc(b?b.num:'')+'</text>'
+      + (isEmpty(n) ? '<text x="'+(p2.x+CW-8)+'" y="'+(p2.y+17)+'" text-anchor="end" font-size="9.5" fill="#A6603A">⚠</text>' : '')
+      + '</g>';
+  });
+
+  svg += '</g></svg>';
+  return warn + '<div class="mmwrap"><div class="mmbar">'
+    + '<button class="btn sm" id="zIn">+</button><button class="btn sm" id="zOut">−</button>'
+    + '<button class="btn sm" id="zRst">Reset</button></div>' + svg + '</div>';
+}
+
+/* ============ GAP TAB ============ */
+function renderGap(){
+  var empty = S.nodes.filter(isEmpty);
+  var noIns = S.nodes.filter(function(n){ return !isEmpty(n) && (!n.insight || !n.insight.trim()); });
+  var out = '';
+
+  var orph = S.nodes.filter(isOrphan);
+  out += '<div class="grp"><div class="ghd"><span class="gnum" style="background:var(--warn)">⚠</span>'
+      + 'Node chưa thuộc Idea/Story nào<span class="gcnt">'+orph.length+'</span></div><div class="rows">';
+  if(!orph.length) out += '<div class="lempty">Mọi node chi tiết đều đã có cha. Tốt.</div>';
+  orph.forEach(function(n){
+    var b = blockOf(n.b);
+    out += '<div class="row'+(sel===n.id?" sel":"")+'" data-id="'+n.id+'">'
+        + '<span class="tchip t-'+n.type+'">'+typeLabel(n.type)+'</span>'
+        + '<div class="rbody"><div class="rtitle">'+esc(n.title)+'</div>'
+        + '<div class="rtext" style="color:var(--dim)">'+esc(b?b.num+" · "+b.name:"")+'</div></div></div>';
+  });
+  out += '</div></div>';
+
+  out += '<div class="grp"><div class="ghd"><span class="gnum" style="background:var(--warn)">⚠</span>'
+      + 'Node chưa có nội dung<span class="gcnt">'+empty.length+'</span></div><div class="rows">';
+  if(!empty.length) out += '<div class="lempty">Không có node nào trống. Tốt.</div>';
+  empty.forEach(function(n){
+    var b = blockOf(n.b);
+    out += '<div class="row'+(sel===n.id?" sel":"")+'" data-id="'+n.id+'">'
+        + '<span class="tchip t-'+n.type+'">'+typeLabel(n.type)+'</span>'
+        + '<div class="rbody"><div class="rtitle">'+esc(n.title)+'</div>'
+        + '<div class="rtext" style="color:var(--dim)">'+esc(b?b.num+" · "+b.name:"")+'</div>'
+        + (n.insight ? '<div class="rmiss" style="color:var(--muted)">'+esc(n.insight)+'</div>' : '')
+        + '</div></div>';
+  });
+  out += '</div></div>';
+
+  // per-block balance
+  out += '<div class="grp"><div class="ghd"><span class="gnum">⚖</span>Cân đối idea / ví dụ / bài tập theo khối</div><div class="rows">';
+  S.blocks.forEach(function(b){
+    var ns = S.nodes.filter(function(n){ return n.b===b.id; });
+    if(!ns.length) return;
+    var ci = ns.filter(function(n){return n.type==="idea";}).length;
+    var cv = ns.filter(function(n){return n.type==="vidu";}).length;
+    var cb = ns.filter(function(n){return n.type==="baitap";}).length;
+    var flags = [];
+    if(ci>0 && cv===0) flags.push("thiếu ví dụ");
+    if(ci>0 && cb===0) flags.push("thiếu bài tập");
+    out += '<div class="row" style="cursor:default">'
+        + '<div class="rbody"><div class="rtitle">'+esc(b.num+" · "+b.name)+'</div>'
+        + '<div class="rtext">'
+        + '<span class="tchip t-idea">IDEA '+ci+'</span> '
+        + '<span class="tchip t-vidu">VÍ DỤ '+cv+'</span> '
+        + '<span class="tchip t-baitap">BÀI TẬP '+cb+'</span></div>'
+        + (flags.length ? '<div class="rmiss">⚠ '+flags.join(" · ")+'</div>' : '')
+        + '</div></div>';
+  });
+  out += '</div></div>';
+
+  out += '<div class="grp"><div class="ghd"><span class="gnum">💬</span>'
+      + 'Có nội dung nhưng chưa có ghi chú khi dạy<span class="gcnt">'+noIns.length+'</span></div><div class="rows">';
+  if(!noIns.length) out += '<div class="lempty">Tất cả node đã có ghi chú.</div>';
+  noIns.forEach(function(n){
+    out += '<div class="row'+(sel===n.id?" sel":"")+'" data-id="'+n.id+'">'
+        + '<span class="tchip t-'+n.type+'">'+typeLabel(n.type)+'</span>'
+        + '<div class="rbody"><div class="rtitle">'+esc(n.title)+'</div></div></div>';
+  });
+  out += '</div></div>';
+  return out;
+}
+
+
+/* ============ DETAIL / SLIDE PANE ============ */
+function visibleNodes(){
+  var out = [];
+  S.blocks.forEach(function(b){
+    S.nodes.forEach(function(n){ if(n.b === b.id && matches(n)) out.push(n); });
+  });
+  return out;
+}
+function renderDetail(){
+  var el = document.getElementById("det");
+  if(!el) return;
+  if(!sel){
+    el.innerHTML = '<div class="slide"><div class="lempty">Chọn một node để xem dạng slide.</div></div>';
+    return;
+  }
+  if(selKind === "block"){
+    var bb = blockOf(sel);
+    if(bb){
+      var ns = S.nodes.filter(function(x){ return x.b === bb.id; });
+      var byType = {};
+      ns.forEach(function(x){ byType[x.type] = (byType[x.type]||0)+1; });
+      el.innerHTML = '<div class="slide">'
+        + '<div class="slblk">KHỐI'+(bb.time?'  ·  '+esc(bb.time):'')+'</div>'
+        + '<h2 class="sltitle">'+esc(bb.num)+' · '+esc(bb.name)+'</h2>'
+        + (bb.note ? '<div class="slbody">'+esc(bb.note)+'</div>' : '')
+        + '<div class="sldep" style="margin-top:0"><span class="l">'+ns.length+' node trong khối</span>'
+        + S.types.map(function(t){ return byType[t.id]
+            ? '<span class="tchip t-'+t.id+'" style="margin-right:6px">'+esc(t.label.toUpperCase())+' '+byType[t.id]+'</span>' : ''; }).join("")
+        + '</div>'
+        + '<div class="sldep">' + ns.map(function(x){
+            return '<a data-goto="'+x.id+'">'+(isEmpty(x)?'⚠ ':'')+esc(x.title)+'</a>'; }).join("") + '</div>'
+        + '</div>';
+      el.querySelectorAll("[data-goto]").forEach(function(a){
+        a.onclick = function(){ sel = a.getAttribute("data-goto"); selKind = "node"; render(); };
+      });
+      return;
+    }
+  }
+  var n = nodeOf(sel);
+  if(!n){ el.innerHTML = '<div class="slide"><div class="lempty">Node không còn tồn tại.</div></div>'; return; }
+  var b = blockOf(n.b);
+  var seq = visibleNodes();
+  var idx = seq.map(function(x){ return x.id; }).indexOf(n.id);
+  var tl = typeLabel(n.type);
+
+  var deps = (n.dep||[]).map(function(d){
+    var t = nodeOf(d); if(!t) return "";
+    var tb = blockOf(t.b);
+    return '<a data-goto="'+d+'"><i>'+esc(tb?tb.num:"?")+'</i>'+esc(t.title)+'</a>';
+  }).join("");
+
+  el.innerHTML =
+    '<div class="slnav">'
+      +'<button class="btn sm" id="slPrev"'+(idx<=0?" disabled":"")+'>‹ Trước</button>'
+      +'<button class="btn sm" id="slNext"'+(idx<0||idx>=seq.length-1?" disabled":"")+'>Sau ›</button>'
+      +'<span class="spacer"></span>'
+      +'<span class="slpos">'+(idx>=0?(idx+1)+" / "+seq.length:"—")+'</span>'
+    +'</div>'
+    +'<div class="slide">'
+      +'<div class="slblk">'+esc(b ? b.num+" · "+b.name : "(chưa xếp khối)")+(b&&b.time?'  ·  '+esc(b.time):'')+'</div>'
+      +'<span class="sltype" style="background:'+typeBg(n.type)+';color:'+typeCol(n.type)+'">'+esc(tl)+'</span>'
+      +'<h2 class="sltitle">'+esc(n.title)+'</h2>'
+      +(n.content && n.content.trim()
+          ? '<div class="slbody">'+esc(n.content)+'</div>'
+          : '<div class="slbody empty">⚠ Chưa có nội dung — điền ở vùng soạn bên trái.</div>')
+      +(n.insight && n.insight.trim()
+          ? '<div class="slnote"><span class="l">Ghi chú khi dạy</span>'+esc(n.insight)+'</div>' : '')
+      +(deps ? '<div class="sldep"><span class="l">Cần hiểu trước</span>'+deps+'</div>' : '')
+      +(n.link && n.link.trim()
+          ? '<div class="sllink">' + (isHttp(n.link)
+              ? '<a href="'+esc(n.link.trim())+'" target="_blank" rel="noopener noreferrer">↗ Mở tài liệu tham khảo</a>'
+              : '<span class="slfile">📎 '+esc(n.link.trim())+'</span>') + '</div>'
+          : '')
+      +(n.src ? '<div class="slsrc">Nguồn: '+esc(n.src)+'</div>' : '')
+    +'</div>';
+
+  var pv = document.getElementById("slPrev"), nx = document.getElementById("slNext");
+  if(pv) pv.onclick = function(){ if(idx>0){ flushPending(); burstId=null; sel = seq[idx-1].id; render(); } };
+  if(nx) nx.onclick = function(){ if(idx>=0 && idx<seq.length-1){ flushPending(); burstId=null; sel = seq[idx+1].id; render(); } };
+  el.querySelectorAll("[data-goto]").forEach(function(a){
+    a.onclick = function(){ flushPending(); burstId=null; sel = a.getAttribute("data-goto"); render(); };
+  });
+}
+
+/* ============ RENDER ============ */
+/* renderRight: redraw content pane ONLY — leaves the inspector (and focus) untouched */
+function renderRight(){
+  var right = document.getElementById("right");
+  if(tab === "gap"){
+    right.innerHTML = renderGap();
+  } else {
+    if(view === "list") right.innerHTML = renderList();
+    else if(view === "board") right.innerHTML = renderBoard();
+    else right.innerHTML = (mmMode === "dep") ? renderDep() : renderMind();
+  }
+  var tot = S.nodes.length, vis = S.nodes.filter(matches).length;
+  document.getElementById("cnt").textContent = vis + "/" + tot + " node";
+  var e = S.nodes.filter(isEmpty).length;
+  document.getElementById("fstat").textContent = tot + " node · " + S.blocks.length + " khối · " + e + " node trống";
+  renderDetail();
+  wire();
+}
+
+function renderFmode(){
+  var b = document.getElementById("fmode");
+  if(!b) return;
+  b.textContent = (filterMode === "dim") ? "👁 Làm mờ" : "🚫 Ẩn hẳn";
+  b.classList.toggle("hidemode", filterMode === "hide");
+  b.title = (filterMode === "dim")
+    ? "Mục bị lọc đang được làm mờ — bấm để ẩn hẳn"
+    : "Mục bị lọc đang bị ẩn — bấm để chuyển sang làm mờ";
+}
+function renderChips(){
+  var el = document.getElementById("tf");
+  el.innerHTML = '<span class="fchip'+(filterType==="all"?" on":"")+'" data-t="all">Tất cả</span>'
+    + S.types.map(function(t){
+        return '<span class="fchip'+(filterType===t.id?" on":"")+'" data-t="'+t.id+'">'+esc(t.label)+'</span>';
+      }).join("");
+}
+function render(){
+  renderChips(); renderFmode();
+  var right = document.getElementById("right");
+  if(tab === "gap"){
+    right.innerHTML = renderGap();
+    document.getElementById("hintTxt").textContent =
+      "Rà soát: node nào còn trống, khối nào thiếu ví dụ hoặc bài tập, node nào chưa có ghi chú khi dạy.";
+  } else {
+    if(view === "list") right.innerHTML = renderList();
+    else if(view === "board") right.innerHTML = renderBoard();
+    else right.innerHTML = (mmMode === "dep") ? renderDep() : renderMind();
+    document.getElementById("hintTxt").textContent =
+      "Phân tầng: Dự án › Khối › Idea/Story › Ví dụ/Câu hỏi/Bài tập. Node chi tiết phải thuộc một Idea hoặc Story. Ba vùng: Soạn · Tổng thể · Slide. Kéo thanh dọc để đổi rộng, nhấp đúp để reset, dùng nút Soạn/Tổng thể/Slide để ẩn hiện.";
+  }
+
+  document.getElementById("mmSeg").style.display = (view === "mind" && tab === "edit") ? "" : "none";
+  var tot = S.nodes.length, vis = S.nodes.filter(matches).length;
+  document.getElementById("cnt").textContent = vis + "/" + tot + " node";
+  var e = S.nodes.filter(isEmpty).length;
+  document.getElementById("fstat").textContent = tot + " node · " + S.blocks.length + " khối · " + e + " node trống";
+  renderLeft();
+  renderDetail();
+  wire();
+}
+
+function wire(){
+  var right = document.getElementById("right");
+  right.querySelectorAll("[data-blk]").forEach(function(el){
+    el.onclick = function(ev){
+      ev.stopPropagation();
+      flushPending(); burstId = null;
+      sel = el.getAttribute("data-blk"); selKind = "block";
+      render();
+    };
+  });
+  right.querySelectorAll("[data-id]").forEach(function(el){
+    el.onclick = function(ev){
+      var act = ev.target.getAttribute("data-act");
+      if(act){
+        ev.stopPropagation();
+        var id = ev.target.getAttribute("data-id"), n = nodeOf(id);
+        var i = S.nodes.indexOf(n);
+        var sib = S.nodes.filter(function(x){ return x.b===n.b; });
+        var si = sib.indexOf(n);
+        if(act==="up" && si>0){ snap(); var p=S.nodes.indexOf(sib[si-1]); S.nodes.splice(i,1); S.nodes.splice(p,0,n); save(); render(); }
+        if(act==="down" && si<sib.length-1){ snap(); var q2=S.nodes.indexOf(sib[si+1]); S.nodes.splice(i,1); S.nodes.splice(q2,0,n); save(); render(); }
+        return;
+      }
+      var nid = el.getAttribute("data-id");
+      flushPending();
+      burstId = null;   /* any (re)selection starts a new editing session → own undo point */
+      sel = nid; selKind = "node";
+      render();
+    };
+  });
+  var zi=document.getElementById("zIn"), zo=document.getElementById("zOut"), zr=document.getElementById("zRst");
+  if(zi){
+    zi.onclick=function(){ mmZoom=Math.min(2.2,mmZoom*1.2); render(); };
+    zo.onclick=function(){ mmZoom=Math.max(.45,mmZoom/1.2); render(); };
+    zr.onclick=function(){ mmZoom=1; mmPanX=0; mmPanY=0; render(); };
+    var svg=document.getElementById("mm"), dragging=false, sx=0, sy=0, ox=0, oy=0;
+    svg.onmousedown=function(e){ if(e.target.closest(".mmn")) return; dragging=true; sx=e.clientX; sy=e.clientY; ox=mmPanX; oy=mmPanY; svg.classList.add("drag"); };
+    window.onmousemove=function(e){ if(!dragging) return; mmPanX=ox+(e.clientX-sx); mmPanY=oy+(e.clientY-sy);
+      var g=document.getElementById("mmg"); if(g) g.setAttribute("transform","translate("+mmPanX+","+mmPanY+") scale("+mmZoom+")"); };
+    window.onmouseup=function(){ if(dragging){ dragging=false; svg.classList.remove("drag"); } };
+  }
+}
+
+/* ============ INIT ============ */
+
+/* ============ PROJECT MANAGEMENT ============ */
+function renderProjBar(){
+  var sel2 = document.getElementById("psel");
+  if(!sel2) return;
+  sel2.innerHTML = PROJ.list.map(function(m){
+    return '<option value="'+m.id+'"'+(m.id===PROJ.cur?" selected":"")+'>'+esc(m.title)+'</option>';
+  }).join("");
+  var m = projMeta(PROJ.cur);
+  document.getElementById("ptitle").textContent = m ? m.title : "Ma trận kịch bản";
+  document.title = (m ? m.title : "Ma trận kịch bản") + " — Ma trận kịch bản";
+  var d = document.getElementById("pdesc");
+  var when = m && m.updated ? new Date(m.updated).toLocaleString("vi-VN",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}) : "";
+  d.textContent = (m && m.desc ? m.desc : "") + (when ? "  ·  sửa lần cuối " + when : "");
+  document.getElementById("pDel").disabled = PROJ.list.length <= 1;
+}
+
+function switchProject(id){
+  if(id === PROJ.cur) return;
+  flushPending();
+  PROJ.cur = id; saveProjects();
+  undoStack = []; sel = null; selKind = "node"; burstId = null;
+  load(); normalize(); syncTypeStyles(); syncUndo(); render(); renderProjBar();
+  pill('Đã mở "' + (projMeta(id) ? projMeta(id).title : id) + '"', "ok");
+}
+
+function createProject(fromTemplate){
+  var t = prompt("Tên dự án mới:", fromTemplate ? "Giáo án mới" : "Dự án trống");
+  if(!t || !t.trim()) return;
+  var ds = prompt("Mô tả ngắn (bỏ trống cũng được):") || "";
+  flushPending();
+  var id = newProjId();
+  var model = fromTemplate
+    ? JSON.parse(JSON.stringify(SEED))
+    : {types: JSON.parse(JSON.stringify(SEED.types)),
+       blocks: [{id:"b1", num:"P1", name:"Phần 1", time:"", note:""}],
+       nodes: []};
+  try{ localStorage.setItem(LS_DATA + id, JSON.stringify(model)); }
+  catch(e){ console.error(e); pill("Không tạo được: "+e.message, "err"); return; }
+  PROJ.list.push({id:id, title:t.trim(), desc:ds.trim(), updated:new Date().toISOString()});
+  PROJ.cur = id; saveProjects();
+  undoStack = []; sel = null; selKind = "node"; burstId = null;
+  S = model; normalize(); syncTypeStyles(); syncUndo(); render(); renderProjBar();
+  pill('Đã tạo "' + t.trim() + '"', "ok");
+}
+
+function editProject(){
+  var m = projMeta(PROJ.cur); if(!m) return;
+  var t = prompt("Tên dự án:", m.title);
+  if(t === null) return;
+  if(!t.trim()){ pill("Tên dự án không được để trống", "warn"); return; }
+  var ds = prompt("Mô tả ngắn:", m.desc || "");
+  if(ds === null) ds = m.desc || "";
+  m.title = t.trim(); m.desc = ds.trim();
+  saveProjects(); renderProjBar();
+  pill("Đã cập nhật thông tin dự án", "ok");
+}
+
+function duplicateProject(){
+  var m = projMeta(PROJ.cur); if(!m) return;
+  flushPending();
+  var id = newProjId();
+  try{ localStorage.setItem(LS_DATA + id, JSON.stringify(S)); }
+  catch(e){ console.error(e); pill("Không nhân bản được: "+e.message, "err"); return; }
+  PROJ.list.splice(PROJ.list.indexOf(m)+1, 0,
+    {id:id, title:m.title + " (bản sao)", desc:m.desc, updated:new Date().toISOString()});
+  PROJ.cur = id; saveProjects();
+  undoStack = []; syncUndo();
+  load(); normalize(); syncTypeStyles(); render(); renderProjBar();
+  pill("Đã nhân bản dự án", "ok");
+}
+
+function deleteProject(){
+  if(PROJ.list.length <= 1){ pill("Phải giữ lại ít nhất một dự án", "warn"); return; }
+  var m = projMeta(PROJ.cur); if(!m) return;
+  var cnt = S.nodes.length;
+  if(!confirm('Xóa dự án "'+m.title+'"?\n\n'+cnt+' node và '+S.blocks.length+' khối sẽ mất khỏi máy này.\n'
+    + 'File JSON đã export KHÔNG bị ảnh hưởng.\n\nHành động này KHÔNG hoàn tác được bằng nút Undo.')) return;
+  try{ localStorage.removeItem(LS_DATA + m.id); }catch(e){ console.error(e); }
+  var i = PROJ.list.indexOf(m);
+  PROJ.list.splice(i,1);
+  PROJ.cur = PROJ.list[Math.max(0,i-1)].id;
+  saveProjects();
+  undoStack = []; sel = null; selKind = "node"; burstId = null;
+  load(); normalize(); syncTypeStyles(); syncUndo(); render(); renderProjBar();
+  pill("Đã xóa dự án", "warn");
+}
+
+/* ============ PANES: resize + collapse ============ */
+var LS_UI = "giaoan_matrix_ui_v1";
+var UI = {w:[20,40,40], hid:{}};
+function loadUI(){
+  try{ var r = localStorage.getItem(LS_UI); if(r){ var d = JSON.parse(r);
+    if(d && Array.isArray(d.w) && d.w.length===3) UI = d; } }
+  catch(e){ console.error("UI load lỗi:", e); }
+  if(!UI.hid) UI.hid = {};
+}
+function saveUI(){
+  try{ localStorage.setItem(LS_UI, JSON.stringify(UI)); }
+  catch(e){ console.error("UI save lỗi:", e); }
+}
+function applyPanes(){
+  var ids = ["left","mid","det"], els = [document.getElementById("left"),
+    document.getElementById("right"), document.getElementById("det")];
+  var vis = ids.filter(function(k){ return !UI.hid[k]; });
+  var sum = vis.reduce(function(a,k){ return a + UI.w[ids.indexOf(k)]; }, 0) || 1;
+  ids.forEach(function(k,i){
+    var el = els[i]; if(!el) return;
+    if(UI.hid[k]){ el.classList.add("hid"); }
+    else { el.classList.remove("hid"); el.style.flex = "0 0 " + (UI.w[i]/sum*100).toFixed(3) + "%"; }
+  });
+  /* a resizer is only useful when both neighbours are visible */
+  var r1 = document.getElementById("rsz1"), r2 = document.getElementById("rsz2");
+  if(r1) r1.classList.toggle("off", !!(UI.hid.left || UI.hid.mid));
+  if(r2) r2.classList.toggle("off", !!(UI.hid.mid || UI.hid.det));
+  document.querySelectorAll("#ptog button").forEach(function(b){
+    b.classList.toggle("on", !UI.hid[b.getAttribute("data-p")]);
+  });
+}
+function initPanes(){
+  loadUI(); applyPanes();
+  document.getElementById("ptog").onclick = function(e){
+    var k = e.target.getAttribute("data-p"); if(!k) return;
+    var vis = ["left","mid","det"].filter(function(x){ return !UI.hid[x]; });
+    if(!UI.hid[k] && vis.length === 1){ pill("Phải giữ lại ít nhất một vùng", "warn"); return; }
+    UI.hid[k] = !UI.hid[k];
+    saveUI(); applyPanes();
+    if(view === "mind") render();
+  };
+  [["rsz1",0,1],["rsz2",1,2]].forEach(function(cfg){
+    var el = document.getElementById(cfg[0]); if(!el) return;
+    var ia = cfg[1], ib = cfg[2];
+    el.onmousedown = function(ev){
+      ev.preventDefault();
+      var shell = document.getElementById("shell");
+      var total = shell.getBoundingClientRect().width;
+      var startX = ev.clientX, a0 = UI.w[ia], b0 = UI.w[ib];
+      var pairPct = a0 + b0;
+      el.classList.add("act");
+      document.body.style.cursor = "col-resize";
+      function mv(e2){
+        var dPct = (e2.clientX - startX) / total * 100;
+        var na = a0 + dPct, nb = b0 - dPct;
+        var MIN = 8;
+        if(na < MIN){ na = MIN; nb = pairPct - MIN; }
+        if(nb < MIN){ nb = MIN; na = pairPct - MIN; }
+        UI.w[ia] = na; UI.w[ib] = nb;
+        applyPanes();
+      }
+      function up(){
+        document.removeEventListener("mousemove", mv);
+        document.removeEventListener("mouseup", up);
+        el.classList.remove("act");
+        document.body.style.cursor = "";
+        saveUI();
+        if(view === "mind") render();
+      }
+      document.addEventListener("mousemove", mv);
+      document.addEventListener("mouseup", up);
+    };
+    el.ondblclick = function(){
+      UI.w = [20,40,40]; saveUI(); applyPanes();
+      if(view === "mind") render();
+      pill("Đã đặt lại tỷ lệ 20/40/40", "ok");
+    };
+  });
+}
+
+document.getElementById("vb").textContent = VER;
+document.getElementById("stamp").textContent = STAMP;
+document.getElementById("fver").textContent = "Ma trận kịch bản " + VER;
+
+try{ var fm = localStorage.getItem("giaoan_fmode"); if(fm==="hide"||fm==="dim") filterMode = fm; }catch(e){}
+load(); normalize(); syncTypeStyles(); initPanes(); syncUndo(); render(); watchLeftWidth();
+
+renderProjBar();
+document.getElementById("psel").onchange = function(){ switchProject(this.value); };
+document.getElementById("pNew").onclick = function(){
+  var useT = confirm("Tạo dự án mới:\n\nOK = dùng MẪU (30 node giáo án AI Builder có sẵn)\nCancel = dự án TRỐNG");
+  createProject(useT);
+};
+document.getElementById("pEdit").onclick = editProject;
+document.getElementById("pDup").onclick = duplicateProject;
+document.getElementById("pDel").onclick = deleteProject;
+document.getElementById("undoBtn").onclick = undo;
+document.getElementById("addBtn").onclick = function(){
+  flushPending(); burstId = null;
+  snap();
+  /* drop it into whatever block is in focus, else the first one */
+  var host = (selKind === "block" && blockOf(sel)) ? sel
+           : (selKind === "node" && nodeOf(sel)) ? nodeOf(sel).b
+           : S.blocks[0].id;
+  var n = {id:"n"+Date.now().toString(36), b:host, type:S.types[0].id,
+           title:"(node mới)", content:"", insight:"", src:"", link:"", dep:[]};
+  S.nodes.push(n); sel = n.id; selKind = "node";
+  save(); render(); pill("Đã thêm node vào " + (blockOf(host) ? blockOf(host).num : "khối"), "ok");
+  var t = document.getElementById("e_title"); if(t){ t.focus(); t.select(); }
+};
+document.getElementById("expBtn").onclick = function(){
+  flushPending();
+  try{
+    var m = projMeta(PROJ.cur);
+    var payload = {project: m ? {title:m.title, desc:m.desc} : null,
+                   exportedAt: new Date().toISOString(),
+                   types:S.types, blocks:S.blocks, nodes:S.nodes};
+    var blob = new Blob([JSON.stringify(payload,null,2)], {type:"application/json"});
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    var slug = (m ? m.title : "du-an").toLowerCase()
+      .replace(/[^a-z0-9\u00C0-\u1EF9]+/gi,"-").replace(/^-+|-+$/g,"").slice(0,40) || "du-an";
+    a.download = slug + "-" + new Date().toISOString().slice(0,10) + ".json";
+    a.click(); URL.revokeObjectURL(a.href);
+    pill("Đã tải file JSON", "ok");
+  }catch(e){ console.error(e); pill("Export lỗi: "+e.message, "err"); }
+};
+document.getElementById("impBtn").onclick = function(){ document.getElementById("impFile").click(); };
+document.getElementById("impFile").onchange = function(ev){
+  var f = ev.target.files[0]; if(!f) return;
+  var r = new FileReader();
+  r.onload = function(){
+    try{
+      var d = JSON.parse(r.result);
+      if(!d.nodes || !d.blocks) throw new Error("File không đúng định dạng — thiếu 'nodes' hoặc 'blocks'");
+      var asNew = confirm("Nạp "+d.nodes.length+" node từ file:\n\n"
+        + "OK = tạo DỰ ÁN MỚI (giữ nguyên dự án đang mở)\n"
+        + "Cancel = GHI ĐÈ dự án đang mở ("+S.nodes.length+" node, hoàn tác được bằng Undo)");
+      var model = {types: d.types || JSON.parse(JSON.stringify(SEED.types)), blocks: d.blocks, nodes: d.nodes};
+      if(asNew){
+        var nid = newProjId();
+        var nt = (d.project && d.project.title) ? d.project.title : ("Nhập từ file " + f.name.replace(/\.json$/i,""));
+        localStorage.setItem(LS_DATA + nid, JSON.stringify(model));
+        PROJ.list.push({id:nid, title:nt, desc:(d.project && d.project.desc) || "", updated:new Date().toISOString()});
+        PROJ.cur = nid; saveProjects();
+        undoStack = []; sel = null; selKind = "node"; burstId = null;
+        S = model; normalize(); syncTypeStyles(); syncUndo(); render(); renderProjBar();
+        pill('Đã tạo dự án "'+nt+'" với '+d.nodes.length+' node', "ok");
+      } else {
+        snap(); S = model; sel = null; selKind = "node";
+        normalize(); syncTypeStyles(); save(); render();
+        pill("Đã ghi đè: "+d.nodes.length+" node", "ok");
+      }
+    }catch(e){ console.error(e); pill("Import lỗi: "+e.message, "err"); }
+    ev.target.value = "";
+  };
+  r.onerror = function(){ pill("Không đọc được file", "err"); };
+  r.readAsText(f);
+};
+document.getElementById("q").oninput = function(e){ query = e.target.value.trim(); render(); };
+document.getElementById("viewSeg").onclick = function(e){
+  var v = e.target.getAttribute("data-v"); if(!v) return;
+  flushPending();
+  view = v;
+  this.querySelectorAll("button").forEach(function(b){ b.classList.toggle("on", b.getAttribute("data-v")===v); });
+  render();
+};
+document.getElementById("fmode").onclick = function(){
+  filterMode = (filterMode === "dim") ? "hide" : "dim";
+  try{ localStorage.setItem("giaoan_fmode", filterMode); }catch(e){ console.error(e); }
+  render();
+  pill(filterMode === "dim" ? "Mục bị lọc: làm mờ" : "Mục bị lọc: ẩn hẳn", "ok");
+};
+document.getElementById("mmSeg").onclick = function(e){
+  var m = e.target.getAttribute("data-m"); if(!m || m === mmMode) return;
+  mmMode = m; mmZoom = 1; mmPanX = 0; mmPanY = 0;
+  this.querySelectorAll("button").forEach(function(b){ b.classList.toggle("on", b.getAttribute("data-m") === m); });
+  render();
+};
+document.getElementById("tf").onclick = function(e){
+  var t = e.target.getAttribute("data-t"); if(!t) return;
+  filterType = t;
+  this.querySelectorAll(".fchip").forEach(function(c){ c.classList.toggle("on", c.getAttribute("data-t")===t); });
+  render();
+};
+document.querySelectorAll(".tab").forEach(function(b){
+  b.onclick = function(){
+    flushPending(); burstId = null;
+    tab = b.getAttribute("data-tab");
+    document.querySelectorAll(".tab").forEach(function(x){ x.classList.toggle("on", x===b); });
+    render();
+  };
+});
+window.addEventListener("beforeunload", flushPending);
+window.addEventListener("resize", growAll);
+document.addEventListener("keydown", function(e){
+  if((e.ctrlKey||e.metaKey) && e.key==="z"){ e.preventDefault(); undo(); }
+});
+</script>
+</body>
+</html>
