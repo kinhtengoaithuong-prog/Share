@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bác sĩ Tài chính FinanOne · v3.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:wght@600;700&family=Outfit:wght@400;500;600;800&family=DM+Mono:wght@400;500&display=swap&subset=vietnamese" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --ink:#16201C; --muted:#6a746e; --line:#e3e8e4; --card:#fff; --bg:#f4f6f4;
+  --own:#0B5D4B; --own-deep:#0B2E24; --neg:#B3402E; --soft:#eaf3ef;
+  --warn:#8a5a12; --warnbg:#fff9e8; --gold:#C79A3B; --ok:#14803a; --okbg:#eaf6ec;
+  --ca:#0B5D4B; --nca:#2D7A66; --scl:#B3402E; --lcl:#C77A2E; --eq:#C79A3B;
+}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:'Outfit',sans-serif;font-size:14px;line-height:1.5}
+.mono{font-family:'DM Mono',monospace}
+.top{position:sticky;top:0;z-index:30;background:var(--own-deep);color:#fff;display:flex;align-items:center;gap:12px;padding:11px 20px;box-shadow:0 2px 12px rgba(11,46,36,.2)}
+.top .bt{font-family:'Noto Serif Display',serif;font-weight:700;font-size:17px}
+.top .bv{font-size:10.5px;background:var(--own);padding:2px 8px;border-radius:8px;font-weight:800}
+.top .sp{flex:1}
+.top button,.uplab{font-family:'Outfit';font-weight:700;font-size:12.5px;padding:8px 13px;border-radius:9px;border:1px solid #2c5f52;background:#0f3a2e;color:#cfe0d9;cursor:pointer}
+.top button:hover,.uplab:hover{background:#155040;color:#fff}
+.uplab{background:var(--own);color:#fff;border-color:var(--own)}
+.uplab:hover{background:#0d7a62}
+#xlsFile{display:none}
+.shell{display:grid;grid-template-columns:330px 1fr;min-height:calc(100vh - 48px)}
+.left{background:var(--card);border-right:1px solid var(--line);padding:18px;overflow-y:auto;max-height:calc(100vh - 48px)}
+.right{padding:20px 24px;overflow-y:auto;max-height:calc(100vh - 48px)}
+.grouphd{font-size:11.5px;font-weight:800;color:var(--own);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 9px;padding-bottom:5px;border-bottom:2px solid var(--soft);display:flex;justify-content:space-between;align-items:center}
+.grouphd:first-child{margin-top:0}
+.fld{margin-bottom:8px}
+.fld label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:3px}
+.fld label .code{font-family:'DM Mono';font-size:9.5px;color:#a4ada7}
+.fld input{width:100%;font-family:'DM Mono';font-size:13.5px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;text-align:right;color:var(--ink)}
+.fld input:focus{outline:none;border-color:var(--own);box-shadow:0 0 0 3px var(--soft)}
+.fld input.derived{background:#fbf7ec;border-color:#e8dcc0}
+.derived-tag{font-size:9px;font-weight:800;color:var(--warn);background:var(--warnbg);border-radius:5px;padding:1px 5px;margin-left:4px}
+.mini{font-size:10.5px;color:var(--muted);margin-top:2px;text-align:right;font-family:'DM Mono'}
+.btnrow{display:flex;gap:7px;margin-top:12px}
+.btn{flex:1;font-family:'Outfit';font-size:12.5px;font-weight:700;padding:9px;border:1px solid var(--own);border-radius:9px;background:var(--own);color:#fff;cursor:pointer}
+.btn.ghost{background:#fff;color:var(--own)}.btn.ghost:hover{background:var(--soft)}
+.bal-note{font-size:10.5px;padding:6px 9px;border-radius:8px;margin-top:8px;text-align:center;font-weight:600}
+.bal-note.ok{background:var(--okbg);color:var(--ok)}.bal-note.bad{background:#fdeceb;color:var(--neg)}
+.srcbox{background:var(--soft);border-radius:10px;padding:10px 12px;font-size:11.5px;margin-bottom:14px;border-left:4px solid var(--own)}
+.srcbox b{color:var(--own-deep)}
+.srcbox .sm{color:var(--muted);font-size:10.5px;margin-top:3px}
+.unit-sel{display:flex;gap:4px;background:#eef1ee;border-radius:8px;padding:3px}
+.unit-sel button{flex:1;border:none;background:transparent;font-family:'Outfit';font-size:11px;font-weight:700;color:var(--muted);padding:5px;border-radius:6px;cursor:pointer}
+.unit-sel button.on{background:#fff;color:var(--own);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:0 3px 14px rgba(16,32,28,.04)}
+.panel h3{font-family:'Noto Serif Display';color:var(--own);font-size:17px;margin:0 0 2px}
+.panel .psub{color:var(--muted);font-size:11.5px;margin:0 0 10px}
+svg{display:block;width:100%;height:auto;font-family:'Outfit',sans-serif}
+.legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px;font-size:11.5px}
+.legend .li{display:flex;align-items:center;gap:5px}
+.legend .sw{width:11px;height:11px;border-radius:3px}
+.pp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:11px}
+.pp{border:1px solid var(--line);border-radius:11px;padding:12px 14px;position:relative;background:#fff}
+.pp.bad{background:#fdf3f1;border-color:#e8c4bc}.pp.warn{background:var(--warnbg);border-color:#ead39b}
+.pp.ok{background:var(--okbg);border-color:#c3e2cb}.pp.na{background:#f7f8f7}
+.pp .ppl{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase}
+.pp .ppv{font-family:'DM Mono';font-size:22px;font-weight:500;margin:2px 0}
+.pp.bad .ppv{color:var(--neg)}.pp.warn .ppv{color:var(--warn)}.pp.ok .ppv{color:var(--ok)}.pp.na .ppv{color:#b6bdb8}
+.pp .ppt{font-size:11px;color:var(--muted)}
+.pp .ppbadge{position:absolute;top:10px;right:11px;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px}
+.pp.bad .ppbadge{background:#fadbd4;color:var(--neg)}.pp.warn .ppbadge{background:#f5e6c0;color:var(--warn)}
+.pp.ok .ppbadge{background:#cdeacf;color:var(--ok)}.pp.na .ppbadge{background:#e9ece9;color:#96a09a}
+.diag{background:var(--own-deep);color:#fff;border-radius:14px;padding:18px 22px;margin-bottom:18px}
+.diag h3{font-family:'Noto Serif Display';font-size:18px;margin:0 0 8px;color:#fff}
+.diag .drow{display:flex;gap:9px;padding:8px 0;border-bottom:1px solid #ffffff1a;font-size:13px}
+.diag .drow:last-child{border-bottom:none}
+.diag .di{flex-shrink:0;width:21px;height:21px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800}
+.diag .dtxt{color:#cfe0d9}
+.diag .empty{color:#9fbcb2;font-size:13px}
+/* sliders */
+.sim-panel{margin-bottom:18px}
+.sl-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px 22px}
+.sl{margin-bottom:4px}
+.sl label{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;margin-bottom:5px}
+.sl label .sv{font-family:'DM Mono';color:var(--own);font-weight:500}
+.sl label .sv.chg{color:var(--gold)}
+input[type=range]{width:100%;accent-color:var(--own)}
+.sl .base{font-size:10.5px;color:var(--muted);font-family:'DM Mono';margin-top:2px}
+.simhd{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.reset-sl{font-size:11.5px;font-weight:700;color:var(--own);background:var(--soft);border:none;padding:6px 12px;border-radius:8px;cursor:pointer}
+.reset-sl:hover{background:#d9ebe3}
+.foot{text-align:center;color:var(--muted);font-size:11.5px;margin-top:20px;padding-top:14px;border-top:1px solid var(--line)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--own-deep);color:#fff;padding:11px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:99;opacity:0;transition:.3s;pointer-events:none}
+.toast.on{opacity:1}
+.toast.err{background:var(--neg)}
+.brandmark{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;background:var(--own);color:#fff;font-weight:800;font-size:15px}
+.bsub{font-size:11.5px;color:#9fbcb2;font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-left:-4px}
+.maintabs{display:flex;gap:3px;margin-left:16px}
+.mtab{font-family:'Outfit';font-weight:700;font-size:13px;padding:7px 15px;border-radius:9px;border:1px solid transparent;background:transparent;color:#9fbcb2;cursor:pointer}
+.mtab:hover{color:#fff}
+.mtab.on{background:#0f3a2e;color:#fff;border-color:#2c5f52}
+.view{display:none}.view.on{display:block}
+/* saved list */
+.saved-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;margin-bottom:6px;background:#fff}
+.saved-item:hover{border-color:var(--own)}
+.saved-item .si-n{flex:1;min-width:0}
+.saved-item .si-name{font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.saved-item .si-meta{font-size:10.5px;color:var(--muted);font-family:'DM Mono'}
+.saved-item button{border:none;background:var(--soft);color:var(--own);font-size:11px;font-weight:700;padding:5px 9px;border-radius:7px;cursor:pointer}
+.saved-item button:hover{background:#d9ebe3}
+.saved-item button.del{background:#fdeceb;color:var(--neg)}
+.grade-dot{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#fff;flex-shrink:0}
+.empty-s{font-size:11.5px;color:var(--muted);text-align:center;padding:14px;background:#f7faf8;border-radius:9px;border:1px dashed var(--line)}
+/* compare */
+.cmp-wrap{padding:22px 26px;max-width:1300px;margin:0 auto}
+.cmp-pick{display:grid;grid-template-columns:1fr 60px 1fr;gap:14px;align-items:center;margin-bottom:20px}
+.cmp-sel{width:100%;font-family:'Outfit';font-size:14px;font-weight:600;padding:11px 13px;border:1px solid var(--line);border-radius:11px;background:#fff;color:var(--ink)}
+.cmp-vs{text-align:center;font-family:'Noto Serif Display';font-size:19px;color:var(--muted);font-weight:700}
+.cmp-head{display:grid;grid-template-columns:1fr 60px 1fr;gap:14px;margin-bottom:16px}
+.cmp-card{background:var(--own-deep);color:#fff;border-radius:14px;padding:16px 18px;text-align:center}
+.cmp-card .cn{font-family:'Noto Serif Display';font-size:17px;margin-bottom:3px}
+.cmp-card .cg{display:inline-block;font-weight:800;font-size:13px;padding:3px 12px;border-radius:999px;margin-top:5px}
+.cmp-card .cm{font-size:11.5px;color:#9fbcb2;font-family:'DM Mono';margin-top:6px}
+.cmp-tbl{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 3px 14px rgba(16,32,28,.05)}
+.cmp-tbl th{background:var(--ink);color:#fff;padding:10px 14px;font-size:12px;font-weight:600;text-align:center}
+.cmp-tbl th:first-child{text-align:left}
+.cmp-tbl td{padding:9px 14px;border-bottom:1px solid #f0f3f0;text-align:center;font-family:'DM Mono'}
+.cmp-tbl td:first-child{text-align:left;font-family:'Outfit';font-weight:600}
+.cmp-tbl tr.grp td{background:#f1f6f2;font-family:'Outfit';font-weight:800;color:var(--own);font-size:12px;text-transform:uppercase;letter-spacing:.4px}
+.cmp-tbl .win{font-weight:700}
+.cv{display:inline-block;padding:2px 9px;border-radius:7px;font-weight:600}
+.cv.ok{background:var(--okbg);color:var(--ok)}.cv.warn{background:var(--warnbg);color:var(--warn)}
+.cv.bad{background:#fdeceb;color:var(--neg)}.cv.na{background:#f0f2f0;color:#9aa39d}
+.cmp-charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0}
+.cmp-empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.cmp-empty .ce-i{font-size:40px;margin-bottom:10px}
+.verdict-box{background:var(--own-deep);color:#fff;border-radius:14px;padding:18px 22px;margin-top:18px}
+.verdict-box h3{font-family:'Noto Serif Display';font-size:17px;margin:0 0 8px;color:#fff}
+.verdict-box .vrow{padding:7px 0;border-bottom:1px solid #ffffff1a;font-size:13.5px;color:#cfe0d9}
+.verdict-box .vrow:last-child{border-bottom:none}
+.verdict-box b{color:#fff}
+@media(max-width:1000px){.shell{grid-template-columns:1fr}.left{max-height:none}.right{max-height:none}.charts{grid-template-columns:1fr}.sl-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <span class="brandmark">✚</span>
+  <span class="bt">Bác sĩ Tài chính</span><span class="bsub">FinanOne</span><span class="bv mono">v3.0</span>
+  <div class="maintabs">
+    <button class="mtab on" data-view="exam">Khám doanh nghiệp</button>
+    <button class="mtab" data-view="compare">So sánh công ty</button>
+  </div>
+  <span class="sp"></span>
+  <label class="uplab" for="xlsFile">📂 Upload Excel BCTC</label>
+  <input type="file" id="xlsFile" accept=".xls,.xlsx">
+  <button id="saveBtn">💾 Lưu báo cáo</button>
+  <button id="demoBtn">Số mẫu</button>
+  <button id="pngBtn">Xuất ảnh</button>
+  <button id="clearBtn">Xóa</button>
+</div>
+
+<div class="view on" id="view-exam">
+<div class="shell">
+  <aside class="left">
+    <div id="srcInfo"></div>
+
+    <div class="grouphd">Đơn vị hiển thị
+      <div class="unit-sel" style="width:150px">
+        <button data-u="1" class="on">Đồng</button>
+        <button data-u="1000000">Triệu</button>
+        <button data-u="1000000000">Tỷ</button>
+      </div>
+    </div>
+
+    <div class="grouphd">Kết quả kinh doanh</div>
+    <div class="fld"><label>Doanh thu thuần <span class="code">MS 10</span></label><input id="rev" data-c placeholder="0"></div>
+    <div class="fld"><label>Giá vốn hàng bán <span class="code">MS 11</span></label><input id="cogs" data-c placeholder="0"></div>
+    <div class="fld"><label>Chi phí bán hàng & QLDN <span class="code">MS 24 / 25+26</span></label><input id="opex" data-c placeholder="0"></div>
+    <div class="fld"><label>Chi phí lãi vay <span class="code">MS 23</span></label><input id="int" data-c placeholder="0"></div>
+    <div class="fld"><label>Chi phí thuế & khác <span class="code">MS 51</span></label><input id="other" data-c placeholder="0"></div>
+    <div class="mini" id="plCheck"></div>
+
+    <div class="grouphd">Tài sản</div>
+    <div class="fld"><label>Tài sản ngắn hạn <span class="code" id="lbl_ca">MS 100</span></label><input id="ca" data-c placeholder="0"></div>
+    <div class="fld"><label>· Hàng tồn kho <span class="code">MS 140/141</span></label><input id="inv" data-c placeholder="0"></div>
+    <div class="fld"><label>· Phải thu ngắn hạn <span class="code">MS 130</span></label><input id="ar" data-c placeholder="0"></div>
+    <div class="fld"><label>Tài sản dài hạn <span class="code" id="lbl_nca">MS 200</span></label><input id="nca" data-c placeholder="0"></div>
+
+    <div class="grouphd">Nguồn vốn</div>
+    <div class="fld"><label>Nợ ngắn hạn <span class="code" id="lbl_scl">MS 310</span></label><input id="scl" data-c placeholder="0"></div>
+    <div class="fld"><label>Nợ dài hạn <span class="code" id="lbl_lcl">MS 330</span></label><input id="lcl" data-c placeholder="0"></div>
+    <div class="fld"><label>Vốn chủ sở hữu <span class="code">MS 400</span></label><input id="eq" data-c placeholder="0"></div>
+    <div class="fld"><label>· Tổng nợ vay <span class="code">MS 316 / 320+338</span></label><input id="debt" data-c placeholder="0"></div>
+    <div class="fld"><label>Nợ gốc phải trả năm tới <span class="code">ước tính</span></label><input id="prin" data-c placeholder="0"></div>
+    <div id="balNote"></div>
+
+    <div class="btnrow"><button class="btn ghost" id="demoBtn2">Điền số mẫu</button></div>
+
+    <div class="grouphd" style="margin-top:22px">Báo cáo đã lưu <span id="savedCount" style="font-family:'DM Mono';font-size:10.5px;color:var(--muted)"></span></div>
+    <div id="savedList"></div>
+    <div class="btnrow">
+      <button class="btn ghost" id="expBtn" style="font-size:11.5px">Xuất JSON</button>
+      <button class="btn ghost" id="impBtn" style="font-size:11.5px">Nhập JSON</button>
+    </div>
+    <input type="file" id="jsonFile" accept=".json" style="display:none">
+  </aside>
+
+  <main class="right">
+    <div class="charts">
+      <div class="panel">
+        <h3>Bảng cân đối kế toán</h3>
+        <p class="psub">Hai cột cân cao độ: Tài sản = Nguồn vốn.</p>
+        <svg id="bsChart" viewBox="0 0 460 360" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="legend" id="bsLegend"></div>
+      </div>
+      <div class="panel">
+        <h3>Kết quả kinh doanh — thác nước</h3>
+        <p class="psub">Doanh thu rơi qua từng lớp chi phí xuống lợi nhuận.</p>
+        <svg id="plChart" viewBox="0 0 500 360" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+    </div>
+
+    <div class="panel sim-panel">
+      <div class="simhd">
+        <div>
+          <h3>Mô phỏng what-if</h3>
+          <p class="psub" style="margin:0">Kéo thanh để xem chỉ số đổi thế nào — chart và chẩn đoán cập nhật ngay.</p>
+        </div>
+        <button class="reset-sl" id="resetSl">Về số gốc</button>
+      </div>
+      <div class="sl-grid">
+        <div class="sl"><label>Doanh thu <span class="sv" id="v_rev">100%</span></label><input type="range" id="s_rev" min="-60" max="80" step="5" value="0"><div class="base" id="b_rev"></div></div>
+        <div class="sl"><label>Giá vốn / DT <span class="sv" id="v_cogs">gốc</span></label><input type="range" id="s_cogs" min="-20" max="20" step="1" value="0"><div class="base" id="b_cogs"></div></div>
+        <div class="sl"><label>Chi phí BH&QL <span class="sv" id="v_opex">100%</span></label><input type="range" id="s_opex" min="-50" max="50" step="5" value="0"><div class="base" id="b_opex"></div></div>
+        <div class="sl"><label>Vay thêm <span class="sv" id="v_debt">0</span></label><input type="range" id="s_debt" min="0" max="100" step="5" value="0"><div class="base" id="b_debt"></div></div>
+        <div class="sl"><label>Lãi suất vay <span class="sv" id="v_rate">11%/năm</span></label><input type="range" id="s_rate" min="5" max="20" step="0.5" value="11"><div class="base">áp cho phần vay thêm</div></div>
+        <div class="sl"><label>Kỳ hạn trả gốc <span class="sv" id="v_term">3 năm</span></label><input type="range" id="s_term" min="1" max="10" step="1" value="3"><div class="base">để tính nợ gốc/năm</div></div>
+      </div>
+    </div>
+
+    <div class="diag" id="diagBox">
+      <h3>Chẩn đoán khả năng vay</h3>
+      <div class="empty">Upload file Excel BCTC hoặc nhập số liệu để xem chẩn đoán.</div>
+    </div>
+
+    <div class="panel">
+      <h3>Chỉ số & pain point</h3>
+      <p class="psub">Ô đỏ = dưới ngưỡng ngân hàng, chính là lý do khó vay.</p>
+      <div class="pp-grid" id="ppGrid"></div>
+    </div>
+
+    <div class="foot">Ngưỡng tham chiếu thị trường ngân hàng Việt Nam · Không thay thế thẩm định tín dụng chính thức</div>
+  </main>
+</div>
+</div>
+
+<div class="view" id="view-compare">
+  <div class="cmp-wrap">
+    <div class="cmp-pick">
+      <select class="cmp-sel" id="cmpA"></select>
+      <div class="cmp-vs">vs</div>
+      <select class="cmp-sel" id="cmpB"></select>
+    </div>
+    <div id="cmpBody"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+let UNIT=1;                 // hiển thị: 1=đồng, 1e6=triệu, 1e9=tỷ
+let BASE=null;              // số gốc (đồng) sau khi load, để slider tham chiếu
+let SRC=null;               // metadata nguồn
+
+const rawNum=id=>{const v=parseFloat(($(id).value||'').replace(/[.,\s]/g,m=>m===','?'.':''));return isNaN(v)?null:v;};
+function num(id){ // trả về giá trị theo ĐỒNG (nhân UNIT)
+  const el=$(id); if(!el)return null;
+  let t=(el.value||'').trim(); if(!t)return null;
+  t=t.replace(/\./g,'').replace(/,/g,'.').replace(/\s/g,'');
+  const v=parseFloat(t); return isNaN(v)?null:v*UNIT;
+}
+function setNum(id,valDong){ // set ô theo đơn vị hiển thị
+  const el=$(id); if(!el)return;
+  if(valDong==null){el.value='';return;}
+  const v=valDong/UNIT;
+  el.value=(UNIT===1)?Math.round(v).toLocaleString('vi-VN'):(Math.abs(v)>=100?Math.round(v).toLocaleString('vi-VN'):v.toFixed(2));
+}
+const fmtD=v=>{ // format số tiền theo đơn vị hiện tại, gọn
+  if(v==null)return '—';
+  const x=v/UNIT;
+  if(Math.abs(x)>=1000) return Math.round(x).toLocaleString('vi-VN');
+  return (Math.abs(x)>=10?Math.round(x):Math.round(x*10)/10).toLocaleString('vi-VN');
+};
+const unitLabel=()=>UNIT===1?'đ':(UNIT===1e6?'tr':'tỷ');
+function toast(msg,err){const t=$('toast');t.textContent=msg;t.className='toast on'+(err?' err':'');setTimeout(()=>t.className='toast',3600);}
+
+/* ============ EXCEL PARSER ============ */
+const MAP_TT133={ // B01a-DNN (TT133)
+  name:'TT133 — B01a/DNN',
+  bs:{ cash:110, fin:120, ar:130, inv:140, fa:150, re:160, cip:170, other:180, totA:200, totLiab:300, loan:316, eq:400, totLE:500 },
+  pl:{ rev:10, cogs:11, gross:20, finInc:21, finExp:22, int:23, opex:24, ebit:30, ebt:50, tax:51, npat:60 }
+};
+const MAP_TT200={ // B01-DN (TT200)
+  name:'TT200 — B01/DN',
+  bs:{ ca:100, ar:130, inv:140, nca:200, totA:270, totLiab:300, scl:310, lcl:330, eq:400, totLE:440, loanS:320, loanL:338 },
+  pl:{ rev:10, cogs:11, gross:20, int:23, sell:25, admin:26, ebit:30, ebt:50, tax:51, npat:60 }
+};
+
+function sheetToGrid(ws){
+  return XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:null});
+}
+// tìm cột chứa mã số + cột giá trị, bằng cách quét dòng có nhiều mã hợp lệ
+function detectLayout(grid,codeSet){
+  let best={score:-1};
+  const nCols=Math.max(...grid.map(r=>r?r.length:0));
+  for(let c=0;c<nCols;c++){
+    let hits=[];
+    grid.forEach((row,ri)=>{
+      if(!row)return;
+      const v=row[c];
+      const n=(typeof v==='number')?v:(typeof v==='string'&&/^\d{1,3}$/.test(v.trim())?parseInt(v.trim()):null);
+      if(n!=null&&codeSet.has(n))hits.push(ri);
+    });
+    if(hits.length>best.score)best={score:hits.length,codeCol:c,rows:hits};
+  }
+  if(best.score<3)return null;
+  // cột giá trị = cột bên phải codeCol có nhiều số lớn nhất
+  const nCols2=nCols;
+  let valCols=[];
+  for(let c=best.codeCol+1;c<nCols2;c++){
+    let cnt=0,sum=0;
+    best.rows.forEach(ri=>{
+      const v=grid[ri][c];
+      if(typeof v==='number'&&isFinite(v)){cnt++;sum+=Math.abs(v);}
+    });
+    if(cnt>=Math.max(3,best.rows.length*0.4))valCols.push({c,cnt,sum});
+  }
+  valCols.sort((a,b)=>b.cnt-a.cnt||b.sum-a.sum);
+  if(!valCols.length)return null;
+  // cột "năm nay" = cột trái nhất trong các cột giá trị tốt
+  const good=valCols.slice(0,3).sort((a,b)=>a.c-b.c);
+  return {codeCol:best.codeCol,valCol:good[0].c,valCol2:good[1]?good[1].c:null,rows:best.rows};
+}
+function readByCode(grid,layout,code){
+  for(const ri of layout.rows){
+    const v=grid[ri][layout.codeCol];
+    const n=(typeof v==='number')?v:parseInt(String(v).trim());
+    if(n===code){
+      const x=grid[ri][layout.valCol];
+      return (typeof x==='number'&&isFinite(x))?x:null;
+    }
+  }
+  return null;
+}
+
+function parseWorkbook(wb){
+  // gom tất cả sheet, tìm sheet BS và sheet PL
+  const bsCodes133=new Set([110,120,130,140,150,160,170,180,200,300,316,400,500]);
+  const bsCodes200=new Set([100,110,130,140,200,270,300,310,330,400,440]);
+  const plCodes=new Set([1,2,10,11,20,21,22,23,24,25,26,30,31,32,40,50,51,60]);
+
+  let bs=null,pl=null,std=null;
+  wb.SheetNames.forEach(nm=>{
+    const grid=sheetToGrid(wb.Sheets[nm]);
+    if(!grid.length)return;
+    // thử BS TT133
+    if(!bs){
+      const L133=detectLayout(grid,bsCodes133);
+      if(L133){
+        const has500=readByCode(grid,L133,500)!=null, has200=readByCode(grid,L133,200)!=null;
+        const has270=readByCode(grid,L133,270)!=null, has310=readByCode(grid,L133,310)!=null;
+        if(has270||has310){bs={grid,L:L133,sheet:nm};std='TT200';}
+        else if(has500||has200){bs={grid,L:L133,sheet:nm};std='TT133';}
+      }
+    }
+    if(!pl){
+      const Lp=detectLayout(grid,plCodes);
+      if(Lp){
+        const r10=readByCode(grid,Lp,10),r60=readByCode(grid,Lp,60),r11=readByCode(grid,Lp,11);
+        // sheet PL phải có doanh thu + LNST và KHÔNG phải sheet BS
+        if(r10!=null&&(r60!=null||r11!=null)&&(!bs||nm!==bs.sheet))pl={grid,L:Lp,sheet:nm};
+      }
+    }
+  });
+  if(!bs&&!pl)return {err:'Không nhận diện được mã chỉ tiêu trong file. Kiểm tra file có phải BCTC mẫu B01/B02 không.'};
+
+  const out={std:std||'TT200',derived:[],sheets:{bs:bs?bs.sheet:null,pl:pl?pl.sheet:null}};
+  // tên công ty: dò nhãn 'người nộp thuế' rồi lấy ô có chữ dài nhất cùng dòng (hoặc dòng kế)
+  (function(){
+    const srcGrid=(bs&&bs.grid)||(pl&&pl.grid); if(!srcGrid)return;
+    for(let ri=0;ri<Math.min(srcGrid.length,30);ri++){
+      const row=srcGrid[ri]; if(!row)continue;
+      for(let ci=0;ci<row.length;ci++){
+        const v=row[ci];
+        if(typeof v==='string'&&/người\s*nộp\s*thuế/i.test(v)&&!/mã số/i.test(v)){
+          let best='';
+          for(let cj=ci+1;cj<row.length;cj++){
+            const t=row[cj];
+            if(typeof t==='string'&&t.trim().length>best.length&&!/mã số|thuế:/i.test(t))best=t.trim();
+          }
+          if(best.length>4){out.company=best.replace(/\s+/g,' ').trim();return;}
+        }
+      }
+    }
+  })();
+  const R=(src,code)=>src?readByCode(src.grid,src.L,code):null;
+
+  // ---- Balance sheet ----
+  if(bs){
+    if(std==='TT133'){
+      const cash=R(bs,110)||0,fin=R(bs,120)||0,ar=R(bs,130)||0,inv=R(bs,140)||0,oth=R(bs,180)||0;
+      const fa=R(bs,150)||0,re=R(bs,160)||0,cip=R(bs,170)||0;
+      out.ca=cash+fin+ar+inv+oth;   // suy diễn
+      out.nca=fa+re+cip;            // suy diễn
+      out.derived.push('TS ngắn hạn = MS 110+120+130+140+180','TS dài hạn = MS 150+160+170');
+      out.ar=ar; out.inv=inv;
+      out.totA=R(bs,200);
+      const liab=R(bs,300);
+      out.scl=liab; out.lcl=0;      // TT133 không tách → coi toàn bộ là ngắn hạn
+      out.derived.push('Nợ ngắn hạn = toàn bộ MS 300 (TT133 không tách ngắn/dài hạn)');
+      out.eq=R(bs,400); out.debt=R(bs,316); out.totLE=R(bs,500);
+    }else{
+      out.ca=R(bs,100); out.nca=R(bs,200); out.ar=R(bs,130); out.inv=R(bs,140);
+      out.totA=R(bs,270); out.scl=R(bs,310); out.lcl=R(bs,330); out.eq=R(bs,400); out.totLE=R(bs,440);
+      const l1=R(bs,320)||0,l2=R(bs,338)||0; out.debt=(l1+l2)||null;
+      if(out.nca!=null&&out.totA!=null&&out.ca!=null&&Math.abs(out.ca+out.nca-out.totA)>1){
+        out.nca=out.totA-out.ca; out.derived.push('TS dài hạn = MS 270 − MS 100');
+      }
+    }
+  }
+  // ---- P&L ----
+  if(pl){
+    out.rev=R(pl,10); out.cogs=R(pl,11); out.int=R(pl,23);
+    const opex24=R(pl,24), sell=R(pl,25), admin=R(pl,26);
+    if(opex24!=null&&sell==null&&admin==null){out.opex=opex24;}
+    else{out.opex=(sell||0)+(admin||0);}
+    out.tax=R(pl,51); out.npat=R(pl,60); out.ebt=R(pl,50);
+    // "chi phí khác" gộp: thuế + chi phí khác(32) - thu nhập khác(31)
+    const oi=R(pl,31)||0, oe=R(pl,32)||0, finExp=R(pl,22)||0, finInc=R(pl,21)||0;
+    out.other=(out.tax||0)+oe-oi+Math.max(0,finExp-(out.int||0))-finInc;
+  }
+  return out;
+}
+
+function applyParsed(P){
+  if(P.err){toast(P.err,true);return;}
+  UNIT=1; document.querySelectorAll('.unit-sel button').forEach(b=>b.classList.toggle('on',b.dataset.u==='1'));
+  const set=(id,v)=>setNum(id,v==null?null:v);
+  set('rev',P.rev); set('cogs',P.cogs); set('opex',P.opex); set('int',P.int); set('other',P.other);
+  set('ca',P.ca); set('inv',P.inv); set('ar',P.ar); set('nca',P.nca);
+  set('scl',P.scl); set('lcl',P.lcl); set('eq',P.eq); set('debt',P.debt);
+  // nợ gốc năm tới: mặc định = nợ vay / 3 năm nếu có vay
+  set('prin',P.debt?P.debt/3:0);
+
+  // đánh dấu ô suy diễn
+  ['ca','nca','scl'].forEach(id=>$(id).classList.remove('derived'));
+  if(P.std==='TT133'){['ca','nca','scl'].forEach(id=>$(id).classList.add('derived'));}
+  $('lbl_ca').textContent=P.std==='TT133'?'suy diễn 110+120+130+140+180':'MS 100';
+  $('lbl_nca').textContent=P.std==='TT133'?'suy diễn 150+160+170':'MS 200';
+  $('lbl_scl').textContent=P.std==='TT133'?'= MS 300 (toàn bộ)':'MS 310';
+  $('lbl_lcl').textContent=P.std==='TT133'?'TT133 không tách':'MS 330';
+
+  SRC=P;
+  $('srcInfo').innerHTML=`<div class="srcbox"><b>✓ ${P.company||('Đã nạp '+P.std)}</b>
+    <div class="sm">Chuẩn: ${P.std}</div>
+    <div class="sm">Sheet: ${[P.sheets.bs,P.sheets.pl].filter(Boolean).join(' · ')||'—'}</div>
+    ${P.derived.length?`<div class="sm" style="color:var(--warn);margin-top:5px">⚠ Số suy diễn (ô nền vàng): ${P.derived.join(' · ')}</div>`:''}
+    </div>`;
+  captureBase(); resetSliders(); update();
+  toast('Đã nạp dữ liệu từ '+P.std);
+}
+
+$('xlsFile').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f)return;
+  const rd=new FileReader();
+  rd.onload=ev=>{
+    try{
+      const wb=XLSX.read(new Uint8Array(ev.target.result),{type:'array'});
+      applyParsed(parseWorkbook(wb));
+    }catch(err){toast('Lỗi đọc file: '+err.message,true);}
+  };
+  rd.readAsArrayBuffer(f);
+  e.target.value='';
+});
+
+/* ============ BASE & SLIDERS ============ */
+function captureBase(){
+  BASE={rev:num('rev')||0,cogs:num('cogs')||0,opex:num('opex')||0,int:num('int')||0,other:num('other')||0,
+    ca:num('ca')||0,inv:num('inv')||0,ar:num('ar')||0,nca:num('nca')||0,
+    scl:num('scl')||0,lcl:num('lcl')||0,eq:num('eq')||0,debt:num('debt')||0,prin:num('prin')||0};
+  const b=(id,v)=>{const el=$(id);if(el)el.textContent='gốc: '+fmtD(v)+' '+unitLabel();};
+  b('b_rev',BASE.rev); b('b_opex',BASE.opex); b('b_debt',BASE.debt);
+  $('b_cogs').textContent=BASE.rev?'gốc: '+(BASE.cogs/BASE.rev*100).toFixed(1)+'% DT':'—';
+}
+function resetSliders(){
+  s_rev.value=0;s_cogs.value=0;s_opex.value=0;s_debt.value=0;s_rate.value=11;s_term.value=3;
+  syncSliderLabels();
+}
+function syncSliderLabels(){
+  const dr=+s_rev.value, dc=+s_cogs.value, dop=+s_opex.value, dd=+s_debt.value;
+  $('v_rev').textContent=(dr>=0?'+':'')+dr+'%'; $('v_rev').className='sv'+(dr?' chg':'');
+  $('v_cogs').textContent=dc===0?'gốc':((dc>0?'+':'')+dc+' điểm %'); $('v_cogs').className='sv'+(dc?' chg':'');
+  $('v_opex').textContent=(dop>=0?'+':'')+dop+'%'; $('v_opex').className='sv'+(dop?' chg':'');
+  const addD=BASE?BASE.eq*dd/100:0;
+  $('v_debt').textContent=dd===0?'0':('+'+fmtD(addD)+' '+unitLabel()); $('v_debt').className='sv'+(dd?' chg':'');
+  $('b_debt').textContent=BASE?('gốc: '+fmtD(BASE.debt)+' '+unitLabel()+' · thêm = '+dd+'% vốn chủ'):'';
+  $('v_rate').textContent=(+s_rate.value).toFixed(1)+'%/năm';
+  $('v_term').textContent=s_term.value+' năm';
+}
+// scenario: trả về số liệu SAU khi áp slider
+function scenario(){
+  const base=BASE||{};
+  const hasBase=BASE&&(BASE.rev||BASE.ca||BASE.eq);
+  if(!hasBase)return null;
+  const dr=+s_rev.value/100, dc=+s_cogs.value, dop=+s_opex.value/100, dd=+s_debt.value/100;
+  const rate=+s_rate.value/100, term=+s_term.value;
+
+  const rev=base.rev*(1+dr);
+  const cogsRatio=base.rev?base.cogs/base.rev:0;
+  const cogs=rev*Math.max(0,cogsRatio+dc/100);
+  const opex=base.opex*(1+dop);
+  const addDebt=base.eq*dd;
+  const debt=base.debt+addDebt;
+  const intr=base.int+addDebt*rate;
+  const prin=debt/term;
+  // tiền vay thêm → tăng TS ngắn hạn & nợ ngắn hạn
+  const ca=base.ca+addDebt, nca=base.nca;
+  const scl=base.scl+addDebt, lcl=base.lcl;
+  // lợi nhuận đổi → vốn chủ đổi (chênh so với gốc)
+  const npBase=base.rev-base.cogs-base.opex-base.int-base.other;
+  const np=rev-cogs-opex-intr-base.other;
+  const eq=base.eq+(np-npBase);
+  return {rev,cogs,opex,int:intr,other:base.other,ca,inv:base.inv,ar:base.ar,nca,scl,lcl,eq,debt,prin,np,
+    changed:(dr||dc||dop||dd||rate!==0.11||term!==3)};
+}
+['s_rev','s_cogs','s_opex','s_debt','s_rate','s_term'].forEach(id=>{
+  $(id).addEventListener('input',()=>{syncSliderLabels();update();});
+});
+$('resetSl').onclick=()=>{resetSliders();update();};
+
+/* ============ ACTIVE DATA (base hoặc scenario) ============ */
+function activeData(){
+  const sc=scenario();
+  if(sc&&sc.changed)return {...sc,isSim:true};
+  return {rev:num('rev')||0,cogs:num('cogs')||0,opex:num('opex')||0,int:num('int')||0,other:num('other')||0,
+    ca:num('ca')||0,inv:num('inv')||0,ar:num('ar')||0,nca:num('nca')||0,
+    scl:num('scl')||0,lcl:num('lcl')||0,eq:num('eq')||0,debt:num('debt')||0,prin:num('prin')||0,isSim:false};
+}
+
+/* ============ CHARTS ============ */
+function drawBS(D){
+  const svg=$('bsChart');
+  const W=460,H=360,top=30,bot=40,colW=118,gap=90;
+  const xA=72,xL=xA+colW+gap,usableH=H-top-bot;
+  const totA=D.ca+D.nca, totL=D.scl+D.lcl+D.eq;
+  const maxTot=Math.max(totA,totL,1);
+  const hA=totA/maxTot*usableH,hL=totL/maxTot*usableH;
+  function stack(x,layers){
+    let y=top+usableH,out='';
+    layers.forEach(l=>{
+      if(l.v<=0)return;
+      const seg=l.v/maxTot*usableH; y-=seg;
+      out+=`<rect x="${x}" y="${y}" width="${colW}" height="${seg}" fill="${l.c}"/>`;
+      if(seg>17){
+        out+=`<text x="${x+colW/2}" y="${y+seg/2-3}" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">${l.lab}</text>`;
+        out+=`<text x="${x+colW/2}" y="${y+seg/2+10}" text-anchor="middle" font-size="9" fill="#ffffffcc" font-family="DM Mono">${fmtD(l.v)}</text>`;
+      }
+    });
+    return out;
+  }
+  let s=`<line x1="42" y1="${top+usableH}" x2="${W-30}" y2="${top+usableH}" stroke="#d7ddd8"/>`;
+  if(totA<=0&&totL<=0){
+    s+=`<text x="${W/2}" y="${H/2}" text-anchor="middle" font-size="12" fill="#b6bdb8">Chưa có số liệu</text>`;
+  }else{
+    s+=stack(xA,[{v:D.nca,c:'var(--nca)',lab:'TS dài hạn'},{v:D.ca,c:'var(--ca)',lab:'TS ngắn hạn'}]);
+    s+=stack(xL,[{v:Math.max(0,D.eq),c:'var(--eq)',lab:'Vốn chủ SH'},{v:D.lcl,c:'var(--lcl)',lab:'Nợ dài hạn'},{v:D.scl,c:'var(--scl)',lab:'Nợ ngắn hạn'}]);
+    if(D.eq<0){
+      const seg=Math.min(usableH*0.12,Math.abs(D.eq)/maxTot*usableH+8);
+      s+=`<rect x="${xL}" y="${top+usableH}" width="${colW}" height="${seg}" fill="#7a1d10"/>`;
+      s+=`<text x="${xL+colW/2}" y="${top+usableH+seg/2+4}" text-anchor="middle" font-size="9.5" fill="#fff" font-weight="700">Vốn chủ ÂM ${fmtD(D.eq)}</text>`;
+    }
+  }
+  s+=`<text x="${xA+colW/2}" y="${top+usableH+18}" text-anchor="middle" font-size="11.5" font-weight="800" fill="var(--own)">TÀI SẢN</text>`;
+  s+=`<text x="${xA+colW/2}" y="${top+usableH+31}" text-anchor="middle" font-size="9.5" fill="var(--muted)" font-family="DM Mono">${fmtD(totA)} ${unitLabel()}</text>`;
+  s+=`<text x="${xL+colW/2}" y="${top+usableH+18}" text-anchor="middle" font-size="11.5" font-weight="800" fill="var(--own)">NGUỒN VỐN</text>`;
+  s+=`<text x="${xL+colW/2}" y="${top+usableH+31}" text-anchor="middle" font-size="9.5" fill="var(--muted)" font-family="DM Mono">${fmtD(totL)} ${unitLabel()}</text>`;
+  const diff=totA-totL;
+  if(totA>0&&totL>0){
+    const ok=Math.abs(diff)<Math.max(totA,totL)*0.005;
+    s+=ok?`<text x="${W/2}" y="17" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--ok)">⇄ Cân đối (TS = NV)</text>`
+        :`<text x="${W/2}" y="17" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--neg)">⚠ Lệch ${fmtD(Math.abs(diff))} ${unitLabel()}</text>`;
+    $('balNote').innerHTML=ok?`<div class="bal-note ok">✓ Cân đối: ${fmtD(totA)} ${unitLabel()}</div>`
+      :`<div class="bal-note bad">⚠ Lệch ${fmtD(Math.abs(diff))} — TS ${fmtD(totA)} vs NV ${fmtD(totL)}</div>`;
+  }else $('balNote').innerHTML='';
+  svg.innerHTML=s;
+  $('bsLegend').innerHTML=[['var(--ca)','TS ngắn hạn'],['var(--nca)','TS dài hạn'],['var(--scl)','Nợ ngắn hạn'],['var(--lcl)','Nợ dài hạn'],['var(--eq)','Vốn chủ SH']]
+    .map(l=>`<span class="li"><span class="sw" style="background:${l[0]}"></span>${l[1]}</span>`).join('');
+}
+
+function drawPL(D){
+  const svg=$('plChart');
+  const W=500,H=360,top=26,bot=62,left=22,right=18;
+  const plotH=H-top-bot,plotW=W-left-right;
+  const gross=D.rev-D.cogs, ebit=gross-D.opex, ebt=ebit-D.int, np=ebt-D.other;
+  const steps=[
+    {lab:'Doanh thu',val:D.rev,type:'total'},
+    {lab:'Giá vốn',val:-D.cogs,type:'sub'},
+    {lab:'Lãi gộp',val:gross,type:'subtotal'},
+    {lab:'CP BH&QL',val:-D.opex,type:'sub'},
+    {lab:'LN thuần',val:ebit,type:'subtotal'},
+    {lab:'Lãi vay',val:-D.int,type:'sub'},
+    {lab:'Thuế/khác',val:-D.other,type:'sub'},
+    {lab:'Lợi nhuận',val:np,type:'total'},
+  ];
+  const vals=steps.map(s=>Math.abs(s.val)).concat([D.rev]);
+  const maxV=Math.max(...vals,1);
+  const minV=Math.min(0,np,ebit,ebt);
+  const range=maxV-Math.min(0,minV);
+  const scale=plotH/range;
+  const y0=top+plotH+Math.min(0,minV)*scale;
+  const n=steps.length,step=plotW/n,bw=Math.min(44,step*0.6);
+  const yOf=v=>y0-v*scale;
+  let s=`<line x1="${left}" y1="${y0}" x2="${W-right}" y2="${y0}" stroke="#d7ddd8"/>`;
+  let running=0;
+  if(D.rev<=0&&np===0){
+    s+=`<text x="${W/2}" y="${H/2}" text-anchor="middle" font-size="12" fill="#b6bdb8">Chưa có số liệu</text>`;
+  }else{
+  steps.forEach((st,i)=>{
+    const cx=left+step*i+step/2,x=cx-bw/2;
+    let barTop,barBot,val=st.val,col;
+    if(st.type!=='sub'){
+      barBot=yOf(0);barTop=yOf(val);running=val;
+      if(barTop>barBot){const t=barTop;barTop=barBot;barBot=t;}
+      col=(i===n-1)?(val>=0?'var(--own)':'var(--neg)'):(st.type==='total'?'var(--own-deep)':'var(--nca)');
+    }else{
+      const a=running,b=running+val;running=b;
+      const ya=yOf(a),yb=yOf(b);
+      barTop=Math.min(ya,yb);barBot=Math.max(ya,yb);
+      col=val<0?'var(--neg)':'var(--ca)';
+    }
+    const h=Math.max(1.5,barBot-barTop);
+    s+=`<rect x="${x}" y="${barTop}" width="${bw}" height="${h}" fill="${col}" rx="2"/>`;
+    const disp=(st.type==='sub'?(val<0?'−':'+'):'')+fmtD(Math.abs(val));
+    const ly=(barTop-5<top+6)?barBot+12:barTop-5;
+    s+=`<text x="${cx}" y="${ly}" text-anchor="middle" font-size="9" font-family="DM Mono" fill="${st.type==='sub'?(val<0?'var(--neg)':'var(--ca)'):'var(--ink)'}" font-weight="${st.type==='sub'?'400':'600'}">${disp}</text>`;
+    s+=`<text x="${cx}" y="${top+plotH+16}" text-anchor="end" font-size="9" fill="var(--muted)" transform="rotate(-35 ${cx} ${top+plotH+16})">${st.lab}</text>`;
+  });
+  if(D.rev>0){
+    const nm=np/D.rev*100;
+    s+=`<text x="${W-right}" y="${top+9}" text-anchor="end" font-size="10.5" font-weight="700" fill="${np>=0?'var(--own)':'var(--neg)'}">Biên LN ròng: ${nm.toFixed(1)}%</text>`;
+  }}
+  svg.innerHTML=s;
+}
+
+/* ============ METRICS ============ */
+function computeMetrics(D){
+  const gross=D.rev-D.cogs, ebit=gross-D.opex, ebt=ebit-D.int, np=ebt-D.other;
+  const ebitda=ebt+D.int;
+  const totLiab=D.scl+D.lcl;
+  const ds=D.prin+D.int;
+  const M=[];
+  const push=(key,label,val,ok,warn,higher,f,thr,naTxt)=>{
+    if(val==null||!isFinite(val)){M.push({key,label,val:null,band:'na',thr,naTxt});return;}
+    const band=higher?(val>=ok?'ok':(val>=warn?'warn':'bad')):(val<=ok?'ok':(val<=warn?'warn':'bad'));
+    M.push({key,label,val,fmtv:f,band,thr});
+  };
+  push('dscr','DSCR', ds>0?ebitda/ds:null, 1.3,1.0,true, v=>v.toFixed(2),'≥ 1,3','Chưa có nợ vay');
+  push('de','Nợ / Vốn chủ (D/E)', D.eq>0?totLiab/D.eq:null, 2,3,false, v=>v.toFixed(2),'≤ 2,0', D.eq<=0?'Vốn chủ âm':'—');
+  push('cr','Thanh toán hiện hành', D.scl>0?D.ca/D.scl:null, 1.2,1.0,true, v=>v.toFixed(2),'≥ 1,2','Không có nợ NH');
+  push('qr','Thanh toán nhanh', D.scl>0?(D.ca-D.inv)/D.scl:null, .8,.5,true, v=>v.toFixed(2),'≥ 0,8','Không có nợ NH');
+  push('nm','Biên LN ròng', D.rev>0?np/D.rev*100:null, 5,1,true, v=>v.toFixed(1)+'%','≥ 5%','Chưa có doanh thu');
+  push('roe','ROE', D.eq>0?np/D.eq*100:null, 12,4,true, v=>v.toFixed(1)+'%','≥ 12%', D.eq<=0?'Vốn chủ âm':'—');
+  push('dEb','Nợ vay / EBITDA', (D.debt>0&&ebitda>0)?D.debt/ebitda:null, 3.5,5,false, v=>v.toFixed(1)+'×','≤ 3,5×', D.debt<=0?'Chưa có nợ vay':'EBITDA ≤ 0');
+  push('icr','Khả năng trả lãi', D.int>0?ebit/D.int:null, 3,1.5,true, v=>v.toFixed(1)+'×','≥ 3×','Chưa có lãi vay');
+  return {M,gross,ebit,ebt,np,ebitda,totLiab,ds};
+}
+
+function renderMetrics(D){
+  const {M}=computeMetrics(D);
+  const bn={ok:'ĐẠT',warn:'SÁT NGƯỠNG',bad:'DƯỚI NGƯỠNG',na:'N/A'};
+  $('ppGrid').innerHTML=M.map(m=>{
+    const v=m.val==null?(m.naTxt&&m.naTxt!=='—'?'—':'—'):m.fmtv(m.val);
+    const sub=m.val==null&&m.naTxt&&m.naTxt!=='—'?m.naTxt:('Ngưỡng '+m.thr);
+    return `<div class="pp ${m.band}"><span class="ppbadge">${bn[m.band]}</span>
+      <div class="ppl">${m.label}</div><div class="ppv">${v}</div><div class="ppt">${sub}</div></div>`;
+  }).join('');
+}
+
+/* ---- borrowing capacity ---- */
+function capacity(D,R){
+  const notes=[];let cap=null;
+  if(R.ebitda>0){
+    const maxDS=R.ebitda/1.3;
+    const c=Math.max(0,(maxDS-D.int)*3); // ~3 năm gốc
+    cap=c; notes.push(`Theo dòng tiền (DSCR mục tiêu 1,3 · kỳ hạn 3 năm): tối đa ~<b>${fmtD(c)} ${unitLabel()}</b>`);
+  }
+  if(D.eq>0){
+    const head=D.eq*2-(D.scl+D.lcl);
+    if(head>0){notes.push(`Theo dư địa đòn bẩy (D/E tối đa 2,0): còn ~<b>${fmtD(head)} ${unitLabel()}</b>`);
+      cap=cap==null?head:Math.min(cap,head);}
+    else notes.push('Đòn bẩy đã chạm ngưỡng D/E 2,0 — không còn dư địa theo tiêu chí này.');
+  }
+  return {cap,notes};
+}
+
+/* ============ DIAGNOSIS ============ */
+const DIAG={
+  dscr:'Dòng tiền không đủ trả cả gốc lẫn lãi — điểm nghẽn nặng nhất, ngân hàng gần như chắc chắn từ chối.',
+  de:'Đòn bẩy quá cao, vốn chủ mỏng. Nên tăng vốn chủ trước khi vay thêm.',
+  cr:'Thanh khoản ngắn hạn yếu — tài sản ngắn hạn không đủ trả nợ ngắn hạn.',
+  qr:'Thanh toán nhanh thấp — phụ thuộc tồn kho để trả nợ ngắn hạn.',
+  nm:'Biên lợi nhuận mỏng — khó thuyết phục về khả năng hoàn vốn.',
+  roe:'ROE thấp — sinh lời trên vốn chủ kém hấp dẫn.',
+  dEb:'Nợ vay lớn so với EBITDA — cần quá nhiều năm dòng tiền để trả hết nợ.',
+  icr:'Lợi nhuận hoạt động không đủ đệm để trả lãi vay.',
+};
+function renderDiag(D){
+  const R=computeMetrics(D);
+  const box=$('diagBox');
+  const has=D.rev>0||D.ca>0||D.eq!==0;
+  if(!has){box.innerHTML='<h3>Chẩn đoán khả năng vay</h3><div class="empty">Upload file Excel BCTC hoặc nhập số liệu để xem chẩn đoán.</div>';return;}
+  const bad=R.M.filter(m=>m.band==='bad'),warn=R.M.filter(m=>m.band==='warn');
+  let rows='';
+  const add=(c,t,x)=>{rows+=`<div class="drow"><div class="di" style="background:${c};color:#fff">${t}</div><div>${x}</div></div>`;};
+
+  // no-debt case → capacity framing
+  if(D.debt<=0&&D.int<=0){
+    const cp=capacity(D,R);
+    add('var(--ok)','✓',`<b>Doanh nghiệp chưa có nợ vay.</b> <span class="dtxt">Các chỉ số nợ chưa áp dụng được — thay vào đó đây là dư địa vay:</span>`);
+    cp.notes.forEach(n=>add('var(--gold)','→',`<span class="dtxt">${n}</span>`));
+    if(cp.cap!=null)add('var(--gold)','₫',`<b>Hạn mức khả thi ước tính: ${fmtD(cp.cap)} ${unitLabel()}</b> <span class="dtxt">(mức thấp hơn giữa hai tiêu chí)</span>`);
+  }
+  bad.forEach(m=>add('var(--neg)','✕',`<b>${m.label} = ${m.fmtv(m.val)}</b> <span class="dtxt">${DIAG[m.key]||''}</span>`));
+  warn.forEach(m=>add('var(--gold)','!',`<b>${m.label} = ${m.fmtv(m.val)}</b> <span class="dtxt">${DIAG[m.key]||'Sát ngưỡng — cần củng cố.'}</span>`));
+
+  // structural
+  if(D.rev>0){
+    if(R.gross<D.rev*.15)add('var(--neg)','✕',`<b>Lãi gộp mỏng (${(R.gross/D.rev*100).toFixed(1)}%)</b> <span class="dtxt">Giá vốn chiếm quá lớn, ít dư địa gánh chi phí và lãi vay.</span>`);
+    if(R.np<0)add('var(--neg)','✕',`<b>Lỗ ròng</b> <span class="dtxt">Rào cản lớn nhất khi vay — cần chứng minh lộ trình hòa vốn.</span>`);
+  }
+  if(D.eq<0)add('var(--neg)','✕',`<b>Vốn chủ sở hữu âm</b> <span class="dtxt">Lỗ lũy kế vượt vốn góp — hầu như không thể vay ngân hàng cho tới khi phục hồi.</span>`);
+  if(D.ca>0&&D.inv/D.ca>.7)add('var(--gold)','!',`<b>Tồn kho chiếm ${(D.inv/D.ca*100).toFixed(0)}% TS ngắn hạn</b> <span class="dtxt">Vốn bị chôn ở hàng, rủi ro thanh khoản nếu hàng chậm luân chuyển.</span>`);
+  if(D.ca>0&&D.ar/D.ca>.7)add('var(--gold)','!',`<b>Phải thu chiếm ${(D.ar/D.ca*100).toFixed(0)}% TS ngắn hạn</b> <span class="dtxt">Vốn bị khách hàng chiếm dụng — cần siết thu hồi công nợ.</span>`);
+
+  if(!rows)add('var(--ok)','✓','<b>Hồ sơ cân đối.</b> <span class="dtxt">Không có chỉ số nào dưới ngưỡng.</span>');
+
+  const nBad=bad.length,nWarn=warn.length;
+  const head=nBad?`${nBad} điểm nghẽn`+(nWarn?` · ${nWarn} cảnh báo`:''):(nWarn?`${nWarn} điểm cần củng cố`:'Chưa phát hiện điểm nghẽn');
+  const simTag=D.isSim?' <span style="font-size:12px;background:var(--gold);color:#16201C;padding:2px 9px;border-radius:7px;font-weight:800">ĐANG MÔ PHỎNG</span>':'';
+  box.innerHTML=`<h3>Chẩn đoán khả năng vay — ${head}${simTag}</h3>${rows}`;
+}
+
+/* ============ UPDATE ============ */
+function plHint(){
+  const D=activeData();
+  if(!D.rev){$('plCheck').textContent='';return;}
+  const np=D.rev-D.cogs-D.opex-D.int-D.other;
+  $('plCheck').textContent='→ Lợi nhuận: '+(np<0?'(':'')+fmtD(Math.abs(np))+(np<0?')':'')+' '+unitLabel();
+}
+function update(){
+  const D=activeData();
+  drawBS(D);drawPL(D);renderMetrics(D);renderDiag(D);plHint();
+}
+document.querySelectorAll('input[data-c]').forEach(i=>i.addEventListener('input',()=>{captureBase();update();}));
+
+/* unit switch */
+document.querySelectorAll('.unit-sel button').forEach(b=>{
+  b.onclick=()=>{
+    const old=UNIT,nu=+b.dataset.u;
+    const ids=['rev','cogs','opex','int','other','ca','inv','ar','nca','scl','lcl','eq','debt','prin'];
+    const vals=ids.map(id=>num(id));
+    UNIT=nu;
+    document.querySelectorAll('.unit-sel button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+    ids.forEach((id,i)=>setNum(id,vals[i]));
+    captureBase();syncSliderLabels();update();
+  };
+});
+
+/* demo = số thật từ file mẫu TT133 */
+function fillDemo(){
+  UNIT=1e6;document.querySelectorAll('.unit-sel button').forEach(x=>x.classList.toggle('on',x.dataset.u==='1000000'));
+  const d={rev:17312827100,cogs:15114887388,opex:974911144,int:0,other:222266620,
+    ca:3997340859,inv:108839707,ar:3777657138,nca:0,
+    scl:2111454304,lcl:0,eq:1885886555,debt:0,prin:0};
+  Object.entries(d).forEach(([k,v])=>setNum(k,v));
+  SRC=null;$('srcInfo').innerHTML='<div class="srcbox"><b>Số mẫu</b><div class="sm">DN thương mại TT133 · năm 2025</div></div>';
+  ['ca','nca','scl'].forEach(id=>$(id).classList.add('derived'));
+  captureBase();resetSliders();update();
+}
+$('demoBtn').onclick=fillDemo;$('demoBtn2').onclick=fillDemo;
+$('clearBtn').onclick=()=>{document.querySelectorAll('input[data-c]').forEach(i=>{i.value='';i.classList.remove('derived');});
+  $('srcInfo').innerHTML='';BASE=null;resetSliders();update();};
+
+/* export png */
+$('pngBtn').onclick=()=>{
+  const svgs=[$('bsChart'),$('plChart')],scale=2,pad=20,gap=26;
+  const vbs=svgs.map(s=>{const v=s.getAttribute('viewBox').split(' ').map(Number);return{w:v[2],h:v[3]};});
+  const totalW=vbs.reduce((a,v)=>a+v.w,0)+gap,maxH=Math.max(...vbs.map(v=>v.h));
+  const cv=document.createElement('canvas');
+  cv.width=(totalW+pad*2)*scale;cv.height=(maxH+pad*2+28)*scale;
+  const ctx=cv.getContext('2d');ctx.scale(scale,scale);
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.fillStyle='#0B5D4B';ctx.font='bold 15px Outfit,sans-serif';
+  ctx.fillText('BCTC — Bảng cân đối & Kết quả kinh doanh (đơn vị: '+unitLabel()+')',pad,pad+2);
+  const CM={'var(--ca)':'#0B5D4B','var(--nca)':'#2D7A66','var(--scl)':'#B3402E','var(--lcl)':'#C77A2E','var(--eq)':'#C79A3B','var(--own)':'#0B5D4B','var(--own-deep)':'#0B2E24','var(--neg)':'#B3402E','var(--muted)':'#6a746e','var(--ink)':'#16201C','var(--ok)':'#14803a'};
+  let xo=pad,done=0;
+  svgs.forEach((sv,i)=>{
+    let str=new XMLSerializer().serializeToString(sv);
+    Object.entries(CM).forEach(([k,v])=>{str=str.split(k).join(v);});
+    const img=new Image(),blob=new Blob([str],{type:'image/svg+xml'}),url=URL.createObjectURL(blob);
+    const lx=xo,vb=vbs[i];
+    img.onload=()=>{ctx.drawImage(img,lx,pad+28,vb.w,vb.h);URL.revokeObjectURL(url);
+      if(++done===svgs.length){const a=document.createElement('a');a.download='BCTC_charts.png';a.href=cv.toDataURL('image/png');a.click();}};
+    img.src=url;xo+=vb.w+gap;
+  });
+};
+
+
+/* ================= LƯU BÁO CÁO ================= */
+const LSKEY='finan_doctor_v3_reports';
+let REPORTS=[];   // [{id,name,at,std,data:{...},derived:[]}]
+
+function hasLS(){try{localStorage.setItem('__t','1');localStorage.removeItem('__t');return true;}catch(e){return false;}}
+function loadReports(){
+  if(!hasLS())return;
+  try{const r=localStorage.getItem(LSKEY);if(r)REPORTS=JSON.parse(r)||[];}catch(e){REPORTS=[];}
+}
+function persist(){
+  if(!hasLS())return;
+  try{localStorage.setItem(LSKEY,JSON.stringify(REPORTS));}catch(e){}
+}
+function snapshotData(){
+  return {rev:num('rev')||0,cogs:num('cogs')||0,opex:num('opex')||0,int:num('int')||0,other:num('other')||0,
+    ca:num('ca')||0,inv:num('inv')||0,ar:num('ar')||0,nca:num('nca')||0,
+    scl:num('scl')||0,lcl:num('lcl')||0,eq:num('eq')||0,debt:num('debt')||0,prin:num('prin')||0};
+}
+/* chấm điểm tổng hợp 0-100 để gắn hạng cho báo cáo */
+function scoreOf(D){
+  const R=computeMetrics(D);
+  const w={dscr:30,de:20,cr:12,qr:8,nm:8,roe:7,dEb:8,icr:7};
+  let sum=0,tot=0;
+  R.M.forEach(m=>{
+    const ww=w[m.key]||0; if(!ww)return;
+    let sc=null;
+    if(m.band==='ok')sc=100; else if(m.band==='warn')sc=55; else if(m.band==='bad')sc=15;
+    if(m.key==='dscr'&&m.val==null&&D.debt<=0&&D.int<=0)sc=null; // chưa vay: bỏ qua
+    if(sc==null)return;
+    sum+=sc*ww; tot+=ww;
+  });
+  // phạt cấu trúc
+  let pen=0;
+  const gross=D.rev-D.cogs, np=gross-D.opex-D.int-D.other;
+  if(D.rev>0&&gross/D.rev<0.15)pen+=12;
+  if(np<0)pen+=15;
+  if(D.eq<0)pen+=30;
+  if(D.ca>0&&(D.inv/D.ca>0.7||D.ar/D.ca>0.7))pen+=6;
+  if(!tot)return null;
+  return Math.max(0,Math.min(100,Math.round(sum/tot)-pen));
+}
+function gradeOf(sc){
+  if(sc==null)return{g:'?',t:'Thiếu dữ liệu',c:'#9aa39d'};
+  if(sc>=80)return{g:'A',t:'Rất tốt',c:'#3ecf8e'};
+  if(sc>=65)return{g:'B',t:'Tốt',c:'#8fd14f'};
+  if(sc>=50)return{g:'C',t:'Trung bình',c:'#e6b32e'};
+  if(sc>=35)return{g:'D',t:'Yếu',c:'#e08a2e'};
+  return{g:'E',t:'Rủi ro cao',c:'#d0492f'};
+}
+function saveReport(){
+  const D=snapshotData();
+  if(!D.rev&&!D.ca&&!D.eq){toast('Chưa có số liệu để lưu',true);return;}
+  let nm=(SRC&&SRC.company)?SRC.company:'';
+  nm=prompt('Tên công ty cho báo cáo này:',nm||'Công ty chưa đặt tên');
+  if(nm===null)return;
+  nm=(nm||'').trim()||'Không tên';
+  const sc=scoreOf(D);
+  REPORTS.unshift({id:'r'+Date.now()+Math.random().toString(36).slice(2,6),
+    name:nm,at:new Date().toISOString(),std:SRC?SRC.std:'nhập tay',
+    unit:UNIT,data:D,score:sc,derived:SRC?SRC.derived:[]});
+  persist();renderSaved();renderCmpOptions();
+  toast('Đã lưu: '+nm+(hasLS()?'':' (chỉ trong phiên này)'));
+}
+function renderSaved(){
+  const box=$('savedList');
+  $('savedCount').textContent=REPORTS.length?'('+REPORTS.length+')':'';
+  if(!REPORTS.length){box.innerHTML='<div class="empty-s">Chưa có báo cáo nào.<br>Load file rồi bấm <b>Lưu báo cáo</b>.</div>';return;}
+  box.innerHTML=REPORTS.map(r=>{
+    const g=gradeOf(r.score);
+    const d=new Date(r.at);
+    const dd=('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+    return `<div class="saved-item">
+      <div class="grade-dot" style="background:${g.c}">${g.g}</div>
+      <div class="si-n"><div class="si-name" title="${r.name}">${r.name}</div>
+      <div class="si-meta">${r.std} · ${dd}${r.score!=null?' · '+r.score+'đ':''}</div></div>
+      <button data-load="${r.id}">Mở</button>
+      <button class="del" data-del="${r.id}">✕</button>
+    </div>`;
+  }).join('');
+  box.querySelectorAll('[data-load]').forEach(b=>b.onclick=()=>openReport(b.dataset.load));
+  box.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
+    const r=REPORTS.find(x=>x.id===b.dataset.del);
+    if(r&&confirm('Xóa báo cáo "'+r.name+'"?')){
+      REPORTS=REPORTS.filter(x=>x.id!==b.dataset.del);persist();renderSaved();renderCmpOptions();toast('Đã xóa');
+    }
+  });
+}
+function openReport(id){
+  const r=REPORTS.find(x=>x.id===id); if(!r)return;
+  UNIT=r.unit||1;
+  document.querySelectorAll('.unit-sel button').forEach(b=>b.classList.toggle('on',+b.dataset.u===UNIT));
+  Object.entries(r.data).forEach(([k,v])=>setNum(k,v));
+  SRC={std:r.std,derived:r.derived||[],company:r.name,sheets:{bs:null,pl:null}};
+  ['ca','nca','scl'].forEach(i=>$(i).classList.toggle('derived',(r.derived||[]).length>0));
+  $('srcInfo').innerHTML=`<div class="srcbox"><b>📄 ${r.name}</b>
+    <div class="sm">${r.std} · đã lưu ${new Date(r.at).toLocaleString('vi-VN')}</div>
+    ${(r.derived||[]).length?`<div class="sm" style="color:var(--warn);margin-top:5px">⚠ Số suy diễn: ${r.derived.join(' · ')}</div>`:''}</div>`;
+  captureBase();resetSliders();update();
+  toast('Đã mở: '+r.name);
+}
+$('saveBtn').onclick=saveReport;
+$('expBtn').onclick=()=>{
+  if(!REPORTS.length){toast('Chưa có báo cáo nào',true);return;}
+  const blob=new Blob([JSON.stringify({app:'FinanOne',v:3,reports:REPORTS},null,1)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='FinanOne_baocao_'+new Date().toISOString().slice(0,10)+'.json';a.click();
+  toast('Đã xuất '+REPORTS.length+' báo cáo');
+};
+$('impBtn').onclick=()=>$('jsonFile').click();
+$('jsonFile').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=ev=>{
+    try{
+      const j=JSON.parse(ev.target.result);
+      const list=j.reports||j;
+      if(!Array.isArray(list))throw new Error('Sai định dạng');
+      let added=0;
+      list.forEach(r=>{if(r&&r.data&&!REPORTS.some(x=>x.id===r.id)){REPORTS.push(r);added++;}});
+      persist();renderSaved();renderCmpOptions();
+      toast('Đã nhập '+added+' báo cáo');
+    }catch(err){toast('Lỗi đọc JSON: '+err.message,true);}
+  };
+  rd.readAsText(f);e.target.value='';
+});
+
+/* ================= TAB SO SÁNH ================= */
+document.querySelectorAll('.mtab').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('.mtab').forEach(x=>x.classList.remove('on'));
+    document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    $('view-'+b.dataset.view).classList.add('on');
+    if(b.dataset.view==='compare')renderCompare();
+  };
+});
+function renderCmpOptions(){
+  const opts='<option value="">— Chọn công ty —</option>'+
+    REPORTS.map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
+  const a=$('cmpA'),b=$('cmpB');
+  const ca=a.value,cb=b.value;
+  a.innerHTML=opts;b.innerHTML=opts;
+  const valid=v=>v&&REPORTS.some(r=>r.id===v);
+  a.value=valid(ca)?ca:(REPORTS[0]?REPORTS[0].id:'');
+  // B phải khác A
+  if(valid(cb)&&cb!==a.value)b.value=cb;
+  else{const other=REPORTS.find(r=>r.id!==a.value);b.value=other?other.id:'';}
+}
+$('cmpA').onchange=renderCompare;$('cmpB').onchange=renderCompare;
+
+const CMP_ROWS=[
+  {g:'Quy mô'},
+  {k:'rev',   l:'Doanh thu thuần', money:1, hi:1},
+  {k:'np',    l:'Lợi nhuận sau thuế', money:1, hi:1},
+  {k:'totA',  l:'Tổng tài sản', money:1, hi:1},
+  {k:'eq',    l:'Vốn chủ sở hữu', money:1, hi:1},
+  {g:'Khả năng trả nợ'},
+  {k:'dscr',  l:'DSCR', f:v=>v.toFixed(2), hi:1, ok:1.3, warn:1.0},
+  {k:'dEb',   l:'Nợ vay / EBITDA', f:v=>v.toFixed(1)+'×', hi:0, ok:3.5, warn:5},
+  {k:'icr',   l:'Khả năng trả lãi', f:v=>v.toFixed(1)+'×', hi:1, ok:3, warn:1.5},
+  {g:'Đòn bẩy & thanh khoản'},
+  {k:'de',    l:'Nợ / Vốn chủ (D/E)', f:v=>v.toFixed(2), hi:0, ok:2, warn:3},
+  {k:'cr',    l:'Thanh toán hiện hành', f:v=>v.toFixed(2), hi:1, ok:1.2, warn:1.0},
+  {k:'qr',    l:'Thanh toán nhanh', f:v=>v.toFixed(2), hi:1, ok:0.8, warn:0.5},
+  {g:'Hiệu quả'},
+  {k:'gm',    l:'Biên lợi nhuận gộp', f:v=>v.toFixed(1)+'%', hi:1, ok:20, warn:15},
+  {k:'nm',    l:'Biên lợi nhuận ròng', f:v=>v.toFixed(1)+'%', hi:1, ok:5, warn:1},
+  {k:'roe',   l:'ROE', f:v=>v.toFixed(1)+'%', hi:1, ok:12, warn:4},
+  {g:'Cơ cấu tài sản'},
+  {k:'arPct', l:'Phải thu / TS ngắn hạn', f:v=>v.toFixed(0)+'%', hi:0, ok:50, warn:70},
+  {k:'invPct',l:'Tồn kho / TS ngắn hạn', f:v=>v.toFixed(0)+'%', hi:0, ok:50, warn:70},
+];
+function metricsOf(D){
+  const R=computeMetrics(D);
+  const m={};R.M.forEach(x=>m[x.key]=x.val);
+  const gross=D.rev-D.cogs;
+  return {...m, rev:D.rev, np:R.np, totA:D.ca+D.nca, eq:D.eq,
+    gm:D.rev?gross/D.rev*100:null,
+    arPct:D.ca?D.ar/D.ca*100:null, invPct:D.ca?D.inv/D.ca*100:null};
+}
+function bandOf(row,v){
+  if(v==null||!isFinite(v))return 'na';
+  if(row.ok==null)return '';
+  return row.hi?(v>=row.ok?'ok':(v>=row.warn?'warn':'bad'))
+               :(v<=row.ok?'ok':(v<=row.warn?'warn':'bad'));
+}
+function renderCompare(){
+  const body=$('cmpBody');
+  const ra=REPORTS.find(r=>r.id===$('cmpA').value), rb=REPORTS.find(r=>r.id===$('cmpB').value);
+  if(!ra||!rb){
+    body.innerHTML=`<div class="cmp-empty"><div class="ce-i">🩺</div>
+      <div>${REPORTS.length<2?'Cần ít nhất <b>2 báo cáo đã lưu</b> để so sánh.<br>Sang tab Khám doanh nghiệp, load file rồi bấm <b>Lưu báo cáo</b>.':'Chọn hai công ty ở trên để so sánh.'}</div></div>`;
+    return;
+  }
+  if(ra.id===rb.id){body.innerHTML='<div class="cmp-empty">Hãy chọn hai công ty <b>khác nhau</b>.</div>';return;}
+  // tự chọn đơn vị theo độ lớn để bảng dễ đọc
+  const mx=Math.max(ra.data.rev||0,rb.data.rev||0,ra.data.ca+ra.data.nca,rb.data.ca+rb.data.nca,1);
+  const U=mx>=1e10?1e9:(mx>=1e7?1e6:1);
+  const fm=v=>v==null?'—':(Math.abs(v/U)>=1000?Math.round(v/U).toLocaleString('vi-VN'):(Math.round(v/U*10)/10).toLocaleString('vi-VN'));
+  const ul=U===1?'đ':(U===1e6?'tr':'tỷ');
+  const A=metricsOf(ra.data), B=metricsOf(rb.data);
+  const ga=gradeOf(ra.score), gb=gradeOf(rb.score);
+
+  let rows='';
+  CMP_ROWS.forEach(r=>{
+    if(r.g){rows+=`<tr class="grp"><td colspan="3">${r.g}</td></tr>`;return;}
+    const va=A[r.k], vb=B[r.k];
+    const fmt=v=>{
+      if(v==null||!isFinite(v))return '<span class="cv na">—</span>';
+      const txt=r.money?fm(v)+' '+ul:r.f(v);
+      const b=bandOf(r,v);
+      return b?`<span class="cv ${b}">${txt}</span>`:txt;
+    };
+    // ai tốt hơn
+    let wa='',wb='';
+    if(va!=null&&vb!=null&&isFinite(va)&&isFinite(vb)&&va!==vb){
+      const aBetter=r.hi?va>vb:va<vb;
+      if(aBetter)wa='win';else wb='win';
+    }
+    rows+=`<tr><td>${r.l}</td><td class="${wa}">${fmt(va)}</td><td class="${wb}">${fmt(vb)}</td></tr>`;
+  });
+
+  // nhận định
+  const verd=[];
+  const cmp=(k,label,hi,fmtf)=>{
+    const a=A[k],b=B[k];
+    if(a==null||b==null||!isFinite(a)||!isFinite(b))return;
+    const aB=hi?a>b:a<b;
+    const win=aB?ra.name:rb.name, lose=aB?rb.name:ra.name;
+    const gap=Math.abs(a-b);
+    if(gap<1e-9)return;
+    verd.push(`<b>${label}:</b> ${win} tốt hơn (${fmtf(aB?a:b)} so với ${fmtf(aB?b:a)}) — ${lose} yếu hơn ở tiêu chí này.`);
+  };
+  cmp('dscr','Khả năng trả nợ',1,v=>v.toFixed(2));
+  cmp('de','Đòn bẩy',0,v=>v.toFixed(2));
+  cmp('cr','Thanh khoản',1,v=>v.toFixed(2));
+  cmp('gm','Biên gộp',1,v=>v.toFixed(1)+'%');
+  cmp('roe','Sinh lời trên vốn chủ',1,v=>v.toFixed(1)+'%');
+
+  const better=(ra.score||0)>=(rb.score||0)?ra:rb;
+  const bScore=Math.max(ra.score||0,rb.score||0), wScore=Math.min(ra.score||0,rb.score||0);
+
+  body.innerHTML=`
+  <div class="cmp-head">
+    <div class="cmp-card"><div class="cn">${ra.name}</div>
+      <div class="cg" style="background:${ga.c}22;color:${ga.c}">${ga.g} · ${ga.t}</div>
+      <div class="cm">${ra.score!=null?ra.score+'/100':'—'} · ${ra.std}</div></div>
+    <div class="cmp-vs" style="align-self:center">vs</div>
+    <div class="cmp-card"><div class="cn">${rb.name}</div>
+      <div class="cg" style="background:${gb.c}22;color:${gb.c}">${gb.g} · ${gb.t}</div>
+      <div class="cm">${rb.score!=null?rb.score+'/100':'—'} · ${rb.std}</div></div>
+  </div>
+
+  <div class="cmp-charts">
+    <div class="panel"><h3>${ra.name}</h3><p class="psub">Cân đối kế toán</p>
+      <svg id="cmpBsA" viewBox="0 0 460 300"></svg></div>
+    <div class="panel"><h3>${rb.name}</h3><p class="psub">Cân đối kế toán</p>
+      <svg id="cmpBsB" viewBox="0 0 460 300"></svg></div>
+  </div>
+
+  <table class="cmp-tbl">
+    <thead><tr><th>Chỉ tiêu</th><th>${ra.name}</th><th>${rb.name}</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+
+  <div class="verdict-box">
+    <h3>Nhận định so sánh</h3>
+    <div class="vrow"><b>Tổng thể:</b> ${better.name} có hồ sơ tín dụng tốt hơn (${bScore}/100 so với ${wScore}/100).</div>
+    ${verd.map(v=>`<div class="vrow">${v}</div>`).join('')}
+  </div>`;
+
+  drawMiniBS('cmpBsA',ra.data,U,ul);
+  drawMiniBS('cmpBsB',rb.data,U,ul);
+}
+/* chart BS thu nhỏ cho tab so sánh — dùng chung tỉ lệ để so trực quan */
+let CMP_SCALE=1;
+function drawMiniBS(id,D,U,ul){
+  const svg=$(id);if(!svg)return;
+  const ra=REPORTS.find(r=>r.id===$('cmpA').value),rb=REPORTS.find(r=>r.id===$('cmpB').value);
+  const maxBoth=Math.max(
+    (ra?ra.data.ca+ra.data.nca:0),(ra?ra.data.scl+ra.data.lcl+Math.max(0,ra.data.eq):0),
+    (rb?rb.data.ca+rb.data.nca:0),(rb?rb.data.scl+rb.data.lcl+Math.max(0,rb.data.eq):0),1);
+  const W=460,H=300,top=16,bot=38,colW=120,gap=86,usable=H-top-bot;
+  const xA=76,xL=xA+colW+gap;
+  const fmv=v=>Math.abs(v/U)>=1000?Math.round(v/U).toLocaleString('vi-VN'):(Math.round(v/U*10)/10).toLocaleString('vi-VN');
+  function stack(x,layers){
+    let y=top+usable,out='';
+    layers.forEach(l=>{if(l.v<=0)return;
+      const seg=l.v/maxBoth*usable;y-=seg;
+      out+=`<rect x="${x}" y="${y}" width="${colW}" height="${seg}" fill="${l.c}"/>`;
+      if(seg>15)out+=`<text x="${x+colW/2}" y="${y+seg/2+3}" text-anchor="middle" font-size="9" fill="#fff" font-weight="600">${l.lab} ${fmv(l.v)}</text>`;
+    });return out;
+  }
+  let s=`<line x1="46" y1="${top+usable}" x2="${W-24}" y2="${top+usable}" stroke="#d7ddd8"/>`;
+  s+=stack(xA,[{v:D.nca,c:'var(--nca)',lab:'TS dài'},{v:D.ca,c:'var(--ca)',lab:'TS ngắn'}]);
+  s+=stack(xL,[{v:Math.max(0,D.eq),c:'var(--eq)',lab:'Vốn chủ'},{v:D.lcl,c:'var(--lcl)',lab:'Nợ dài'},{v:D.scl,c:'var(--scl)',lab:'Nợ ngắn'}]);
+  if(D.eq<0){
+    const seg=Math.min(usable*0.14,Math.abs(D.eq)/maxBoth*usable+6);
+    s+=`<rect x="${xL}" y="${top+usable}" width="${colW}" height="${seg}" fill="#7a1d10"/>`;
+    s+=`<text x="${xL+colW/2}" y="${top+usable+seg/2+4}" text-anchor="middle" font-size="8.5" fill="#fff" font-weight="700">VCSH ÂM ${fmv(D.eq)}</text>`;
+  }
+  s+=`<text x="${xA+colW/2}" y="${top+usable+16}" text-anchor="middle" font-size="10" font-weight="800" fill="var(--own)">TÀI SẢN</text>`;
+  s+=`<text x="${xL+colW/2}" y="${top+usable+16}" text-anchor="middle" font-size="10" font-weight="800" fill="var(--own)">NGUỒN VỐN</text>`;
+  s+=`<text x="${W/2}" y="${top+usable+30}" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="DM Mono">đơn vị: ${ul} · cùng tỉ lệ hai bên</text>`;
+  svg.innerHTML=s;
+}
+
+loadReports();renderSaved();renderCmpOptions();
+
+syncSliderLabels();update();
+</script>
+</body>
+</html>
