@@ -43,8 +43,16 @@ body{font-family:var(--s-sans);background:var(--s-cream);color:var(--s-ink);font
 .pslot .plab{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:7px}
 .pslot .pn{font-size:12.5px;color:#cfe3db;line-height:1.35}
 .pslot .pn i{display:block;font-style:normal;font-family:var(--s-mono);font-size:9.5px;color:#7fa294;letter-spacing:.06em}
-.pslot .pv{font-family:var(--s-mono);font-size:14px;color:#fff;white-space:nowrap}
-.pslot .pv.ch{color:var(--s-gold)}
+.pslot .pv{font-family:var(--s-mono);font-size:14px;color:#fff;white-space:nowrap;
+ cursor:pointer;padding:2px 8px;border-radius:7px;border:1px dashed rgba(255,255,255,.28);transition:.15s}
+.pslot .pv:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.55)}
+.pslot .pv:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(255,255,255,.3)}
+.pslot .pv.ch{color:var(--s-gold);border-color:rgba(201,162,39,.6)}
+.pfoot .mxlab{cursor:pointer;padding:1px 5px;border-radius:5px;transition:.15s}
+.pfoot .mxlab:hover{background:rgba(255,255,255,.12);color:#cfe3db}
+.pfoot .mxlab:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(255,255,255,.4)}
+.pfoot .mxlab.ex{color:var(--s-gold)}
+.pfoot .mxlab.flash{background:rgba(201,162,39,.35);color:#fff}
 input[type=range]{width:100%;-webkit-appearance:none;height:3px;border-radius:2px;background:rgba(255,255,255,.2);outline:none}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#fff;cursor:pointer;border:4px solid var(--s-green);box-shadow:0 0 0 1px rgba(255,255,255,.5)}
 input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#fff;cursor:pointer;border:4px solid var(--s-green)}
@@ -230,7 +238,6 @@ td .sub{display:block;font-size:11px;color:var(--s-dim)}
 .dbx div.li:last-child{border:0}
 .dbx div.li span{font-family:var(--s-mono);color:var(--s-dim);font-size:11px;display:block}
 @media(max-width:1000px){.pgrid{grid-template-columns:1fr 1fr}.diffbox{grid-template-columns:1fr}}
-@media(max-width:820px){.pgrid{grid-template-columns:1fr 1fr}.vsbar{grid-template-columns:1fr;gap:4px}.vsbar .mid{text-align:left;min-width:0}.vsbar .bl{justify-content:flex-start}.vsbar .bl i{border-radius:5px}}
 
 /* ===== SNAPSHOTS ===== */
 .snaprow{display:flex;gap:9px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px}
@@ -277,20 +284,146 @@ td .sub{display:block;font-size:11px;color:var(--s-dim)}
 .tchip.on{background:var(--s-green);color:#fff;border-color:var(--s-green)}
 .tchip:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(0,112,74,.18)}
 .deltas{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
-@media(max-width:820px){.deltas{grid-template-columns:1fr}.srow{grid-template-columns:1fr auto}.srow .acts{opacity:1}}
+
 .disc{margin-top:30px;padding-top:15px;border-top:1px solid var(--s-line);font-size:11.5px;color:var(--s-dim);line-height:1.7}
 
+/* ===== MOBILE: FAB + SCRIM + GRABBER (ẩn ở desktop) ===== */
+#fab{display:none}
+#scrim{display:none;position:fixed;inset:0;background:rgba(20,38,31,.5);z-index:55;
+ opacity:0;transition:opacity .25s;backdrop-filter:blur(2px)}
+#scrim.on{opacity:1}
+#grab{display:none}
+
 @media(max-width:1000px){.grid2,.find,.pillars,.split{grid-template-columns:1fr}.pillars{grid-template-columns:1fr 1fr}}
+
+/* ============ MOBILE ============ */
 @media(max-width:820px){
- #panel{position:fixed;left:0;top:0;z-index:60;width:82%!important;max-width:340px;box-shadow:4px 0 24px rgba(0,0,0,.25)}
+ body{font-size:15.5px}
+ .wrap{padding:0 15px 96px}
  #resizer{display:none}
- .wrap{padding:0 16px 60px}
- .dashhead{grid-template-columns:1fr}.plabs{display:none}
- .nrow{grid-template-columns:24px 1fr 104px}
- header{flex-direction:column;align-items:flex-start}.stamp{text-align:left}
+ header{flex-direction:column;align-items:flex-start;padding:18px 0 8px;gap:10px}
+ .stamp{text-align:left;font-size:9.5px}
+ .togg{display:none}                       /* thay bằng FAB */
+ .plabs{display:none}
+ .prog{margin:8px 0 18px}
+
+ /* --- PANEL thành bottom sheet, MẶC ĐỊNH ĐÓNG --- */
+ #panel{position:fixed;left:0;right:0;bottom:0;top:auto;
+  width:100%!important;max-width:none;height:auto;max-height:76vh;
+  border-radius:20px 20px 0 0;z-index:60;
+  transform:translateY(101%);transition:transform .3s cubic-bezier(.32,.72,0,1);
+  box-shadow:0 -6px 30px rgba(20,38,31,.3);overflow:hidden;display:flex;flex-direction:column}
+ #panel.open{transform:translateY(0)}
+ #panel.hidden{display:flex}            /* class desktop không áp dụng ở mobile */
+ #grab{display:block;width:100%;padding:9px 0 3px;flex-shrink:0;cursor:grab;touch-action:none}
+ #grab i{display:block;width:38px;height:4px;border-radius:99px;background:rgba(255,255,255,.35);margin:0 auto}
+ .pnhead{position:static;padding:6px 18px 13px}
+ .pnhead .ttl{font-size:16.5px}
+ .pndelta{margin-top:10px;padding:9px 12px}
+ .pndelta .big{font-size:23px}
+ .pbtns .pbtn{padding:13px 10px;font-size:13px;min-height:46px}
+ input[type=range]{height:5px;box-sizing:content-box;padding:14px 0;background-clip:content-box}
+ .pnbody{flex:1;overflow-y:auto;padding:12px 18px 30px;-webkit-overflow-scrolling:touch}
+ .pslot{margin-bottom:20px}
+ .pslot .pv{font-size:15px;padding:5px 12px;min-height:32px;display:inline-flex;align-items:center}
+ .pfoot{font-size:10.5px}
+ .pfoot .mxlab{padding:9px 10px;margin:-5px -2px}
+ input[type=range]{height:5px}
+ input[type=range]::-webkit-slider-thumb{width:24px;height:24px;border-width:5px}
+ input[type=range]::-moz-range-thumb{width:24px;height:24px;border-width:5px}
+ #scrim{display:block;pointer-events:none}
+ #scrim.on{pointer-events:auto}
+
+ /* --- FAB --- */
+ #fab{display:flex;position:fixed;right:15px;bottom:15px;z-index:58;
+  align-items:center;gap:9px;padding:13px 19px;border-radius:99px;border:0;
+  background:var(--s-green);color:#fff;font-family:var(--s-sans);font-size:14px;font-weight:500;
+  box-shadow:0 5px 18px rgba(0,112,74,.4);cursor:pointer;min-height:50px}
+ #fab:active{transform:scale(.96)}
+ #fab .n{font-family:var(--s-mono);font-size:11px;background:rgba(255,255,255,.22);
+  padding:2px 8px;border-radius:99px}
+ #fab.hide{display:none}
+
+ /* --- typography --- */
+ h2{font-size:24px;line-height:1.24}
+ .lede{font-size:14.5px;margin-bottom:18px}
+ .card{padding:17px 16px;border-radius:13px}
+ .card h3{font-size:15.5px}
+ .split{grid-template-columns:1fr}
+ .split .gr{padding:20px 18px}
+
+ /* --- input rows: nhãn trên, ô dưới --- */
+ .nrow{grid-template-columns:34px 1fr;grid-template-areas:"star lbl" ". inp";gap:6px 10px;padding:11px 0}
+ .nrow .star{grid-area:star;width:30px;height:30px;font-size:15px}
+ .nrow .lbl{grid-area:lbl;font-size:14.5px}
+ .nrow .ni{grid-area:inp;padding:9px 12px}
+ .nrow .ni input{font-size:16px}          /* ≥16px: iOS không auto-zoom */
+ .fld input{font-size:16px;padding:11px 13px}
+ .choices.two,.choices.three{grid-template-columns:1fr}
+ .ch{padding:13px 15px;min-height:48px}
+ .s-btn{padding:12px 22px;min-height:46px;font-size:14px}
+ .nav{gap:10px}.nav .s-btn{flex:1}
+ .navnote{display:none}
+
+ /* --- dashboard --- */
+ .dashhead{grid-template-columns:1fr;gap:12px;text-align:center}
+ .verdict{font-size:22px}
+ .pillars{grid-template-columns:1fr 1fr;gap:9px}
+ .pillbox{padding:12px 13px}
+ .wfr{grid-template-columns:88px 1fr 76px;gap:7px;font-size:12px}
+ .wfr .amt{font-size:11.5px}
+ .quote{font-size:14.5px;padding:13px 15px}
+
+ /* --- bảng chỉ số → thẻ dọc --- */
+ table,thead,tbody,tr,td{display:block;width:100%}
+ thead{display:none}
+ tbody tr:not(.grp){border:1px solid var(--s-line);border-radius:11px;padding:11px 13px;margin-bottom:8px;background:var(--s-white)}
+ tbody tr:nth-child(even):not(.grp) td{background:transparent}
+ tr.grp{margin:16px 0 8px}
+ tr.grp td{border-radius:8px;padding:8px 12px}
+ tbody tr:not(.grp) td{border:0;padding:2px 0;text-align:left}
+ tbody tr:not(.grp) td:first-child{font-weight:600;font-size:14px;margin-bottom:5px}
+ tbody tr:not(.grp) td.m:nth-child(2){display:inline-block;width:auto;font-size:19px;margin-right:9px}
+ tbody tr:not(.grp) td.m:nth-child(3){display:inline-block;width:auto;font-size:12px}
+ tbody tr:not(.grp) td.m:nth-child(3)::before{content:"chuẩn ";color:var(--s-dim);font-size:10.5px}
+ tbody tr:not(.grp) td:last-child{margin-top:7px}
+
+ /* --- chân dung --- */
+ .pgrid{grid-template-columns:1fr 1fr;gap:8px}
+ .pcard{padding:11px 12px;min-height:88px}
+ .pcard .pnm{font-size:13px}.pcard .ptag{font-size:9.5px}.pcard .psc{font-size:17px}
+ .cmphead{flex-direction:column;gap:10px}
+ .cmphead .s-btn{width:100%}
+ .vsbar{grid-template-columns:1fr;gap:3px;padding:11px 0}
+ .vsbar .mid{text-align:left;min-width:0;display:flex;justify-content:space-between;
+  align-items:baseline;flex-direction:row-reverse;font-size:12px}
+ .vsbar .mid b{display:inline;font-size:12.5px}
+ .vsbar .bl{justify-content:flex-start}
+ .vsbar .bl i,.vsbar .br i{border-radius:5px}
+ .vsbar .bl,.vsbar .br{height:13px}
+ .diffbox{grid-template-columns:1fr}
+
+ /* --- snapshot --- */
+ .snaprow{flex-direction:column;align-items:stretch;gap:11px}
+ .snaprow .s-btn{width:100%;min-height:48px}
+ .phead{padding:13px 14px}
+ .phead .ct{font-size:9.5px;width:100%}
+ .srow{grid-template-columns:1fr auto;gap:8px;padding:11px 0}
+ .srow .acts{opacity:1;grid-column:1/-1;margin-top:5px}
+ .srow .mini{padding:7px 14px;font-size:12px;min-height:36px}
+ .deltas{grid-template-columns:1fr}
+ .tchips{gap:6px}.tchip{padding:8px 14px;font-size:12.5px;min-height:38px}
 }
+
+@media(max-width:380px){
+ .pgrid{grid-template-columns:1fr}
+ .pillars{grid-template-columns:1fr}
+ .wfr{grid-template-columns:78px 1fr 66px}
+ h2{font-size:21.5px}
+}
+
 @media print{
- #panel,#resizer,.nav,.togg,.prog,.plabs{display:none!important}
+ #panel,#resizer,.nav,.togg,.prog,.plabs,#fab,#scrim{display:none!important}
  body{background:#fff;color:#000}.card,.fbox{border:1px solid #ccc;break-inside:avoid}
 }
 </style>
@@ -300,6 +433,7 @@ td .sub{display:block;font-size:11px;color:var(--s-dim)}
 
 <!-- ============ PANEL ============ -->
 <aside id="panel">
+ <div id="grab" title="Kéo xuống để đóng"><i></i></div>
  <div class="pnhead">
   <div class="ttl">Bảng điều chỉnh</div>
   <div class="sub">What-if · chỉ số ★</div>
@@ -312,6 +446,8 @@ td .sub{display:block;font-size:11px;color:var(--s-dim)}
    <button class="pbtn" onclick="resetWhatif()">Về gốc</button>
    <button class="pbtn" onclick="applyWhatif()">Chốt số mới</button>
   </div>
+  <div style="font-size:10.5px;color:#7fa294;margin-top:9px;line-height:1.5;font-family:var(--s-mono)">
+   Bấm vào số để gõ giá trị bất kỳ · kéo tới cuối thanh để nới trần</div>
  </div>
  <div class="pnbody" id="pnbody"></div>
 </aside>
@@ -611,8 +747,13 @@ td .sub{display:block;font-size:11px;color:var(--s-dim)}
 </div></div>
 </div>
 
+<div id="scrim" onclick="closeSheet()"></div>
+<button id="fab" onclick="openSheet()" aria-label="Mở bảng điều chỉnh">
+ <span>Điều chỉnh</span><span class="n" id="fabN">0</span>
+</button>
+
 <script>
-const VERSION='v0.5', REL='19/07/2026 · Siren + what-if ★ + chân dung + lưu thời điểm';
+const VERSION='v0.7', REL='19/07/2026 · Range mở: trần tự nới + gõ số + bước tự động';
 vb.textContent=VERSION; st.textContent='Released '+REL;
 const LS_W='fh_panel_w', LS_S='fh_stars';
 
@@ -625,7 +766,7 @@ function paint(){[...prog.children].forEach((e,i)=>e.className='seg'+(i<cur?' do
  [...plabs.children].forEach((e,i)=>e.className=i===cur?'now':'')}
 function go(n){cur=n;onDash=(n===4);
  document.querySelectorAll('.step').forEach(s=>s.classList.toggle('on',+s.dataset.s===n));
- paint();scrollTo({top:0,behavior:'smooth'});buildPanel();}
+ paint();scrollTo({top:0,behavior:'smooth'});buildPanel();syncFab();if(isMobile())closeSheet();}
 paint();
 document.querySelectorAll('.ch[data-q]').forEach(b=>b.onclick=()=>{
  b.parentElement.querySelectorAll('.ch').forEach(x=>x.classList.remove('sel'));
@@ -635,7 +776,7 @@ document.querySelectorAll('.ch[data-q]').forEach(b=>b.onclick=()=>{
 const panel=document.getElementById('panel'),rz=document.getElementById('resizer');
 const savedW=localStorage.getItem(LS_W); if(savedW)document.documentElement.style.setProperty('--panel',savedW);
 let drag=false;
-rz.addEventListener('mousedown',e=>{drag=true;rz.classList.add('drag');document.body.style.userSelect='none';e.preventDefault()});
+rz.addEventListener('mousedown',e=>{if(isMobile())return;drag=true;rz.classList.add('drag');document.body.style.userSelect='none';e.preventDefault()});
 window.addEventListener('mousemove',e=>{if(!drag)return;
  const p=Math.max(210,Math.min(window.innerWidth*.46,e.clientX));
  const v=(p/window.innerWidth*100).toFixed(1)+'%';
@@ -644,6 +785,51 @@ window.addEventListener('mouseup',()=>{if(!drag)return;drag=false;rz.classList.r
  localStorage.setItem(LS_W,getComputedStyle(document.documentElement).getPropertyValue('--panel').trim());});
 function togglePanel(){const h=panel.classList.toggle('hidden');rz.classList.toggle('hidden',h);
  tg.textContent=h?'◨ Hiện bảng điều chỉnh':'◧ Ẩn bảng điều chỉnh';}
+
+/* ---------- MOBILE BOTTOM SHEET ---------- */
+const isMobile=()=>window.matchMedia('(max-width:820px)').matches;
+const scrim=document.getElementById('scrim'),fab=document.getElementById('fab'),grab=document.getElementById('grab');
+function openSheet(){
+ if(!isMobile())return;
+ panel.classList.add('open');scrim.classList.add('on');
+ fab.classList.add('hide');document.body.style.overflow='hidden';
+}
+function closeSheet(){
+ panel.classList.remove('open');scrim.classList.remove('on');
+ fab.classList.remove('hide');document.body.style.overflow='';
+ panel.style.transform='';
+}
+/* kéo grabber để đóng */
+let gy=0,gOn=false;
+const gStart=e=>{gOn=true;gy=(e.touches?e.touches[0]:e).clientY;panel.style.transition='none'};
+const gMove=e=>{if(!gOn)return;
+ const d=(e.touches?e.touches[0]:e).clientY-gy;
+ if(d>0){panel.style.transform=`translateY(${d}px)`;e.preventDefault()}};
+const gEnd=e=>{if(!gOn)return;gOn=false;panel.style.transition='';
+ const d=(e.changedTouches?e.changedTouches[0]:e).clientY-gy;
+ if(d>90)closeSheet();else panel.style.transform='';};
+grab.addEventListener('touchstart',gStart,{passive:true});
+grab.addEventListener('touchmove',gMove,{passive:false});
+grab.addEventListener('touchend',gEnd);
+grab.addEventListener('mousedown',gStart);
+window.addEventListener('mousemove',e=>{if(gOn)gMove(e)});
+window.addEventListener('mouseup',e=>{if(gOn)gEnd(e)});
+/* Esc để đóng */
+window.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.classList.contains('open'))closeSheet()});
+/* đổi hướng màn hình / resize: dọn trạng thái chéo */
+let lastM=isMobile();
+window.addEventListener('resize',()=>{
+ const m=isMobile();
+ if(m!==lastM){lastM=m;closeSheet();
+  if(!m){panel.classList.remove('hidden');rz.classList.remove('hidden');
+   tg.textContent='◧ Ẩn bảng điều chỉnh'}}
+ syncFab();});
+function syncFab(){
+ if(!isMobile()){fab.style.display='none';return}
+ const n=STARS.length;
+ fabN.textContent=onDash?(Object.keys(WHATIF).length?'●':n):n;
+ fab.style.display=n?'flex':'none';
+}
 
 /* ---------- stars ---------- */
 const META={
@@ -665,7 +851,7 @@ document.querySelectorAll('.star').forEach(b=>{
  b.title='Đưa chỉ số này vào bảng điều chỉnh';
  b.onclick=()=>{b.classList.toggle('on');
   STARS=[...document.querySelectorAll('.star.on')].map(x=>x.dataset.k);
-  localStorage.setItem(LS_S,JSON.stringify(STARS));buildPanel();}});
+  localStorage.setItem(LS_S,JSON.stringify(STARS));buildPanel();syncFab();}});
 
 /* ---------- data access ---------- */
 let WHATIF={};                       // key -> giá trị đang kéo
@@ -674,6 +860,26 @@ const V=id=>(id in WHATIF)?WHATIF[id]:RAW(id);
 const fmt=n=>n>=1000?(n/1000).toFixed(n%1000?2:0).replace(/\.?0+$/,'')+' tỷ':Math.round(n)+' tr';
 const pc=n=>(n*100).toFixed(Math.abs(n)<.1?1:0)+'%';
 const cl=(x,a,b)=>Math.max(a,Math.min(b,x));
+
+/* ---------- range: sàn theo loại + tự nới + bước tự động ---------- */
+const FLOOR={'tr/th':50,'tr':500,'tr/năm':300,'%/năm':25,'người':6,'tuổi':75};
+const DEBTK=['d_mor','d_con','d_cc','d_oth'];
+const INSK=['p_life','p_ci','p_pro'];
+function baseMax(k){
+ const un=(META[k]||[,''])[1],base=RAW(k);
+ if(un==='tuổi')return 75;
+ let fl=FLOOR[un]||50;
+ if(INSK.includes(k))fl=3000;
+ else if(DEBTK.includes(k))fl=1000;
+ else if(k==='a_home'||k==='a_re')fl=5000;
+ return Math.max(fl,Math.ceil(base*1.6/10)*10);
+}
+let MAXES=JSON.parse(localStorage.getItem('fh_maxes')||'{}');
+const getMax=k=>MAXES[k]||baseMax(k);
+const setMax=(k,v)=>{MAXES[k]=v;localStorage.setItem('fh_maxes',JSON.stringify(MAXES))};
+const stepFor=m=>m<20?.5:m<100?1:m<1000?5:m<10000?25:100;
+const MINAGE=k=>(META[k]||[,''])[1]==='tuổi'?18:0;
+const nice=v=>{const n=+(+v).toFixed(1);return n>=1000?n.toLocaleString('vi-VN'):n};
 
 /* ---------- build panel ---------- */
 function buildPanel(){
@@ -684,18 +890,60 @@ function buildPanel(){
   pScore.textContent='—';pDelta.textContent='—';pBase.textContent='Gốc: —';return;}
  body.innerHTML=STARS.map(k=>{
   const [nm,un]=META[k]||[k,''],base=RAW(k),v=V(k);
-  const mx=Math.max(base*1.6,base+ (un==='%/năm'?6:un==='người'?3:un==='tuổi'?10:10));
+  const mx=Math.max(getMax(k),v),mn=MINAGE(k),ex=MAXES[k]&&MAXES[k]>baseMax(k);
   return `<div class="pslot" data-k="${k}">
-   <div class="plab"><span class="pn">${nm}<i>${un}</i></span><span class="pv${v!==base?' ch':''}" id="pv_${k}">${(+v.toFixed(1))}</span></div>
-   <input type="range" min="0" max="${mx.toFixed(1)}" step="${mx>200?5:mx>40?1:.5}" value="${v}" data-k="${k}">
-   <div class="pfoot"><span>0</span><span>gốc ${base}</span><span>${Math.round(mx)}</span></div></div>`}).join('');
- body.querySelectorAll('input[type=range]').forEach(r=>r.oninput=()=>{
-  const k=r.dataset.k,v=+r.value;WHATIF[k]=v;
-  const pv=document.getElementById('pv_'+k);pv.textContent=(+v.toFixed(1));
-  pv.classList.toggle('ch',v!==RAW(k));
-  live();render();});
+   <div class="plab"><span class="pn">${nm}<i>${un}</i></span>
+    <span class="pv${v!==base?' ch':''}" id="pv_${k}" data-k="${k}" role="button" tabindex="0" title="Bấm để gõ số">${nice(v)}</span></div>
+   <input type="range" min="${mn}" max="${mx}" step="${stepFor(mx)}" value="${v}" data-k="${k}">
+   <div class="pfoot"><span>${mn}</span><span>gốc ${nice(base)}</span>
+    <span class="mxlab${ex?' ex':''}" data-k="${k}" role="button" tabindex="0" title="${ex?'Bấm để thu trần về mặc định':'Kéo tới cuối để nới trần'}">${nice(mx)}${ex?' ↺':''}</span></div></div>`}).join('');
+
+ body.querySelectorAll('input[type=range]').forEach(r=>{
+  r.oninput=()=>{
+   const k=r.dataset.k;let v=+r.value;
+   const mx=+r.max;
+   /* chạm sát trần → nới ×2 */
+   if(v>=mx*.985&&mx>0){
+    const nm2=Math.round(mx*2/10)*10;setMax(k,nm2);
+    r.max=nm2;r.step=stepFor(nm2);
+    const lb=body.querySelector(`.mxlab[data-k="${k}"]`);
+    if(lb){lb.textContent=nice(nm2)+' ↺';lb.classList.add('ex','flash');setTimeout(()=>lb.classList.remove('flash'),600)}
+   }
+   WHATIF[k]=v;
+   const pv=document.getElementById('pv_'+k);pv.textContent=nice(v);
+   pv.classList.toggle('ch',v!==RAW(k));
+   live();render();syncFab();};
+ });
+
+ /* bấm số → gõ tay */
+ body.querySelectorAll('.pv').forEach(el=>{
+  const edit=()=>{
+   const k=el.dataset.k,cur=V(k);
+   const raw=prompt(`${(META[k]||[k])[0]} (${(META[k]||[,''])[1]})\n\nNhập giá trị bất kỳ — nếu vượt trần hiện tại, thanh trượt sẽ tự giãn theo.`,cur);
+   if(raw===null)return;
+   let v=parseFloat(String(raw).replace(/[.,\s]/g,m=>m===','?'.':''));
+   if(isNaN(v)||v<0){alert('Giá trị không hợp lệ.');return}
+   const mn=MINAGE(k);if(v<mn)v=mn;
+   if(v>getMax(k))setMax(k,Math.ceil(v*1.25/10)*10);
+   WHATIF[k]=v;buildPanel();live();render();syncFab();};
+  el.onclick=edit;
+  el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();edit()}};
+ });
+
+ /* bấm nhãn trần → thu về mặc định */
+ body.querySelectorAll('.mxlab').forEach(el=>{
+  const rst=()=>{
+   const k=el.dataset.k;if(!MAXES[k])return;
+   delete MAXES[k];localStorage.setItem('fh_maxes',JSON.stringify(MAXES));
+   const bm=baseMax(k);
+   if((WHATIF[k]??RAW(k))>bm)WHATIF[k]=bm;
+   buildPanel();live();render();syncFab();};
+  el.onclick=rst;
+  el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();rst()}};
+ });
+ syncFab();
 }
-function resetWhatif(){WHATIF={};buildPanel();live();render();}
+function resetWhatif(){WHATIF={};MAXES={};localStorage.removeItem('fh_maxes');buildPanel();live();render();syncFab();}
 function applyWhatif(){
  if(!Object.keys(WHATIF).length)return;
  if(!confirm('Ghi các giá trị đang kéo vào ô nhập gốc?\n\nCác ô nhập ở 4 bước sẽ đổi theo slider. Không thể hoàn tác — nhưng bạn vẫn kéo lại được bất cứ lúc nào.'))return;
@@ -1139,7 +1387,7 @@ function render(){
  buildPersonas();
 }
 
-live();buildPanel();
+live();buildPanel();renderSnaps();syncFab();
 </script>
 </body>
 </html>
