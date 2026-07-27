@@ -1,0 +1,2101 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CDD Information Readiness Survey — MEDiCARE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap&subset=latin,latin-ext,vietnamese" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+:root{
+  --ink:#16201c; --muted:#6a746e; --line:#e1e6e3; --line2:#eef1ef;
+  --bg:#f5f7f6; --card:#ffffff;
+  --accent:#1e3a5f; --accent-soft:#eaeff5; --accent-line:#c6d3e2;
+  --ok:#0b5d4b; --ok-soft:#e8f2ee;
+  --warn:#8a5a12; --warn-soft:#fdf6e6;
+  --neg:#b3402e; --neg-soft:#fbeeeb;
+  --r:6px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:'Outfit',system-ui,sans-serif; font-size:14px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.mono{font-family:'DM Mono',ui-monospace,monospace}
+
+/* ---------- TOP BAR ---------- */
+.topbar{
+  position:sticky; top:0; z-index:60; background:var(--card);
+  border-bottom:1px solid var(--line); padding:9px 20px;
+  display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+}
+.brand{font-family:'Noto Serif Display',serif; font-size:16px; font-weight:600; color:var(--accent); letter-spacing:-.01em}
+.vbadge{
+  font-family:'DM Mono',monospace; font-size:10.5px; background:var(--accent-soft);
+  color:var(--accent); padding:2px 7px; border-radius:999px; border:1px solid var(--accent-line);
+}
+.stamp{font-family:'DM Mono',monospace; font-size:10px; color:var(--muted)}
+.spacer{flex:1}
+.pill{
+  font-size:11.5px; padding:4px 11px; border-radius:999px; font-weight:500;
+  opacity:0; transition:opacity .25s; white-space:nowrap;
+}
+.pill.on{opacity:1}
+.pill.ok{background:var(--ok-soft); color:var(--ok)}
+.pill.warn{background:var(--warn-soft); color:var(--warn)}
+.pill.err{background:var(--neg-soft); color:var(--neg)}
+
+button{font-family:inherit; font-size:13px; cursor:pointer}
+.btn{
+  background:#fff; border:1px solid var(--line); color:var(--ink);
+  padding:6px 13px; border-radius:var(--r); transition:.14s;
+}
+.btn:hover{border-color:var(--accent-line); background:var(--accent-soft)}
+.btn:focus-visible{outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(30,58,95,.16)}
+.btn.primary{background:var(--accent); border-color:var(--accent); color:#fff; font-weight:500}
+.btn.primary:hover{background:#16304f}
+.btn.sm{padding:3px 9px; font-size:12px}
+.btn[disabled]{opacity:.4; cursor:not-allowed}
+
+.langtog{display:flex; border:1px solid var(--line); border-radius:var(--r); overflow:hidden}
+.langtog button{background:#fff; border:0; padding:5px 11px; font-size:12px; color:var(--muted)}
+.langtog button.on{background:var(--accent); color:#fff; font-weight:500}
+
+/* ---------- TABS ---------- */
+.tabs{
+  position:sticky; top:47px; z-index:55; background:var(--bg);
+  border-bottom:1px solid var(--line); padding:0 20px; display:flex; gap:2px; overflow-x:auto;
+}
+.tab{
+  background:transparent; border:1px solid transparent; border-bottom:0;
+  padding:9px 16px; font-size:13px; color:var(--muted); white-space:nowrap;
+  border-radius:var(--r) var(--r) 0 0; margin-bottom:-1px;
+}
+.tab.on{background:var(--card); border-color:var(--line); color:var(--accent); font-weight:600}
+.tabnum{font-family:'DM Mono',monospace; font-size:11px; opacity:.7; margin-right:5px}
+
+/* ---------- PROGRESS ---------- */
+.progwrap{background:var(--card); border-bottom:1px solid var(--line); padding:8px 20px; display:flex; align-items:center; gap:14px; flex-wrap:wrap}
+.progbar{flex:1; min-width:160px; height:5px; background:var(--line2); border-radius:999px; overflow:hidden}
+.progfill{height:100%; background:var(--accent); width:0%; transition:width .3s}
+.progtxt{font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); white-space:nowrap}
+
+/* ---------- SHELL ---------- */
+.wrap{max-width:1080px; margin:0 auto; padding:22px 20px 90px}
+.pane{display:none}
+.pane.on{display:block}
+
+.hint{
+  background:var(--accent-soft); border-left:3px solid var(--accent);
+  padding:11px 15px; border-radius:0 var(--r) var(--r) 0; font-size:13px; margin-bottom:20px;
+}
+.hint b{font-weight:600}
+
+h2.sec{
+  font-family:'Noto Serif Display',serif; font-size:19px; font-weight:600;
+  margin:28px 0 6px; color:var(--ink);
+}
+h2.sec:first-of-type{margin-top:6px}
+p.secsub{font-size:13px; color:var(--muted); margin:0 0 16px}
+
+.grp{
+  font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.09em;
+  text-transform:uppercase; color:var(--accent); margin:26px 0 10px;
+  padding-bottom:5px; border-bottom:1px solid var(--accent-line);
+}
+
+/* ---------- CARD ---------- */
+.q{
+  background:var(--card); border:1px solid var(--line); border-radius:var(--r);
+  padding:14px 16px; margin-bottom:10px; transition:border-color .15s;
+}
+.q.answered{border-left:3px solid var(--ok)}
+.q.flagged{border-left:3px solid var(--warn)}
+.qhead{display:flex; gap:10px; align-items:flex-start}
+.qcode{
+  font-family:'DM Mono',monospace; font-size:11.5px; font-weight:500; color:var(--accent);
+  background:var(--accent-soft); padding:2px 7px; border-radius:4px; flex-shrink:0; margin-top:1px;
+}
+.qtitle{flex:1; font-size:14px; font-weight:500; line-height:1.45}
+.qmeta{font-size:11.5px; color:var(--muted); margin:5px 0 0 0; font-family:'DM Mono',monospace}
+.clarify{
+  flex-shrink:0; background:#fff; border:1px solid var(--line); color:var(--muted);
+  border-radius:999px; padding:2px 10px; font-size:11.5px; transition:.14s;
+}
+.clarify:hover{border-color:var(--accent); color:var(--accent); background:var(--accent-soft)}
+.clarify.open{background:var(--accent); border-color:var(--accent); color:#fff}
+
+.exp{display:none; margin:12px 0 2px; background:var(--bg); border-radius:var(--r); padding:13px 15px; border:1px solid var(--line2)}
+.exp.on{display:block}
+.exph{font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); margin:0 0 4px; font-weight:500}
+.exph.o1{color:var(--ok)} .exph.o2{color:var(--warn)}
+.expb{font-size:13px; margin:0 0 12px; line-height:1.6}
+.expb:last-child{margin-bottom:0}
+.expb.ex{font-style:italic; color:var(--muted)}
+
+.field{margin-top:11px}
+label.fl{display:block; font-size:11.5px; color:var(--muted); margin-bottom:4px; font-family:'DM Mono',monospace}
+input[type=text],input[type=email],input[type=date],textarea,select{
+  width:100%; font-family:'Outfit',sans-serif; font-size:13.5px; color:var(--ink);
+  background:#fff; border:1px solid var(--line); border-radius:var(--r); padding:7px 10px;
+}
+textarea{min-height:62px; resize:vertical; line-height:1.5}
+input:focus,textarea:focus,select:focus{
+  outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(30,58,95,.14);
+}
+
+.opts{display:flex; gap:7px; flex-wrap:wrap; margin-top:11px}
+.opt{
+  border:1px solid var(--line); background:#fff; border-radius:var(--r);
+  padding:6px 12px; font-size:12.5px; color:var(--ink); transition:.14s; position:relative;
+}
+.opt:hover{border-color:var(--accent-line)}
+.opt.on{border-color:var(--accent); background:var(--accent); color:#fff; font-weight:500}
+.opt.on.o1{background:var(--ok); border-color:var(--ok)}
+.opt.on.o2{background:var(--warn); border-color:var(--warn)}
+.opt.on.o3{background:var(--muted); border-color:var(--muted)}
+.opt.sug::after{
+  content:'✦'; position:absolute; top:-6px; right:-4px; font-size:11px;
+  color:var(--warn); background:#fff; border-radius:999px; padding:0 3px; line-height:1.2;
+}
+.sugnote{font-size:11.5px; color:var(--warn); margin-top:7px; display:none}
+.sugnote.on{display:block}
+
+.row2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px}
+
+/* ---------- SUMMARY ---------- */
+.stats{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:20px}
+.stat{background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:13px 14px}
+.statn{font-family:'Noto Serif Display',serif; font-size:26px; font-weight:600; line-height:1}
+.statl{font-size:11.5px; color:var(--muted); margin-top:4px}
+.stat.o1 .statn{color:var(--ok)} .stat.o2 .statn{color:var(--warn)}
+.stat.o3 .statn{color:var(--muted)} .stat.o4 .statn{color:var(--neg)}
+
+table.sum{width:100%; border-collapse:collapse; background:var(--card); border:1px solid var(--line); border-radius:var(--r); overflow:hidden; font-size:12.5px}
+table.sum th{background:var(--accent); color:#fff; text-align:left; padding:8px 10px; font-weight:500; font-size:11.5px}
+table.sum td{padding:7px 10px; border-top:1px solid var(--line2); vertical-align:top}
+table.sum tr.dim{opacity:.45}
+
+.exportbox{background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:16px 18px; margin-bottom:14px}
+.exportbox h3{margin:0 0 4px; font-family:'Noto Serif Display',serif; font-size:16px; font-weight:600}
+.exportbox p{margin:0 0 12px; font-size:12.5px; color:var(--muted); line-height:1.55}
+.btnrow{display:flex; gap:8px; flex-wrap:wrap}
+
+.log{
+  background:#0f1a14; color:#c8d6ce; font-family:'DM Mono',monospace; font-size:11px;
+  border-radius:var(--r); padding:10px 12px; max-height:150px; overflow:auto; margin-top:12px; display:none;
+}
+.log.on{display:block}
+.log div{margin-bottom:2px}
+.log .t{color:#6a8a78}
+
+.warnbox{background:var(--warn-soft); border-left:3px solid var(--warn); padding:11px 15px; border-radius:0 var(--r) var(--r) 0; font-size:12.5px; margin-bottom:14px}
+
+@media(max-width:900px){
+  .row2,.row3{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .wrap{padding:18px 14px 80px}
+  .topbar{padding:8px 14px}
+  .tabs{padding:0 14px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand">CDD Information Readiness Survey</span>
+  <span class="vbadge" id="vbadge"></span>
+  <span class="stamp" id="stamp"></span>
+  <span class="spacer"></span>
+  <span class="pill" id="pill"></span>
+  <div class="langtog">
+    <button id="lvi" class="on" onclick="setLang('vi')">VI</button>
+    <button id="len" onclick="setLang('en')">EN</button>
+  </div>
+  <button class="btn" onclick="saveNow()">Lưu</button>
+  <button class="btn primary" onclick="go(2)">Xuất kết quả</button>
+</div>
+
+<div class="tabs">
+  <button class="tab on" id="t0" onclick="go(0)"><span class="tabnum">1</span><span data-i18n="tab0">Thông tin & Hệ thống</span></button>
+  <button class="tab" id="t1" onclick="go(1)"><span class="tabnum">2</span><span data-i18n="tab1">Yêu cầu dữ liệu</span></button>
+  <button class="tab" id="t2" onclick="go(2)"><span class="tabnum">3</span><span data-i18n="tab2">Đặc tả follow-up</span></button>
+  <button class="tab" id="t3" onclick="go(3)"><span class="tabnum">4</span><span data-i18n="tab3">Kết quả & Xuất file</span></button>
+</div>
+
+<div class="progwrap">
+  <div class="progbar"><div class="progfill" id="pf"></div></div>
+  <span class="progtxt" id="pt"></span>
+  <span class="progtxt" id="autosave" style="color:var(--ok)"></span>
+</div>
+
+<div class="wrap">
+
+<!-- ================= TAB 0 ================= -->
+<div class="pane on" id="p0">
+  <div class="hint" id="hint0"></div>
+  <h2 class="sec" data-i18n="s0a">Phần A — Thông tin người trả lời</h2>
+  <p class="secsub" data-i18n="s0asub">Dùng để ghi vào biên bản và xác định đầu mối liên hệ.</p>
+  <div class="q">
+    <div class="row2">
+      <div class="field"><label class="fl" data-i18n="f_name">Họ và tên</label><input type="text" id="m_name" oninput="mark()"></div>
+      <div class="field"><label class="fl" data-i18n="f_title">Chức danh / Bộ phận</label><input type="text" id="m_title" oninput="mark()"></div>
+    </div>
+    <div class="row3">
+      <div class="field"><label class="fl" data-i18n="f_email">Email</label><input type="email" id="m_email" oninput="mark()"></div>
+      <div class="field"><label class="fl" data-i18n="f_phone">Điện thoại</label><input type="text" id="m_phone" oninput="mark()"></div>
+      <div class="field"><label class="fl" data-i18n="f_date">Ngày trả lời</label><input type="date" id="m_date" oninput="mark()"></div>
+    </div>
+  </div>
+
+  <h2 class="sec" data-i18n="s0b">Phần B — Khảo sát hệ thống và dữ liệu hiện có</h2>
+  <p class="secsub" data-i18n="s0bsub">Mười sáu câu hỏi. Không yêu cầu tài liệu nào. Câu trả lời ở đây sẽ tự động định hướng phần Yêu cầu dữ liệu ở bước 2.</p>
+  <div id="g0list"></div>
+</div>
+
+<!-- ================= TAB 1 ================= -->
+<div class="pane" id="p1">
+  <div class="hint" id="hint1"></div>
+  <div id="g1list"></div>
+</div>
+
+<!-- ================= TAB 2 — ĐẶC TẢ FOLLOW-UP ================= -->
+<div class="pane" id="p2">
+  <div class="hint" id="hint2"></div>
+  <div id="specwrap"></div>
+</div>
+
+<!-- ================= TAB 3 — XUẤT FILE ================= -->
+<div class="pane" id="p3">
+  <div class="hint" id="hint3"></div>
+  <div class="stats">
+    <div class="stat o1"><div class="statn" id="c1">0</div><div class="statl" data-i18n="st1">Có báo cáo sẵn (PA1)</div></div>
+    <div class="stat o2"><div class="statn" id="c2">0</div><div class="statl" data-i18n="st2">Gửi dữ liệu thô (PA2)</div></div>
+    <div class="stat o3"><div class="statn" id="c3">0</div><div class="statl" data-i18n="st3">Chưa có sẵn</div></div>
+    <div class="stat o4"><div class="statn" id="c4">0</div><div class="statl" data-i18n="st4">Chưa trả lời</div></div>
+  </div>
+
+  <div class="exportbox">
+    <h3 data-i18n="ex1h">1. Tải biên bản Word</h3>
+    <p data-i18n="ex1p"></p>
+    <div class="btnrow">
+      <button class="btn primary" onclick="exportDocx()" data-i18n="b_docx">Tải file Word (.docx)</button>
+      <button class="btn" onclick="exportJson()" data-i18n="b_json">Tải file JSON (nạp lại được)</button>
+      <button class="btn" onclick="document.getElementById('imp').click()" data-i18n="b_imp">Nạp lại từ JSON</button>
+      <input type="file" id="imp" accept=".json" style="display:none" onchange="importJson(this)">
+    </div>
+  </div>
+
+  <div class="exportbox">
+    <h3 data-i18n="ex2h">2. Gửi cho deal team</h3>
+    <p data-i18n="ex2p"></p>
+    <div class="field" style="margin-bottom:11px">
+      <label class="fl" data-i18n="f_to">Email người nhận (deal team)</label>
+      <input type="text" id="m_to" placeholder="deal.team@advisor.com" oninput="saveNow()">
+    </div>
+    <div class="btnrow">
+      <button class="btn" onclick="openMail()" data-i18n="b_mail">Mở email đã soạn sẵn</button>
+      <button class="btn" onclick="copySummary()" data-i18n="b_copy">Sao chép tóm tắt</button>
+    </div>
+  </div>
+
+  <div class="exportbox">
+    <h3 data-i18n="ex3h">3. Tự động gửi lên Google Drive (tuỳ chọn)</h3>
+    <p data-i18n="ex3p"></p>
+    <div class="field" style="margin-bottom:11px">
+      <label class="fl">Webhook URL (Google Apps Script / Power Automate)</label>
+      <input type="text" id="m_hook" placeholder="https://script.google.com/macros/s/.../exec" oninput="saveNow()">
+    </div>
+    <div class="btnrow">
+      <button class="btn" onclick="sendHook()" data-i18n="b_hook">Gửi lên webhook</button>
+    </div>
+    <div class="log" id="log"></div>
+  </div>
+
+  <h2 class="sec" data-i18n="s2sum">Bảng tổng hợp</h2>
+  <p class="secsub" data-i18n="s2sumsub">Đây chính là nội dung sẽ xuất ra file Word.</p>
+  <div id="sumtbl"></div>
+</div>
+
+</div>
+
+<script>
+/* ============================================================
+   CDD INFORMATION READINESS SURVEY
+   Single-file. State ở localStorage. Xuất .docx thật qua JSZip.
+   ============================================================ */
+var VERSION = 'v2.0';
+var BUILD   = '2026-07-27 · GĐ0 16 câu + GĐ1 24 mục + engine sinh đặc tả follow-up';
+var LS_KEY  = 'cdd_survey_medicare_v1';
+var LANG    = 'vi';
+var TAB     = 0;
+
+document.getElementById('vbadge').textContent = VERSION;
+document.getElementById('stamp').textContent  = 'Build ' + BUILD;
+
+/* ---------------- I18N (nhãn UI) ---------------- */
+var I18N = {
+  vi:{
+    tab0:'Thông tin & Hệ thống', tab1:'Yêu cầu dữ liệu', tab2:'Đặc tả follow-up', tab3:'Kết quả & Xuất file',
+    hint3:'<b>Kiểm tra lại trước khi xuất file.</b> Sau khi xuất, file Word sẽ là biên bản chính thức mà hai bên dùng làm danh sách theo dõi.',
+    spec_empty:'Chưa chọn phương án nào ở bước 2. Hãy quay lại bước 2 và chọn phương án cho ít nhất một nội dung — đặc tả sẽ tự sinh ra ở đây.',
+    spec_retain_h:'Lưu ý về thời gian lưu dữ liệu.',
+    spec_retain_b:'Theo câu trả lời ở bước 1, hệ thống lưu dữ liệu ngắn hơn 36 tháng. Các kỳ dữ liệu dưới đây đã được rút ngắn tương ứng, và những mục bị ảnh hưởng được đánh dấu. Hai bên cần bàn nguồn thay thế cho phần thiếu.',
+    spec_h1:'Đặc tả dữ liệu cần thu thập', spec_sub1:'Sinh tự động theo hệ thống và thời gian lưu dữ liệu Quý Công ty đã khai ở bước 1. Đây là nội dung có thể gửi thẳng cho bộ phận CNTT hoặc kế toán để thực hiện.',
+    spec_h2:'Nội dung cần trao đổi thêm', spec_sub2:'Chưa có sẵn hoặc cần làm rõ. Cột cuối là hướng xử lý đề xuất.',
+    spec_h3:'Nội dung chưa trả lời', spec_sub3:'Cần hoàn tất ở bước 2 trước khi chốt danh sách.',
+    sp_src:'Nguồn lấy', sp_period:'Kỳ dữ liệu', sp_months:'tháng', sp_owner:'Bộ phận thực hiện',
+    sp_fields:'Các trường bắt buộc', sp_col:'Tên trường', sp_desc:'Nội dung',
+    sp_sample:'Dữ liệu mẫu — định dạng mong đợi', sp_sample_note:'Số liệu trên chỉ là minh họa định dạng, không phải số thật.',
+    sp_qa:'Điều kiện nghiệm thu', sp_extra:'Tệp kèm theo', sp_fb:'Nếu không lấy được như trên',
+    sp_short:'ngắn hơn yêu cầu do giới hạn lưu trữ', sp_unknown:'chưa rõ thời gian lưu, cần xác nhận',
+    sp_noaction:'Không cần gửi gì thêm — chúng tôi tự suy ra từ các mục khác.',
+    sp_targetnote:'Ghi chú của Quý Công ty', sp_status:'Trạng thái', sp_next:'Hướng xử lý đề xuất',
+    s0a:'Phần A — Thông tin người trả lời',
+    s0asub:'Dùng để ghi vào biên bản và xác định đầu mối liên hệ.',
+    s0b:'Phần B — Khảo sát hệ thống và dữ liệu hiện có',
+    s0bsub:'Mười sáu câu hỏi. Không yêu cầu tài liệu nào. Câu trả lời ở đây sẽ tự động định hướng phần Yêu cầu dữ liệu ở bước 2.',
+    f_name:'Họ và tên', f_title:'Chức danh / Bộ phận', f_email:'Email', f_phone:'Điện thoại', f_date:'Ngày trả lời',
+    f_to:'Email người nhận (deal team)',
+    st1:'Có báo cáo sẵn (PA1)', st2:'Gửi dữ liệu thô (PA2)', st3:'Chưa có sẵn', st4:'Chưa trả lời',
+    ex1h:'1. Tải biên bản Word',
+    ex1p:'File Word gồm: thông tin người trả lời, toàn bộ câu trả lời khảo sát hệ thống, bảng 24 mục với phương án đã chọn, và một mục riêng tổng hợp việc cần làm cho deal team.',
+    ex2h:'2. Gửi cho deal team',
+    ex2p:'Trình duyệt không đính kèm tệp tự động được. Hãy tải file Word ở bước 1 trước, sau đó bấm nút dưới để mở email đã soạn sẵn rồi đính kèm tệp.',
+    ex3h:'3. Tự động gửi lên Google Drive (tuỳ chọn)',
+    ex3p:'Nếu deal team đã dựng một Google Apps Script nhận dữ liệu, dán URL vào đây. Toàn bộ câu trả lời sẽ được gửi dưới dạng JSON và script sẽ tự lưu vào Drive. Không dựng script thì bỏ qua mục này.',
+    b_docx:'Tải file Word (.docx)', b_json:'Tải file JSON (nạp lại được)', b_imp:'Nạp lại từ JSON',
+    b_mail:'Mở email đã soạn sẵn', b_copy:'Sao chép tóm tắt', b_hook:'Gửi lên webhook',
+    s2sum:'Bảng tổng hợp', s2sumsub:'Đây chính là nội dung sẽ xuất ra file Word.',
+    hint0:'<b>Cách làm việc:</b> Chúng tôi chỉ xin những gì Quý Công ty đã có. Nếu một nội dung chưa tồn tại dưới dạng báo cáo đang chạy, xin đừng tạo mới — hãy chọn phương án gửi dữ liệu thô, phần xử lý là việc của chúng tôi. Không hiểu câu hỏi nào, bấm <b>Làm rõ</b> ở bên phải câu đó.',
+    hint1:'<b>24 nội dung.</b> Với mỗi nội dung chỉ cần chọn <b>một</b> phương án — không cần làm cả hai. Dấu <b style="color:var(--warn)">✦</b> là gợi ý dựa trên câu trả lời của Quý Công ty ở bước 1; đây chỉ là gợi ý, Quý Công ty có thể chọn khác.',
+    hint2:'<b>Kiểm tra lại trước khi xuất file.</b> Sau khi xuất, file Word sẽ là biên bản chính thức mà hai bên dùng làm danh sách theo dõi.',
+    why:'Vì sao chúng tôi hỏi', ex:'Ví dụ', o1:'Phương án 1 — nếu đã có báo cáo sẵn', o2:'Phương án 2 — nếu chưa có, xin gửi dữ liệu thô',
+    clarify:'Làm rõ', close:'Đóng',
+    a1:'Có báo cáo sẵn', a2:'Gửi dữ liệu thô', a3:'Chưa có sẵn', a4:'Cần trao đổi thêm',
+    note:'Ghi chú', owner:'Người phụ trách', due:'Ngày dự kiến gửi',
+    sug:'Dựa trên câu trả lời ở bước 1, chúng tôi gợi ý phương án này.',
+    prog:'đã trả lời', saved:'Đã lưu tự động'
+  },
+  en:{
+    tab0:'Respondent & Systems', tab1:'Information requests', tab2:'Follow-up specification', tab3:'Results & Export',
+    hint3:'<b>Please review before exporting.</b> Once exported, the Word file becomes the formal record both parties use as a tracking list.',
+    spec_empty:'No option selected in step 2 yet. Go back to step 2 and choose an option for at least one item — the specification will generate here automatically.',
+    spec_retain_h:'Note on data retention.',
+    spec_retain_b:'Based on your step 1 answers, the system retains less than 36 months of data. The periods below have been shortened accordingly and affected items are flagged. Both parties should discuss an alternative source for the shortfall.',
+    spec_h1:'Data extraction specification', spec_sub1:'Generated automatically from the systems and retention period you stated in step 1. This can be forwarded directly to your IT or accounting function to execute.',
+    spec_h2:'Items requiring further discussion', spec_sub2:'Not available or needing clarification. The last column is our proposed way forward.',
+    spec_h3:'Items not yet answered', spec_sub3:'Please complete these in step 2 before finalising the list.',
+    sp_src:'Source system', sp_period:'Data period', sp_months:'months', sp_owner:'Responsible function',
+    sp_fields:'Required fields', sp_col:'Field name', sp_desc:'Description',
+    sp_sample:'Sample data — expected format', sp_sample_note:'Figures above illustrate format only and are not real data.',
+    sp_qa:'Acceptance criteria', sp_extra:'Accompanying files', sp_fb:'If the above cannot be produced',
+    sp_short:'shorter than requested due to retention limits', sp_unknown:'retention period unclear, to be confirmed',
+    sp_noaction:'Nothing further to send — we derive this from other items.',
+    sp_targetnote:'Your note', sp_status:'Status', sp_next:'Proposed way forward',
+    s0a:'Part A — Respondent details',
+    s0asub:'Used for the record and to identify the point of contact.',
+    s0b:'Part B — Systems and data availability',
+    s0bsub:'Sixteen questions. No documents required. Your answers here automatically tailor the requests in step 2.',
+    f_name:'Full name', f_title:'Job title / Function', f_email:'Email', f_phone:'Phone', f_date:'Date',
+    f_to:'Recipient email (deal team)',
+    st1:'Report exists (Opt.1)', st2:'Send raw data (Opt.2)', st3:'Not available', st4:'Not answered',
+    ex1h:'1. Download the Word record',
+    ex1p:'The Word file contains: respondent details, all systems-questionnaire answers, the 24-item table with the option selected, and a separate section summarising follow-up actions for the deal team.',
+    ex2h:'2. Send to the deal team',
+    ex2p:'A browser cannot attach files automatically. Download the Word file in step 1 first, then use the button below to open a pre-drafted email and attach it.',
+    ex3h:'3. Auto-send to Google Drive (optional)',
+    ex3p:'If the deal team has set up a Google Apps Script endpoint, paste its URL here. All answers are posted as JSON and the script saves them to Drive. Skip this section if no endpoint exists.',
+    b_docx:'Download Word (.docx)', b_json:'Download JSON (re-loadable)', b_imp:'Load from JSON',
+    b_mail:'Open pre-drafted email', b_copy:'Copy summary', b_hook:'Post to webhook',
+    s2sum:'Summary table', s2sumsub:'This is exactly what the Word file will contain.',
+    hint0:'<b>How we work:</b> We only ask for what you already have. If something does not exist as a recurring report, please do not create one — choose the raw-data option and leave the processing to us. If a question is unclear, press <b>Clarify</b> beside it.',
+    hint1:'<b>24 items.</b> For each, choose <b>one</b> option only — not both. The <b style="color:var(--warn)">✦</b> marker is a suggestion based on your step 1 answers; it is only a suggestion and you may choose otherwise.',
+    hint2:'<b>Please review before exporting.</b> Once exported, the Word file becomes the formal record both parties use as a tracking list.',
+    why:'Why we ask', ex:'Example', o1:'Option 1 — if a report already exists', o2:'Option 2 — if not, please send raw data',
+    clarify:'Clarify', close:'Close',
+    a1:'Report exists', a2:'Send raw data', a3:'Not available', a4:'To be discussed',
+    note:'Note', owner:'Owner', due:'Expected date',
+    sug:'Based on your step 1 answers, we suggest this option.',
+    prog:'answered', saved:'Autosaved'
+  }
+};
+function T(k){ return I18N[LANG][k] || k; }
+
+/* ---------------- DỮ LIỆU: GIAI ĐOẠN 0 ---------------- */
+var G0 = [
+ {id:'q1', type:'text',
+  vi:'Hệ thống bán hàng tại cửa hàng (POS) đang dùng là gì, triển khai từ năm nào?',
+  en:'Which point-of-sale system is in use, and since which year?',
+  why_vi:'POS quyết định dữ liệu bán hàng có thể lấy ở mức nào. Biết hệ thống, chúng tôi biết ngay tệp nào xuất được và không cần hỏi thừa.',
+  why_en:'The POS determines the level at which sales data can be extracted. Knowing the system tells us immediately which exports are possible.',
+  ex_vi:'Ví dụ: "KiotViet, dùng từ 2019" hoặc "hệ thống nội bộ tự phát triển, từ 2015".',
+  ex_en:'Example: "KiotViet since 2019" or "in-house system since 2015".'},
+
+ {id:'q2', type:'text',
+  vi:'Hệ thống quản trị doanh nghiệp (ERP) hoặc phần mềm kế toán đang dùng là gì?',
+  en:'Which ERP or accounting system is in use?',
+  why_vi:'Quyết định việc xuất bảng cân đối phát sinh và sổ chi tiết chi phí có dễ hay không — đây là hai tệp thay thế được cho phần lớn báo cáo quản trị.',
+  why_en:'Determines how easily the trial balance and expense sub-ledger can be exported — two files that substitute for most management reports.',
+  ex_vi:'Ví dụ: "MISA AMIS" hoặc "SAP B1" hoặc "Excel do phòng kế toán tự làm".',
+  ex_en:'Example: "MISA AMIS", "SAP B1", or "Excel maintained by the accounting team".'},
+
+ {id:'q3', type:'text',
+  vi:'Hệ thống quản lý kho và hệ thống khách hàng thành viên (CRM) là gì? Có tích hợp với POS không?',
+  en:'Which warehouse and loyalty/CRM systems are in use? Are they integrated with the POS?',
+  why_vi:'Nếu CRM không nối với POS thì không gắn được giao dịch với khách hàng — điều này đổi hoàn toàn cách chúng tôi tiếp cận phần khách hàng thành viên.',
+  why_en:'If the CRM is not linked to the POS, transactions cannot be tied to customers — this changes our whole approach to the membership analysis.',
+  ex_vi:'Ví dụ: "kho dùng module của ERP; CRM riêng, có nối với POS qua API".',
+  ex_en:'Example: "warehouse via the ERP module; separate CRM linked to POS via API".'},
+
+ {id:'q4', type:'select', opts_vi:['Từng giao dịch','Từng mã hàng theo ngày','Chỉ tổng hợp theo ngày','Chưa rõ'],
+  opts_en:['Transaction level','SKU by day','Daily summary only','Not sure'],
+  vi:'Dữ liệu bán hàng được lưu ở mức nào?',
+  en:'At what level is sales data retained?',
+  why_vi:'Đây là câu quyết định phần lớn các mục ở bước 2. Lưu ở mức giao dịch hoặc mã hàng thì chúng tôi tự dựng được gần như mọi báo cáo mà không cần Quý Công ty làm gì thêm.',
+  why_en:'This drives most of the step 2 items. If data is retained at transaction or SKU level, we can rebuild nearly any report ourselves without further work on your side.',
+  ex_vi:'Nếu không chắc, chọn "Chưa rõ" — chúng tôi sẽ hỏi lại bộ phận CNTT.',
+  ex_en:'If unsure, choose "Not sure" — we will follow up with your IT function.'},
+
+ {id:'q4b', type:'select', opts_vi:['Trên 5 năm','3–5 năm','1–3 năm','Dưới 1 năm'],
+  opts_en:['Over 5 years','3–5 years','1–3 years','Under 1 year'],
+  vi:'Dữ liệu bán hàng lưu được bao nhiêu năm?',
+  en:'For how many years is sales data retained?',
+  why_vi:'Chúng tôi cần 36 tháng. Nếu hệ thống chỉ lưu ngắn hơn, phải tìm nguồn thay thế ngay từ đầu thay vì phát hiện ở giữa quá trình.',
+  why_en:'We need 36 months. If retention is shorter, we must identify an alternative source at the outset rather than midway.',
+  ex_vi:'', ex_en:''},
+
+ {id:'q5', type:'select', opts_vi:['Có, hàng tháng','Có, hàng quý','Có nhưng làm khi cần','Không có'],
+  opts_en:['Yes, monthly','Yes, quarterly','Yes, ad hoc only','No'],
+  vi:'Có báo cáo lãi lỗ đến từng cửa hàng không?',
+  en:'Is there a store-level P&L?',
+  why_vi:'Đây là mục quan trọng nhất của toàn bộ đợt thẩm định. Nếu đã có, mọi việc nhanh hơn nhiều. Nếu chưa có, chúng tôi tự dựng từ dữ liệu thô — và bản thân việc chưa có cũng là thông tin hữu ích, không phải điểm trừ.',
+  why_en:'This is the single most important item in the exercise. If it exists, everything moves faster. If not, we build it from raw data — and its absence is itself useful information, not a negative mark.',
+  ex_vi:'', ex_en:''},
+
+ {id:'q6', type:'select', opts_vi:['Tự động từ hệ thống','Bán tự động','Tổng hợp thủ công','Không áp dụng'],
+  opts_en:['Automated from system','Semi-automated','Manual','Not applicable'],
+  vi:'Báo cáo đó được kết xuất tự động từ hệ thống hay tổng hợp thủ công?',
+  en:'Is that report generated automatically or compiled manually?',
+  why_vi:'Báo cáo thủ công thường có sai lệch giữa các kỳ. Biết trước, chúng tôi sẽ đối chiếu ngược về sổ cái thay vì tin thẳng con số.',
+  why_en:'Manually compiled reports often drift between periods. Knowing this, we reconcile back to the ledger rather than taking figures at face value.',
+  ex_vi:'', ex_en:''},
+
+ {id:'q7', type:'select', opts_vi:['Có, theo doanh thu','Có, theo tiêu thức khác','Không phân bổ','Chưa rõ'],
+  opts_en:['Yes, by revenue','Yes, other basis','Not allocated','Not sure'],
+  vi:'Chi phí khối văn phòng có được phân bổ về cửa hàng không?',
+  en:'Are head-office costs allocated to stores?',
+  why_vi:'Quyết định cách đọc biên đóng góp theo cửa hàng. Nếu có phân bổ, chúng tôi phải tách ngược ra để so sánh công bằng giữa các cửa hàng.',
+  why_en:'Determines how store contribution margin is read. If costs are allocated, we strip them back out for a like-for-like comparison.',
+  ex_vi:'', ex_en:''},
+
+ {id:'q8', type:'select', opts_vi:['Có, nhất quán nhiều cấp','Có nhưng chỉ 1 cấp','Không nhất quán','Chưa rõ'],
+  opts_en:['Yes, consistent multi-level','Yes, single level only','Not consistent','Not sure'],
+  vi:'Doanh thu có được phân loại theo ngành hàng một cách nhất quán không?',
+  en:'Is revenue consistently classified by category?',
+  why_vi:'Phân loại ngành hàng là nền của phân tích cơ cấu. Nếu chưa nhất quán, chúng tôi lấy bảng danh mục hàng hóa và tự nhóm lại, không yêu cầu Quý Công ty chuẩn hóa.',
+  why_en:'Category classification underpins the mix analysis. If it is inconsistent, we take the product master and regroup it ourselves rather than asking you to standardise.',
+  ex_vi:'', ex_en:''},
+
+ {id:'q9', type:'select', opts_vi:['Có, có định nghĩa rõ','Có nhưng chưa chuẩn hóa','Chưa có'],
+  opts_en:['Yes, clearly defined','Yes, not standardised','Not yet'],
+  vi:'Quý Công ty đã có số liệu tăng trưởng cùng cửa hàng (like-for-like) chưa?',
+  en:'Do you already have like-for-like growth figures?',
+  why_vi:'Nếu chưa có, Quý Công ty không cần tính. Chúng tôi tự tính từ dữ liệu doanh thu và ngày khai trương, rồi gửi lại định nghĩa để Quý Công ty xác nhận.',
+  why_en:'If not, no calculation is needed on your side. We compute it from revenue data and opening dates, then send back the definition for your confirmation.',
+  ex_vi:'', ex_en:''},
+
+ {id:'q10', type:'select', opts_vi:['Trên 70%','40–70%','Dưới 40%','Không gắn được'],
+  opts_en:['Over 70%','40–70%','Under 40%','Cannot be linked'],
+  vi:'Tỷ lệ giao dịch có gắn được với khách hàng thành viên khoảng bao nhiêu?',
+  en:'Roughly what share of transactions can be linked to a loyalty member?',
+  why_vi:'Quyết định độ tin cậy của toàn bộ phân tích khách hàng. Dưới 40% thì kết luận về hành vi khách hàng chỉ mang tính tham khảo, và chúng tôi sẽ nói rõ điều đó trong báo cáo.',
+  why_en:'Determines the reliability of the entire customer analysis. Below 40%, conclusions on customer behaviour are indicative only, and we will say so explicitly in the report.',
+  ex_vi:'', ex_en:''},
+
+ {id:'q11', type:'select', opts_vi:['Có, theo từng lô','Có, tổng hợp','Không theo dõi','Chưa rõ'],
+  opts_en:['Yes, by batch','Yes, in aggregate','Not tracked','Not sure'],
+  vi:'Dữ liệu tồn kho có theo dõi được theo hạn sử dụng không?',
+  en:'Is inventory tracked by expiry date?',
+  why_vi:'Với ngành dược và thực phẩm chức năng, tồn kho gần hạn là rủi ro giá trị trực tiếp. Không theo dõi được thì chúng tôi phải ước lượng theo vòng quay, và biên độ sai số sẽ được nêu rõ.',
+  why_en:'For pharmaceuticals and supplements, near-expiry stock is a direct valuation risk. If it is not tracked, we estimate from turnover and state the resulting margin of error.',
+  ex_vi:'', ex_en:''},
+
+ {id:'q12', type:'textarea',
+  vi:'Danh sách các báo cáo định kỳ đang chạy sẵn: tên báo cáo, tần suất, bộ phận nhận.',
+  en:'List of recurring reports already in production: name, frequency, recipient function.',
+  why_vi:'Đây là câu quan trọng nhất của toàn bộ bảng khảo sát. Nguyên tắc của chúng tôi là xin báo cáo đã chạy sẵn thay vì báo cáo phải xây mới. Danh sách này giúp chúng tôi thay thế phần lớn yêu cầu ở bước 2 bằng những gì Quý Công ty vốn đã có.',
+  why_en:'This is the most important question in the questionnaire. Our principle is to ask for reports already in production rather than reports that must be built. This list lets us replace most step 2 requests with material you already hold.',
+  ex_vi:'Ví dụ: "Báo cáo doanh thu ngày — hàng ngày — BGĐ; Báo cáo tồn kho — hàng tuần — Thu mua; Báo cáo P&L công ty — hàng tháng — HĐQT". Liệt kê được bao nhiêu tốt bấy nhiêu, không cần đầy đủ tuyệt đối.',
+  ex_en:'Example: "Daily sales report — daily — management; Inventory report — weekly — buying; Company P&L — monthly — board." List as many as you can; completeness is not required.'},
+
+ {id:'q13', type:'select', opts_vi:['Pháp nhân riêng, hạch toán tách biệt','Pháp nhân riêng, hạch toán chung','Cùng pháp nhân','Chưa rõ'],
+  opts_en:['Separate entity, separate books','Separate entity, combined books','Same entity','Not sure'],
+  vi:'Hoạt động tại Myanmar do pháp nhân nào sở hữu và hạch toán tách biệt tới mức nào?',
+  en:'Which entity owns the Myanmar operations, and how separately are they accounted for?',
+  why_vi:'Đây là một trong hai vấn đề có thể ảnh hưởng tới cấu trúc thương vụ, không chỉ tới giá. Làm rõ sớm có lợi cho cả hai bên: nếu có vướng mắc, cả hai cùng biết ngay từ đầu.',
+  why_en:'One of two issues that can affect deal structure, not merely price. Early clarity serves both sides: if there is an obstacle, both parties learn of it at the outset.',
+  ex_vi:'', ex_en:''},
+
+ {id:'q14', type:'text',
+  vi:'Bộ phận nào là đầu mối cung cấp thông tin, và ai phê duyệt trước khi phát hành?',
+  en:'Which function coordinates information, and who approves before release?',
+  why_vi:'Một đầu mối duy nhất mỗi bên giúp tránh trùng lặp và thất lạc. Chúng tôi cũng cần biết ai phê duyệt để lên lịch cho hợp lý.',
+  why_en:'A single point of contact on each side avoids duplication and loss. We also need to know who approves in order to plan timing realistically.',
+  ex_vi:'', ex_en:''},
+
+ {id:'q15', type:'textarea',
+  vi:'Quý Công ty có ràng buộc nào về thời điểm hoặc khối lượng cung cấp thông tin cần chúng tôi lưu ý không?',
+  en:'Are there timing or capacity constraints on your side we should take into account?',
+  why_vi:'Chúng tôi sẵn sàng điều chỉnh cả nội dung lẫn tiến độ theo nguồn lực thực tế. Biết trước ràng buộc thì lịch trình mới khả thi.',
+  why_en:'We are willing to adjust both content and timing to your actual capacity. Knowing constraints upfront is what makes the schedule realistic.',
+  ex_vi:'Ví dụ: "Tháng 8 đang quyết toán, đội kế toán không hỗ trợ được".',
+  ex_en:'Example: "August is year-end close; the accounting team will have no capacity."'}
+];
+
+/* ---------------- DỮ LIỆU: GIAI ĐOẠN 1 ---------------- */
+function it(code,grp,vi,en,ky,kyEn,serves,o1vi,o1en,o2vi,o2en,whyVi,whyEn,exVi,exEn){
+  return {code:code,grp:grp,vi:vi,en:en,ky:ky,kyEn:kyEn,serves:serves,
+    o1vi:o1vi,o1en:o1en,o2vi:o2vi,o2en:o2en,why_vi:whyVi,why_en:whyEn,ex_vi:exVi,ex_en:exEn};
+}
+
+var GROUPS = [
+ {id:'A', vi:'A. Tổng quan doanh nghiệp và mạng lưới', en:'A. Corporate overview and network'},
+ {id:'B', vi:'B. Kết quả kinh doanh — mức tổng hợp', en:'B. Financial performance — aggregate level'},
+ {id:'C', vi:'C. Giấy phép và tuân thủ ngành dược — ưu tiên cao', en:'C. Pharmacy licensing and compliance — high priority'},
+ {id:'D', vi:'D. Mặt bằng — mức tổng hợp', en:'D. Property — aggregate level'},
+ {id:'E', vi:'E. Khách hàng thành viên — mức tổng hợp', en:'E. Loyalty membership — aggregate level'},
+ {id:'F', vi:'F. Hoạt động tại Myanmar — ưu tiên cao', en:'F. Myanmar operations — high priority'}
+];
+
+var G1 = [
+ it('A1','A','Sơ đồ cấu trúc pháp nhân và sở hữu, gồm các pháp nhân trong và ngoài Việt Nam',
+  'Legal entity and ownership structure chart, covering entities in and outside Vietnam',
+  'Hiện tại','Current','Q6',
+  'Sơ đồ cấu trúc tập đoàn do bộ phận pháp chế hoặc đơn vị kiểm toán lập.',
+  'Group structure chart prepared by the legal function or by your auditor.',
+  'Một bảng liệt kê: tên pháp nhân, quốc gia, ngày thành lập, tỷ lệ sở hữu, công ty mẹ trực tiếp. Kèm bản chụp giấy chứng nhận đăng ký doanh nghiệp. Chúng tôi tự vẽ sơ đồ.',
+  'A simple list: entity name, jurisdiction, incorporation date, ownership percentage, immediate parent. Attach business registration certificates. We will draw the chart ourselves.',
+  'Cần để xác định phạm vi thương vụ gồm những pháp nhân nào, và mảng Myanmar nằm ở đâu trong cấu trúc.',
+  'Needed to determine which entities fall within the transaction perimeter, and where the Myanmar business sits in the structure.',
+  '','' ),
+
+ it('A2','A','Danh sách cửa hàng đang hoạt động, kèm các thuộc tính cơ bản',
+  'List of operating stores with basic attributes',
+  'Hiện tại, theo cửa hàng','Current, by store','Q2, Q3',
+  'Báo cáo danh sách điểm bán do bộ phận vận hành hoặc phát triển mặt bằng duy trì.',
+  'Store master list maintained by the operations or store development function.',
+  'Kết xuất bảng danh mục cửa hàng từ POS hoặc ERP, giữ nguyên toàn bộ trường sẵn có. Tối thiểu: mã cửa hàng, tên, địa chỉ, tỉnh/thành, ngày khai trương, ngày đóng nếu có, diện tích, loại mặt bằng, cờ có quầy thuốc. Không cần làm sạch trước khi gửi.',
+  'Export the store dimension table from the POS or ERP, keeping every existing field. At minimum: store code, name, address, province, opening date, closing date if any, floor area, site type, pharmacy-counter flag. No cleaning needed.',
+  'Đây là bảng nền cho mọi phân tích khác — biên đóng góp theo cửa hàng, tăng trưởng cùng cửa hàng, phân bố theo tỉnh đều dựa vào nó.',
+  'This is the base table for every other analysis — store contribution, like-for-like growth and provincial distribution all rely on it.',
+  'Nếu bảng có thêm trường ngoài danh sách trên, xin cứ để nguyên. Thừa dữ liệu không gây khó cho chúng tôi.',
+  'If the table has fields beyond those listed, please leave them in. Extra data causes us no difficulty.'),
+
+ it('A3','A','Danh sách cửa hàng đã đóng trong 36 tháng gần nhất và lý do',
+  'Stores closed in the last 36 months and the reasons',
+  '36 tháng','36 months','Q3',
+  'Báo cáo hoặc biên bản đóng điểm bán do bộ phận vận hành lập.',
+  'Store closure report or minutes maintained by operations.',
+  'Trích các bản ghi có ngày đóng trong 36 tháng từ bảng ở mục A2. Nếu hệ thống không lưu ngày đóng, gửi danh sách mã cửa hàng có doanh thu ở năm trước nhưng không có ở năm hiện tại.',
+  'Extract records with a closing date within 36 months from the table in A2. If closing dates are not stored, send store codes that recorded revenue in a prior year but not the current year.',
+  'Cửa hàng đã đóng cho biết mô hình nào không hoạt động được. Đây thường là thông tin có giá trị hơn danh sách cửa hàng đang mở.',
+  'Closed stores reveal which formats did not work. This is often more informative than the list of open stores.',
+  '',''),
+
+ it('A4','A','Sơ đồ tổ chức cấp quản lý và số lượng nhân sự theo khối',
+  'Management organisation chart and headcount by function',
+  'Hiện tại','Current','Q3',
+  'Sơ đồ tổ chức và báo cáo nhân sự định kỳ của bộ phận nhân sự.',
+  'Organisation chart and the HR function\u2019s periodic headcount report.',
+  'Kết xuất danh sách nhân sự từ hệ thống nhân sự hoặc chấm công: mã nhân viên, phòng ban, chức danh, nơi làm việc, ngày vào làm. Không cần thông tin lương và không cần họ tên.',
+  'Export the employee list from the HR or time-attendance system: employee ID, department, job title, work location, start date. Compensation and names are not required.',
+  'Cần để hiểu cấu trúc chi phí nhân sự và xác định các vị trí chủ chốt. Ở giai đoạn này chúng tôi không xem xét từng cá nhân.',
+  'Needed to understand the personnel cost structure and identify key roles. We do not review individuals at this stage.',
+  '',''),
+
+ it('A5','A','Bản trình bày giới thiệu doanh nghiệp hoặc hồ sơ chào bán, nếu đã có',
+  'Company presentation or information memorandum, if one exists',
+  'Hiện tại','Current','Chung / General',
+  'Bản trình bày hoặc hồ sơ chào bán đã lập cho mục đích khác.',
+  'An existing presentation or information memorandum prepared for another purpose.',
+  'Nếu chưa có, xin đừng tạo mới. Một buổi trao đổi 60–90 phút với ban điều hành là đủ cho giai đoạn này.',
+  'If none exists, please do not create one. A 60–90 minute session with management is sufficient for this phase.',
+  'Giúp chúng tôi hiểu cách Quý Công ty tự mô tả hoạt động kinh doanh, từ đó đặt câu hỏi đúng trọng tâm hơn.',
+  'Helps us understand how you describe the business yourselves, so that our questions are better targeted.',
+  '',''),
+
+ it('B1','B','Báo cáo tài chính đã kiểm toán',
+  'Audited financial statements',
+  '3 năm gần nhất','Last 3 years','Chung / General',
+  'Báo cáo kiểm toán ba năm gần nhất, kèm đầy đủ thuyết minh.',
+  'Audited financial statements for the last three years, including full notes.',
+  'Nếu báo cáo năm gần nhất chưa phát hành: gửi báo cáo tài chính nội bộ chưa kiểm toán của năm đó, kèm thư quản lý của kiểm toán viên cho năm liền trước nếu có.',
+  'If the most recent year is not yet issued: send internal unaudited statements for that year, with the auditor\u2019s prior-year management letter if available.',
+  'Là điểm neo để đối chiếu mọi số liệu khác. Thuyết minh thường chứa thông tin mà báo cáo quản trị không có.',
+  'The anchor against which all other figures are reconciled. The notes often contain information absent from management accounts.',
+  '',''),
+
+ it('B2','B','Báo cáo quản trị nội bộ về kết quả kinh doanh, tách riêng Việt Nam và Myanmar',
+  'Internal management accounts, with Vietnam and Myanmar shown separately',
+  '3 năm, theo quý','3 years, quarterly','Q6',
+  'Bộ báo cáo quản trị theo quý mà ban điều hành đang sử dụng.',
+  'The quarterly management reporting pack currently used by management.',
+  'Kết xuất bảng cân đối phát sinh (trial balance) theo tháng, theo từng pháp nhân, ba năm, kèm bảng danh mục tài khoản. Đây là thao tác xuất tệp tiêu chuẩn của mọi phần mềm kế toán. Chúng tôi tự dựng báo cáo và gửi lại để Quý Công ty xác nhận cách nhóm tài khoản.',
+  'Export the monthly trial balance by entity for three years, with the chart of accounts. This is a standard export in any accounting package. We build the accounts and return them for you to confirm the groupings.',
+  'Nếu chưa có báo cáo quản trị tách riêng, xin đừng lập mới. Trial balance là tệp mọi phần mềm kế toán đều xuất được trong vài phút, và từ đó chúng tôi tự dựng.',
+  'If separated management accounts do not exist, please do not build them. The trial balance exports from any accounting package in minutes, and we build from there.',
+  '',''),
+
+ it('B3','B','Doanh thu và lợi nhuận gộp theo nhóm ngành hàng cấp 1',
+  'Revenue and gross profit by level-1 category',
+  '3 năm, theo quý','3 years, quarterly','Q2',
+  'Báo cáo doanh thu theo nhóm hàng mà bộ phận thu mua hoặc kinh doanh đang chạy.',
+  'The category sales report already produced by the buying or commercial function.',
+  'Kết xuất doanh số theo tháng ở mức mã hàng: mã hàng, kỳ, số lượng, doanh thu, giá vốn. Kèm bảng danh mục hàng hóa có cây phân loại. Nếu tệp quá lớn, tổng hợp sẵn ở cấp nhóm hàng 1 hoặc 2. Không cần giá bán theo mã hàng.',
+  'Export monthly sales at SKU level: SKU code, period, quantity, revenue, cost of goods. Attach the product master with the category hierarchy. If too large, aggregate to category level 1 or 2. SKU pricing is not required.',
+  'Cơ cấu ngành hàng quyết định biên lợi nhuận. Với chuỗi sức khỏe và sắc đẹp, tỷ trọng nhóm hàng cần giấy phép là con số ảnh hưởng trực tiếp tới cách nhìn thương vụ.',
+  'Category mix drives margin. For a health and beauty chain, the share of licence-dependent categories directly shapes how the transaction is viewed.',
+  '',''),
+
+ it('B4','B','Doanh thu theo kênh: cửa hàng, thương mại điện tử, ứng dụng, kênh khác',
+  'Revenue by channel: stores, e-commerce, app, other',
+  '3 năm, theo quý','3 years, quarterly','Q4',
+  'Báo cáo doanh thu theo kênh đang chạy định kỳ.',
+  'The recurring channel revenue report.',
+  'Kết xuất doanh thu theo tháng có trường mã kênh hoặc mã cửa hàng, cùng bảng ánh xạ mã cửa hàng sang kênh. Nếu doanh thu trực tuyến ghi nhận ở một mã đơn vị riêng, chỉ cần nêu rõ mã đó.',
+  'Export monthly revenue with a channel or store code field, plus a store-to-channel mapping. If online revenue sits under a separate cost centre, simply identifying that code is sufficient.',
+  'Cần để tách tăng trưởng của kênh trực tuyến khỏi kênh cửa hàng — hai kênh có cấu trúc chi phí và triển vọng khác nhau hoàn toàn.',
+  'Needed to separate online from store growth — the two channels have entirely different cost structures and outlooks.',
+  '',''),
+
+ it('B5','B','Doanh thu và biên đóng góp theo từng cửa hàng',
+  'Revenue and contribution margin by store',
+  '12 tháng gần nhất','Last 12 months','Q3',
+  'Báo cáo lãi lỗ theo cửa hàng đang chạy hàng tháng.',
+  'The monthly store-level P&L already in production.',
+  'Ba tệp: (a) doanh thu và giá vốn theo tháng × cửa hàng từ POS; (b) sổ chi tiết chi phí theo tháng × cửa hàng × tài khoản từ hệ thống kế toán; (c) bảng danh mục tài khoản. Chúng tôi tự dựng báo cáo và trình bày lại để Quý Công ty xác nhận trước khi sử dụng.',
+  'Three files: (a) monthly revenue and cost of goods by store from the POS; (b) the expense sub-ledger by month, store and account; (c) the chart of accounts. We construct the P&L and walk it back to you for confirmation before relying on it.',
+  'Đây là mục quan trọng nhất của cả Giai đoạn 1. Phân bố biên đóng góp giữa các cửa hàng thường là phát hiện lớn nhất của một đợt thẩm định bán lẻ — và đa số doanh nghiệp chưa từng nhìn số của mình theo cách này.',
+  'This is the single most important item in Phase 1. The spread of contribution margin across stores is usually the largest finding in a retail diligence — and most businesses have never seen their numbers presented this way.',
+  'Nếu chỉ có được một trong ba tệp, xin cứ gửi tệp đó trước. Chúng tôi sẽ làm phần dựng được và nêu rõ phần còn thiếu.',
+  'If only one of the three files is available, please send that first. We will build what we can and state clearly what is missing.'),
+
+ it('B6','B','Tăng trưởng cùng cửa hàng (like-for-like), kèm định nghĩa đang áp dụng',
+  'Like-for-like growth, with the definition currently applied',
+  '3 năm','3 years','Q4',
+  'Số liệu tăng trưởng cùng cửa hàng cùng định nghĩa mà Quý Công ty đang dùng.',
+  'Your existing like-for-like figures together with the definition applied.',
+  'Không cần tính. Nếu đã gửi mục B5 và A2, chúng tôi có đủ dữ liệu để tự tính, và sẽ gửi lại định nghĩa đã dùng để Quý Công ty xác nhận hoặc điều chỉnh.',
+  'No calculation needed. If items B5 and A2 have been provided, we compute it ourselves and send back the definition applied for your confirmation.',
+  'Tách tăng trưởng thật khỏi tăng trưởng do mở thêm cửa hàng. Đây là con số quyết định cách định giá triển vọng.',
+  'Separates genuine growth from growth driven by opening more stores. This figure determines how future prospects are valued.',
+  '',''),
+
+ it('B7','B','Số lượng cửa hàng mở mới và đóng theo từng năm',
+  'Store openings and closures by year',
+  '5 năm','5 years','Q4',
+  'Báo cáo phát triển mạng lưới theo năm.',
+  'The annual network development report.',
+  'Không cần cung cấp riêng. Chúng tôi suy ra từ mục A2 và A3.',
+  'No separate submission needed. We derive this from items A2 and A3.',
+  'Nhịp mở và đóng cửa hàng cho biết mô hình đang mở rộng hay đang co lại, và tốc độ đó có bền không.',
+  'The rhythm of openings and closures shows whether the format is expanding or contracting, and whether that pace is sustainable.',
+  '',''),
+
+ it('B8','B','Cơ cấu tổng thu nhập thương mại: phần từ biên bán hàng và phần từ hỗ trợ của nhà cung cấp',
+  'Split of total commercial income between selling margin and supplier support',
+  '3 năm','3 years','Q1',
+  'Báo cáo tổng hợp các khoản hỗ trợ, chiết khấu và thưởng doanh số từ nhà cung cấp.',
+  'The summary report of supplier rebates, discounts and volume bonuses.',
+  'Kết xuất phát sinh của các tài khoản liên quan theo tháng, ba năm: giảm giá hàng mua, chiết khấu thương mại được hưởng, hỗ trợ trưng bày, thu nhập khác từ nhà cung cấp. Kèm bảng danh mục tài khoản. Chúng tôi không cần và không yêu cầu chi tiết theo từng nhà cung cấp ở giai đoạn này.',
+  'Export monthly movements for the relevant accounts over three years: purchase rebates, trade discounts received, listing and display support, other supplier income. Attach the chart of accounts. We neither need nor request supplier-level detail at this stage.',
+  'Trong bán lẻ, phần thu nhập từ nhà cung cấp thường chiếm tỷ trọng lớn trong lợi nhuận. Hiểu cơ cấu này là hiểu bản chất mô hình kinh doanh.',
+  'In retail, supplier income often makes up a large share of profit. Understanding its structure is understanding the business model itself.',
+  'Chúng tôi chủ động không hỏi điều khoản với từng nhà cung cấp ở giai đoạn này vì đó là thông tin nhạy cảm cạnh tranh.',
+  'We deliberately do not ask for supplier-specific terms at this stage, as that is competitively sensitive information.'),
+
+ it('C1','C','Giấy chứng nhận đủ điều kiện kinh doanh dược và chứng nhận thực hành tốt theo từng điểm bán',
+  'Pharmacy eligibility and Good Pharmacy Practice certificates by outlet',
+  'Hiện tại','Current','Q2',
+  'Bảng theo dõi giấy phép tập trung do bộ phận pháp chế hoặc chuyên môn duy trì.',
+  'The central licence register maintained by the legal or regulatory function.',
+  'Nếu chưa có bảng theo dõi tập trung: gửi bản chụp giấy phép theo cửa hàng, hoặc bảng kê thủ công gồm mã cửa hàng, số giấy phép, ngày cấp, ngày hết hạn. Chúng tôi tự lập bảng theo dõi và gửi lại để Quý Công ty dùng về sau.',
+  'If no central register exists: send scanned licences by store, or a manual list of store code, licence number, issue date and expiry date. We build the register and return it for your own ongoing use.',
+  'Giấy phép là thứ có thể ảnh hưởng tới cấu trúc thương vụ chứ không chỉ tới giá. Vì vậy nhóm này được đưa lên vòng đầu thay vì để đến giai đoạn sau.',
+  'Licensing can affect deal structure, not merely price. That is why this group is brought forward rather than left to a later phase.',
+  '',''),
+
+ it('C2','C','Số lượng dược sĩ phụ trách chuyên môn và tình hình biến động nhân sự vị trí này',
+  'Number of responsible pharmacists and turnover in that role',
+  '24 tháng','24 months','Q2',
+  'Báo cáo nhân sự chuyên môn do bộ phận nhân sự hoặc chuyên môn lập.',
+  'The regulated-personnel report prepared by HR or the regulatory function.',
+  'Kết xuất từ hệ thống nhân sự: danh sách nhân sự có chức danh dược sĩ, nơi làm việc, ngày vào, ngày nghỉ nếu có, trong 24 tháng. Chỉ cần mã nhân viên, không cần họ tên.',
+  'Export from the HR system: employees holding a pharmacist role, work location, start date, and leaving date if any, over 24 months. Employee ID is sufficient; names are not required.',
+  'Dược sĩ phụ trách là điều kiện để duy trì giấy phép. Trong bối cảnh các chuỗi lớn mở rộng nhanh, đây là nguồn lực khan hiếm và tỷ lệ biến động là chỉ số rủi ro thực.',
+  'Responsible pharmacists are a condition of maintaining licences. With large chains expanding rapidly, this is a scarce resource and turnover is a genuine risk indicator.',
+  '',''),
+
+ it('C3','C','Ý kiến của Quý Công ty về khả năng duy trì giấy phép khi thay đổi chủ sở hữu',
+  'Your view on licence continuity in a change of ownership',
+  'Hiện tại','Current','Q2',
+  'Ý kiến pháp lý đã có, nếu Quý Công ty từng xin tư vấn về nội dung này.',
+  'An existing legal opinion, if advice has previously been sought.',
+  'Không cần văn bản. Một buổi trao đổi 45 phút với người phụ trách pháp chế hoặc chuyên môn là đủ cho giai đoạn này.',
+  'No written document required. A 45-minute discussion with the legal or regulatory lead is sufficient.',
+  'Đây là câu hỏi có thể ảnh hưởng tới toàn bộ cấu trúc thương vụ. Chúng tôi muốn nghe quan điểm của người trong cuộc trước khi tự đánh giá.',
+  'This question can affect the entire deal structure. We want to hear the view of those closest to it before forming our own.',
+  '',''),
+
+ it('C4','C','Lịch sử thanh tra và xử phạt hành chính liên quan hoạt động dược',
+  'History of inspections and administrative penalties',
+  '36 tháng','36 months','Q2',
+  'Sổ theo dõi thanh tra và xử lý vi phạm.',
+  'The inspection and enforcement log.',
+  'Bản chụp các quyết định xử phạt và biên bản thanh tra trong 36 tháng. Nếu không phát sinh vụ việc nào, một văn bản xác nhận ngắn của Quý Công ty là đủ.',
+  'Scanned penalty decisions and inspection minutes for 36 months. If there were none, a short written confirmation is sufficient.',
+  'Chúng tôi phân biệt rõ lỗi lẻ tẻ với vấn đề có tính hệ thống. Chỉ loại thứ hai mới ảnh hưởng tới đánh giá.',
+  'We distinguish clearly between isolated incidents and systemic issues. Only the latter affects our assessment.',
+  '',''),
+
+ it('C5','C','Chứng nhận thực hành tốt phân phối và bảo quản của trung tâm phân phối',
+  'Good Distribution and Storage Practice certificates for the distribution centre',
+  'Hiện tại','Current','Q2',
+  'Chứng nhận còn hiệu lực kèm báo cáo đánh giá gần nhất.',
+  'Valid certificates with the most recent audit report.',
+  'Bản chụp chứng nhận còn hiệu lực. Nếu hệ thống kho xuất được nhật ký nhiệt độ, gửi kèm ba tháng gần nhất; nếu không, có thể bỏ qua ở giai đoạn này.',
+  'Scanned valid certificates. If the warehouse system can export temperature logs, include the last three months; if not, this may be skipped.',
+  'Trung tâm phân phối đạt chuẩn là một tài sản thực, không chỉ là yêu cầu tuân thủ. Nó ảnh hưởng tới việc bên mua có phải đầu tư thêm hay không.',
+  'A compliant distribution centre is a real asset, not merely a compliance requirement. It affects whether a buyer must invest further.',
+  '',''),
+
+ it('D1','D','Bảng tổng hợp hợp đồng thuê theo từng cửa hàng',
+  'Lease summary by store',
+  'Hiện tại','Current','Q5',
+  'Bảng theo dõi hợp đồng thuê do bộ phận phát triển mặt bằng duy trì.',
+  'The lease register maintained by the store development function.',
+  'Hai nguồn kết hợp: (a) kết xuất chi phí thuê theo tháng × cửa hàng từ hệ thống kế toán, ba năm; (b) danh sách hợp đồng từ bộ phận mặt bằng gồm mã cửa hàng, bên cho thuê, ngày bắt đầu, ngày kết thúc. Chúng tôi tự lập bảng tổng hợp. Chưa cần bản hợp đồng gốc.',
+  'Two sources combined: (a) monthly rent expense by store from accounting, three years; (b) a lease list from the property function with store code, landlord, commencement and expiry dates. We compile the summary. Original leases are not required yet.',
+  'Với một chuỗi bán lẻ, danh mục hợp đồng thuê chính là cấu trúc chi phí cố định của cả doanh nghiệp. Thời hạn còn lại quyết định mức độ chắc chắn của dòng tiền tương lai.',
+  'For a retail chain, the lease portfolio is the fixed cost structure of the entire business. Remaining tenor determines how secure future cash flows are.',
+  '',''),
+
+ it('D2','D','Thống kê số hợp đồng đáo hạn theo từng năm',
+  'Lease expiry profile by year',
+  '5 năm tới','Next 5 years','Q5',
+  'Báo cáo lịch đáo hạn hợp đồng thuê.',
+  'The lease expiry schedule report.',
+  'Không cần cung cấp riêng. Chúng tôi suy ra từ mục D1.',
+  'No separate submission needed. We derive this from item D1.',
+  'Cho biết bao nhiêu phần doanh thu đang đứng trên hợp đồng sắp phải đàm phán lại.',
+  'Shows what share of revenue rests on leases that will soon need renegotiating.',
+  '',''),
+
+ it('E1','E','Tổng số thành viên và số thành viên còn hoạt động, kèm định nghĩa đang dùng',
+  'Total and active membership, stating the definition applied',
+  'Hiện tại','Current','Q7',
+  'Báo cáo chương trình thành viên do bộ phận marketing hoặc khách hàng lập.',
+  'The loyalty programme report prepared by marketing or the customer function.',
+  'Kết xuất tổng hợp từ hệ thống khách hàng: số thành viên theo tháng đăng ký, và số thành viên có giao dịch trong 3, 6 và 12 tháng gần nhất. Dạng bảng tổng hợp — chúng tôi không yêu cầu và không tiếp nhận dữ liệu ở cấp cá nhân.',
+  'An aggregated CRM export: member counts by registration month, and members transacting within the last 3, 6 and 12 months. Summary tables only — we neither request nor accept individual-level records.',
+  'Số thành viên đăng ký và số thành viên còn mua hàng là hai con số rất khác nhau. Chỉ con số thứ hai mới có giá trị.',
+  'Registered members and still-purchasing members are very different numbers. Only the second has value.',
+  'Chúng tôi không nhận dữ liệu định danh cá nhân. Mọi phân tích chạy trên dữ liệu đã tổng hợp hoặc ẩn danh.',
+  'We do not accept personally identifiable data. All analysis runs on aggregated or anonymised data.'),
+
+ it('E2','E','Tỷ trọng doanh thu đến từ khách hàng thành viên',
+  'Share of revenue attributable to loyalty members',
+  '3 năm','3 years','Q7',
+  'Báo cáo doanh thu tách theo khách thành viên và khách vãng lai.',
+  'The revenue report split between member and non-member transactions.',
+  'Kết xuất doanh thu theo tháng, tách thành hai dòng: giao dịch có gắn mã thành viên và giao dịch không gắn. Không cần mã thành viên cụ thể.',
+  'Export monthly revenue split into two lines: transactions with a member identifier and those without. Individual identifiers are not required.',
+  'Cho biết chương trình thành viên thực sự đang giữ chân khách hay chỉ là một thẻ giảm giá.',
+  'Shows whether the loyalty programme genuinely retains customers or is simply a discount card.',
+  '',''),
+
+ it('F1','F','Mô hình vận hành tại Myanmar: sở hữu trực tiếp, liên doanh hay nhượng quyền; số điểm bán',
+  'Myanmar operating model: owned, joint venture or franchise; number of outlets',
+  'Hiện tại','Current','Q6',
+  'Tài liệu mô tả cấu trúc hoặc hợp đồng liên doanh, nhượng quyền hiện hành.',
+  'Existing structure documentation, joint venture or franchise agreements.',
+  'Một bản ghi chú ngắn của ban điều hành mô tả mô hình vận hành, kèm danh sách điểm bán. Không cần tài liệu pháp lý chính thức ở giai đoạn này.',
+  'A short management note describing the operating model, with an outlet list. Formal legal documentation is not required yet.',
+  'Mảng Myanmar chiếm một phần đáng kể mạng lưới. Việc nó có nằm trong phạm vi thương vụ hay không là câu hỏi cấu trúc, cần trả lời sớm.',
+  'The Myanmar business accounts for a significant part of the network. Whether it falls within the transaction perimeter is a structural question that needs an early answer.',
+  '',''),
+
+ it('F2','F','Kết quả kinh doanh mảng Myanmar và mức độ tách biệt về hạch toán',
+  'Myanmar financial performance and the degree of accounting separation',
+  '3 năm','3 years','Q6',
+  'Báo cáo tài chính hoặc báo cáo quản trị riêng của pháp nhân Myanmar.',
+  'Standalone financial or management accounts for the Myanmar entity.',
+  'Bảng cân đối phát sinh của pháp nhân Myanmar theo năm, ba năm. Nếu hạch toán chung với Việt Nam, gửi bảng phân tách doanh thu và chi phí theo mã đơn vị, kèm giải thích ngắn về cách phân tách.',
+  'Annual trial balances for the Myanmar entity over three years. If accounted for together with Vietnam, send a split of revenue and costs by business unit code, with a short explanation of the method.',
+  'Cần để đánh giá mảng này đóng góp hay đang tiêu hao nguồn lực, và việc tách ra sẽ dễ hay khó.',
+  'Needed to assess whether this business contributes or consumes resources, and how straightforward a separation would be.',
+  '','')
+];
+
+/* ============================================================
+   ĐẶC TẢ FOLLOW-UP — sinh động theo câu trả lời của Target
+   ============================================================ */
+
+/* Tên hệ thống Target đã khai; rỗng thì dùng nhãn chung */
+function sysPOS(){ return (S.g0.q1||'').trim() || (LANG==='vi'?'hệ thống bán hàng (POS)':'the POS system'); }
+function sysERP(){ return (S.g0.q2||'').trim() || (LANG==='vi'?'hệ thống kế toán / ERP':'the accounting / ERP system'); }
+function sysCRM(){ return (S.g0.q3||'').trim() || (LANG==='vi'?'hệ thống khách hàng (CRM)':'the CRM system'); }
+
+/* Số tháng dữ liệu thực sự lấy được, dựa trên câu 5 (thời gian lưu) */
+function retainMonths(){
+  var v = S.g0.q4b;
+  if(v===0) return 999;      // trên 5 năm
+  if(v===1) return 60;       // 3–5 năm
+  if(v===2) return 36;       // 1–3 năm  → thực tế có thể chỉ 12–36
+  if(v===3) return 12;       // dưới 1 năm
+  return null;               // chưa trả lời
+}
+function pad2(n){ return String(n).padStart(2,'0'); }
+/* Trả về chuỗi kỳ dữ liệu thực tế + cờ cảnh báo nếu không đủ */
+function periodFor(wantMonths){
+  var base = (S.meta && S.meta.date) ? new Date(S.meta.date) : new Date();
+  if(isNaN(base.getTime())) base = new Date();
+  var have = retainMonths();
+  var use = wantMonths;
+  var short = false;
+  if(have !== null && have < wantMonths){ use = have; short = true; }
+  var end = new Date(base.getFullYear(), base.getMonth(), 1);
+  end.setMonth(end.getMonth()-1);
+  var start = new Date(end.getFullYear(), end.getMonth(), 1);
+  start.setMonth(start.getMonth()-(use-1));
+  return {
+    txt: pad2(start.getMonth()+1)+'/'+start.getFullYear()+' – '+pad2(end.getMonth()+1)+'/'+end.getFullYear(),
+    months: use, want: wantMonths, short: short, unknown: (have===null)
+  };
+}
+
+/* Bộ đặc tả: kind 'data' = cần kết xuất dữ liệu · 'doc' = cần tài liệu */
+var SPEC = {
+ A1:{kind:'doc', owner:'Pháp chế / Kế toán trưởng', ownerEn:'Legal / Chief Accountant', months:0,
+   src:function(){return LANG==='vi'?'Hồ sơ pháp lý nội bộ':'Internal legal records';},
+   docs:['Giấy chứng nhận đăng ký doanh nghiệp của từng pháp nhân (bản chụp)',
+         'Bảng liệt kê: tên pháp nhân · quốc gia · ngày thành lập · tỷ lệ sở hữu · công ty mẹ trực tiếp'],
+   docsEn:['Business registration certificate for each entity (scan)',
+           'A list: entity name · jurisdiction · incorporation date · ownership % · immediate parent'],
+   qa:['Tổng tỷ lệ sở hữu mỗi pháp nhân phải bằng 100%','Phải bao gồm cả pháp nhân sở hữu hoạt động Myanmar'],
+   qaEn:['Ownership percentages must total 100% for each entity','Must include the entity holding the Myanmar operations']},
+
+ A2:{kind:'data', owner:'CNTT / Vận hành', ownerEn:'IT / Operations', months:0,
+   src:function(){return sysPOS()+' '+(LANG==='vi'?'hoặc':'or')+' '+sysERP();},
+   fields:[['store_code','Mã cửa hàng — khóa chính, dùng nối với mọi bảng khác'],
+           ['store_name','Tên cửa hàng'],['address','Địa chỉ đầy đủ'],['province','Tỉnh / thành phố'],
+           ['open_date','Ngày khai trương (yyyy-mm-dd)'],['close_date','Ngày đóng, để trống nếu đang hoạt động'],
+           ['area_sqm','Diện tích sàn (m²)'],['site_type','Loại mặt bằng: TTTM / nhà phố / khối đế'],
+           ['has_pharmacy','Có quầy thuốc: 1 / 0']],
+   fieldsEn:[['store_code','Store code — primary key, used to join every other table'],
+           ['store_name','Store name'],['address','Full address'],['province','Province / city'],
+           ['open_date','Opening date (yyyy-mm-dd)'],['close_date','Closing date, blank if operating'],
+           ['area_sqm','Floor area (sqm)'],['site_type','Site type: mall / street / podium'],
+           ['has_pharmacy','Pharmacy counter: 1 / 0']],
+   sample:{cols:['store_code','store_name','province','open_date','close_date','area_sqm','site_type','has_pharmacy'],
+           rows:[['MC001','MEDiCARE Nguyễn Huệ','TP.HCM','2016-03-12','','92','nhà phố','1'],
+                 ['MC047','MEDiCARE AEON Tân Phú','TP.HCM','2021-11-05','','78','TTTM','1'],
+                 ['MC052','MEDiCARE Lê Lợi','Đà Nẵng','2019-06-20','2025-02-28','64','nhà phố','0']]},
+   qa:['Số dòng có close_date trống phải khớp số cửa hàng đang hoạt động Quý Công ty công bố',
+       'store_code không trùng lặp','Cột has_pharmacy phải khớp số giấy phép ở mục C1'],
+   qaEn:['Rows with blank close_date must match your stated number of operating stores',
+       'store_code must be unique','has_pharmacy must reconcile to the licence count in item C1'],
+   note:'Nếu bảng có thêm trường ngoài danh sách trên, xin cứ giữ nguyên. Thừa dữ liệu không gây khó cho chúng tôi.',
+   noteEn:'If the table has fields beyond those listed, please keep them. Extra data causes us no difficulty.'},
+
+ A3:{kind:'data', owner:'Vận hành', ownerEn:'Operations', months:36,
+   src:function(){return LANG==='vi'?('Trích từ bảng ở mục A2 ('+sysPOS()+')'):('Derived from the A2 table ('+sysPOS()+')');},
+   fields:[['store_code','Mã cửa hàng'],['close_date','Ngày đóng'],['reason','Lý do đóng — nhập tay nếu hệ thống không lưu']],
+   fieldsEn:[['store_code','Store code'],['close_date','Closing date'],['reason','Reason — manual entry if not stored']],
+   sample:{cols:['store_code','close_date','reason'],
+           rows:[['MC052','2025-02-28','Không gia hạn được hợp đồng thuê'],
+                 ['MC019','2024-07-31','Doanh thu không đạt điểm hòa vốn']]},
+   qa:['Danh sách này phải khớp với các dòng có close_date trong mục A2'],
+   qaEn:['This list must reconcile to rows with a close_date in item A2'],
+   fallback:'Nếu hệ thống không lưu ngày đóng: gửi danh sách store_code có doanh thu năm N-1 nhưng không có doanh thu năm N. Chúng tôi sẽ hỏi lý do trong buổi trao đổi.',
+   fallbackEn:'If closing dates are not stored: send store_codes with revenue in year N-1 but none in year N. We will ask about reasons in discussion.'},
+
+ A4:{kind:'data', owner:'Nhân sự', ownerEn:'HR', months:0,
+   src:function(){return LANG==='vi'?'Hệ thống nhân sự hoặc chấm công':'HR or time-attendance system';},
+   fields:[['emp_id','Mã nhân viên — KHÔNG cần họ tên'],['department','Phòng ban / khối'],
+           ['job_title','Chức danh'],['work_location','Nơi làm việc (mã cửa hàng hoặc VP)'],
+           ['start_date','Ngày vào làm']],
+   fieldsEn:[['emp_id','Employee ID — names NOT required'],['department','Department / function'],
+           ['job_title','Job title'],['work_location','Work location (store code or HO)'],
+           ['start_date','Start date']],
+   sample:{cols:['emp_id','department','job_title','work_location','start_date'],
+           rows:[['E10233','Vận hành','Cửa hàng trưởng','MC001','2019-04-01'],
+                 ['E10877','Chuyên môn','Dược sĩ phụ trách','MC001','2022-09-15']]},
+   qa:['Không gửi thông tin lương và họ tên ở giai đoạn này','Tổng số dòng phải khớp headcount Quý Công ty công bố'],
+   qaEn:['Do not send compensation data or names at this stage','Total rows must match your stated headcount']},
+
+ A5:{kind:'doc', owner:'Ban điều hành', ownerEn:'Management', months:0,
+   src:function(){return LANG==='vi'?'Tài liệu sẵn có':'Existing material';},
+   docs:['Bản trình bày giới thiệu doanh nghiệp hoặc hồ sơ chào bán đã lập cho mục đích khác'],
+   docsEn:['An existing company presentation or information memorandum'],
+   qa:['Nếu chưa có, KHÔNG tạo mới — thay bằng buổi trao đổi 60–90 phút với ban điều hành'],
+   qaEn:['If none exists, do NOT create one — replace with a 60–90 minute management session']},
+
+ B1:{kind:'doc', owner:'Kế toán trưởng', ownerEn:'Chief Accountant', months:36,
+   src:function(){return LANG==='vi'?'Hồ sơ kiểm toán':'Audit files';},
+   docs:['Báo cáo tài chính đã kiểm toán, đầy đủ thuyết minh, 3 năm gần nhất',
+         'Thư quản lý (management letter) của kiểm toán viên, nếu có'],
+   docsEn:['Audited financial statements with full notes, last 3 years',
+           'Auditor management letters, if available'],
+   qa:['Nếu năm gần nhất chưa phát hành: gửi BCTC nội bộ chưa kiểm toán và ghi rõ trạng thái'],
+   qaEn:['If the latest year is not yet issued: send internal unaudited statements and state their status']},
+
+ B2:{kind:'data', owner:'Kế toán trưởng', ownerEn:'Chief Accountant', months:36,
+   src:function(){return LANG==='vi'?('Kết xuất từ '+sysERP()):('Export from '+sysERP());},
+   fields:[['entity_code','Mã pháp nhân — tách riêng Việt Nam và Myanmar'],
+           ['period','Kỳ (yyyy-mm)'],['account_code','Số hiệu tài khoản'],
+           ['opening','Số dư đầu kỳ'],['debit','Phát sinh nợ'],['credit','Phát sinh có'],['closing','Số dư cuối kỳ']],
+   fieldsEn:[['entity_code','Entity code — Vietnam and Myanmar separated'],
+           ['period','Period (yyyy-mm)'],['account_code','Account number'],
+           ['opening','Opening balance'],['debit','Debit movement'],['credit','Credit movement'],['closing','Closing balance']],
+   sample:{cols:['entity_code','period','account_code','opening','debit','credit','closing'],
+           rows:[['VN01','2026-06','5111','0','0','48,230,115,000','48,230,115,000'],
+                 ['VN01','2026-06','6321','0','31,940,772,000','0','31,940,772,000'],
+                 ['MM01','2026-06','5111','0','0','9,115,400,000','9,115,400,000']]},
+   extra:['Kèm bảng danh mục tài khoản (COA): account_code · account_name · account_type · parent_code'],
+   extraEn:['Attach the chart of accounts: account_code · account_name · account_type · parent_code'],
+   qa:['Tổng phát sinh nợ = tổng phát sinh có cho từng kỳ, từng pháp nhân',
+       'Lợi nhuận suy ra từ trial balance phải khớp BCTC đã kiểm toán trong phạm vi ±0,5%'],
+   qaEn:['Total debits must equal total credits for each period and entity',
+       'Profit derived from the trial balance must reconcile to audited statements within ±0.5%'],
+   note:'Đây là thao tác xuất tệp tiêu chuẩn, thường mất vài phút. KHÔNG cần lập báo cáo quản trị mới.',
+   noteEn:'This is a standard export, usually a matter of minutes. Do NOT build new management accounts.'},
+
+ B3:{kind:'data', owner:'CNTT / Thu mua', ownerEn:'IT / Buying', months:36,
+   src:function(){return LANG==='vi'?('Kết xuất từ '+sysPOS()):('Export from '+sysPOS());},
+   fields:[['period','Kỳ (yyyy-mm)'],['sku_code','Mã hàng'],['qty','Số lượng bán'],
+           ['revenue','Doanh thu thuần'],['cogs','Giá vốn hàng bán']],
+   fieldsEn:[['period','Period (yyyy-mm)'],['sku_code','SKU code'],['qty','Quantity sold'],
+           ['revenue','Net revenue'],['cogs','Cost of goods sold']],
+   sample:{cols:['period','sku_code','qty','revenue','cogs'],
+           rows:[['2026-06','SKU00013','1,204','96,320,000','61,644,800'],
+                 ['2026-06','SKU00147','388','54,320,000','39,110,400']]},
+   extra:['Kèm bảng danh mục hàng hóa: sku_code · sku_name · cat_l1 · cat_l2 · cat_l3 · brand · is_rx (thuốc kê đơn 1/0)'],
+   extraEn:['Attach the product master: sku_code · sku_name · cat_l1 · cat_l2 · cat_l3 · brand · is_rx (prescription 1/0)'],
+   qa:['Tổng revenue theo kỳ phải khớp doanh thu trên BCTC trong phạm vi ±0,5%',
+       'Mọi sku_code trong bảng bán hàng phải tồn tại trong danh mục hàng hóa'],
+   qaEn:['Total revenue by period must reconcile to the financial statements within ±0.5%',
+       'Every sku_code in the sales table must exist in the product master'],
+   note:'Nếu tệp quá lớn, có thể tổng hợp sẵn ở cấp cat_l1 hoặc cat_l2 trước khi gửi. KHÔNG cần giá bán theo mã hàng.',
+   noteEn:'If the file is too large, pre-aggregate to cat_l1 or cat_l2. SKU-level pricing is NOT required.'},
+
+ B4:{kind:'data', owner:'CNTT / Thương mại điện tử', ownerEn:'IT / E-commerce', months:36,
+   src:function(){return LANG==='vi'?('Kết xuất từ '+sysPOS()):('Export from '+sysPOS());},
+   fields:[['period','Kỳ (yyyy-mm)'],['channel_code','Mã kênh hoặc mã cửa hàng'],
+           ['revenue','Doanh thu thuần'],['orders','Số đơn / số hóa đơn'],['delivery_cost','Chi phí giao vận, nếu tách được']],
+   fieldsEn:[['period','Period (yyyy-mm)'],['channel_code','Channel or store code'],
+           ['revenue','Net revenue'],['orders','Order / invoice count'],['delivery_cost','Delivery cost, if separable']],
+   sample:{cols:['period','channel_code','revenue','orders','delivery_cost'],
+           rows:[['2026-06','STORE','41,208,500,000','214,880',''],
+                 ['2026-06','ECOM','5,442,100,000','18,205','612,400,000'],
+                 ['2026-06','APP','1,579,500,000','9,043','174,800,000']]},
+   extra:['Kèm bảng ánh xạ mã cửa hàng sang kênh nếu doanh thu online nằm chung bảng cửa hàng'],
+   extraEn:['Attach a store-to-channel mapping if online revenue sits in the store table'],
+   qa:['Tổng revenue mọi kênh phải khớp tổng ở mục B3'],
+   qaEn:['Total revenue across channels must reconcile to item B3']},
+
+ B5:{kind:'data', owner:'Kế toán trưởng + CNTT', ownerEn:'Chief Accountant + IT', months:12,
+   src:function(){return LANG==='vi'?(sysPOS()+' (tệp a) và '+sysERP()+' (tệp b, c)'):(sysPOS()+' (file a) and '+sysERP()+' (files b, c)');},
+   fields:[['— TỆP A —','Doanh thu & giá vốn theo cửa hàng'],
+           ['period','Kỳ (yyyy-mm)'],['store_code','Mã cửa hàng'],['revenue','Doanh thu thuần'],['cogs','Giá vốn'],
+           ['— TỆP B —','Sổ chi tiết chi phí'],
+           ['period','Kỳ (yyyy-mm)'],['store_code','Mã cửa hàng — để trống nếu là chi phí văn phòng'],
+           ['account_code','Số hiệu tài khoản chi phí'],['amount','Số tiền'],
+           ['— TỆP C —','Danh mục tài khoản (COA)']],
+   fieldsEn:[['— FILE A —','Revenue & COGS by store'],
+           ['period','Period (yyyy-mm)'],['store_code','Store code'],['revenue','Net revenue'],['cogs','COGS'],
+           ['— FILE B —','Expense sub-ledger'],
+           ['period','Period (yyyy-mm)'],['store_code','Store code — blank for head-office costs'],
+           ['account_code','Expense account number'],['amount','Amount'],
+           ['— FILE C —','Chart of accounts']],
+   sample:{cols:['period','store_code','account_code','amount'],
+           rows:[['2026-06','MC001','6421','184,500,000'],
+                 ['2026-06','MC001','6427','96,200,000'],
+                 ['2026-06','','6428','1,240,800,000']]},
+   qa:['Tổng revenue tệp A phải khớp mục B3 và khớp BCTC',
+       'Tổng amount tệp B phải khớp tổng chi phí trên BCTC',
+       'Mọi store_code phải tồn tại trong mục A2'],
+   qaEn:['Total revenue in file A must reconcile to item B3 and to the financial statements',
+       'Total amount in file B must reconcile to total costs in the financial statements',
+       'Every store_code must exist in item A2'],
+   note:'MỤC QUAN TRỌNG NHẤT. Nếu chỉ có một trong ba tệp, xin cứ gửi tệp đó trước — chúng tôi dựng phần dựng được và nêu rõ phần còn thiếu. Sau khi dựng xong, chúng tôi trình bày lại để Quý Công ty xác nhận trước khi sử dụng.',
+   noteEn:'MOST IMPORTANT ITEM. If only one of the three files is available, send it first — we build what we can and state what is missing. Once built, we walk the output back to you for confirmation before relying on it.'},
+
+ B6:{kind:'derived', owner:'—', ownerEn:'—', months:36,
+   src:function(){return LANG==='vi'?'Suy ra từ mục B5 và A2':'Derived from items B5 and A2';},
+   qa:['Không cần gửi gì thêm nếu đã có B5 và A2','Chúng tôi sẽ gửi lại định nghĩa like-for-like đã dùng để Quý Công ty xác nhận'],
+   qaEn:['Nothing further needed if B5 and A2 are provided','We will send back the like-for-like definition applied for your confirmation']},
+
+ B7:{kind:'derived', owner:'—', ownerEn:'—', months:60,
+   src:function(){return LANG==='vi'?'Suy ra từ mục A2 và A3':'Derived from items A2 and A3';},
+   qa:['Không cần gửi riêng'], qaEn:['No separate submission needed']},
+
+ B8:{kind:'data', owner:'Kế toán trưởng', ownerEn:'Chief Accountant', months:36,
+   src:function(){return LANG==='vi'?('Kết xuất từ '+sysERP()):('Export from '+sysERP());},
+   fields:[['period','Kỳ (yyyy-mm)'],['account_code','Tài khoản thu nhập từ nhà cung cấp'],
+           ['account_name','Tên tài khoản'],['amount','Số tiền phát sinh']],
+   fieldsEn:[['period','Period (yyyy-mm)'],['account_code','Supplier-income account'],
+           ['account_name','Account name'],['amount','Movement amount']],
+   sample:{cols:['period','account_code','account_name','amount'],
+           rows:[['2026-06','5111','Chiết khấu thương mại được hưởng','3,120,400,000'],
+                 ['2026-06','7118','Hỗ trợ trưng bày từ nhà cung cấp','842,600,000'],
+                 ['2026-06','1561','Giảm giá hàng mua','1,905,300,000']]},
+   qa:['Chỉ cần ở mức tài khoản — KHÔNG cần chi tiết theo từng nhà cung cấp ở giai đoạn này',
+       'Tổng phải khớp các khoản tương ứng trên BCTC'],
+   qaEn:['Account level only — supplier-level detail is NOT required at this stage',
+       'Totals must reconcile to the corresponding lines in the financial statements'],
+   note:'Chúng tôi chủ động không hỏi điều khoản với từng nhà cung cấp vì đó là thông tin nhạy cảm cạnh tranh.',
+   noteEn:'We deliberately avoid supplier-specific terms as they are competitively sensitive.'},
+
+ C1:{kind:'data', owner:'Pháp chế / Chuyên môn', ownerEn:'Legal / Regulatory', months:0,
+   src:function(){return LANG==='vi'?'Bảng theo dõi giấy phép hoặc hồ sơ lưu':'Licence register or filing records';},
+   fields:[['store_code','Mã cửa hàng — nối với mục A2'],['licence_no','Số giấy chứng nhận'],
+           ['licence_type','Loại: đủ điều kiện KD dược / GPP'],['issue_date','Ngày cấp'],
+           ['expiry_date','Ngày hết hạn'],['issuing_authority','Cơ quan cấp']],
+   fieldsEn:[['store_code','Store code — joins to item A2'],['licence_no','Certificate number'],
+           ['licence_type','Type: pharmacy eligibility / GPP'],['issue_date','Issue date'],
+           ['expiry_date','Expiry date'],['issuing_authority','Issuing authority']],
+   sample:{cols:['store_code','licence_no','licence_type','issue_date','expiry_date'],
+           rows:[['MC001','79/GCN-SYT','Đủ điều kiện KD dược','2023-05-18','2028-05-18'],
+                 ['MC001','GPP-0412','GPP','2023-06-02','2026-06-02']]},
+   qa:['Số cửa hàng có giấy phép phải khớp cột has_pharmacy ở mục A2',
+       'Đánh dấu rõ giấy phép hết hạn trong 12 tháng tới'],
+   qaEn:['Stores with a licence must reconcile to has_pharmacy in item A2',
+       'Flag licences expiring within the next 12 months'],
+   fallback:'Nếu chưa có bảng theo dõi tập trung: gửi bản chụp giấy phép theo cửa hàng. Chúng tôi tự lập bảng và gửi lại để Quý Công ty dùng về sau.',
+   fallbackEn:'If no central register exists: send scanned licences by store. We build the register and return it for your own use.'},
+
+ C2:{kind:'data', owner:'Nhân sự / Chuyên môn', ownerEn:'HR / Regulatory', months:24,
+   src:function(){return LANG==='vi'?'Hệ thống nhân sự':'HR system';},
+   fields:[['emp_id','Mã nhân viên — KHÔNG cần họ tên'],['store_code','Nơi làm việc'],
+           ['role','Chức danh (dược sĩ phụ trách / dược sĩ)'],['start_date','Ngày vào vị trí'],
+           ['end_date','Ngày rời vị trí, để trống nếu đang làm']],
+   fieldsEn:[['emp_id','Employee ID — names NOT required'],['store_code','Work location'],
+           ['role','Role (responsible pharmacist / pharmacist)'],['start_date','Role start date'],
+           ['end_date','Role end date, blank if current']],
+   sample:{cols:['emp_id','store_code','role','start_date','end_date'],
+           rows:[['E10877','MC001','Dược sĩ phụ trách','2022-09-15',''],
+                 ['E10412','MC047','Dược sĩ phụ trách','2021-03-01','2025-08-31']]},
+   qa:['Mỗi cửa hàng có quầy thuốc phải có ít nhất một dược sĩ phụ trách đang tại nhiệm',
+       'Tỷ lệ rời vị trí 24 tháng là chỉ số rủi ro — xin gửi đủ cả người đã nghỉ'],
+   qaEn:['Each store with a pharmacy counter must have at least one current responsible pharmacist',
+       '24-month turnover is a risk indicator — please include leavers']},
+
+ C3:{kind:'doc', owner:'Pháp chế', ownerEn:'Legal', months:0,
+   src:function(){return LANG==='vi'?'Trao đổi trực tiếp':'Direct discussion';},
+   docs:['Ý kiến pháp lý đã có về chuyển giao giấy phép, nếu từng xin tư vấn',
+         'Nếu chưa có: một buổi trao đổi 45 phút với người phụ trách pháp chế hoặc chuyên môn'],
+   docsEn:['Any existing legal opinion on licence transferability',
+           'If none: a 45-minute session with the legal or regulatory lead'],
+   qa:['KHÔNG cần soạn văn bản mới cho mục này'],
+   qaEn:['Do NOT prepare a new written document for this item']},
+
+ C4:{kind:'doc', owner:'Pháp chế / Chuyên môn', ownerEn:'Legal / Regulatory', months:36,
+   src:function(){return LANG==='vi'?'Hồ sơ thanh tra':'Inspection files';},
+   docs:['Bản chụp quyết định xử phạt hành chính (nếu có)','Biên bản thanh tra 36 tháng'],
+   docsEn:['Scanned administrative penalty decisions (if any)','Inspection minutes for 36 months'],
+   qa:['Nếu không phát sinh vụ việc nào, một văn bản xác nhận ngắn là đủ'],
+   qaEn:['If there were no incidents, a short written confirmation is sufficient']},
+
+ C5:{kind:'doc', owner:'Trung tâm phân phối', ownerEn:'Distribution centre', months:3,
+   src:function(){return LANG==='vi'?'Hồ sơ kho':'Warehouse records';},
+   docs:['Bản chụp chứng nhận GDP và GSP còn hiệu lực','Nhật ký theo dõi nhiệt độ 3 tháng gần nhất, nếu hệ thống xuất được'],
+   docsEn:['Scanned valid GDP and GSP certificates','Temperature logs for the last 3 months, if exportable'],
+   qa:['Nếu hệ thống kho không xuất được nhật ký nhiệt độ, có thể bỏ qua phần đó ở giai đoạn này'],
+   qaEn:['If temperature logs cannot be exported, that part may be skipped at this stage']},
+
+ D1:{kind:'data', owner:'Phát triển mặt bằng + Kế toán', ownerEn:'Property + Accounting', months:36,
+   src:function(){return LANG==='vi'?('Bộ phận mặt bằng (tệp a) và '+sysERP()+' (tệp b)'):('Property function (file a) and '+sysERP()+' (file b)');},
+   fields:[['— TỆP A —','Danh sách hợp đồng thuê'],
+           ['store_code','Mã cửa hàng'],['landlord','Bên cho thuê'],['start_date','Ngày bắt đầu'],
+           ['end_date','Ngày hết hạn'],['renewal_option','Có quyền gia hạn: 1 / 0'],
+           ['monthly_rent','Tiền thuê tháng'],['escalation','Mức tăng định kỳ (%/năm)'],
+           ['— TỆP B —','Chi phí thuê thực tế theo tháng × cửa hàng']],
+   fieldsEn:[['— FILE A —','Lease list'],
+           ['store_code','Store code'],['landlord','Landlord'],['start_date','Commencement date'],
+           ['end_date','Expiry date'],['renewal_option','Renewal option: 1 / 0'],
+           ['monthly_rent','Monthly rent'],['escalation','Annual escalation (%)'],
+           ['— FILE B —','Actual rent expense by month and store']],
+   sample:{cols:['store_code','landlord','start_date','end_date','renewal_option','monthly_rent'],
+           rows:[['MC001','Công ty CP ABC','2021-04-01','2026-03-31','1','185,000,000'],
+                 ['MC047','AEON Mall Tân Phú','2021-11-01','2031-10-31','0','142,000,000']]},
+   qa:['Tổng monthly_rent × 12 phải xấp xỉ chi phí thuê năm trên BCTC',
+       'Đánh dấu rõ hợp đồng hết hạn trong 24 tháng tới'],
+   qaEn:['Total monthly_rent × 12 must approximate the annual rent expense in the financial statements',
+       'Flag leases expiring within the next 24 months'],
+   note:'CHƯA cần bản hợp đồng gốc ở giai đoạn này.',
+   noteEn:'Original lease documents are NOT required at this stage.'},
+
+ D2:{kind:'derived', owner:'—', ownerEn:'—', months:60,
+   src:function(){return LANG==='vi'?'Suy ra từ mục D1':'Derived from item D1';},
+   qa:['Không cần gửi riêng'], qaEn:['No separate submission needed']},
+
+ E1:{kind:'data', owner:'Marketing / CNTT', ownerEn:'Marketing / IT', months:36,
+   src:function(){return LANG==='vi'?('Kết xuất tổng hợp từ '+sysCRM()):('Aggregated export from '+sysCRM());},
+   fields:[['signup_month','Tháng đăng ký (yyyy-mm)'],['members','Số thành viên đăng ký trong tháng đó'],
+           ['active_3m','Số thành viên đó có giao dịch trong 3 tháng gần nhất'],
+           ['active_6m','… trong 6 tháng gần nhất'],['active_12m','… trong 12 tháng gần nhất']],
+   fieldsEn:[['signup_month','Registration month (yyyy-mm)'],['members','Members registered that month'],
+           ['active_3m','Of those, transacting in the last 3 months'],
+           ['active_6m','… in the last 6 months'],['active_12m','… in the last 12 months']],
+   sample:{cols:['signup_month','members','active_3m','active_6m','active_12m'],
+           rows:[['2024-01','12,480','2,914','4,102','6,338'],
+                 ['2025-01','15,220','5,187','7,044','10,912']]},
+   qa:['DẠNG TỔNG HỢP — tuyệt đối không gửi dữ liệu ở cấp cá nhân',
+       'active_3m ≤ active_6m ≤ active_12m ≤ members cho mọi dòng'],
+   qaEn:['AGGREGATED ONLY — do not send individual-level records under any circumstances',
+       'active_3m ≤ active_6m ≤ active_12m ≤ members for every row'],
+   note:'Chúng tôi không yêu cầu và không tiếp nhận thông tin định danh cá nhân.',
+   noteEn:'We neither request nor accept personally identifiable information.'},
+
+ E2:{kind:'data', owner:'Marketing / CNTT', ownerEn:'Marketing / IT', months:36,
+   src:function(){return LANG==='vi'?('Kết xuất từ '+sysPOS()+' hoặc '+sysCRM()):('Export from '+sysPOS()+' or '+sysCRM());},
+   fields:[['period','Kỳ (yyyy-mm)'],['is_member','Giao dịch có gắn mã thành viên: 1 / 0'],
+           ['revenue','Doanh thu'],['transactions','Số giao dịch']],
+   fieldsEn:[['period','Period (yyyy-mm)'],['is_member','Transaction linked to a member: 1 / 0'],
+           ['revenue','Revenue'],['transactions','Transaction count']],
+   sample:{cols:['period','is_member','revenue','transactions'],
+           rows:[['2026-06','1','29,844,000,000','128,400'],
+                 ['2026-06','0','18,385,600,000','113,728']]},
+   qa:['Tổng revenue hai dòng mỗi kỳ phải khớp mục B3','Không cần mã thành viên cụ thể'],
+   qaEn:['The two rows per period must sum to item B3','Individual member IDs are not required']},
+
+ F1:{kind:'doc', owner:'Ban điều hành', ownerEn:'Management', months:0,
+   src:function(){return LANG==='vi'?'Tài liệu hoặc ghi chú của ban điều hành':'Documentation or a management note';},
+   docs:['Mô tả mô hình vận hành: sở hữu trực tiếp / liên doanh / nhượng quyền',
+         'Danh sách điểm bán tại Myanmar','Hợp đồng liên doanh hoặc nhượng quyền, nếu có'],
+   docsEn:['Description of the operating model: owned / joint venture / franchise',
+           'List of Myanmar outlets','Joint venture or franchise agreements, if any'],
+   qa:['Một bản ghi chú ngắn là đủ ở giai đoạn này — chưa cần tài liệu pháp lý chính thức'],
+   qaEn:['A short note is sufficient at this stage — formal legal documentation not yet required']},
+
+ F2:{kind:'data', owner:'Kế toán trưởng', ownerEn:'Chief Accountant', months:36,
+   src:function(){return LANG==='vi'?('Kết xuất từ '+sysERP()+', lọc pháp nhân Myanmar'):('Export from '+sysERP()+', filtered to the Myanmar entity');},
+   fields:[['entity_code','Mã pháp nhân Myanmar'],['year','Năm'],['account_code','Số hiệu tài khoản'],
+           ['closing','Số dư cuối kỳ'],['currency','Đơn vị tiền tệ gốc']],
+   fieldsEn:[['entity_code','Myanmar entity code'],['year','Year'],['account_code','Account number'],
+           ['closing','Closing balance'],['currency','Original currency']],
+   sample:{cols:['entity_code','year','account_code','closing','currency'],
+           rows:[['MM01','2025','5111','—','MMK'],['MM01','2025','6321','—','MMK']]},
+   qa:['Ghi rõ đơn vị tiền tệ và tỷ giá quy đổi đã dùng nếu có hợp nhất',
+       'Nêu rõ có bảo lãnh chéo với pháp nhân Việt Nam hay không'],
+   qaEn:['State the currency and any translation rate used in consolidation',
+       'State whether cross-guarantees with the Vietnamese entity exist'],
+   fallback:'Nếu hạch toán chung với Việt Nam: gửi bảng phân tách doanh thu và chi phí theo mã đơn vị, kèm giải thích ngắn về cách phân tách.',
+   fallbackEn:'If accounted for together with Vietnam: send a revenue and cost split by business unit code, with a short note on the method.'}
+};
+
+/* ---------------- QUY TẮC ĐỊNH HƯỚNG ---------------- */
+/* Dựa vào câu trả lời GĐ0 để gợi ý phương án cho từng mục GĐ1 */
+var RULES = [
+  {q:'q5',  idx:[3],      set:{B5:'o2'}},                 // Không có P&L cửa hàng
+  {q:'q5',  idx:[0,1],    set:{B5:'o1'}},
+  {q:'q5',  idx:[2],      set:{B5:'o2'}},
+  {q:'q6',  idx:[2],      set:{B5:'o2', B2:'o2'}},        // Báo cáo thủ công
+  {q:'q9',  idx:[2],      set:{B6:'o2'}},                 // Chưa có LFL
+  {q:'q9',  idx:[0],      set:{B6:'o1'}},
+  {q:'q8',  idx:[2,3],    set:{B3:'o2'}},                 // Ngành hàng không nhất quán
+  {q:'q8',  idx:[0],      set:{B3:'o1'}},
+  {q:'q4',  idx:[0,1],    set:{B3:'o2', B4:'o2', B5:'o2'}},// Có dữ liệu chi tiết -> xuất thô được
+  {q:'q4',  idx:[2],      set:{B3:'o1', B5:'o1'}},
+  {q:'q10', idx:[3],      set:{E1:'o2', E2:'o2'}},        // Không gắn được member
+  {q:'q13', idx:[0],      set:{F2:'o1'}},                 // Myanmar hạch toán tách biệt
+  {q:'q13', idx:[1,2],    set:{F2:'o2', F1:'o2'}},
+  {q:'q11', idx:[2,3],    set:{}}                          // không ảnh hưởng GĐ1 hiện tại
+];
+
+/* ---------------- STATE ---------------- */
+var S = { meta:{}, g0:{}, g1:{}, ui:{lang:'vi'} };
+
+function defaults(){
+  var d = new Date();
+  var iso = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  if(!S.meta.date) S.meta.date = iso;
+}
+
+function load(){
+  try{
+    var raw = localStorage.getItem(LS_KEY);
+    if(raw){ var o = JSON.parse(raw); if(o && o.g0){ S = o; } }
+  }catch(e){}
+  if(!S.meta) S.meta={};
+  if(!S.g0) S.g0={};
+  if(!S.g1) S.g1={};
+  if(!S.ui) S.ui={lang:'vi'};
+  LANG = S.ui.lang || 'vi';
+  defaults();
+}
+function save(){
+  try{ S.ui.lang = LANG; localStorage.setItem(LS_KEY, JSON.stringify(S)); return true; }
+  catch(e){ return false; }
+}
+function saveNow(){
+  if(save()) pill('Đã lưu · Saved','ok'); else pill('Không lưu được — trình duyệt chặn localStorage','err');
+}
+var saveTimer=null;
+function mark(){
+  readMeta();
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(function(){
+    save();
+    var a=document.getElementById('autosave');
+    a.textContent = T('saved');
+    setTimeout(function(){ a.textContent=''; }, 1800);
+    updateProgress();
+  }, 500);
+}
+
+function pill(msg,kind){
+  var p = document.getElementById('pill');
+  p.textContent = msg;
+  p.className = 'pill on ' + (kind||'ok');
+  clearTimeout(p._t);
+  p._t = setTimeout(function(){ p.className='pill '+(kind||'ok'); }, 4000);
+}
+
+function logline(msg){
+  var l = document.getElementById('log');
+  l.classList.add('on');
+  var t = new Date().toTimeString().slice(0,8);
+  var d = document.createElement('div');
+  d.innerHTML = '<span class="t">['+t+']</span> ' + esc(msg);
+  l.appendChild(d);
+  l.scrollTop = l.scrollHeight;
+}
+
+function esc(s){
+  return String(s==null?'':s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+/* ---------------- RENDER GĐ0 ---------------- */
+function renderG0(){
+  var host = document.getElementById('g0list');
+  var h = '';
+  G0.forEach(function(q,i){
+    var val = S.g0[q.id];
+    var answered = val!==undefined && val!==null && String(val).trim()!=='';
+    var title = LANG==='vi' ? q.vi : q.en;
+    var why   = LANG==='vi' ? q.why_vi : q.why_en;
+    var ex    = LANG==='vi' ? q.ex_vi : q.ex_en;
+    var key   = (q.id==='q12');
+
+    h += '<div class="q '+(answered?'answered':'')+'" id="qc_'+q.id+'">';
+    h +=  '<div class="qhead">';
+    h +=   '<span class="qcode">'+(i+1)+'</span>';
+    h +=   '<span class="qtitle"'+(key?' style="color:var(--accent)"':'')+'>'+esc(title)+(key?' ★':'')+'</span>';
+    h +=   '<button class="clarify" id="cb_'+q.id+'" onclick="toggleExp(\''+q.id+'\')">'+T('clarify')+'</button>';
+    h +=  '</div>';
+
+    h +=  '<div class="exp" id="ex_'+q.id+'">';
+    h +=   '<div class="exph">'+T('why')+'</div><p class="expb">'+esc(why)+'</p>';
+    if(ex){ h += '<div class="exph">'+T('ex')+'</div><p class="expb ex">'+esc(ex)+'</p>'; }
+    h +=  '</div>';
+
+    if(q.type==='select'){
+      var opts = LANG==='vi' ? q.opts_vi : q.opts_en;
+      h += '<div class="opts">';
+      opts.forEach(function(o,oi){
+        var on = (S.g0[q.id]===oi) ? ' on' : '';
+        h += '<button class="opt'+on+'" onclick="pickG0(\''+q.id+'\','+oi+')">'+esc(o)+'</button>';
+      });
+      h += '</div>';
+    } else if(q.type==='textarea'){
+      h += '<div class="field"><textarea id="in_'+q.id+'" oninput="setG0(\''+q.id+'\',this.value)">'+esc(val||'')+'</textarea></div>';
+    } else {
+      h += '<div class="field"><input type="text" id="in_'+q.id+'" value="'+esc(val||'')+'" oninput="setG0(\''+q.id+'\',this.value)"></div>';
+    }
+    h += '</div>';
+  });
+  host.innerHTML = h;
+}
+
+function toggleExp(id){
+  var e = document.getElementById('ex_'+id);
+  var b = document.getElementById('cb_'+id);
+  var on = e.classList.toggle('on');
+  b.classList.toggle('open', on);
+  b.textContent = on ? T('close') : T('clarify');
+}
+function pickG0(id,idx){
+  S.g0[id] = (S.g0[id]===idx) ? null : idx;
+  save(); renderG0(); applyRules(); updateProgress();
+}
+function setG0(id,v){
+  S.g0[id] = v;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(function(){
+    save(); updateProgress();
+    var c = document.getElementById('qc_'+id);
+    if(c){ c.classList.toggle('answered', String(v).trim()!==''); }
+  }, 450);
+}
+
+/* ---------------- RENDER GĐ1 ---------------- */
+var SUG = {};
+function applyRules(){
+  SUG = {};
+  RULES.forEach(function(r){
+    var ans = S.g0[r.q];
+    if(ans===undefined || ans===null) return;
+    if(r.idx.indexOf(ans) === -1) return;
+    for(var k in r.set){ SUG[k] = r.set[k]; }
+  });
+  if(document.getElementById('g1list').innerHTML) renderG1();
+}
+
+function renderG1(){
+  var host = document.getElementById('g1list');
+  var h = '';
+  GROUPS.forEach(function(g){
+    h += '<div class="grp">'+esc(LANG==='vi'?g.vi:g.en)+'</div>';
+    G1.filter(function(x){return x.grp===g.id;}).forEach(function(it){
+      var st = S.g1[it.code] || {};
+      var ch = st.choice;
+      var cls = ch ? (ch==='o3'||ch==='o4' ? 'flagged' : 'answered') : '';
+      var title = LANG==='vi' ? it.vi : it.en;
+      var ky    = LANG==='vi' ? it.ky : it.kyEn;
+      var why   = LANG==='vi' ? it.why_vi : it.why_en;
+      var ex    = LANG==='vi' ? it.ex_vi : it.ex_en;
+      var o1    = LANG==='vi' ? it.o1vi : it.o1en;
+      var o2    = LANG==='vi' ? it.o2vi : it.o2en;
+      var sug   = SUG[it.code];
+
+      h += '<div class="q '+cls+'" id="ic_'+it.code+'">';
+      h +=  '<div class="qhead">';
+      h +=   '<span class="qcode">'+it.code+'</span>';
+      h +=   '<span class="qtitle">'+esc(title)+'</span>';
+      h +=   '<button class="clarify" id="ib_'+it.code+'" onclick="toggleIExp(\''+it.code+'\')">'+T('clarify')+'</button>';
+      h +=  '</div>';
+      h +=  '<div class="qmeta">'+esc(ky)+' · '+esc(it.serves)+'</div>';
+
+      h +=  '<div class="exp" id="ie_'+it.code+'">';
+      h +=   '<div class="exph">'+T('why')+'</div><p class="expb">'+esc(why)+'</p>';
+      h +=   '<div class="exph o1">'+T('o1')+'</div><p class="expb">'+esc(o1)+'</p>';
+      h +=   '<div class="exph o2">'+T('o2')+'</div><p class="expb">'+esc(o2)+'</p>';
+      if(ex){ h += '<div class="exph">'+T('ex')+'</div><p class="expb ex">'+esc(ex)+'</p>'; }
+      h +=  '</div>';
+
+      h +=  '<div class="opts">';
+      h +=   btn(it.code,'o1',T('a1'), sug==='o1');
+      h +=   btn(it.code,'o2',T('a2'), sug==='o2');
+      h +=   btn(it.code,'o3',T('a3'), false);
+      h +=   btn(it.code,'o4',T('a4'), false);
+      h +=  '</div>';
+      if(sug){ h += '<div class="sugnote on">✦ '+T('sug')+'</div>'; }
+
+      h +=  '<div class="row3" style="margin-top:10px">';
+      h +=   '<div class="field"><label class="fl">'+T('note')+'</label><input type="text" value="'+esc(st.note||'')+'" oninput="setI(\''+it.code+'\',\'note\',this.value)"></div>';
+      h +=   '<div class="field"><label class="fl">'+T('owner')+'</label><input type="text" value="'+esc(st.owner||'')+'" oninput="setI(\''+it.code+'\',\'owner\',this.value)"></div>';
+      h +=   '<div class="field"><label class="fl">'+T('due')+'</label><input type="date" value="'+esc(st.due||'')+'" oninput="setI(\''+it.code+'\',\'due\',this.value)"></div>';
+      h +=  '</div>';
+      h += '</div>';
+    });
+  });
+  host.innerHTML = h;
+}
+
+function btn(code,val,label,isSug){
+  var st = S.g1[code] || {};
+  var on = (st.choice===val) ? ' on '+val : '';
+  var sg = (isSug && st.choice!==val) ? ' sug' : '';
+  return '<button class="opt'+on+sg+'" onclick="pickI(\''+code+'\',\''+val+'\')">'+esc(label)+'</button>';
+}
+function toggleIExp(code){
+  var e = document.getElementById('ie_'+code);
+  var b = document.getElementById('ib_'+code);
+  var on = e.classList.toggle('on');
+  b.classList.toggle('open', on);
+  b.textContent = on ? T('close') : T('clarify');
+}
+function pickI(code,val){
+  if(!S.g1[code]) S.g1[code] = {};
+  S.g1[code].choice = (S.g1[code].choice===val) ? null : val;
+  save(); renderG1(); updateProgress();
+}
+function setI(code,field,v){
+  if(!S.g1[code]) S.g1[code] = {};
+  S.g1[code][field] = v;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(function(){ save(); }, 450);
+}
+
+/* ---------------- META ---------------- */
+var METAF = ['name','title','email','phone','date','to','hook'];
+function readMeta(){
+  METAF.forEach(function(f){
+    var el = document.getElementById('m_'+f);
+    if(el) S.meta[f] = el.value;
+  });
+}
+function fillMeta(){
+  METAF.forEach(function(f){
+    var el = document.getElementById('m_'+f);
+    if(el && S.meta[f]!==undefined) el.value = S.meta[f];
+  });
+}
+
+/* ---------------- PROGRESS ---------------- */
+function updateProgress(){
+  var total = G0.length + G1.length;
+  var done = 0;
+  G0.forEach(function(q){
+    var v = S.g0[q.id];
+    if(v!==undefined && v!==null && String(v).trim()!=='') done++;
+  });
+  G1.forEach(function(it){
+    var st = S.g1[it.code];
+    if(st && st.choice) done++;
+  });
+  var pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('pf').style.width = pct+'%';
+  document.getElementById('pt').textContent = done+'/'+total+' '+T('prog')+' · '+pct+'%';
+  countStats();
+}
+function countStats(){
+  var c = {o1:0,o2:0,o3:0,o4:0,none:0};
+  G1.forEach(function(it){
+    var st = S.g1[it.code];
+    if(st && st.choice) c[st.choice]++; else c.none++;
+  });
+  var e;
+  e=document.getElementById('c1'); if(e) e.textContent=c.o1;
+  e=document.getElementById('c2'); if(e) e.textContent=c.o2;
+  e=document.getElementById('c3'); if(e) e.textContent=c.o3+c.o4;
+  e=document.getElementById('c4'); if(e) e.textContent=c.none;
+}
+
+/* ---------------- SUMMARY TABLE ---------------- */
+function labelOf(ch){
+  if(ch==='o1') return T('a1');
+  if(ch==='o2') return T('a2');
+  if(ch==='o3') return T('a3');
+  if(ch==='o4') return T('a4');
+  return '—';
+}
+function renderSum(){
+  var h = '<table class="sum"><tr><th style="width:8%">Mã</th><th style="width:38%">Nội dung</th><th style="width:16%">Phương án</th><th style="width:14%">Người phụ trách</th><th style="width:10%">Ngày</th><th style="width:14%">Ghi chú</th></tr>';
+  G1.forEach(function(it){
+    var st = S.g1[it.code] || {};
+    var dim = st.choice ? '' : ' class="dim"';
+    h += '<tr'+dim+'><td class="mono">'+it.code+'</td><td>'+esc(LANG==='vi'?it.vi:it.en)+'</td><td>'+esc(labelOf(st.choice))+'</td><td>'+esc(st.owner||'')+'</td><td>'+esc(st.due||'')+'</td><td>'+esc(st.note||'')+'</td></tr>';
+  });
+  h += '</table>';
+  document.getElementById('sumtbl').innerHTML = h;
+}
+
+/* ---------------- RENDER ĐẶC TẢ FOLLOW-UP ---------------- */
+function specRows(sp){ return LANG==='vi' ? (sp.fields||[]) : (sp.fieldsEn||sp.fields||[]); }
+function specDocs(sp){ return LANG==='vi' ? (sp.docs||[])   : (sp.docsEn||sp.docs||[]); }
+function specQa(sp){   return LANG==='vi' ? (sp.qa||[])     : (sp.qaEn||sp.qa||[]); }
+function specExtra(sp){return LANG==='vi' ? (sp.extra||[])  : (sp.extraEn||sp.extra||[]); }
+function specNote(sp){ return LANG==='vi' ? sp.note : (sp.noteEn||sp.note); }
+function specFb(sp){   return LANG==='vi' ? sp.fallback : (sp.fallbackEn||sp.fallback); }
+function specOwner(sp){return LANG==='vi' ? sp.owner : (sp.ownerEn||sp.owner); }
+
+function renderSpec(){
+  var host = document.getElementById('specwrap');
+  var picked = G1.filter(function(it){ var s=S.g1[it.code]; return s && (s.choice==='o1'||s.choice==='o2'); });
+  var pend   = G1.filter(function(it){ var s=S.g1[it.code]; return s && (s.choice==='o3'||s.choice==='o4'); });
+  var none   = G1.filter(function(it){ var s=S.g1[it.code]; return !s || !s.choice; });
+
+  if(picked.length===0 && pend.length===0){
+    host.innerHTML = '<div class="warnbox">'+T('spec_empty')+'</div>';
+    return;
+  }
+
+  var h = '';
+  var ret = retainMonths();
+  if(ret!==null && ret<36){
+    h += '<div class="warnbox"><b>'+T('spec_retain_h')+'</b> '+T('spec_retain_b')+'</div>';
+  }
+
+  h += '<h2 class="sec">'+T('spec_h1')+' ('+picked.length+')</h2>';
+  h += '<p class="secsub">'+T('spec_sub1')+'</p>';
+
+  picked.forEach(function(it){
+    var sp = SPEC[it.code]; if(!sp) return;
+    var st = S.g1[it.code]||{};
+    var per = sp.months ? periodFor(sp.months) : null;
+    var isDerived = sp.kind==='derived';
+
+    h += '<div class="q" style="border-left:3px solid '+(st.choice==='o1'?'var(--ok)':'var(--warn)')+'">';
+    h +=  '<div class="qhead"><span class="qcode">'+it.code+'</span>';
+    h +=   '<span class="qtitle">'+esc(LANG==='vi'?it.vi:it.en)+'</span>';
+    h +=   '<span class="qcode" style="background:'+(st.choice==='o1'?'var(--ok-soft)':'var(--warn-soft)')+
+           ';color:'+(st.choice==='o1'?'var(--ok)':'var(--warn)')+'">'+esc(labelOf(st.choice))+'</span></div>';
+
+    h += '<table class="sum" style="margin-top:10px">';
+    h += '<tr><td style="width:22%;background:var(--bg)"><b>'+T('sp_src')+'</b></td><td>'+esc(sp.src())+'</td></tr>';
+    if(per){
+      var pw = per.short ? ' <span style="color:var(--neg)">('+T('sp_short')+')</span>' :
+               (per.unknown ? ' <span style="color:var(--warn)">('+T('sp_unknown')+')</span>' : '');
+      h += '<tr><td style="background:var(--bg)"><b>'+T('sp_period')+'</b></td><td class="mono">'+per.txt+' · '+per.months+' '+T('sp_months')+pw+'</td></tr>';
+    }
+    h += '<tr><td style="background:var(--bg)"><b>'+T('sp_owner')+'</b></td><td>'+esc(specOwner(sp))+
+         (st.owner?' → <b>'+esc(st.owner)+'</b>':'')+(st.due?' · '+esc(st.due):'')+'</td></tr>';
+    h += '</table>';
+
+    if(isDerived){
+      h += '<p class="expb" style="margin-top:10px;color:var(--ok)"><b>'+T('sp_noaction')+'</b></p>';
+    }
+
+    var flds = specRows(sp);
+    if(flds.length){
+      h += '<div class="exph" style="margin-top:12px">'+T('sp_fields')+'</div>';
+      h += '<table class="sum"><tr><th style="width:26%">'+T('sp_col')+'</th><th>'+T('sp_desc')+'</th></tr>';
+      flds.forEach(function(f){
+        var isHdr = f[0].indexOf('—')===0;
+        h += '<tr'+(isHdr?' style="background:var(--accent-soft)"':'')+'><td class="mono"><b>'+esc(f[0])+'</b></td><td>'+esc(f[1])+'</td></tr>';
+      });
+      h += '</table>';
+    }
+
+    var ex = specExtra(sp);
+    if(ex.length){
+      h += '<div class="exph" style="margin-top:12px">'+T('sp_extra')+'</div>';
+      ex.forEach(function(e){ h += '<p class="expb">• '+esc(e)+'</p>'; });
+    }
+
+    if(sp.sample){
+      h += '<div class="exph" style="margin-top:12px">'+T('sp_sample')+'</div>';
+      h += '<table class="sum"><tr>';
+      sp.sample.cols.forEach(function(c){ h += '<th class="mono">'+esc(c)+'</th>'; });
+      h += '</tr>';
+      sp.sample.rows.forEach(function(r){
+        h += '<tr>';
+        r.forEach(function(v){ h += '<td class="mono" style="font-size:11.5px">'+esc(v)+'</td>'; });
+        h += '</tr>';
+      });
+      h += '</table>';
+      h += '<p class="expb ex" style="margin-top:6px">'+T('sp_sample_note')+'</p>';
+    }
+
+    var qa = specQa(sp);
+    if(qa.length){
+      h += '<div class="exph" style="margin-top:12px">'+T('sp_qa')+'</div>';
+      qa.forEach(function(q){ h += '<p class="expb">☐ '+esc(q)+'</p>'; });
+    }
+
+    var fb = specFb(sp);
+    if(fb){
+      h += '<div class="exph o2" style="margin-top:12px">'+T('sp_fb')+'</div><p class="expb">'+esc(fb)+'</p>';
+    }
+    var nt = specNote(sp);
+    if(nt){
+      h += '<div style="margin-top:10px;background:var(--warn-soft);border-left:3px solid var(--warn);padding:9px 12px;border-radius:0 6px 6px 0;font-size:12.5px">'+esc(nt)+'</div>';
+    }
+    if(st.note){
+      h += '<p class="expb" style="margin-top:10px"><b>'+T('sp_targetnote')+':</b> '+esc(st.note)+'</p>';
+    }
+    h += '</div>';
+  });
+
+  if(pend.length){
+    h += '<h2 class="sec">'+T('spec_h2')+' ('+pend.length+')</h2>';
+    h += '<p class="secsub">'+T('spec_sub2')+'</p>';
+    h += '<table class="sum"><tr><th style="width:9%">Mã</th><th style="width:45%">'+T('sp_desc')+'</th><th style="width:20%">'+T('sp_status')+'</th><th>'+T('sp_next')+'</th></tr>';
+    pend.forEach(function(it){
+      var st = S.g1[it.code]||{};
+      var sp = SPEC[it.code]||{};
+      var next = specFb(sp) || (LANG==='vi'?'Đưa vào chương trình làm việc trực tiếp gần nhất':'Add to the next working session agenda');
+      h += '<tr><td class="mono"><b>'+it.code+'</b></td><td>'+esc(LANG==='vi'?it.vi:it.en)+'</td><td>'+esc(labelOf(st.choice))+(st.note?'<br><i>'+esc(st.note)+'</i>':'')+'</td><td>'+esc(next)+'</td></tr>';
+    });
+    h += '</table>';
+  }
+
+  if(none.length){
+    h += '<h2 class="sec">'+T('spec_h3')+' ('+none.length+')</h2>';
+    h += '<p class="secsub">'+T('spec_sub3')+'</p>';
+    h += '<p class="mono" style="font-size:12.5px;color:var(--muted)">'+none.map(function(i){return i.code;}).join(' · ')+'</p>';
+  }
+
+  host.innerHTML = h;
+}
+
+/* ---------------- XUẤT WORD (.docx thật qua JSZip) ---------------- */
+function xe(s){
+  return String(s==null?'':s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+}
+function wp(text,o){
+  o = o || {};
+  /* Thứ tự trong rPr do schema quy định: rFonts → b → i → color → sz */
+  var rpr = '<w:rPr>';
+  rpr += '<w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:cs="Calibri"/>';
+  if(o.b) rpr += '<w:b/>';
+  if(o.i) rpr += '<w:i/>';
+  if(o.color) rpr += '<w:color w:val="'+o.color+'"/>';
+  rpr += '<w:sz w:val="'+(o.sz||20)+'"/><w:szCs w:val="'+(o.sz||20)+'"/>';
+  rpr += '</w:rPr>';
+  var ppr = '<w:pPr><w:spacing w:before="'+(o.before||0)+'" w:after="'+(o.after||80)+'" w:line="260" w:lineRule="auto"/></w:pPr>';
+  return '<w:p>'+ppr+'<w:r>'+rpr+'<w:t xml:space="preserve">'+xe(text)+'</w:t></w:r></w:p>';
+}
+function wcell(text,w,o){
+  o = o || {};
+  /* Thứ tự trong tcPr: tcW → gridSpan → shd → tcMar */
+  var shd = o.fill ? '<w:shd w:val="clear" w:color="auto" w:fill="'+o.fill+'"/>' : '';
+  var span = o.span ? '<w:gridSpan w:val="'+o.span+'"/>' : '';
+  var body = Array.isArray(text) ? text.map(function(t){return wp(t.t,t);}).join('') : wp(text,o);
+  return '<w:tc><w:tcPr><w:tcW w:w="'+w+'" w:type="dxa"/>'+span+shd+
+    '<w:tcMar><w:top w:w="60" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:left w:w="90" w:type="dxa"/><w:right w:w="90" w:type="dxa"/></w:tcMar>'+
+    '</w:tcPr>'+body+'</w:tc>';
+}
+function wtable(widths,rows){
+  var grid = widths.map(function(w){return '<w:gridCol w:w="'+w+'"/>';}).join('');
+  var b = '<w:tblBorders>'+
+    ['top','left','bottom','right','insideH','insideV'].map(function(s){
+      return '<w:'+s+' w:val="single" w:sz="4" w:space="0" w:color="D6DCD8"/>';
+    }).join('')+'</w:tblBorders>';
+  return '<w:tbl><w:tblPr><w:tblW w:w="'+widths.reduce(function(a,c){return a+c;},0)+'" w:type="dxa"/>'+b+'</w:tblPr>'+
+    '<w:tblGrid>'+grid+'</w:tblGrid>'+rows.join('')+'</w:tbl>';
+}
+function wrow(cells){ return '<w:tr>'+cells.join('')+'</w:tr>'; }
+function wspace(){ return wp('',{sz:12,after:40}); }
+
+function buildDocXml(){
+  var W = 9746;
+  var b = [];
+  var m = S.meta || {};
+
+  b.push(wp('BIÊN BẢN KHẢO SÁT MỨC ĐỘ SẴN SÀNG DỮ LIỆU', {b:true, sz:32, color:'1E3A5F', after:40}));
+  b.push(wp('Information Readiness Survey — Record of Responses', {i:true, sz:22, color:'6A746E', after:200}));
+
+  b.push(wtable([2600,7146],[
+    wrow([wcell('Doanh nghiệp / Company',2600,{b:true,fill:'F2F4F3',sz:18}), wcell('Công ty TNHH MEDiCARE',7146,{sz:18})]),
+    wrow([wcell('Người trả lời / Respondent',2600,{b:true,fill:'F2F4F3',sz:18}), wcell((m.name||'—')+(m.title?' — '+m.title:''),7146,{sz:18})]),
+    wrow([wcell('Liên hệ / Contact',2600,{b:true,fill:'F2F4F3',sz:18}), wcell((m.email||'—')+(m.phone?' · '+m.phone:''),7146,{sz:18})]),
+    wrow([wcell('Ngày / Date',2600,{b:true,fill:'F2F4F3',sz:18}), wcell(m.date||'—',7146,{sz:18})]),
+    wrow([wcell('Phiên bản công cụ / Tool version',2600,{b:true,fill:'F2F4F3',sz:18}), wcell(VERSION+' · '+BUILD,7146,{sz:18})])
+  ]));
+  b.push(wspace());
+
+  /* --- Phần 1: GĐ0 --- */
+  b.push(wp('1.  Khảo sát hệ thống và dữ liệu hiện có', {b:true, sz:24, color:'1E3A5F', before:240, after:100}));
+  var r0 = [wrow([
+    wcell('#',560,{b:true,fill:'1E3A5F',color:'FFFFFF',sz:17}),
+    wcell('Câu hỏi',4600,{b:true,fill:'1E3A5F',color:'FFFFFF',sz:17}),
+    wcell('Trả lời',4586,{b:true,fill:'1E3A5F',color:'FFFFFF',sz:17})
+  ])];
+  G0.forEach(function(q,i){
+    var v = S.g0[q.id];
+    var ans = '—';
+    if(q.type==='select'){
+      if(v!==undefined && v!==null && v!=='') ans = (LANG==='vi'?q.opts_vi:q.opts_en)[v] || '—';
+    } else if(v){ ans = v; }
+    r0.push(wrow([
+      wcell(String(i+1),560,{sz:17,b:true,color:'1E3A5F'}),
+      wcell(LANG==='vi'?q.vi:q.en,4600,{sz:17}),
+      wcell(ans,4586,{sz:17, b:(ans!=='—')})
+    ]));
+  });
+  b.push(wtable([560,4600,4586], r0));
+  b.push(wspace());
+
+  /* --- Phần 2: GĐ1 --- */
+  b.push(wp('2.  Phương án cung cấp thông tin — 24 nội dung', {b:true, sz:24, color:'1E3A5F', before:240, after:60}));
+  b.push(wp('PA1 = đã có báo cáo sẵn · PA2 = gửi dữ liệu thô, bên tư vấn tự xử lý', {i:true, sz:17, color:'6A746E', after:100}));
+  var wds = [640,3700,1500,1500,900,1506];
+  var r1 = [wrow([
+    wcell('Mã',wds[0],{b:true,fill:'1E3A5F',color:'FFFFFF',sz:16}),
+    wcell('Nội dung',wds[1],{b:true,fill:'1E3A5F',color:'FFFFFF',sz:16}),
+    wcell('Phương án',wds[2],{b:true,fill:'1E3A5F',color:'FFFFFF',sz:16}),
+    wcell('Người phụ trách',wds[3],{b:true,fill:'1E3A5F',color:'FFFFFF',sz:16}),
+    wcell('Ngày',wds[4],{b:true,fill:'1E3A5F',color:'FFFFFF',sz:16}),
+    wcell('Ghi chú',wds[5],{b:true,fill:'1E3A5F',color:'FFFFFF',sz:16})
+  ])];
+  GROUPS.forEach(function(g){
+    r1.push(wrow([wcell(LANG==='vi'?g.vi:g.en, wds.reduce(function(a,c){return a+c;},0),
+      {b:true, fill:'EAEFF5', color:'1E3A5F', sz:17, span:6})]));
+    G1.filter(function(x){return x.grp===g.id;}).forEach(function(it){
+      var st = S.g1[it.code] || {};
+      var col = st.choice==='o1' ? '0B5D4B' : (st.choice==='o2' ? '8A5A12' : (st.choice ? 'B3402E' : '6A746E'));
+      r1.push(wrow([
+        wcell(it.code,wds[0],{sz:16,b:true,color:'1E3A5F'}),
+        wcell(LANG==='vi'?it.vi:it.en,wds[1],{sz:16}),
+        wcell(labelOf(st.choice),wds[2],{sz:16,b:true,color:col}),
+        wcell(st.owner||'',wds[3],{sz:16}),
+        wcell(st.due||'',wds[4],{sz:16}),
+        wcell(st.note||'',wds[5],{sz:16})
+      ]));
+    });
+  });
+  b.push(wtable(wds, r1));
+  b.push(wspace());
+
+  /* --- Phần 3: ĐẶC TẢ FOLLOW-UP --- */
+  var picked = G1.filter(function(it){ var s=S.g1[it.code]; return s && (s.choice==='o1'||s.choice==='o2'); });
+  var o3list = G1.filter(function(it){ var s=S.g1[it.code]; return s && (s.choice==='o3'||s.choice==='o4'); });
+  var nolist = G1.filter(function(it){ var s=S.g1[it.code]; return !s || !s.choice; });
+
+  b.push(wp('3.  Đặc tả dữ liệu cần thu thập  ('+picked.length+' mục)', {b:true, sz:24, color:'1E3A5F', before:240, after:60}));
+  b.push(wp('Sinh tự động theo hệ thống và thời gian lưu dữ liệu đã khai ở mục 1. Phần này có thể gửi thẳng cho bộ phận công nghệ thông tin hoặc kế toán để thực hiện.',
+    {i:true, sz:17, color:'6A746E', after:120}));
+
+  var ret = retainMonths();
+  if(ret!==null && ret<36){
+    b.push(wp('Lưu ý: hệ thống lưu dữ liệu ngắn hơn 36 tháng. Các kỳ dưới đây đã được rút ngắn tương ứng; hai bên cần bàn nguồn thay thế cho phần thiếu.',
+      {b:true, sz:17, color:'B3402E', after:120}));
+  }
+  if(picked.length===0){ b.push(wp('Chưa chọn phương án nào.', {sz:18, color:'6A746E'})); }
+
+  picked.forEach(function(it){
+    var sp = SPEC[it.code]; if(!sp) return;
+    var st = S.g1[it.code]||{};
+    b.push(wp(it.code+' — '+(LANG==='vi'?it.vi:it.en)+'   ['+labelOf(st.choice)+']',
+      {b:true, sz:19, color:'1E3A5F', before:200, after:50}));
+
+    var per = sp.months ? periodFor(sp.months) : null;
+    var meta = [
+      wrow([wcell('Nguồn lấy',2100,{b:true,fill:'F2F4F3',sz:16}), wcell(sp.src(),7646,{sz:16})])
+    ];
+    if(per){
+      var ptxt = per.txt+'  ('+per.months+' tháng'+(per.short?' — ngắn hơn yêu cầu do giới hạn lưu trữ':'')+
+                 (per.unknown?' — chưa rõ thời gian lưu, cần xác nhận':'')+')';
+      meta.push(wrow([wcell('Kỳ dữ liệu',2100,{b:true,fill:'F2F4F3',sz:16}),
+                      wcell(ptxt,7646,{sz:16, b:per.short, color:per.short?'B3402E':'1A211E'})]));
+    }
+    meta.push(wrow([wcell('Bộ phận thực hiện',2100,{b:true,fill:'F2F4F3',sz:16}),
+                    wcell(specOwner(sp)+(st.owner?'  →  '+st.owner:'')+(st.due?'   ·   hạn '+st.due:''),7646,{sz:16})]));
+    b.push(wtable([2100,7646], meta));
+
+    if(sp.kind==='derived'){
+      b.push(wp('Không cần gửi gì thêm — bên tư vấn tự suy ra từ các mục khác.', {sz:17, color:'0B5D4B', before:60, after:60}));
+    }
+
+    var flds = specRows(sp);
+    if(flds.length){
+      b.push(wp('Các trường bắt buộc', {b:true, sz:17, color:'1E3A5F', before:100, after:40}));
+      var fr = [wrow([wcell('Tên trường',2600,{b:true,fill:'1E3A5F',color:'FFFFFF',sz:15}),
+                      wcell('Nội dung',7146,{b:true,fill:'1E3A5F',color:'FFFFFF',sz:15})])];
+      flds.forEach(function(f){
+        var hdr = f[0].indexOf('—')===0;
+        fr.push(wrow([wcell(f[0],2600,{sz:15,b:true,fill:hdr?'EAEFF5':null}),
+                      wcell(f[1],7146,{sz:15,b:hdr,fill:hdr?'EAEFF5':null})]));
+      });
+      b.push(wtable([2600,7146], fr));
+    }
+
+    var ex = specExtra(sp);
+    if(ex.length){
+      b.push(wp('Tệp kèm theo', {b:true, sz:17, color:'1E3A5F', before:100, after:40}));
+      ex.forEach(function(e){ b.push(wp('•  '+e, {sz:16, after:30})); });
+    }
+
+    var dcs = specDocs(sp);
+    if(dcs.length){
+      b.push(wp('Tài liệu cần gửi', {b:true, sz:17, color:'1E3A5F', before:100, after:40}));
+      dcs.forEach(function(d){ b.push(wp('☐  '+d, {sz:16, after:30})); });
+    }
+
+    if(sp.sample){
+      b.push(wp('Dữ liệu mẫu — định dạng mong đợi', {b:true, sz:17, color:'1E3A5F', before:100, after:40}));
+      var n = sp.sample.cols.length;
+      var cw = Math.floor(9746/n);
+      var ws2 = []; for(var z=0;z<n;z++){ ws2.push(z===n-1 ? 9746-cw*(n-1) : cw); }
+      var sr = [wrow(sp.sample.cols.map(function(c,ci){
+        return wcell(c, ws2[ci], {b:true, fill:'EAEFF5', color:'1E3A5F', sz:14});
+      }))];
+      sp.sample.rows.forEach(function(r){
+        sr.push(wrow(r.map(function(v,vi){ return wcell(v, ws2[vi], {sz:14}); })));
+      });
+      b.push(wtable(ws2, sr));
+      b.push(wp('Số liệu trên chỉ minh họa định dạng, không phải số thật.', {i:true, sz:14, color:'6A746E', after:60}));
+    }
+
+    var qa = specQa(sp);
+    if(qa.length){
+      b.push(wp('Điều kiện nghiệm thu', {b:true, sz:17, color:'1E3A5F', before:100, after:40}));
+      qa.forEach(function(q){ b.push(wp('☐  '+q, {sz:16, after:30})); });
+    }
+
+    var fb = specFb(sp);
+    if(fb){ b.push(wp('Nếu không lấy được như trên: '+fb, {sz:16, color:'8A5A12', before:60, after:40})); }
+    var nt = specNote(sp);
+    if(nt){ b.push(wp(nt, {i:true, sz:16, color:'8A5A12', after:60})); }
+    if(st.note){ b.push(wp('Ghi chú của Quý Công ty: '+st.note, {sz:16, before:40, after:60})); }
+  });
+
+  b.push(wp('4.  Nội dung cần trao đổi thêm  ('+o3list.length+' mục)', {b:true, sz:24, color:'1E3A5F', before:280, after:80}));
+  if(o3list.length===0){ b.push(wp('Không có.', {sz:18, color:'6A746E'})); }
+  else{
+    var pr = [wrow([wcell('Mã',900,{b:true,fill:'1E3A5F',color:'FFFFFF',sz:15}),
+                    wcell('Nội dung',4200,{b:true,fill:'1E3A5F',color:'FFFFFF',sz:15}),
+                    wcell('Trạng thái',1800,{b:true,fill:'1E3A5F',color:'FFFFFF',sz:15}),
+                    wcell('Hướng xử lý đề xuất',2846,{b:true,fill:'1E3A5F',color:'FFFFFF',sz:15})])];
+    o3list.forEach(function(it){
+      var st = S.g1[it.code]||{}; var sp = SPEC[it.code]||{};
+      var next = specFb(sp) || 'Đưa vào chương trình làm việc trực tiếp gần nhất';
+      pr.push(wrow([wcell(it.code,900,{sz:15,b:true,color:'1E3A5F'}),
+                    wcell(LANG==='vi'?it.vi:it.en,4200,{sz:15}),
+                    wcell(labelOf(st.choice)+(st.note?' · '+st.note:''),1800,{sz:15}),
+                    wcell(next,2846,{sz:15})]));
+    });
+    b.push(wtable([900,4200,1800,2846], pr));
+  }
+
+  b.push(wp('5.  Nội dung chưa trả lời  ('+nolist.length+' mục)', {b:true, sz:24, color:'1E3A5F', before:280, after:80}));
+  if(nolist.length===0){ b.push(wp('Không có — đã trả lời đầy đủ.', {sz:18, color:'0B5D4B'})); }
+  else { b.push(wp(nolist.map(function(it){return it.code;}).join(', '), {sz:18, color:'6A746E'})); }
+
+  b.push(wspace());
+  b.push(wp('Biên bản này được sinh tự động từ công cụ khảo sát. Nội dung phản ánh câu trả lời tại thời điểm xuất file và có thể được cập nhật ở các vòng trao đổi tiếp theo.',
+    {i:true, sz:17, color:'6A746E', before:200}));
+
+  var doc = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+   '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'+
+   '<w:body>'+b.join('')+
+   '<w:sectPr><w:pgSz w:w="11906" w:h="16838"/>'+
+   '<w:pgMar w:top="1080" w:right="1080" w:bottom="1080" w:left="1080" w:header="708" w:footer="708" w:gutter="0"/>'+
+   '</w:sectPr></w:body></w:document>';
+  return doc;
+}
+
+function fname(ext){
+  var m = S.meta||{};
+  var d = (m.date||'').replace(/-/g,'') || 'nodate';
+  return 'CDD_ReadinessSurvey_MEDiCARE_'+d+'.'+ext;
+}
+
+function exportDocx(){
+  readMeta();
+  if(typeof JSZip === 'undefined'){
+    pill('Không tải được thư viện nén — dùng bản .doc thay thế','warn');
+    exportDocFallback();
+    return;
+  }
+  try{
+    var zip = new JSZip();
+    zip.file('[Content_Types].xml',
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+      '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
+      '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'+
+      '<Default Extension="xml" ContentType="application/xml"/>'+
+      '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>'+
+      '</Types>');
+    zip.folder('_rels').file('.rels',
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+      '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'+
+      '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>'+
+      '</Relationships>');
+    zip.folder('word').file('document.xml', buildDocXml());
+    zip.generateAsync({type:'blob', mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'})
+      .then(function(blob){
+        dl(blob, fname('docx'));
+        pill('Đã tải file Word · Word file downloaded','ok');
+      })
+      .catch(function(e){
+        pill('Lỗi tạo docx — chuyển sang .doc','warn');
+        exportDocFallback();
+      });
+  }catch(e){
+    exportDocFallback();
+  }
+}
+
+function exportDocFallback(){
+  var m = S.meta||{};
+  var h = '<html xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8">'+
+    '<style>body{font-family:Calibri,sans-serif;font-size:10.5pt}h1{color:#1E3A5F;font-size:16pt}'+
+    'h2{color:#1E3A5F;font-size:12pt}table{border-collapse:collapse;width:100%}'+
+    'th{background:#1E3A5F;color:#fff;padding:5px;font-size:8.5pt;text-align:left}'+
+    'td{border:1px solid #D6DCD8;padding:5px;font-size:8.5pt;vertical-align:top}</style></head><body>';
+  h += '<h1>Biên bản khảo sát mức độ sẵn sàng dữ liệu</h1>';
+  h += '<p><i>Information Readiness Survey — Record of Responses</i></p>';
+  h += '<table><tr><td><b>Người trả lời</b></td><td>'+esc(m.name||'')+' — '+esc(m.title||'')+'</td></tr>'+
+       '<tr><td><b>Liên hệ</b></td><td>'+esc(m.email||'')+' '+esc(m.phone||'')+'</td></tr>'+
+       '<tr><td><b>Ngày</b></td><td>'+esc(m.date||'')+'</td></tr></table>';
+  h += '<h2>1. Khảo sát hệ thống</h2><table><tr><th>#</th><th>Câu hỏi</th><th>Trả lời</th></tr>';
+  G0.forEach(function(q,i){
+    var v = S.g0[q.id], a='—';
+    if(q.type==='select'){ if(v!==undefined&&v!==null&&v!=='') a=(LANG==='vi'?q.opts_vi:q.opts_en)[v]||'—'; }
+    else if(v) a=v;
+    h += '<tr><td>'+(i+1)+'</td><td>'+esc(LANG==='vi'?q.vi:q.en)+'</td><td>'+esc(a)+'</td></tr>';
+  });
+  h += '</table><h2>2. Phương án cung cấp — 24 nội dung</h2><table><tr><th>Mã</th><th>Nội dung</th><th>Phương án</th><th>Người phụ trách</th><th>Ngày</th><th>Ghi chú</th></tr>';
+  G1.forEach(function(it){
+    var st=S.g1[it.code]||{};
+    h += '<tr><td>'+it.code+'</td><td>'+esc(LANG==='vi'?it.vi:it.en)+'</td><td>'+esc(labelOf(st.choice))+'</td><td>'+esc(st.owner||'')+'</td><td>'+esc(st.due||'')+'</td><td>'+esc(st.note||'')+'</td></tr>';
+  });
+  h += '</table>';
+  var o2 = G1.filter(function(it){var s=S.g1[it.code];return s&&s.choice==='o2';});
+  h += '<h2>3. Đặc tả dữ liệu thô cần gửi ('+o2.length+' mục)</h2>';
+  o2.forEach(function(it){
+    h += '<p><b>'+it.code+' — '+esc(LANG==='vi'?it.vi:it.en)+'</b><br>'+esc(LANG==='vi'?it.o2vi:it.o2en)+'</p>';
+  });
+  h += '</body></html>';
+  dl(new Blob(['\ufeff'+h],{type:'application/msword'}), fname('doc'));
+  pill('Đã tải bản .doc (Word mở được)','ok');
+}
+
+function dl(blob,name){
+  var a = document.createElement('a');
+  var url = URL.createObjectURL(blob);
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 400);
+}
+
+/* ---------------- JSON ---------------- */
+function exportJson(){
+  readMeta();
+  var payload = {tool:'cdd-readiness-survey', version:VERSION, exportedAt:new Date().toISOString(), data:S};
+  dl(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}), fname('json'));
+  pill('Đã tải JSON · nạp lại được','ok');
+}
+function importJson(inp){
+  var f = inp.files[0]; if(!f) return;
+  var r = new FileReader();
+  r.onload = function(){
+    try{
+      var o = JSON.parse(r.result);
+      var d = o.data || o;
+      if(!d.g0 || !d.g1){ pill('Tệp không đúng định dạng','err'); return; }
+      S = d;
+      if(!S.meta) S.meta={};
+      if(!S.ui) S.ui={lang:LANG};
+      save(); fillMeta(); renderG0(); applyRules(); renderG1(); renderSum(); updateProgress();
+      pill('Đã nạp lại dữ liệu','ok');
+    }catch(e){ pill('Không đọc được tệp JSON','err'); }
+  };
+  r.readAsText(f);
+  inp.value = '';
+}
+
+/* ---------------- EMAIL / WEBHOOK ---------------- */
+function summaryText(){
+  var m = S.meta||{};
+  var c = {o1:0,o2:0,o3:0,o4:0,none:0};
+  G1.forEach(function(it){ var s=S.g1[it.code]; if(s&&s.choice) c[s.choice]++; else c.none++; });
+  var t = 'KHẢO SÁT MỨC ĐỘ SẴN SÀNG DỮ LIỆU — MEDiCARE\n';
+  t += 'Người trả lời: '+(m.name||'')+(m.title?' ('+m.title+')':'')+'\n';
+  t += 'Ngày: '+(m.date||'')+'\n\n';
+  t += 'Kết quả 24 nội dung:\n';
+  t += '  - Đã có báo cáo sẵn (PA1): '+c.o1+'\n';
+  t += '  - Sẽ gửi dữ liệu thô (PA2): '+c.o2+'\n';
+  t += '  - Chưa có sẵn: '+c.o3+'\n';
+  t += '  - Cần trao đổi thêm: '+c.o4+'\n';
+  t += '  - Chưa trả lời: '+c.none+'\n\n';
+  var o2 = G1.filter(function(it){var s=S.g1[it.code];return s&&s.choice==='o2';});
+  if(o2.length){
+    t += 'Các mục sẽ gửi dữ liệu thô: '+o2.map(function(i){return i.code;}).join(', ')+'\n';
+  }
+  var o3 = G1.filter(function(it){var s=S.g1[it.code];return s&&(s.choice==='o3'||s.choice==='o4');});
+  if(o3.length){
+    t += 'Cần trao đổi: '+o3.map(function(i){return i.code;}).join(', ')+'\n';
+  }
+  t += '\n(Biên bản đầy đủ ở tệp Word đính kèm.)';
+  return t;
+}
+function openMail(){
+  readMeta();
+  var to = (S.meta.to||'').trim();
+  var subj = 'CDD Readiness Survey — MEDiCARE — ' + (S.meta.date||'');
+  var body = summaryText();
+  var url = 'mailto:'+encodeURIComponent(to)+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body);
+  if(url.length > 1900){
+    body = body.slice(0,1200)+'\n...(xem đầy đủ trong tệp Word đính kèm)';
+    url = 'mailto:'+encodeURIComponent(to)+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body);
+  }
+  window.location.href = url;
+  pill('Đã mở trình soạn email — nhớ đính kèm tệp Word','warn');
+}
+function copySummary(){
+  var t = summaryText();
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(function(){ pill('Đã sao chép tóm tắt','ok'); },
+      function(){ pill('Không sao chép được','err'); });
+  } else { pill('Trình duyệt không hỗ trợ sao chép','err'); }
+}
+function sendHook(){
+  readMeta();
+  var url = (S.meta.hook||'').trim();
+  if(!url){ pill('Chưa nhập webhook URL','err'); return; }
+  if(url.indexOf('https://')!==0){ pill('URL phải bắt đầu bằng https://','err'); return; }
+  logline('Bắt đầu gửi tới webhook…');
+  logline('Đích: '+url.slice(0,60)+(url.length>60?'…':''));
+  var payload = {tool:'cdd-readiness-survey', version:VERSION, sentAt:new Date().toISOString(),
+                 filename:fname('json'), summary:summaryText(), data:S};
+  fetch(url,{method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'},
+             body:JSON.stringify(payload)})
+   .then(function(){
+     logline('Đã gửi xong. Lưu ý: chế độ no-cors nên trình duyệt không đọc được phản hồi.');
+     logline('Xin kiểm tra thư mục Drive đích để xác nhận tệp đã tới.');
+     pill('Đã gửi tới webhook — hãy kiểm tra Drive','warn');
+   })
+   .catch(function(e){
+     logline('LỖI: '+e.message);
+     pill('Gửi thất bại — xem nhật ký','err');
+   });
+}
+
+/* ---------------- NAV / LANG ---------------- */
+function go(i){
+  TAB = i;
+  [0,1,2,3].forEach(function(n){
+    document.getElementById('p'+n).classList.toggle('on', n===i);
+    document.getElementById('t'+n).classList.toggle('on', n===i);
+  });
+  if(i===1){ applyRules(); renderG1(); }
+  if(i===2){ readMeta(); renderSpec(); }
+  if(i===3){ readMeta(); renderSum(); countStats(); }
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function setLang(l){
+  LANG = l; S.ui.lang = l; save();
+  document.getElementById('lvi').classList.toggle('on', l==='vi');
+  document.getElementById('len').classList.toggle('on', l==='en');
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    var k = el.getAttribute('data-i18n');
+    if(I18N[l][k]) el.textContent = I18N[l][k];
+  });
+  document.getElementById('hint0').innerHTML = I18N[l].hint0;
+  document.getElementById('hint1').innerHTML = I18N[l].hint1;
+  document.getElementById('hint2').innerHTML = I18N[l].hint2;
+  document.getElementById('hint3').innerHTML = I18N[l].hint3;
+  renderG0(); renderG1(); renderSpec(); renderSum();
+  updateProgress();
+}
+
+/* ---------------- INIT ---------------- */
+function init(){
+  load();
+  fillMeta();
+  document.getElementById('hint0').innerHTML = I18N[LANG].hint0;
+  document.getElementById('hint1').innerHTML = I18N[LANG].hint1;
+  document.getElementById('hint2').innerHTML = I18N[LANG].hint2;
+  document.getElementById('hint3').innerHTML = I18N[LANG].hint3;
+  setLang(LANG);
+  applyRules();
+  renderG0();
+  renderG1();
+  renderSpec();
+  renderSum();
+  updateProgress();
+  METAF.forEach(function(f){
+    var el = document.getElementById('m_'+f);
+    if(el) el.addEventListener('input', mark);
+  });
+}
+init();
+</script>
+</body>
+</html>
