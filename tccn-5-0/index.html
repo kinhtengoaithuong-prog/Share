@@ -1,0 +1,2196 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chẩn đoán Tài chính Cá nhân</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap&subset=latin,latin-ext,vietnamese" rel="stylesheet">
+<style>
+:root{
+/* ===== BẢNG MÀU SIREN (v07) ===== */
+--s-cream:#F7F5EF;--s-cream-warm:#EFEBE0;--s-white:#fff;
+--s-green:#00704A;--s-forest:#1E3932;--s-deep:#14261F;--s-green-soft:#D4E9E2;
+--s-ink:#1E3932;--s-muted:#5C6B66;--s-dim:#637069;--s-line:#DFDBD0;--s-line-dark:#2C4A40;
+--s-gold:#C9A227;--s-warn:#A6603A;--s-ok:#00704A;
+/* ===== FONT (đổi theo trường phái qua JS) ===== */
+--s-serif:'Noto Serif Display',ui-serif,Georgia,serif;
+--s-sans:'Outfit',-apple-system,system-ui,sans-serif;
+--s-mono:'DM Mono',ui-monospace,monospace;
+--panel:20%;
+/* ===== FONT SCALE (nút phóng to/thu nhỏ; layout theo rem nên không vỡ) ===== */
+--fs:16px;
+}
+html{font-size:var(--fs)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--s-sans);background:var(--s-cream);color:var(--s-ink);font-size:.9375rem;line-height:1.65;min-height:100vh}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ===== SHELL ===== */
+.shell{display:flex;min-height:100vh;align-items:stretch}
+#panel{width:var(--panel);min-width:210px;max-width:46%;background:var(--s-forest);color:#fff;
+  position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;transition:width .0s}
+#panel.hidden{display:none}
+#resizer{width:5px;background:var(--s-line);cursor:col-resize;flex-shrink:0;position:sticky;top:0;height:100vh;transition:background .15s}
+#resizer:hover,#resizer.drag{background:var(--s-green)}
+#resizer.hidden{display:none}
+.main{flex:1;min-width:0}
+.wrap{max-width:1060px;margin:0 auto;padding:0 30px 80px}
+
+/* ===== PANEL ===== */
+.pnhead{padding:18px 18px 14px;border-bottom:1px solid var(--s-line-dark);position:sticky;top:0;background:var(--s-forest);z-index:5}
+.pnhead .ttl{font-family:var(--s-serif);font-size:18px;font-weight:600;line-height:1.2}
+.pnhead .sub{font-family:var(--s-mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:#9dbfb2;margin-top:5px}
+.pndelta{margin-top:12px;background:rgba(255,255,255,.07);border:1px solid var(--s-line-dark);border-radius:11px;padding:10px 12px}
+.pndelta .row{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:#b9d3c9}
+.pndelta .big{font-family:var(--s-mono);font-size:26px;color:#fff;line-height:1.1}
+.pndelta .dv{font-family:var(--s-mono);font-size:13px}
+.pndelta .dv.up{color:#7fd8b8}.pndelta .dv.dn{color:#e0a98c}
+.pnbody{padding:14px 18px 40px}
+.pslot{margin-bottom:17px}
+.pslot .plab{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:7px}
+.pslot .pn{font-size:12.5px;color:#cfe3db;line-height:1.35}
+.pslot .pn i{display:block;font-style:normal;font-family:var(--s-mono);font-size:9.5px;color:#7fa294;letter-spacing:.06em}
+.pslot .pv{font-family:var(--s-mono);font-size:14px;color:#fff;white-space:nowrap;
+ cursor:pointer;padding:2px 8px;border-radius:7px;border:1px dashed rgba(255,255,255,.28);transition:.15s}
+.pslot .pv:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.55)}
+.pslot .pv:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(255,255,255,.3)}
+.pslot .pv.ch{color:var(--s-gold);border-color:rgba(201,162,39,.6)}
+.pfoot .mxlab{cursor:pointer;padding:1px 5px;border-radius:5px;transition:.15s}
+.pfoot .mxlab:hover{background:rgba(255,255,255,.12);color:#cfe3db}
+.pfoot .mxlab:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(255,255,255,.4)}
+.pfoot .mxlab.ex{color:var(--s-gold)}
+.pfoot .mxlab.flash{background:rgba(201,162,39,.35);color:#fff}
+input[type=range]{width:100%;-webkit-appearance:none;height:3px;border-radius:2px;background:rgba(255,255,255,.2);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#fff;cursor:pointer;border:4px solid var(--s-green);box-shadow:0 0 0 1px rgba(255,255,255,.5)}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#fff;cursor:pointer;border:4px solid var(--s-green)}
+input[type=range]:focus-visible{box-shadow:0 0 0 3px rgba(255,255,255,.3)}
+.pfoot{display:flex;justify-content:space-between;font-size:9.5px;color:#7fa294;font-family:var(--s-mono);margin-top:4px}
+.pempty{color:#9dbfb2;font-size:12.5px;line-height:1.6;padding:14px 0}
+.pempty b{color:var(--s-gold)}
+.pbtns{display:flex;gap:8px;margin-top:6px}
+.pbtn{flex:1;border:1.5px solid rgba(255,255,255,.4);color:#fff;background:transparent;border-radius:999px;padding:7px 10px;font-family:var(--s-sans);font-size:11.5px;cursor:pointer;transition:.15s}
+.pbtn:hover{background:rgba(255,255,255,.12)}
+.pbtn:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(255,255,255,.3)}
+
+/* ===== HEADER ===== */
+header{padding:26px 0 12px;display:flex;justify-content:space-between;align-items:flex-end;gap:18px;flex-wrap:wrap}
+.brand h1{font-family:var(--s-serif);font-size:clamp(22px,3vw,29px);font-weight:600;letter-spacing:-.015em;line-height:1.15}
+.brand h1 em{font-style:italic;color:var(--s-green)}
+.brand p{color:var(--s-dim);font-size:12.5px;margin-top:3px;font-family:var(--s-mono)}
+.stamp{font-family:var(--s-mono);font-size:10px;color:var(--s-dim);text-align:right;line-height:1.7}
+.vbadge{display:inline-block;padding:2px 9px;border:1px solid var(--s-line);border-radius:999px;color:var(--s-green);font-size:9.5px}
+.togg{border:1.5px solid var(--s-green);color:var(--s-green);background:transparent;border-radius:999px;padding:6px 15px;font-family:var(--s-sans);font-size:.75rem;cursor:pointer;transition:.15s}
+.togg:hover{background:var(--s-green-soft)}
+.togg:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(0,112,74,.18)}
+
+/* ===== THANH ĐIỀU KHIỂN FONT ===== */
+.ctrlbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.fontpick,.fontsize{display:inline-flex;border:1px solid var(--s-line);border-radius:999px;overflow:hidden;background:var(--s-white)}
+.fbtn,.szbtn{border:0;background:transparent;font-family:var(--s-sans);font-size:.72rem;color:var(--s-muted);
+ padding:6px 13px;cursor:pointer;transition:.13s;white-space:nowrap}
+.fbtn+.fbtn,.szbtn+.szbtn,.szval+.szbtn{border-left:1px solid var(--s-line)}
+.fbtn:hover,.szbtn:hover{background:var(--s-green-soft);color:var(--s-green)}
+.fbtn.on{background:var(--s-green);color:#fff}
+.fbtn:focus-visible,.szbtn:focus-visible{outline:none;box-shadow:inset 0 0 0 2px rgba(0,112,74,.4)}
+.szbtn{font-weight:600;min-width:38px}
+.szval{font-family:var(--s-mono);font-size:.68rem;color:var(--s-dim);padding:6px 8px;
+ display:flex;align-items:center;min-width:44px;justify-content:center;border-left:1px solid var(--s-line)}
+
+.prog{display:flex;gap:5px;margin:10px 0 5px}
+.prog .seg{flex:1;height:3px;background:var(--s-line);border-radius:2px}
+.prog .seg.done{background:var(--s-green)}.prog .seg.now{background:linear-gradient(90deg,var(--s-green) 55%,var(--s-green-soft))}
+.plabs{display:flex;gap:5px;margin-bottom:24px;font-size:10px;color:var(--s-dim);font-family:var(--s-mono);letter-spacing:.05em}
+.plabs span{flex:1;text-align:center}.plabs span.now{color:var(--s-green)}
+
+.step{display:none;animation:f .35s ease}.step.on{display:block}
+@keyframes f{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+.eyebrow{font-family:var(--s-mono);font-size:11px;letter-spacing:.22em;color:var(--s-green);text-transform:uppercase;margin-bottom:9px}
+h2{font-family:var(--s-serif);font-size:clamp(21px,3.2vw,29px);font-weight:600;line-height:1.22;margin-bottom:8px;letter-spacing:-.015em}
+h2 em{font-style:italic;color:var(--s-green)}
+.lede{color:var(--s-muted);font-size:14.5px;max-width:620px;margin-bottom:22px}
+
+.card{background:var(--s-white);border:1px solid var(--s-line);border-radius:14px;padding:20px 22px;margin-bottom:14px}
+.card h3{font-size:16px;font-weight:600;margin-bottom:3px}
+.card .hint{font-size:12.5px;color:var(--s-dim);margin-bottom:15px;line-height:1.55}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* split signature */
+.split{display:grid;grid-template-columns:1fr 1fr;border-radius:14px;overflow:hidden;border:1px solid var(--s-line);margin-bottom:14px}
+.split .gr{background:var(--s-forest);color:#fff;padding:26px 24px;display:flex;flex-direction:column;justify-content:center;text-align:center}
+.split .gr h3{font-family:var(--s-serif);font-size:21px;font-weight:600;margin-bottom:8px;color:#fff}
+.split .gr p{font-size:13.5px;color:#c5dbd2;line-height:1.6}
+.split .cr{background:var(--s-white);padding:22px 24px}
+
+/* input rows */
+.nrow{display:grid;grid-template-columns:26px 1fr 128px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--s-line)}
+.nrow:last-of-type{border:0}
+.nrow .lbl{font-size:14px;line-height:1.35}
+.nrow .lbl small{display:block;color:var(--s-dim);font-size:11px;line-height:1.4}
+.star{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--s-line);background:transparent;color:var(--s-line);
+  cursor:pointer;font-size:13px;line-height:1;display:flex;align-items:center;justify-content:center;transition:.15s;padding:0}
+.star:hover{border-color:var(--s-green);color:var(--s-green)}
+.star.on{background:var(--s-green);border-color:var(--s-green);color:#fff}
+.star:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(0,112,74,.18)}
+.ni{display:flex;align-items:center;gap:6px;border:1px solid var(--s-line);border-radius:9px;padding:6px 10px;background:var(--s-cream)}
+.ni:focus-within{border-color:var(--s-green);box-shadow:0 0 0 3px rgba(0,112,74,.18)}
+.ni input{width:100%;background:none;border:0;color:var(--s-green);font-family:var(--s-mono);font-size:14px;text-align:right;outline:none;font-weight:500}
+.ni span{font-size:10px;color:var(--s-dim);font-family:var(--s-mono);white-space:nowrap}
+.sumline{display:flex;justify-content:space-between;margin-top:12px;padding-top:11px;border-top:1px solid var(--s-line);font-size:13.5px}
+.sumline b{font-family:var(--s-mono);color:var(--s-green);font-size:15px}
+.sumline.warn b{color:var(--s-warn)}
+
+.choices{display:grid;gap:9px}.choices.two{grid-template-columns:1fr 1fr}.choices.three{grid-template-columns:repeat(3,1fr)}
+.ch{border:1px solid var(--s-line);background:var(--s-cream);border-radius:12px;padding:12px 15px;cursor:pointer;transition:.15s;text-align:left;color:var(--s-ink);font-family:var(--s-sans);font-size:13.5px}
+.ch:hover{border-color:var(--s-green)}
+.ch:focus-visible{outline:none;border-color:var(--s-green);box-shadow:0 0 0 3px rgba(0,112,74,.18)}
+.ch.sel{border-color:var(--s-green);background:var(--s-green-soft)}
+.ch .t{font-weight:500;display:block}.ch .d{font-size:11.5px;color:var(--s-muted);display:block;line-height:1.45;margin-top:2px}
+
+.livebar{display:flex;height:26px;border-radius:7px;overflow:hidden;margin:14px 0 8px;border:1px solid var(--s-line)}
+.livebar div{display:flex;align-items:center;justify-content:center;font-size:10px;font-family:var(--s-mono);color:#fff;transition:width .25s}
+.lbleg{display:flex;gap:13px;flex-wrap:wrap;font-size:11.5px;color:var(--s-muted);font-family:var(--s-mono)}
+.lbleg b{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
+
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:22px;gap:14px;flex-wrap:wrap}
+.s-btn{border:1.5px solid var(--s-green);color:var(--s-green);background:transparent;border-radius:999px;padding:9px 22px;font-family:var(--s-sans);font-size:13.5px;cursor:pointer;transition:.15s}
+.s-btn:hover{background:var(--s-green-soft)}
+.s-btn-pri{background:var(--s-green);color:#fff}
+.s-btn-pri:hover{background:#005c3c}
+.s-btn:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(0,112,74,.18)}
+.navnote{font-size:11px;color:var(--s-dim);font-family:var(--s-mono)}
+
+/* dashboard */
+.dashhead{display:grid;grid-template-columns:200px 1fr;gap:22px;align-items:center;margin-bottom:16px}
+.ring{position:relative;width:180px;height:180px;margin:0 auto}
+.ring .val{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .val b{font-family:var(--s-serif);font-size:48px;font-weight:600;line-height:1;color:var(--s-forest)}
+.ring .val span{font-size:9.5px;color:var(--s-dim);font-family:var(--s-mono);letter-spacing:.16em;margin-top:3px}
+.verdict{font-family:var(--s-serif);font-size:clamp(19px,2.6vw,25px);font-weight:600;color:var(--s-green);margin-bottom:7px;line-height:1.24}
+.vsub{color:var(--s-muted);font-size:14px}
+
+.pillars{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:14px}
+.pillbox{background:var(--s-white);border:1px solid var(--s-line);border-radius:13px;padding:14px 15px}
+.pillbox .pn{font-size:11.5px;color:var(--s-muted);margin-bottom:6px}
+.pillbox .pv{font-family:var(--s-mono);font-size:23px;font-weight:500;line-height:1}
+.pillbox .pb{height:3px;border-radius:2px;background:var(--s-line);margin-top:9px;overflow:hidden}
+.pillbox .pb i{display:block;height:100%;border-radius:2px;transition:width .3s}
+
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--s-forest);color:#fff;text-align:left;font-size:10.5px;font-family:var(--s-mono);text-transform:uppercase;letter-spacing:.1em;padding:9px 10px;font-weight:400}
+th:first-child{border-radius:8px 0 0 0}th:last-child{border-radius:0 8px 0 0}
+th.r,td.r{text-align:right}
+td{padding:9px 10px;border-bottom:1px solid var(--s-line)}
+tbody tr:nth-child(even):not(.grp) td{background:var(--s-cream-warm)}
+td.m{font-family:var(--s-mono);font-size:13.5px;font-weight:500}
+td .sub{display:block;font-size:11px;color:var(--s-dim)}
+.tag{font-family:var(--s-mono);font-size:9.5px;padding:2.5px 9px;border-radius:999px;white-space:nowrap}
+.tag.ok{background:var(--s-green-soft);color:var(--s-green)}
+.tag.wn{background:#FDF6F1;color:var(--s-warn)}
+.tag.bd{background:#F6E7E0;color:#8C4A28}
+.grp td{background:var(--s-forest)!important;font-size:10px;font-family:var(--s-mono);letter-spacing:.14em;color:#fff;text-transform:uppercase;padding:7px 10px}
+
+.find{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fbox{border-radius:14px;padding:19px 21px;background:var(--s-white);border:1px solid var(--s-line);border-left:3px solid}
+.fbox.up{border-left-color:var(--s-green)}
+.fbox.dn{border-left-color:var(--s-warn);background:#FDF6F1}
+.fbox.rk{border-left-color:var(--s-gold);background:#FDFAF0}
+.fbox h3{font-family:var(--s-serif);font-size:18px;font-weight:600;margin-bottom:11px}
+.fbox.up h3{color:var(--s-green)}.fbox.dn h3{color:var(--s-warn)}.fbox.rk h3{color:#8a6f16}
+.fi{display:flex;gap:9px;padding:9px 0;border-bottom:1px solid var(--s-line);font-size:13px;line-height:1.55}
+.fi:last-child{border:0}
+.fi .dot{opacity:.45;line-height:1.5}
+.fi b{font-weight:600}
+.fi .num,.act .num{font-family:var(--s-mono);color:var(--s-green);font-weight:500}
+
+.act{display:flex;gap:14px;padding:15px 0;border-bottom:1px solid var(--s-line)}
+.act:last-child{border:0}
+.act .no{font-family:var(--s-serif);font-size:26px;color:var(--s-green);opacity:.4;line-height:1;min-width:30px}
+.act h4{font-size:15px;font-weight:600;margin-bottom:4px}
+.act p{font-size:13px;color:var(--s-muted);line-height:1.6}
+
+.wf{display:flex;flex-direction:column;gap:6px}
+.wfr{display:grid;grid-template-columns:106px 1fr 88px;gap:9px;align-items:center;font-size:12.5px}
+.wfr .bar{height:19px;border-radius:5px;background:var(--s-cream-warm);overflow:hidden}
+.wfr .bar i{display:block;height:100%;border-radius:5px;transition:width .3s}
+.wfr .amt{font-family:var(--s-mono);text-align:right;font-size:12.5px}
+.donut-legend{display:flex;flex-direction:column;gap:6px;font-size:12.5px}
+.dl{display:flex;justify-content:space-between;gap:10px}
+.dl .k{display:flex;align-items:center;gap:7px;color:var(--s-muted)}
+.dl .k b{width:9px;height:9px;border-radius:2px;display:inline-block}
+.dl .v{font-family:var(--s-mono)}
+.quote{font-family:var(--s-serif);font-style:italic;font-size:16px;border-left:3px solid var(--s-green);background:var(--s-green-soft);padding:15px 19px;border-radius:0 12px 12px 0;margin-bottom:14px;color:var(--s-forest)}
+
+/* ===== PERSONAS ===== */
+.pgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.pcard{border:1px solid var(--s-line);background:var(--s-cream);border-radius:12px;padding:13px 14px;cursor:pointer;transition:.15s;text-align:left;font-family:var(--s-sans);color:var(--s-ink)}
+.pcard:hover{border-color:var(--s-green);background:var(--s-white)}
+.pcard:focus-visible{outline:none;border-color:var(--s-green);box-shadow:0 0 0 3px rgba(0,112,74,.18)}
+.pcard.sel{border-color:var(--s-green);background:var(--s-green-soft);border-width:1.5px}
+.pcard.own{border-left:3px solid var(--s-green)}
+.pcard.own .ptag{color:var(--s-dim)}
+.pcard .pnm{font-weight:600;font-size:13.5px;line-height:1.3}
+.pcard .ptag{font-family:var(--s-mono);font-size:10px;color:var(--s-warn);margin-top:4px;line-height:1.35}
+.pcard .psc{font-family:var(--s-mono);font-size:19px;color:var(--s-green);margin-top:7px;line-height:1}
+.pcard .psc small{font-size:10px;color:var(--s-dim)}
+
+.cmpwrap{margin-top:16px;border-top:1px solid var(--s-line);padding-top:16px}
+.cmphead{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.cmphead .story{flex:1;min-width:250px}
+.cmphead .story h4{font-family:var(--s-serif);font-size:19px;font-weight:600;margin-bottom:5px}
+.cmphead .story p{font-size:13.5px;color:var(--s-muted);line-height:1.62}
+.vsbar{display:grid;grid-template-columns:1fr auto 1fr;gap:9px;align-items:center;padding:8px 0;border-bottom:1px solid var(--s-line);font-size:12.5px}
+.vsbar:last-child{border:0}
+.vsbar .bl,.vsbar .br{height:17px;border-radius:5px;background:var(--s-cream-warm);overflow:hidden;display:flex}
+.vsbar .bl{justify-content:flex-end}
+.vsbar .bl i,.vsbar .br i{display:block;height:100%;transition:width .3s}
+.vsbar .bl i{border-radius:5px 0 0 5px}.vsbar .br i{border-radius:0 5px 5px 0}
+.vsbar .mid{font-family:var(--s-mono);font-size:10.5px;color:var(--s-muted);text-align:center;min-width:118px;line-height:1.3}
+.vsbar .mid b{display:block;color:var(--s-ink);font-size:11.5px}
+.vslegend{display:flex;justify-content:space-between;font-family:var(--s-mono);font-size:10.5px;color:var(--s-dim);margin-bottom:8px;letter-spacing:.06em}
+.vslegend b{display:inline-block;width:9px;height:9px;border-radius:2px;margin:0 5px}
+.diffbox{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.dbx{border-radius:12px;padding:15px 17px;border:1px solid var(--s-line);border-left:3px solid;background:var(--s-white)}
+.dbx.better{border-left-color:var(--s-green)}
+.dbx.worse{border-left-color:var(--s-warn);background:#FDF6F1}
+.dbx h5{font-size:13px;font-weight:600;margin-bottom:9px}
+.dbx.better h5{color:var(--s-green)}.dbx.worse h5{color:var(--s-warn)}
+.dbx div.li{font-size:12.5px;padding:6px 0;border-bottom:1px solid var(--s-line);line-height:1.5}
+.dbx div.li:last-child{border:0}
+.dbx div.li span{font-family:var(--s-mono);color:var(--s-dim);font-size:11px;display:block}
+@media(max-width:1000px){.pgrid{grid-template-columns:1fr 1fr}.diffbox{grid-template-columns:1fr}}
+
+/* ===== SNAPSHOTS ===== */
+.snaprow{display:flex;gap:9px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px}
+.fld{flex:1;min-width:150px}
+.fld label{display:block;font-family:var(--s-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--s-dim);margin-bottom:5px}
+.fld input{width:100%;border:1px solid var(--s-line);border-radius:9px;padding:9px 12px;background:var(--s-cream);
+ font-family:var(--s-sans);font-size:13.5px;color:var(--s-ink);outline:none}
+.fld input:focus{border-color:var(--s-green);box-shadow:0 0 0 3px rgba(0,112,74,.18)}
+
+.person{border:1px solid var(--s-line);border-radius:12px;margin-bottom:10px;overflow:hidden;background:var(--s-white)}
+.phead{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 15px;background:var(--s-cream-warm);cursor:pointer;flex-wrap:wrap}
+.phead .l{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.phead .nm{font-weight:600;font-size:14px}
+.phead .ct{font-family:var(--s-mono);font-size:10.5px;color:var(--s-dim)}
+.phead .r{display:flex;align-items:center;gap:9px}
+.phead .sc{font-family:var(--s-mono);font-size:17px;color:var(--s-green)}
+.trend{font-family:var(--s-mono);font-size:11.5px;padding:2px 9px;border-radius:999px}
+.trend.up{background:var(--s-green-soft);color:var(--s-green)}
+.trend.dn{background:#FDF6F1;color:var(--s-warn)}
+.trend.eq{background:var(--s-cream);color:var(--s-dim)}
+.plist{display:none;padding:4px 15px 12px}
+.person.open .plist{display:block}
+.srow{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--s-line);font-size:13px}
+.srow:last-child{border:0}
+.srow .when{font-family:var(--s-mono);font-size:11px;color:var(--s-dim);display:block}
+.srow .note{color:var(--s-muted);font-size:12px}
+.srow .sc2{font-family:var(--s-mono);font-size:15px;color:var(--s-ink);min-width:34px;text-align:right}
+.srow .acts{display:flex;gap:5px;opacity:0;transition:.15s}
+.srow:hover .acts,.srow:focus-within .acts{opacity:1}
+.mini{border:1px solid var(--s-line);background:var(--s-white);color:var(--s-muted);border-radius:999px;
+ padding:3px 11px;font-size:11px;font-family:var(--s-sans);cursor:pointer;transition:.15s}
+.mini:hover{border-color:var(--s-green);color:var(--s-green)}
+.mini.dg:hover{border-color:var(--s-warn);color:var(--s-warn)}
+.mini:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(0,112,74,.18)}
+.emptyst{padding:22px;text-align:center;color:var(--s-dim);font-size:13px;line-height:1.7;
+ border:1px dashed var(--s-line);border-radius:12px;background:var(--s-cream)}
+.emptyst b{color:var(--s-green)}
+
+.trendwrap{margin-top:16px;border-top:1px solid var(--s-line);padding-top:16px}
+.tchips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.tchip{border:1px solid var(--s-line);background:var(--s-cream);border-radius:999px;padding:5px 14px;
+ font-size:12px;cursor:pointer;font-family:var(--s-sans);color:var(--s-ink);transition:.15s}
+.tchip:hover{border-color:var(--s-green)}
+.tchip.on{background:var(--s-green);color:#fff;border-color:var(--s-green)}
+.tchip:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(0,112,74,.18)}
+.deltas{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+
+.disc{margin-top:30px;padding-top:15px;border-top:1px solid var(--s-line);font-size:.72rem;color:var(--s-dim);line-height:1.7}
+
+/* ===== MODULE SETUP ===== */
+.modrow{display:flex;align-items:flex-start;gap:13px;padding:15px;border:1px solid var(--s-line);
+ border-radius:12px;margin-bottom:10px;background:var(--s-white);transition:.15s}
+.modrow.off{opacity:.5;background:var(--s-cream)}
+.modrow.drag{border-color:var(--s-green);box-shadow:0 4px 14px rgba(0,112,74,.16)}
+.modrow.dragover{border-color:var(--s-green);border-style:dashed}
+.modrow .grip{cursor:grab;color:var(--s-dim);font-size:1.1rem;line-height:1.3;padding:2px 3px;user-select:none;touch-action:none}
+.modrow .grip:active{cursor:grabbing}
+.modrow .mbody{flex:1;min-width:0}
+.modrow .mtop{display:flex;align-items:center;gap:9px;margin-bottom:4px;flex-wrap:wrap}
+.modrow .mname{font-family:var(--s-serif);font-size:1.02rem;font-weight:600}
+.modrow .mw{font-family:var(--s-mono);font-size:.62rem;color:var(--s-green);background:var(--s-green-soft);
+ padding:2px 8px;border-radius:999px}
+.modrow .mw.changed{color:#fff;background:var(--s-green)}
+.modrow .mdesc{font-size:.82rem;color:var(--s-muted);line-height:1.55;margin-bottom:5px}
+.modrow .mwhy{font-size:.78rem;color:var(--s-dim);font-style:italic;line-height:1.5}
+.modrow .updown{display:flex;flex-direction:column;gap:2px}
+.modrow .updown button{border:1px solid var(--s-line);background:var(--s-white);border-radius:6px;
+ width:26px;height:22px;cursor:pointer;color:var(--s-muted);font-size:.7rem;line-height:1;padding:0}
+.modrow .updown button:hover:not(:disabled){border-color:var(--s-green);color:var(--s-green)}
+.modrow .updown button:disabled{opacity:.3;cursor:not-allowed}
+/* toggle switch */
+.sw{position:relative;width:42px;height:24px;flex-shrink:0;cursor:pointer}
+.sw input{opacity:0;width:0;height:0;position:absolute}
+.sw .track{position:absolute;inset:0;background:var(--s-line);border-radius:999px;transition:.2s}
+.sw .track::before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.sw input:checked+.track{background:var(--s-green)}
+.sw input:checked+.track::before{transform:translateX(18px)}
+.sw input:focus-visible+.track{box-shadow:0 0 0 3px rgba(0,112,74,.25)}
+.sw input:disabled+.track{opacity:.5;cursor:not-allowed}
+.modwarn{margin-top:12px;padding:11px 14px;border-radius:10px;background:#FDF6F1;border:1px solid var(--s-warn);
+ color:var(--s-warn);font-size:.8rem;line-height:1.5}
+
+/* ===== CHỌN GIỌNG ===== */
+.voicepick{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.vopt{border:1px solid var(--s-line);background:var(--s-white);border-radius:12px;padding:13px 10px;cursor:pointer;
+ text-align:center;transition:.15s;font-family:var(--s-sans)}
+.vopt:hover{border-color:var(--s-green);background:var(--s-green-soft)}
+.vopt:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(0,112,74,.2)}
+.vopt.on{border-color:var(--s-green);background:var(--s-green-soft);border-width:1.5px}
+.vopt .vic{font-size:1.5rem;line-height:1;display:block;margin-bottom:5px}
+.vopt .vnm{font-size:.8rem;font-weight:500;color:var(--s-ink)}
+.voiceprev{margin-top:14px;padding:15px 17px;border-radius:12px;background:var(--s-green-soft);
+ border-left:3px solid var(--s-green);font-family:var(--s-serif);font-size:.98rem;font-style:italic;
+ line-height:1.6;color:var(--s-forest);min-height:20px}
+.voiceprev .who{display:block;font-family:var(--s-mono);font-size:.62rem;font-style:normal;letter-spacing:.1em;
+ text-transform:uppercase;color:var(--s-green);margin-bottom:7px}
+
+/* ===== THẺ TỔNG KẾT SAU SECTION ===== */
+#sectOverlay{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;
+ background:rgba(20,38,31,.55);backdrop-filter:blur(3px);padding:24px}
+#sectOverlay.on{display:flex;animation:fadeIn .3s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.sectcard{background:var(--s-white);border-radius:20px;max-width:440px;width:100%;padding:30px 28px;text-align:center;
+ box-shadow:0 20px 60px rgba(20,38,31,.35);animation:popIn .4s cubic-bezier(.2,.8,.3,1.1)}
+@keyframes popIn{from{opacity:0;transform:scale(.9) translateY(20px)}to{opacity:1;transform:none}}
+.sectcard .seyebrow{font-family:var(--s-mono);font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:var(--s-green);margin-bottom:10px}
+.sectcard .sscore{font-family:var(--s-serif);font-size:3.4rem;font-weight:600;line-height:1;margin-bottom:4px}
+.sectcard .sname{font-size:.95rem;color:var(--s-muted);margin-bottom:18px}
+.sectcard .sbar{height:6px;border-radius:99px;background:var(--s-line);overflow:hidden;margin-bottom:20px}
+.sectcard .sbar i{display:block;height:100%;border-radius:99px;transition:width .8s cubic-bezier(.2,.8,.3,1)}
+.sectcard .squip{font-family:var(--s-serif);font-style:italic;font-size:1.02rem;line-height:1.6;color:var(--s-forest);
+ background:var(--s-green-soft);border-radius:12px;padding:14px 16px;margin-bottom:22px;position:relative}
+.sectcard .squip .qvoice{display:block;font-family:var(--s-mono);font-size:.6rem;font-style:normal;letter-spacing:.1em;
+ text-transform:uppercase;color:var(--s-green);margin-bottom:6px}
+.sectcard .scont{background:var(--s-green);color:#fff;border:0;border-radius:999px;padding:12px 30px;
+ font-family:var(--s-sans);font-size:.9rem;font-weight:500;cursor:pointer;transition:.15s;width:100%}
+.sectcard .scont:hover{background:#005c3c}
+.sectcard .scont:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(0,112,74,.3)}
+
+/* ===== CÂU PHÁN Ở DASHBOARD ===== */
+.oracle{border-radius:16px;padding:22px 24px;margin-bottom:16px;position:relative;overflow:hidden;
+ background:linear-gradient(135deg,var(--s-forest),var(--s-deep));color:#fff}
+.oracle .otop{display:flex;align-items:center;gap:12px;margin-bottom:13px}
+.oracle .oic{font-size:2rem;line-height:1}
+.oracle .owho{font-family:var(--s-mono);font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:#9dbfb2}
+.oracle .owho b{display:block;font-family:var(--s-serif);font-size:1.15rem;font-style:italic;font-weight:600;color:var(--s-gold);letter-spacing:0;text-transform:none;margin-top:2px}
+.oracle .otext{font-family:var(--s-serif);font-size:1.12rem;font-style:italic;line-height:1.65;color:#f0f4f2}
+.oracle .osign{font-family:var(--s-mono);font-size:.68rem;color:#9dbfb2;margin-top:14px;letter-spacing:.03em}
+.oracle .oreroll{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);
+ color:#fff;border-radius:999px;padding:6px 14px;font-family:var(--s-sans);font-size:.72rem;cursor:pointer;transition:.15s}
+.oracle .oreroll:hover{background:rgba(255,255,255,.22)}
+.oracle .oreroll:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(255,255,255,.3)}
+.oswap{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+.oswap button{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:999px;
+ padding:5px 11px;font-size:.9rem;cursor:pointer;transition:.15s;line-height:1}
+.oswap button:hover{background:rgba(255,255,255,.22)}
+.oswap button.on{background:var(--s-gold);border-color:var(--s-gold)}
+
+/* ===== FOOTER OMNIKEY ===== */
+.okfoot{margin-top:36px;padding:22px 0 8px;border-top:1px solid var(--s-line);text-align:center}
+.okfoot .oklogo{font-family:var(--s-serif);font-size:1.15rem;font-weight:600;color:var(--s-green);letter-spacing:.02em}
+.okfoot .oktag{font-size:.78rem;color:var(--s-dim);margin-top:4px}
+.okfoot .okby{font-family:var(--s-mono);font-size:.62rem;color:var(--s-dim);margin-top:9px;letter-spacing:.08em}
+
+/* ===== SO SÁNH VỚI THIÊN HẠ ===== */
+.wcompact{border:1.5px solid var(--s-green);background:linear-gradient(180deg,var(--s-green-soft),var(--s-white) 60%)}
+.wcompact.wflash{animation:wflash 1.4s ease}
+@keyframes wflash{0%,100%{box-shadow:0 0 0 0 rgba(0,112,74,0)}30%,60%{box-shadow:0 0 0 4px rgba(0,112,74,.35)}}
+.whint{font-size:.82rem;color:var(--s-muted);line-height:1.55;margin-bottom:12px}
+.wgate{padding:4px 0}
+.wsel{width:100%;border:1px solid var(--s-line);border-radius:9px;padding:10px 12px;background:var(--s-cream);
+ font-family:var(--s-sans);font-size:.9rem;color:var(--s-ink);outline:none;cursor:pointer}
+.wsel:focus{border-color:var(--s-green);box-shadow:0 0 0 3px rgba(0,112,74,.18)}
+.wnote{font-size:.74rem;color:var(--s-dim);margin-top:10px;line-height:1.5;text-align:center}
+.wnote.err{color:var(--s-warn)}
+.wbig{text-align:center;padding:8px 0 16px}
+.wbig .wpct{font-family:var(--s-serif);font-size:3.2rem;font-weight:600;color:var(--s-green);line-height:1}
+.wbig .wpctlbl{font-size:.9rem;color:var(--s-muted);margin-top:4px}
+.wbig .wverdict{font-family:var(--s-serif);font-style:italic;font-size:1.05rem;color:var(--s-forest);margin-top:10px;line-height:1.5}
+/* biểu đồ phân phối */
+.wdist{margin:16px 0}
+.wdlabel{display:flex;justify-content:space-between;font-family:var(--s-mono);font-size:.62rem;color:var(--s-dim);margin-bottom:6px}
+.wbars{display:flex;align-items:flex-end;gap:3px;height:80px;padding:0 2px}
+.wbars .wb{flex:1;background:var(--s-line);border-radius:3px 3px 0 0;position:relative;transition:height .6s,background .2s;min-height:2px}
+.wbars .wb.you{background:var(--s-green)}
+.wbars .wb.you::after{content:"BẠN";position:absolute;top:-16px;left:50%;transform:translateX(-50%);
+ font-family:var(--s-mono);font-size:.55rem;color:var(--s-green);white-space:nowrap}
+.wcompare{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.wcmp{border:1px solid var(--s-line);border-radius:11px;padding:13px 15px;background:var(--s-white)}
+.wcmp .wcl{font-size:.72rem;color:var(--s-dim);margin-bottom:5px}
+.wcmp .wcv{font-family:var(--s-mono);font-size:1.5rem;font-weight:500}
+.wcmp .wcsub{font-size:.68rem;color:var(--s-muted);margin-top:3px}
+.wpillcmp{margin-top:14px}
+.wpcrow{display:grid;grid-template-columns:96px 1fr 1fr;gap:9px;align-items:center;padding:7px 0;border-bottom:1px solid var(--s-line);font-size:.78rem}
+.wpcrow:last-child{border:0}
+.wpcrow .wpn{color:var(--s-muted)}
+.wpcbar{height:14px;border-radius:5px;background:var(--s-cream-warm);overflow:hidden;position:relative}
+.wpcbar i{display:block;height:100%;border-radius:5px;transition:width .5s}
+.wpcbar .val{position:absolute;right:5px;top:0;line-height:14px;font-family:var(--s-mono);font-size:.6rem;color:var(--s-ink)}
+.wmeta{font-family:var(--s-mono);font-size:.66rem;color:var(--s-dim);text-align:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--s-line)}
+.wshare{display:flex;gap:8px;margin-top:14px}
+.wshare button{flex:1;border:1.5px solid var(--s-green);color:var(--s-green);background:transparent;border-radius:999px;
+ padding:9px;font-family:var(--s-sans);font-size:.8rem;cursor:pointer;transition:.15s}
+.wshare button:hover{background:var(--s-green-soft)}
+.wspin{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;
+ border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:7px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:820px){.wcompare{grid-template-columns:1fr}.wpcrow{grid-template-columns:80px 1fr 1fr}}
+
+/* ===== MOBILE: FAB + SCRIM + GRABBER (ẩn ở desktop) ===== */
+#fab{display:none}
+#scrim{display:none;position:fixed;inset:0;background:rgba(20,38,31,.5);z-index:55;
+ opacity:0;transition:opacity .25s;backdrop-filter:blur(2px)}
+#scrim.on{opacity:1}
+#grab{display:none}
+
+@media(max-width:1000px){.grid2,.find,.pillars,.split{grid-template-columns:1fr}.pillars{grid-template-columns:1fr 1fr}}
+
+/* ============ MOBILE ============ */
+@media(max-width:820px){
+ body{font-size:15.5px}
+ .wrap{padding:0 15px 96px}
+ #resizer{display:none}
+ header{flex-direction:column;align-items:flex-start;padding:18px 0 8px;gap:10px}
+ .stamp{text-align:left;font-size:9.5px}
+ .togg{display:none}                       /* thay bằng FAB */
+ .plabs{display:none}
+ .prog{margin:8px 0 18px}
+
+ /* --- PANEL thành bottom sheet, MẶC ĐỊNH ĐÓNG --- */
+ #panel{position:fixed;left:0;right:0;bottom:0;top:auto;
+  width:100%!important;max-width:none;height:auto;max-height:76vh;
+  border-radius:20px 20px 0 0;z-index:60;
+  transform:translateY(101%);transition:transform .3s cubic-bezier(.32,.72,0,1);
+  box-shadow:0 -6px 30px rgba(20,38,31,.3);overflow:hidden;display:flex;flex-direction:column}
+ #panel.open{transform:translateY(0)}
+ #panel.hidden{display:flex}            /* class desktop không áp dụng ở mobile */
+ #grab{display:block;width:100%;padding:9px 0 3px;flex-shrink:0;cursor:grab;touch-action:none}
+ #grab i{display:block;width:38px;height:4px;border-radius:99px;background:rgba(255,255,255,.35);margin:0 auto}
+ .pnhead{position:static;padding:6px 18px 13px}
+ .pnhead .ttl{font-size:16.5px}
+ .pndelta{margin-top:10px;padding:9px 12px}
+ .pndelta .big{font-size:23px}
+ .pbtns .pbtn{padding:13px 10px;font-size:13px;min-height:46px}
+ input[type=range]{height:5px;box-sizing:content-box;padding:14px 0;background-clip:content-box}
+ .pnbody{flex:1;overflow-y:auto;padding:12px 18px 30px;-webkit-overflow-scrolling:touch}
+ .pslot{margin-bottom:20px}
+ .pslot .pv{font-size:15px;padding:5px 12px;min-height:32px;display:inline-flex;align-items:center}
+ .pfoot{font-size:10.5px}
+ .pfoot .mxlab{padding:9px 10px;margin:-5px -2px}
+ input[type=range]{height:5px}
+ input[type=range]::-webkit-slider-thumb{width:24px;height:24px;border-width:5px}
+ input[type=range]::-moz-range-thumb{width:24px;height:24px;border-width:5px}
+ #scrim{display:block;pointer-events:none}
+ #scrim.on{pointer-events:auto}
+
+ /* --- FAB --- */
+ #fab{display:flex;position:fixed;right:15px;bottom:15px;z-index:58;
+  align-items:center;gap:9px;padding:13px 19px;border-radius:99px;border:0;
+  background:var(--s-green);color:#fff;font-family:var(--s-sans);font-size:14px;font-weight:500;
+  box-shadow:0 5px 18px rgba(0,112,74,.4);cursor:pointer;min-height:50px}
+ #fab:active{transform:scale(.96)}
+ #fab .n{font-family:var(--s-mono);font-size:11px;background:rgba(255,255,255,.22);
+  padding:2px 8px;border-radius:99px}
+ #fab.hide{display:none}
+
+ /* --- typography --- */
+ h2{font-size:24px;line-height:1.24}
+ .lede{font-size:14.5px;margin-bottom:18px}
+ .card{padding:17px 16px;border-radius:13px}
+ .card h3{font-size:15.5px}
+ .split{grid-template-columns:1fr}
+ .split .gr{padding:20px 18px}
+
+ /* --- input rows: nhãn trên, ô dưới --- */
+ .nrow{grid-template-columns:34px 1fr;grid-template-areas:"star lbl" ". inp";gap:6px 10px;padding:11px 0}
+ .nrow .star{grid-area:star;width:30px;height:30px;font-size:15px}
+ .nrow .lbl{grid-area:lbl;font-size:14.5px}
+ .nrow .ni{grid-area:inp;padding:9px 12px}
+ .nrow .ni input{font-size:16px}          /* ≥16px: iOS không auto-zoom */
+ .fld input{font-size:16px;padding:11px 13px}
+ .choices.two,.choices.three{grid-template-columns:1fr}
+ .ch{padding:13px 15px;min-height:48px}
+ .s-btn{padding:12px 22px;min-height:46px;font-size:14px}
+ .nav{gap:10px}.nav .s-btn{flex:1}
+ .navnote{display:none}
+
+ /* --- dashboard --- */
+ .dashhead{grid-template-columns:1fr;gap:12px;text-align:center}
+ .verdict{font-size:22px}
+ .pillars{grid-template-columns:1fr 1fr;gap:9px}
+ .pillbox{padding:12px 13px}
+ .wfr{grid-template-columns:88px 1fr 76px;gap:7px;font-size:12px}
+ .wfr .amt{font-size:11.5px}
+ .quote{font-size:14.5px;padding:13px 15px}
+
+ /* --- bảng chỉ số → thẻ dọc --- */
+ table,thead,tbody,tr,td{display:block;width:100%}
+ thead{display:none}
+ tbody tr:not(.grp){border:1px solid var(--s-line);border-radius:11px;padding:11px 13px;margin-bottom:8px;background:var(--s-white)}
+ tbody tr:nth-child(even):not(.grp) td{background:transparent}
+ tr.grp{margin:16px 0 8px}
+ tr.grp td{border-radius:8px;padding:8px 12px}
+ tbody tr:not(.grp) td{border:0;padding:2px 0;text-align:left}
+ tbody tr:not(.grp) td:first-child{font-weight:600;font-size:14px;margin-bottom:5px}
+ tbody tr:not(.grp) td.m:nth-child(2){display:inline-block;width:auto;font-size:19px;margin-right:9px}
+ tbody tr:not(.grp) td.m:nth-child(3){display:inline-block;width:auto;font-size:12px}
+ tbody tr:not(.grp) td.m:nth-child(3)::before{content:"chuẩn ";color:var(--s-dim);font-size:10.5px}
+ tbody tr:not(.grp) td:last-child{margin-top:7px}
+
+ /* --- chân dung --- */
+ .pgrid{grid-template-columns:1fr 1fr;gap:8px}
+ .pcard{padding:11px 12px;min-height:88px}
+ .pcard .pnm{font-size:13px}.pcard .ptag{font-size:9.5px}.pcard .psc{font-size:17px}
+ .cmphead{flex-direction:column;gap:10px}
+ .cmphead .s-btn{width:100%}
+ .vsbar{grid-template-columns:1fr;gap:3px;padding:11px 0}
+ .vsbar .mid{text-align:left;min-width:0;display:flex;justify-content:space-between;
+  align-items:baseline;flex-direction:row-reverse;font-size:12px}
+ .vsbar .mid b{display:inline;font-size:12.5px}
+ .vsbar .bl{justify-content:flex-start}
+ .vsbar .bl i,.vsbar .br i{border-radius:5px}
+ .vsbar .bl,.vsbar .br{height:13px}
+ .diffbox{grid-template-columns:1fr}
+
+ /* --- snapshot --- */
+ .snaprow{flex-direction:column;align-items:stretch;gap:11px}
+ .snaprow .s-btn{width:100%;min-height:48px}
+ .phead{padding:13px 14px}
+ .phead .ct{font-size:9.5px;width:100%}
+ .srow{grid-template-columns:1fr auto;gap:8px;padding:11px 0}
+ .srow .acts{opacity:1;grid-column:1/-1;margin-top:5px}
+ .srow .mini{padding:7px 14px;font-size:12px;min-height:36px}
+ .deltas{grid-template-columns:1fr}
+ .tchips{gap:6px}.tchip{padding:8px 14px;font-size:12.5px;min-height:38px}
+ /* màn thiết lập mobile */
+ .modrow{padding:13px;gap:10px}
+ .modrow .updown button{height:30px;width:30px;font-size:.8rem}
+ .modrow .grip{display:none}
+ .modrow .mname{font-size:.98rem}
+ .ctrlbar{width:100%;justify-content:space-between}
+ .fbtn,.szbtn{padding:8px 11px}
+ .voicepick{grid-template-columns:1fr 1fr}
+ .oracle{padding:18px 17px}.oracle .otext{font-size:1.02rem}.oracle .oreroll{position:static;margin-bottom:10px}
+ .oracle .otop{margin-top:2px}
+}
+
+@media(max-width:380px){
+ .pgrid{grid-template-columns:1fr}
+ .pillars{grid-template-columns:1fr}
+ .wfr{grid-template-columns:78px 1fr 66px}
+ h2{font-size:21.5px}
+}
+
+@media print{
+ #panel,#resizer,.nav,.togg,.prog,.plabs,#fab,#scrim{display:none!important}
+ body{background:#fff;color:#000}.card,.fbox{border:1px solid #ccc;break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ============ PANEL ============ -->
+<aside id="panel">
+ <div id="grab" title="Kéo xuống để đóng"><i></i></div>
+ <div class="pnhead">
+  <div class="ttl">Bảng điều chỉnh</div>
+  <div class="sub">What-if · chỉ số ★</div>
+  <div class="pndelta">
+   <div class="row"><span>Điểm hiện tại</span><span class="dv" id="pDelta">—</span></div>
+   <div class="big" id="pScore">—</div>
+   <div class="row" style="margin-top:3px"><span id="pBase">Gốc: —</span></div>
+  </div>
+  <div class="pbtns">
+   <button class="pbtn" onclick="resetWhatif()">Về gốc</button>
+   <button class="pbtn" onclick="applyWhatif()">Chốt số mới</button>
+  </div>
+  <div style="font-size:10.5px;color:#7fa294;margin-top:9px;line-height:1.5;font-family:var(--s-mono)">
+   Bấm vào số để gõ giá trị bất kỳ · kéo tới cuối thanh để nới trần</div>
+ </div>
+ <div class="pnbody" id="pnbody"></div>
+</aside>
+<div id="resizer"></div>
+
+<!-- ============ MAIN ============ -->
+<div class="main"><div class="wrap">
+
+<header>
+ <div class="brand">
+  <h1>Chẩn đoán <em>Tài chính Cá nhân</em></h1>
+  <p>Tạo thu nhập · Quản lý chi tiêu · Đầu tư · Bảo vệ</p>
+ </div>
+ <div style="display:flex;flex-direction:column;align-items:flex-end;gap:9px">
+  <div class="ctrlbar">
+   <div class="fontpick" role="group" aria-label="Chọn kiểu chữ">
+    <button class="fbtn" data-font="elegant" title="Đẹp — thanh lịch, có nhịp">Đẹp</button>
+    <button class="fbtn" data-font="simple" title="Đơn giản — phẳng, trung tính">Đơn giản</button>
+    <button class="fbtn" data-font="strong" title="Cứng cáp — chắc, kỹ thuật">Cứng cáp</button>
+   </div>
+   <div class="fontsize" role="group" aria-label="Cỡ chữ">
+    <button class="szbtn" onclick="bumpFont(-1)" title="Thu nhỏ chữ" aria-label="Thu nhỏ chữ">A−</button>
+    <span class="szval" id="szval" title="Cỡ chữ hiện tại">100%</span>
+    <button class="szbtn" onclick="bumpFont(1)" title="Phóng to chữ" aria-label="Phóng to chữ">A+</button>
+   </div>
+  </div>
+  <button class="togg" id="tg" onclick="togglePanel()">◧ Ẩn bảng điều chỉnh</button>
+  <div class="stamp"><span class="vbadge" id="vb"></span><br><span id="st"></span></div>
+ </div>
+</header>
+
+<div class="prog" id="prog"></div><div class="plabs" id="plabs"></div>
+
+<!-- ===== MÀN THIẾT LẬP HÀNH TRÌNH ===== -->
+<div class="step on" data-s="-1">
+<div class="eyebrow">Thiết lập hành trình</div>
+<h2>Bạn muốn <em>đo những gì?</em></h2>
+<p class="lede">Chẩn đoán đầy đủ gồm bốn khối. Bạn có thể bật/tắt từng khối và sắp lại thứ tự cho phù hợp — ví dụ chỉ tập trung vào dòng tiền và bảo vệ. Điểm số sẽ tự tính lại theo đúng những khối bạn chọn.</p>
+
+<div class="card" style="border-left:3px solid var(--s-green)">
+ <h3>Các khối chẩn đoán</h3>
+ <div class="hint">Kéo <span style="font-family:var(--s-mono)">⠿</span> để đổi thứ tự · bật/tắt bằng công tắc. Cần giữ ít nhất hai khối để điểm tổng còn ý nghĩa.</div>
+ <div id="modlist"></div>
+ <div id="modwarn" class="modwarn" style="display:none"></div>
+</div>
+
+<div class="card">
+ <h3>Chọn giọng chẩn đoán <span style="font-family:var(--s-mono);font-size:.6rem;color:var(--s-green);background:var(--s-green-soft);padding:2px 8px;border-radius:999px;vertical-align:middle">VUI</span></h3>
+ <div class="hint">Cùng một điểm số, tám người sẽ "phán" theo tám kiểu khác nhau. Chọn giọng bạn thích — lời chẩn đoán cuối hành trình sẽ nói theo giọng đó. Đổi lúc nào cũng được.</div>
+ <div class="voicepick" id="voicepick"></div>
+ <div class="voiceprev" id="voiceprev"></div>
+</div>
+
+<div class="nav">
+ <span class="navnote" id="modsummary">—</span>
+ <button class="s-btn s-btn-pri" onclick="startJourney()">Bắt đầu →</button>
+</div>
+</div>
+
+<!-- ===== 1 ===== -->
+<div class="step" data-s="0">
+<div class="eyebrow">Khối 01 — Tạo thu nhập</div>
+<h2>Tiền của bạn <em>đến từ đâu</em>, và có mấy đường vào?</h2>
+<p class="lede">Không chỉ tổng thu nhập. Một người kiếm 50tr từ một nguồn duy nhất mong manh hơn nhiều so với người kiếm 40tr từ ba nguồn. Nhập số bình quân tháng, đơn vị triệu đồng.</p>
+
+<div class="split">
+ <div class="gr"><h3>Dấu ★ nghĩa là gì?</h3><p>Bấm ★ cạnh một ô để đưa chỉ số đó vào bảng điều chỉnh bên trái. Ở màn hình cuối, bạn kéo slider và xem toàn bộ chẩn đoán đổi theo — không cần nhập lại.</p></div>
+ <div class="cr"><h3 style="margin-bottom:8px">Nên đánh dấu chỉ số nào?</h3>
+ <p style="font-size:13.5px;color:var(--s-muted);line-height:1.6">Chọn những con số bạn <b>thực sự thay đổi được</b> trong 12 tháng tới: lương, chi lối sống, khoản trả nợ, số tiền để dành. Đừng đánh dấu thứ nằm ngoài tầm với — kéo slider cho vui thì kết quả cũng chỉ để cho vui.</p></div>
+</div>
+
+<div class="card">
+<h3>Các nguồn thu nhập bình quân tháng</h3>
+<div class="hint">Để 0 nếu không có. Tính sau thuế, phần thực nhận về tay.</div>
+<div class="nrow"><button class="star on" data-k="i_sal">★</button><div class="lbl">Lương chính<small>Gồm phụ cấp cố định</small></div><div class="ni"><input type="number" id="i_sal" value="35"><span>tr/th</span></div></div>
+<div class="nrow"><button class="star" data-k="i_bon">★</button><div class="lbl">Thưởng &amp; hoa hồng<small>Bình quân hoá theo tháng</small></div><div class="ni"><input type="number" id="i_bon" value="8"><span>tr/th</span></div></div>
+<div class="nrow"><button class="star" data-k="i_biz">★</button><div class="lbl">Kinh doanh / nghề tay trái<small>Lợi nhuận, không phải doanh thu</small></div><div class="ni"><input type="number" id="i_biz" value="5"><span>tr/th</span></div></div>
+<div class="nrow"><button class="star" data-k="i_rent">★</button><div class="lbl">Cho thuê tài sản<small>Sau chi phí</small></div><div class="ni"><input type="number" id="i_rent" value="0"><span>tr/th</span></div></div>
+<div class="nrow"><button class="star on" data-k="i_fin">★</button><div class="lbl">Lãi đầu tư đều đặn<small>Cổ tức, lãi trái phiếu, lãi tiết kiệm</small></div><div class="ni"><input type="number" id="i_fin" value="2"><span>tr/th</span></div></div>
+<div class="sumline"><span>Tổng thu nhập tháng</span><b id="s_inc">—</b></div>
+<div class="sumline"><span>Trong đó thu nhập thụ động</span><b id="s_pas">—</b></div>
+</div>
+
+<div class="card">
+<h3>Ba năm qua, thu nhập của bạn thay đổi thế nào?</h3>
+<div class="choices three">
+<button class="ch" data-q="grw" data-v="3"><span class="t">Tăng mạnh</span><span class="d">Hơn 15%/năm</span></button>
+<button class="ch sel" data-q="grw" data-v="2"><span class="t">Tăng đều</span><span class="d">Khoảng 5–15%/năm</span></button>
+<button class="ch" data-q="grw" data-v="1"><span class="t">Đi ngang hoặc giảm</span><span class="d">Dưới 5%/năm</span></button>
+</div>
+</div>
+
+<div class="card">
+<h3>Nếu mất nguồn thu lớn nhất, bạn tìm được nguồn thay thế trong bao lâu?</h3>
+<div class="hint">Đo khả năng phục hồi thu nhập — quyết định quỹ dự phòng bạn cần dày bao nhiêu.</div>
+<div class="choices two">
+<button class="ch" data-q="rep" data-v="3"><span class="t">Dưới 1 tháng</span><span class="d">Kỹ năng dễ bán, nhiều lời mời</span></button>
+<button class="ch sel" data-q="rep" data-v="2"><span class="t">1–3 tháng</span><span class="d">Cần tìm nhưng khả thi</span></button>
+<button class="ch" data-q="rep" data-v="1"><span class="t">3–6 tháng</span><span class="d">Thị trường hẹp</span></button>
+<button class="ch" data-q="rep" data-v="0"><span class="t">Trên 6 tháng / không rõ</span><span class="d">Nghề đặc thù hoặc phụ thuộc một nơi</span></button>
+</div>
+</div>
+<div class="nav"><span></span><button class="s-btn s-btn-pri" onclick="go(1)">Tiếp tục →</button></div>
+</div>
+
+<!-- ===== 2 ===== -->
+<div class="step" data-s="1">
+<div class="eyebrow">Khối 02 — Quản lý chi tiêu</div>
+<h2>Tiền ra đi <em>theo những đường nào?</em></h2>
+<p class="lede">Chia theo 6 nhóm. Thanh màu bên dưới cập nhật ngay khi bạn nhập — cơ cấu chi tiêu hiện ra theo thời gian thực.</p>
+
+<div class="card">
+<h3>Chi tiêu bình quân tháng</h3>
+<div class="hint">Ước lượng gần đúng là đủ. Sai 10–15% không làm đổi kết luận.</div>
+<div class="nrow"><button class="star" data-k="e_ess">★</button><div class="lbl">Thiết yếu<small>Ăn uống, điện nước, đi lại, y tế thường</small></div><div class="ni"><input type="number" id="e_ess" value="14"><span>tr/th</span></div></div>
+<div class="nrow"><button class="star" data-k="e_hom">★</button><div class="lbl">Nhà ở<small>Thuê nhà, phí quản lý, sửa chữa</small></div><div class="ni"><input type="number" id="e_hom" value="8"><span>tr/th</span></div></div>
+<div class="nrow"><button class="star on" data-k="e_deb">★</button><div class="lbl">Trả nợ<small>Gốc + lãi mọi khoản vay, thẻ tín dụng</small></div><div class="ni"><input type="number" id="e_deb" value="9"><span>tr/th</span></div></div>
+<div class="nrow"><button class="star on" data-k="e_lif">★</button><div class="lbl">Lối sống<small>Giải trí, du lịch, mua sắm, cà phê</small></div><div class="ni"><input type="number" id="e_lif" value="7"><span>tr/th</span></div></div>
+<div class="nrow"><button class="star" data-k="e_fam">★</button><div class="lbl">Con cái &amp; gia đình<small>Học phí, biếu cha mẹ, người phụ thuộc</small></div><div class="ni"><input type="number" id="e_fam" value="6"><span>tr/th</span></div></div>
+<div class="nrow"><button class="star" data-k="e_ins">★</button><div class="lbl">Phí bảo hiểm<small>Nhân thọ, sức khoẻ, tài sản</small></div><div class="ni"><input type="number" id="e_ins" value="2"><span>tr/th</span></div></div>
+<div class="livebar" id="livebar"></div>
+<div class="lbleg" id="lbleg"></div>
+<div class="sumline"><span>Tổng chi tháng</span><b id="s_exp">—</b></div>
+<div class="sumline" id="sl_sur"><span>Còn lại mỗi tháng</span><b id="s_sur">—</b></div>
+</div>
+
+<div class="card">
+<h3>Khi thu nhập tăng, chi tiêu của bạn có tăng theo không?</h3>
+<div class="hint">Hiện tượng "lifestyle creep" — thu nhập tăng nhưng không giàu thêm.</div>
+<div class="choices three">
+<button class="ch" data-q="crp" data-v="3"><span class="t">Gần như không</span><span class="d">Phần tăng đem để dành</span></button>
+<button class="ch sel" data-q="crp" data-v="2"><span class="t">Tăng một phần</span><span class="d">Chia đôi tiêu và để dành</span></button>
+<button class="ch" data-q="crp" data-v="1"><span class="t">Tăng gần hết</span><span class="d">Kiếm nhiều tiêu nhiều</span></button>
+</div>
+</div>
+
+<div class="card">
+<h3>Bạn có theo dõi chi tiêu không?</h3>
+<div class="choices two">
+<button class="ch" data-q="trk" data-v="3"><span class="t">Có, ghi chép đều</span><span class="d">Biết tháng vừa rồi tiêu vào đâu</span></button>
+<button class="ch sel" data-q="trk" data-v="2"><span class="t">Nhìn sao kê ngân hàng</span><span class="d">Không phân loại nhưng có xem</span></button>
+<button class="ch" data-q="trk" data-v="1"><span class="t">Chỉ ước chừng trong đầu</span></button>
+<button class="ch" data-q="trk" data-v="0"><span class="t">Không theo dõi gì cả</span></button>
+</div>
+</div>
+<div class="nav"><button class="s-btn" onclick="go(0)">← Quay lại</button><button class="s-btn s-btn-pri" onclick="go(2)">Tiếp tục →</button></div>
+</div>
+
+<!-- ===== 3 ===== -->
+<div class="step" data-s="2">
+<div class="eyebrow">Khối 03 — Đầu tư &amp; tích luỹ</div>
+<h2>Tài sản của bạn đang <em>nằm ở đâu?</em></h2>
+<p class="lede">Cơ cấu quan trọng hơn tổng số. Mình sẽ đối chiếu danh mục của bạn với mô hình phân bổ theo độ tuổi và chỉ ra chỗ lệch. Đơn vị: triệu đồng.</p>
+
+<div class="grid2">
+<div class="card">
+<h3>Tài sản đang có</h3>
+<div class="hint">Theo giá thị trường hiện tại.</div>
+<div class="nrow"><button class="star on" data-k="a_cash">★</button><div class="lbl">Tiền mặt &amp; tài khoản<small>Dùng được ngay</small></div><div class="ni"><input type="number" id="a_cash" value="120"><span>tr</span></div></div>
+<div class="nrow"><button class="star" data-k="a_dep">★</button><div class="lbl">Tiết kiệm ngân hàng<small>Có kỳ hạn</small></div><div class="ni"><input type="number" id="a_dep" value="300"><span>tr</span></div></div>
+<div class="nrow"><button class="star on" data-k="a_eq">★</button><div class="lbl">Cổ phiếu &amp; quỹ mở<small>Chứng khoán, ETF</small></div><div class="ni"><input type="number" id="a_eq" value="250"><span>tr</span></div></div>
+<div class="nrow"><button class="star" data-k="a_alt">★</button><div class="lbl">Vàng, trái phiếu, khác<small>Kể cả crypto</small></div><div class="ni"><input type="number" id="a_alt" value="150"><span>tr</span></div></div>
+<div class="nrow"><button class="star" data-k="a_re">★</button><div class="lbl">Bất động sản đầu tư<small>Không tính nhà đang ở</small></div><div class="ni"><input type="number" id="a_re" value="0"><span>tr</span></div></div>
+<div class="nrow"><button class="star" data-k="a_home">★</button><div class="lbl">Nhà đang ở<small>Giá thị trường</small></div><div class="ni"><input type="number" id="a_home" value="2800"><span>tr</span></div></div>
+<div class="sumline"><span>Tổng tài sản</span><b id="s_ass">—</b></div>
+</div>
+
+<div class="card">
+<h3>Nợ đang mang</h3>
+<div class="hint">Số dư còn lại phải trả, không phải số đã vay ban đầu.</div>
+<div class="nrow"><button class="star" data-k="d_mor">★</button><div class="lbl">Vay mua nhà<small>Thế chấp</small></div><div class="ni"><input type="number" id="d_mor" value="900"><span>tr</span></div></div>
+<div class="nrow"><button class="star" data-k="d_con">★</button><div class="lbl">Vay tiêu dùng &amp; mua xe</div><div class="ni"><input type="number" id="d_con" value="120"><span>tr</span></div></div>
+<div class="nrow"><button class="star on" data-k="d_cc">★</button><div class="lbl">Dư nợ thẻ tín dụng<small>Phần chưa trả hết trong kỳ</small></div><div class="ni"><input type="number" id="d_cc" value="20"><span>tr</span></div></div>
+<div class="nrow"><button class="star" data-k="d_oth">★</button><div class="lbl">Vay khác<small>Người thân, vay kinh doanh</small></div><div class="ni"><input type="number" id="d_oth" value="0"><span>tr</span></div></div>
+<div class="nrow"><button class="star" data-k="d_rate">★</button><div class="lbl">Lãi suất bình quân<small>Của toàn bộ khoản vay</small></div><div class="ni"><input type="number" id="d_rate" value="9.5" step="0.5"><span>%/năm</span></div></div>
+<div class="sumline"><span>Tổng nợ</span><b id="s_dbt">—</b></div>
+<div class="sumline"><span>Tài sản ròng</span><b id="s_net">—</b></div>
+</div>
+</div>
+
+<div class="grid2">
+<div class="card">
+<h3>Tuổi của bạn</h3>
+<div class="hint">Dùng để so danh mục với mô hình phân bổ theo vòng đời.</div>
+<div class="nrow" style="border:0"><button class="star" data-k="p_age">★</button><div class="lbl">Tuổi hiện tại</div><div class="ni"><input type="number" id="p_age" value="38"><span>tuổi</span></div></div>
+</div>
+<div class="card">
+<h3>Bạn có đầu tư đều đặn hàng tháng không?</h3>
+<div class="choices" style="gap:8px">
+<button class="ch" data-q="dca" data-v="3"><span class="t">Có, tự động</span><span class="d">Lệnh định kỳ, không cần nghĩ</span></button>
+<button class="ch sel" data-q="dca" data-v="2"><span class="t">Có, nhưng thủ công</span><span class="d">Khi nào nhớ thì mua</span></button>
+<button class="ch" data-q="dca" data-v="1"><span class="t">Chỉ mua khi thấy cơ hội</span><span class="d">Theo tin tức, theo sóng</span></button>
+</div>
+</div>
+</div>
+
+<div class="card">
+<h3>Kinh nghiệm đầu tư của bạn</h3>
+<div class="choices two">
+<button class="ch" data-q="exp" data-v="3"><span class="t">Nhiều năm, có phương pháp</span><span class="d">Biết mình mua gì và vì sao</span></button>
+<button class="ch sel" data-q="exp" data-v="2"><span class="t">Có trải nghiệm, chưa hệ thống</span><span class="d">Đã lời và lỗ, học dần</span></button>
+<button class="ch" data-q="exp" data-v="1"><span class="t">Mới bắt đầu</span><span class="d">Chủ yếu nghe theo người khác</span></button>
+<button class="ch" data-q="exp" data-v="0"><span class="t">Chưa đầu tư gì ngoài gửi tiết kiệm</span></button>
+</div>
+</div>
+<div class="nav"><button class="s-btn" onclick="go(1)">← Quay lại</button><button class="s-btn s-btn-pri" onclick="go(3)">Tiếp tục →</button></div>
+</div>
+
+<!-- ===== 4 ===== -->
+<div class="step" data-s="3">
+<div class="eyebrow">Khối 04 — Bảo vệ</div>
+<h2>Nếu <em>điều xấu nhất</em> xảy ra, ai đỡ?</h2>
+<p class="lede">Khối ít người tính bằng con số nhất, nhưng quyết định ba khối trên có tồn tại được hay không. Nhập <b>số tiền bảo hiểm</b> — số công ty chi trả, không phải phí bạn đóng.</p>
+
+<div class="card">
+<h3>Số tiền bảo hiểm hiện có</h3>
+<div class="hint">Nhập 0 nếu chưa có. Bảo hiểm nhân thọ ghi mệnh giá quyền lợi tử vong / thương tật toàn bộ.</div>
+<div class="nrow"><button class="star on" data-k="p_life">★</button><div class="lbl">Bảo hiểm nhân thọ<small>Mệnh giá quyền lợi chính</small></div><div class="ni"><input type="number" id="p_life" value="1000"><span>tr</span></div></div>
+<div class="nrow"><button class="star" data-k="p_ci">★</button><div class="lbl">Bảo hiểm bệnh hiểm nghèo</div><div class="ni"><input type="number" id="p_ci" value="300"><span>tr</span></div></div>
+<div class="nrow"><button class="star" data-k="p_hea">★</button><div class="lbl">Hạn mức bảo hiểm sức khoẻ<small>Chi trả nằm viện mỗi năm</small></div><div class="ni"><input type="number" id="p_hea" value="200"><span>tr/năm</span></div></div>
+<div class="nrow"><button class="star" data-k="p_pro">★</button><div class="lbl">Bảo hiểm tài sản<small>Nhà, xe — giá trị được bảo hiểm</small></div><div class="ni"><input type="number" id="p_pro" value="0"><span>tr</span></div></div>
+<div class="nrow"><button class="star" data-k="p_dep">★</button><div class="lbl">Số người phụ thuộc tài chính<small>Con nhỏ, cha mẹ, vợ/chồng không thu nhập</small></div><div class="ni"><input type="number" id="p_dep" value="2"><span>người</span></div></div>
+</div>
+
+<div class="grid2">
+<div class="card">
+<h3>Bạn có di chúc hoặc kế hoạch thừa kế?</h3>
+<div class="choices" style="gap:8px">
+<button class="ch" data-q="wil" data-v="2"><span class="t">Có, bằng văn bản</span></button>
+<button class="ch" data-q="wil" data-v="1"><span class="t">Đã bàn miệng trong nhà</span></button>
+<button class="ch sel" data-q="wil" data-v="0"><span class="t">Chưa có gì</span></button>
+</div>
+</div>
+<div class="card">
+<h3>Nếu không thể làm việc 6 tháng, gia đình xoay xở thế nào?</h3>
+<div class="choices" style="gap:8px">
+<button class="ch" data-q="cont" data-v="3"><span class="t">Vẫn sống bình thường</span><span class="d">Có nguồn thu khác hoặc dự phòng đủ</span></button>
+<button class="ch sel" data-q="cont" data-v="2"><span class="t">Phải thắt chặt nhưng qua được</span></button>
+<button class="ch" data-q="cont" data-v="1"><span class="t">Phải bán bớt tài sản</span></button>
+<button class="ch" data-q="cont" data-v="0"><span class="t">Phải vay mượn</span><span class="d">Chưa có phương án rõ ràng</span></button>
+</div>
+</div>
+</div>
+<div class="nav"><button class="s-btn" onclick="go(2)">← Quay lại</button><button class="s-btn s-btn-pri" onclick="firstCalc()">Xem chẩn đoán →</button></div>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div class="step" data-s="4">
+<div class="eyebrow">Chẩn đoán tổng hợp</div>
+
+<div class="oracle" id="oracle"></div>
+
+<div class="card wcompact" id="worldCard">
+ <h3>So sánh với thiên hạ <span style="font-family:var(--s-mono);font-size:.6rem;color:var(--s-green);background:var(--s-green-soft);padding:2px 8px;border-radius:999px;vertical-align:middle">CỘNG ĐỒNG</span></h3>
+ <div id="worldGate">
+  <div class="wgate">
+   <div class="whint">Bạn đứng ở đâu so với những người đã làm bài này? Bấm để góp điểm của mình vào kho dữ liệu chung và xem ngay — <b>thiên hạ</b> lớn dần theo mỗi lượt chơi. Gửi ẩn danh: chỉ điểm số, độ tuổi và nhóm thu nhập (lấy từ số bạn đã nhập), không có tên.</div>
+   <button class="s-btn s-btn-pri" id="wSubmit" onclick="submitToWorld()" style="width:100%">
+    Góp điểm &amp; xem mình đứng đâu →</button>
+   <div class="wnote" id="wNote">Bạn chỉ cần bấm một lần — tuổi và thu nhập tự lấy từ dữ liệu đã nhập.</div>
+  </div>
+ </div>
+ <div id="worldResult" style="display:none"></div>
+</div>
+
+<div class="quote" id="qz">Kéo slider bên trái để xem chẩn đoán thay đổi theo thời gian thực.</div>
+
+<div class="dashhead">
+ <div class="ring">
+  <svg width="180" height="180"><circle cx="90" cy="90" r="76" fill="none" stroke="#DFDBD0" stroke-width="9"/>
+  <circle id="arc" cx="90" cy="90" r="76" fill="none" stroke="#00704A" stroke-width="9" stroke-linecap="round" stroke-dasharray="477.5" stroke-dashoffset="477.5" transform="rotate(-90 90 90)" style="transition:stroke-dashoffset .5s ease"/></svg>
+  <div class="val"><b id="scN">0</b><span>TRÊN 100</span></div>
+ </div>
+ <div><div class="verdict" id="vd">—</div><div class="vsub" id="vs">—</div></div>
+</div>
+
+<div class="pillars" id="pillars"></div>
+
+<div class="grid2">
+ <div class="card"><h3>Dòng tiền tháng</h3><div class="hint">Thu nhập chảy đi đâu, còn lại bao nhiêu.</div><div class="wf" id="wf"></div></div>
+ <div class="card"><h3>Cơ cấu tài sản</h3><div class="hint">So với mô hình phân bổ theo tuổi.</div>
+  <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+   <svg id="donut" width="140" height="140" viewBox="0 0 42 42"></svg>
+   <div class="donut-legend" id="dleg" style="flex:1;min-width:165px"></div>
+  </div></div>
+</div>
+
+<div class="card">
+ <h3>Bảng chỉ số — bạn ở đâu so với chuẩn</h3>
+ <div class="hint">Ngưỡng tham chiếu theo thông lệ hoạch định tài chính cá nhân. Đây là mock-up — ngưỡng cần hiệu chỉnh theo tệp khách của bạn.</div>
+ <table><thead><tr><th>Chỉ số</th><th class="r">Của bạn</th><th class="r">Ngưỡng chuẩn</th><th class="r">Đánh giá</th></tr></thead><tbody id="mtbl"></tbody></table>
+</div>
+
+<div class="find">
+ <div class="fbox up"><h3>Điểm mạnh</h3><div id="fUp"></div></div>
+ <div class="fbox dn"><h3>Điểm yếu</h3><div id="fDn"></div></div>
+</div>
+<div class="fbox rk" style="margin-top:14px"><h3>Rủi ro âm thầm — chưa đau nhưng sẽ đau</h3><div id="fRk"></div></div>
+
+<div class="card" style="margin-top:14px">
+ <h3>Đối chiếu với tám chân dung</h3>
+ <div class="hint">Tám người, tám vấn đề khác nhau — không phải thang tốt-kém. Chọn một người để so sánh song song với bức tranh của bạn. Nhiều khi nhận ra mình trong chân dung của người khác dễ hơn nhìn thẳng vào con số của chính mình.</div>
+ <div class="pgrid" id="pgrid"></div>
+ <div class="cmpwrap" id="cmpwrap" style="display:none">
+  <div class="cmphead">
+   <div class="story"><h4 id="cmpName">—</h4><p id="cmpStory">—</p></div>
+   <button class="s-btn" onclick="loadPersona()" style="white-space:nowrap">Nạp số liệu người này</button>
+  </div>
+  <div class="vslegend"><span><b style="background:#00704A"></b>BẠN</span><span id="cmpWho"><b style="background:#A6603A"></b>—</span></div>
+  <div id="vsbars"></div>
+  <div class="diffbox">
+   <div class="dbx better"><h5>Bạn đang hơn ở</h5><div id="dBetter"></div></div>
+   <div class="dbx worse"><h5>Người này đang hơn ở</h5><div id="dWorse"></div></div>
+  </div>
+ </div>
+</div>
+
+<div class="card" style="margin-top:14px">
+ <h3>Lưu thời điểm &amp; theo dõi tiến triển</h3>
+ <div class="hint">Lưu bức tranh hiện tại để lần sau quay lại so sánh. Điểm số một lần không nói lên nhiều — hướng nó di chuyển qua các mốc mới là thứ đáng nhìn. Dữ liệu lưu ngay trên máy này, không gửi đi đâu.</div>
+ <div class="snaprow">
+  <div class="fld"><label>Tên người được đánh giá</label><input type="text" id="snapName" placeholder="VD: Chị Hương" maxlength="40"></div>
+  <div class="fld"><label>Ghi chú thời điểm</label><input type="text" id="snapNote" placeholder="VD: Trước khi trả hết thẻ tín dụng" maxlength="60"></div>
+  <button class="s-btn s-btn-pri" onclick="saveSnap()" style="white-space:nowrap">Lưu thời điểm này</button>
+ </div>
+ <div id="snapList"></div>
+ <div class="trendwrap" id="trendWrap" style="display:none">
+  <h3 style="font-size:15px;margin-bottom:3px">Đường tiến triển</h3>
+  <div class="hint" id="trendHint">—</div>
+  <div class="tchips" id="tchips"></div>
+  <svg id="tchart" width="100%" height="230" style="overflow:visible"></svg>
+  <div class="deltas">
+   <div class="dbx better"><h5 id="dImpTitle">Đã cải thiện</h5><div id="dImp"></div></div>
+   <div class="dbx worse"><h5 id="dRegTitle">Đã đi lùi</h5><div id="dReg"></div></div>
+  </div>
+ </div>
+</div>
+
+<div class="card" style="margin-top:14px">
+ <h3>Ba việc trong 90 ngày tới</h3>
+ <div class="hint">Xếp theo mức độ ảnh hưởng, con số tính từ chính số liệu bạn nhập.</div>
+ <div id="acts"></div>
+</div>
+
+<div class="nav"><button class="s-btn" onclick="go(-1)">← Thiết lập lại</button><span class="navnote">Không lưu dữ liệu lên máy chủ</span>
+ <span style="display:flex;gap:9px;flex-wrap:wrap">
+  <button class="s-btn" onclick="jumpToWorld()">↑ So với thiên hạ</button>
+  <button class="s-btn" onclick="exportWord()">Xuất Word</button>
+  <button class="s-btn s-btn-pri" onclick="exportPDF()">Xuất PDF</button>
+ </span></div>
+
+<div class="disc">Bản mock-up minh hoạ luồng và cấu trúc chấm điểm. Trọng số, ngưỡng chuẩn và công thức là giá trị giả định phục vụ demo, chưa hiệu chỉnh theo dữ liệu thực tế của tệp khách hàng. Kết quả không phải lời khuyên đầu tư hoặc tư vấn tài chính cá nhân. Phần "giọng chẩn đoán" chỉ mang tính giải trí.</div>
+
+<div class="okfoot">
+ <div class="oklogo">Omnikey</div>
+ <div class="okby">Công cụ Chẩn đoán Tài chính Cá nhân · phát triển bởi Omnikey</div>
+</div>
+</div>
+
+</div></div>
+</div>
+
+<!-- overlay tổng kết sau mỗi section -->
+<div id="sectOverlay">
+ <div class="sectcard">
+  <div class="seyebrow" id="sectEye">Khối hoàn thành</div>
+  <div class="sscore" id="sectScore">0</div>
+  <div class="sname" id="sectName">—</div>
+  <div class="sbar"><i id="sectBar"></i></div>
+  <div class="squip"><span class="qvoice" id="sectQVoice">—</span><span id="sectQuip">—</span></div>
+  <button class="scont" id="sectCont" onclick="dismissSect()">Tiếp tục →</button>
+ </div>
+</div>
+
+<div id="scrim" onclick="closeSheet()"></div>
+<button id="fab" onclick="openSheet()" aria-label="Mở bảng điều chỉnh">
+ <span>Điều chỉnh</span><span class="n" id="fabN">0</span>
+</button>
+
+<script>
+const VERSION='v1.2', REL='27/07/2026 · So sánh thiên hạ lên đầu dashboard + nút ghim · tự lấy tuổi/thu nhập';
+vb.textContent=VERSION; st.textContent='Released '+REL;
+const LS_W='fh_panel_w', LS_S='fh_stars';
+
+/* ================= FONT: 3 TRƯỜNG PHÁI + CỠ CHỮ ================= */
+const FONTS={
+ elegant:{serif:"'Playfair Display',ui-serif,Georgia,serif",sans:"'Outfit',system-ui,sans-serif",mono:"'DM Mono',monospace"},
+ simple:{serif:"'Inter',system-ui,sans-serif",sans:"'Inter',system-ui,sans-serif",mono:"'DM Mono',monospace"},
+ strong:{serif:"'Space Grotesk',system-ui,sans-serif",sans:"'IBM Plex Sans',system-ui,sans-serif",mono:"'JetBrains Mono',monospace"}
+};
+const LS_FONT='fh_font',LS_FS='fh_fontsize';
+let curFont=localStorage.getItem(LS_FONT)||'elegant';
+function applyFont(f){
+ curFont=f;const r=document.documentElement.style;const F=FONTS[f]||FONTS.elegant;
+ r.setProperty('--s-serif',F.serif);r.setProperty('--s-sans',F.sans);r.setProperty('--s-mono',F.mono);
+ localStorage.setItem(LS_FONT,f);
+ document.querySelectorAll('.fbtn').forEach(b=>b.classList.toggle('on',b.dataset.font===f));
+}
+document.querySelectorAll('.fbtn').forEach(b=>b.onclick=()=>applyFont(b.dataset.font));
+applyFont(curFont);
+
+let curFS=+(localStorage.getItem(LS_FS)||16);
+const FS_MIN=13,FS_MAX=22;
+function applyFS(){
+ curFS=Math.max(FS_MIN,Math.min(FS_MAX,curFS));
+ document.documentElement.style.setProperty('--fs',curFS+'px');
+ document.getElementById('szval').textContent=Math.round(curFS/16*100)+'%';
+ localStorage.setItem(LS_FS,curFS);
+}
+function bumpFont(d){curFS+=d;applyFS();}
+applyFS();
+
+/* ---------- steps ---------- */
+const STEPS=['Thu nhập','Chi tiêu','Đầu tư','Bảo vệ','Chẩn đoán'];
+let cur=0, onDash=false;
+const Q={grw:2,rep:2,crp:2,trk:2,exp:2,dca:2,wil:0,cont:2};
+
+/* ================= GIỌNG CHẨN ĐOÁN (VIRAL) ================= */
+/* 8 nhân vật × 5 bậc điểm. band: 0 rất thấp(<30) 1 thấp(30-47) 2 TB(48-64) 3 khá(65-79) 4 cao(≥80) */
+const bandOf=t=>t>=80?4:t>=65?3:t>=48?2:t>=30?1:0;
+const VOICES={
+ boi:{name:'Thầy bói',icon:'🔮',
+  lines:[
+   ['Trời… cái quẻ này nặng lắm cưng ơi. Túi tiền của bạn đang có hạn Tam Tai, tiền vào cửa trước ra cửa sau. Nhưng đừng lo, thầy phán: chịu khó một năm, vận chuyển liền.','Số bạn không phải số nghèo đâu, mà là số… chưa chịu giữ. Ví như cái ao thủng đáy, nước Trời đổ bao nhiêu cũng cạn. Trám cái lỗ lại là phát.'],
+   ['Quẻ bạn ra chữ "Động" — tiền có chạy nhưng chạy loạn, chưa vào khuôn. Thầy nhìn tay bạn thấy vất vả, làm nhiều mà tay giữ chưa chặt. Nắm lại đi cưng.','Cung Tài của bạn hơi lung lay, nhưng không xấu. Cái hạn này là hạn "quên phòng thân". Sắm cái ô trước khi Trời mưa, nghe thầy.'],
+   ['Quẻ này trung bình khá, có căn có cốt. Bạn không giàu xổi nhưng cũng chẳng khổ. Chỉ tội hay lưỡng lự — Trời cho cơ hội mà bạn cứ ngồi bấm đốt tay tính mãi.','Thầy thấy bạn có quý nhân phù trợ, chỉ là bạn chưa chịu tin. Vận đang lên đều, giữ cái tâm vững thì ba năm nữa khác hẳn.'],
+   ['Ồ, quẻ đẹp! Cung Tài của bạn sáng, có của ăn của để. Thầy chỉ nhắc: đừng ham cái lộc bất ngờ, giữ cái đang có mới là cao tay.','Số bạn vào vận Thịnh rồi cưng. Tiền đã biết đẻ ra tiền. Giờ chỉ cần tránh tiểu nhân rủ rê đầu tư linh tinh là an.'],
+   ['Quẻ Đại Cát! Thầy soi mấy chục năm hiếm ai được quẻ này. Bạn không còn phải lo cơm áo nữa, giờ là lúc nghĩ xem để lại gì cho đời. Phúc phần dày lắm.','Cung Tài viên mãn, hậu vận hanh thông. Thầy chỉ xin bạn một điều: giàu rồi nhớ làm phúc, lộc mới bền qua ba đời.']],
+   sign:'Thầy phán xong, tin hay không tùy duyên 🔮'},
+ gs:{name:'Giáo sư',icon:'🎓',
+  lines:[
+   ['Theo dữ liệu bạn cung cấp, đây là một hồ sơ tài chính có tính dễ tổn thương cao. Nghiên cứu về hộ gia đình cho thấy nhóm này chịu cú sốc thu nhập rất kém. Khuyến nghị: ưu tiên xây quỹ dự phòng trước mọi thứ khác.','Về mặt học thuật, tình trạng của bạn minh họa gần như hoàn hảo khái niệm "sống theo dòng tiền" — chi gần bằng thu, không có biên an toàn. Đây là điểm khởi đầu, không phải điểm kết.'],
+   ['Số liệu cho thấy nền tảng đã có nhưng cấu trúc còn lỏng. Trong tài chính cá nhân, tỷ lệ tiết kiệm quan trọng hơn thu nhập tuyệt đối — và đây chính là biến bạn cần cải thiện.','Phân tích của tôi chỉ ra một vài lỗ hổng có thể lượng hóa được. Tin tốt: các lỗ hổng lượng hóa được là các lỗ hổng sửa được. Ta bắt đầu từ cái đo được.'],
+   ['Hồ sơ của bạn nằm ở phân vị giữa — không đáng lo, nhưng cũng chưa tối ưu. Lý thuyết vòng đời tài chính gợi ý rằng ở giai đoạn này, kỷ luật đều đặn thắng mọi cú đột phá.','Dữ liệu cân bằng một cách thú vị. Bạn không mắc lỗi nghiêm trọng nào, chỉ là chưa khai thác hết đòn bẩy của thời gian. Lãi kép, như Einstein được cho là đã nói, là kỳ quan thứ tám.'],
+   ['Đây là một hồ sơ tốt theo hầu hết các thước đo chuẩn. Bạn đã vượt qua giai đoạn phòng thủ. Câu hỏi nghiên cứu tiếp theo không phải "tích lũy bao nhiêu" mà "phân bổ cho mục tiêu nào".','Số liệu rất đáng khích lệ. Bạn thuộc nhóm thiểu số có cả kỷ luật lẫn cấu trúc. Tôi chỉ lưu ý: tối ưu hóa quá mức đôi khi phản tác dụng — hãy để dành chỗ cho cuộc sống.'],
+   ['Xuất sắc. Đây là hồ sơ mà tôi thường dùng làm ví dụ mẫu trong bài giảng. Bạn đã đạt trạng thái mà lý thuyết gọi là "tự do tài chính tương đối". Chúc mừng — và mong bạn chia sẻ phương pháp.','Về mặt định lượng, gần như không còn gì để phê bình. Bạn đã giải xong bài toán tích lũy. Giờ là lĩnh vực của triết học hơn là tài chính: tiền để làm gì cho một cuộc đời đáng sống?']],
+   sign:'— Nhận định dựa trên dữ liệu bạn cung cấp 🎓'},
+ ny:{name:'Người yêu',icon:'💕',
+  lines:[
+   ['Cưng ơi… mình xem xong hơi lo cho bạn á. Bạn làm việc cực mà chẳng giữ được bao nhiêu cho mình. Mình không cần bạn giàu, chỉ mong bạn đừng để bản thân chông chênh vậy. Bắt đầu từ chuyện nhỏ thôi, mình đi cùng bạn nha.','Nhìn mấy con số này mình thương bạn ghê. Bạn lo cho mọi thứ trừ chính mình. Từ tháng này, hứa với mình là để dành một chút cho bạn trước nha, được không cưng?'],
+   ['Bạn giỏi mà, chỉ là chưa thương bản thân đủ thôi. Mình thấy bạn đang cố, và mình tin bạn. Mình mình từng bước, đừng vội, có mình đây rồi.','Mình biết bạn mệt. Nhưng đừng bỏ cuộc với tiền bạc nha, vì đó cũng là lo cho tương lai của tụi mình. Mình chỉ cần bạn nhích lên một chút mỗi ngày là mình vui rồi.'],
+   ['Bạn đang làm ổn hơn bạn nghĩ đó cưng. Mình tự hào về bạn ghê. Mình chỉ muốn nhắc nhẹ: mình lo xa một xíu nữa thôi, để sau này tụi mình nhàn hơn.','Ổn áp nè! Mình thấy bạn có kỷ luật đó. Cứ giữ vầy đi, rồi mình cùng nhau đi xa. Mình tin vào tụi mình mà.'],
+   ['Wow bạn của mình giỏi thiệt sự luôn á! Mình yên tâm về bạn ghê. Bạn lo cho tương lai chu đáo vậy, mình chỉ biết tự hào thôi. Nhớ thi thoảng thưởng cho bản thân nha cưng.','Mình hạnh phúc khi thấy bạn vững vàng thế này. Bạn không chỉ lo cho mình mà còn nghĩ cho cả hai. Yêu bạn thêm mấy phần vì cái sự chững chạc này đó.'],
+   ['Trời ơi bạn của mình xuất sắc quá đi! Mình không còn gì để lo nữa luôn. Bạn xây được cả một nền móng vững chắc — mình biết ơn vì có bạn kề bên. Giờ mình chỉ việc tận hưởng cuộc sống cùng nhau thôi.','Mình tự hào muốn khoe cả thế giới luôn á! Bạn quá đỉnh. Có một người vững vàng như bạn, mình thấy tương lai tụi mình sáng bừng. Cảm ơn bạn vì đã chăm lo mọi thứ.']],
+   sign:'Thương bạn nhiều nha 💕'},
+ bo:{name:'Bố',icon:'👨',
+  lines:[
+   ['Này, ngồi xuống bố nói. Tiền nong thế này là không được đâu con. Hồi bằng tuổi mày bố còn khổ hơn, nhưng bố biết để dành. Kiếm được đồng nào tiêu hết đồng đó là hỏng. Bắt đầu tiết kiệm từ hôm nay, nghe chưa.','Bố không mắng, bố lo. Con làm cật lực mà tay trắng thì sau này lấy gì phòng thân? Đừng sĩ diện, cứ để dành trước cái đã. Bố nói thật lòng đấy.'],
+   ['Cũng tạm, nhưng chưa chắc chân đâu con. Đời nó không báo trước cái gì cả. Có bao nhiêu để dành phòng thân bấy nhiêu, đừng có chủ quan. Bố đi qua rồi bố biết.','Con có cố gắng, bố ghi nhận. Nhưng còn lỏng lẻo lắm. Việc nhà mình là phải có cái quỹ dắt lưng, mất việc còn cầm cự được. Nhớ lời bố.'],
+   ['Ừ, tạm ổn. Con đi đúng hướng đấy, bố yên tâm phần nào. Nhưng đừng dừng lại, cứ đều đặn mà tiến. Bố không cần con giàu, chỉ cần con vững.','Được đấy con. Bố hồi xưa mà biết mấy cái này thì đã khác. Con hơn bố ở chỗ chịu học hỏi. Cứ thế phát huy, đừng ham hố linh tinh là được.'],
+   ['Khá lắm con! Bố mừng thật đấy, không phải khen suông đâu. Con lo được cho mình thế này là bố nhẹ cả người. Giữ cái đầu tỉnh táo, đừng để đồng tiền làm chủ mình là được.','Con làm bố tự hào. Bằng tuổi con mà bố chưa được thế này. Con vững vàng thế, bố an tâm. Nhớ chăm lo cho cả nhà nữa nhé, con trai/con gái của bố.'],
+   ['Giỏi! Con trai/con gái bố đây rồi. Bố chẳng còn gì phải dạy con về khoản này nữa. Con lo xa, chững chạc, bố yên lòng lắm. Giờ sống cho thoải mái, và nhớ giúp đỡ người khác khi có thể.','Bố tự hào về con thật sự. Con xây dựng được cơ ngơi vững vàng thế này là phúc nhà ta. Bố chỉ dặn một câu: giàu rồi thì đừng quên gốc, đừng quên người khó.']],
+   sign:'— Bố nói vậy thôi, con tự hiểu 👨'},
+ vo:{name:'Vợ',icon:'💍',
+  lines:[
+   ['Anh xem lại đi nhé! Tháng nào cũng kêu hết tiền mà em thấy tiêu như nước. Cứ đà này thì lấy gì lo cho con? Từ mai em quản lý cái khoản chi tiêu, anh đưa đây em cầm. Nói thật là em lo chứ em không cằn nhằn đâu.','Trời ơi cái nhà này… anh làm được đồng nào ra đồng nấy hết. Em không cần kim cương, em chỉ cần cái sổ tiết kiệm nó đừng trống trơn. Ngồi xuống, tối nay hai vợ chồng tính lại.'],
+   ['Cũng đỡ, nhưng chưa yên tâm được đâu anh ơi. Cái quỹ dự phòng mỏng dính, lỡ có chuyện gì thì sao? Em nhắc trước để mình còn liệu. Đừng để nước đến chân mới nhảy.','Được rồi đấy, nhưng em vẫn phải nhắc. Đàn ông các anh cứ chủ quan. Nhà mình phải có của để dành, em nói thật. Cuối tuần này ngồi lại làm cái kế hoạch nghiêm túc nhé.'],
+   ['Ừ tạm được, em công nhận anh cũng biết lo. Nhưng đừng tự mãn nha. Cứ đều đặn thế này thì em yên tâm hơn. Mà nhớ, cái gì cũng phải bàn với em trước khi quyết đấy.','Ổn phết đấy chồng ạ. Em thấy mình đi đúng hướng rồi. Giữ nhịp này thì vài năm nữa nhà mình khác hẳn. Em với anh cùng cố gắng nhé.'],
+   ['Ơ anh giỏi thế! Em không ngờ anh lo chu đáo vậy đâu. Được lắm, em tự hào về chồng em. Cứ thế này thì con cái sau này sướng. Mà thi thoảng cũng phải thưởng cho mình tí nha, đừng ki bo quá.','Chồng em number one! Em yên tâm giao tay hòm chìa khóa cho anh luôn. Anh lo được thế này em còn mong gì hơn. Tối nay em nấu món anh thích để thưởng nhé.'],
+   ['Chồng em đỉnh của chóp! Em chẳng còn gì để nhắc nữa luôn. Anh xây được cơ đồ thế này em nở mày nở mặt với hai bên nội ngoại. Giờ mình cứ thế mà hưởng thụ thôi, anh nhỉ.','Em lấy anh là quyết định đúng nhất đời em! Nhìn cái nền tài chính này là biết anh chững chạc cỡ nào. Em hạnh phúc thật sự. Cả nhà mình mang ơn anh đấy.']],
+   sign:'— Vợ nói vậy vì vợ lo, biết chưa 💍'},
+ nyc:{name:'Người yêu cũ',icon:'💔',
+  lines:[
+   ['Ơ… vẫn thế à? Hồi xưa mình nói rồi mà, tiêu tiền như phá. Thôi không sao, giờ đâu còn là chuyện của mình nữa. Chỉ là… hơi buồn cười thôi, chẳng thay đổi gì cả. Cố lên nhé, người dưng.','Ừ thì cũng đoán được mà. Ngày xưa mình lo cái này riết rồi mệt. Giờ tự lo đi nha cưng. À mà nói thật, người mới của bạn chắc cũng đang đau đầu như mình từng đau đó.'],
+   ['Cũng có tiến bộ hơn hồi yêu mình đấy. Ơ hay, chia tay xong lại biết lo cơ à? Đùa thôi. Mừng cho bạn, thật lòng… chắc vậy. Dù gì cũng từng là người quan trọng mà.','Nhìn đỡ hơn xưa rồi ha. Hồi đó mình mà thấy bạn thế này thì đã khác. Thôi kệ, giờ đường ai nấy đi. Chúc bạn giữ được phong độ, đừng như hồi ở cạnh mình.'],
+   ['Ồ, khá đấy chứ. Không tệ như mình tưởng. Hồi xưa mình cứ nghĩ bạn không bao giờ lớn nổi cơ. Hóa ra chia tay mình xong bạn khôn ra thật à? Mừng ghê… một cách rất khách quan thôi nhé.','Ửm, tạm ổn. Thấy bạn ổn mình cũng… ừ, cũng mừng. Dù gì hồi xưa cũng có công mình nhắc nhở phần nào chứ nhỉ? Thôi, người dưng rồi, không dám nhận công.'],
+   ['Ơ khá thật đấy! Bạn đổi khác nhiều ghê. Hồi yêu mình có được thế này đâu… đùa tí. Mừng cho bạn thật mà, không mỉa đâu. Người mới của bạn may đấy, được hưởng bản nâng cấp.','Wow, làm ăn được phết. Mình đi rồi bạn phất lên à? Hơi tự ái tí nhưng thôi, mừng cho bạn. Dù sao cũng chúc bạn hạnh phúc… với cái ví dày đó.'],
+   ['Trời, đỉnh vậy luôn hả? Bạn giàu thế này cơ à… ừ thì mừng cho bạn. Hơi tiếc một xíu thôi, tí xíu à nha. Người mới trúng số rồi đấy. Thôi chúc mừng, người dưng thành đạt.','Ối giời, thành công quá ta! Mình mà biết bạn phất thế này thì… đùa thôi. Mừng thật lòng nhé. Coi như hồi xưa mình cũng góp phần tạo động lực cho bạn vươn lên, ha.']],
+   sign:'— Người dưng có duyên, chúc bạn ổn 💔'},
+ idol:{name:'Idol',icon:'✨',
+  lines:[
+   ['Cưng ơi nghe idol nói nè 🥺 Tài chính đang hơi wobbly xíu nhưng không sao đâu! Idol từng flop banh rồi comeback đây nè. Cưng bắt đầu từ hôm nay, idol tin cưng làm được! Fighting nha! 💪✨','Baby của idol ơi, đừng nản! Ai cũng có giai đoạn khó mà. Quan trọng là mình không bỏ cuộc đúng không? Idol thương cưng, mình cùng level up nha! 🌈'],
+   ['Cưng đang cố gắng và idol thấy hết nha! 🥹 Chưa hoàn hảo nhưng đang đi đúng hướng rồi đó. Idol tự hào về cưng! Cứ giữ vibe này, mình sẽ tỏa sáng thôi! ✨','Ơ cưng ơi khá lên rồi nè! Idol proud ghê. Cứ consistent như vậy đi, thành công không phụ người kiên trì đâu. Idol luôn support cưng nha! 💖'],
+   ['Cưng làm tốt lắm nha! 👏 Idol chấm điểm khá cao đó. Cưng có discipline nè, cái này quý lắm. Giữ vững phong độ, mình sẽ đi được xa! Love you cưng nhiều 💕','Solid nha cưng! Idol yên tâm về cưng rồi. Cưng biết lo cho tương lai, mature ghê. Cứ thế này thì slay thôi! Idol hào hứng dõi theo cưng! ✨'],
+   ['ICON! LEGEND! Cưng của idol đỉnh quá đi! 🔥 Tài chính vững như bàn thạch luôn. Idol học hỏi cưng đây nè. Cưng là inspiration của cả fandom đó! Keep slaying! 👑','Cưng ơi cưng giỏi dữ vậy trời! 😭✨ Idol không ngờ cưng manage tốt thế này. Cưng vừa có tâm vừa có tầm. Idol vinh dự khi có fan xịn như cưng!'],
+   ['MOTHER HAS ARRIVED 👑✨ Cưng không còn là fan nữa, cưng là ROLE MODEL của idol luôn rồi! Tài chính level thần thánh. Cả fandom nên học cưng. Idol cúi đầu bái phục, cưng là main character! 🔥','SỤP ĐỔ TRƯỚC CƯNG LUÔN 😭💅 Cưng giàu, cưng giỏi, cưng có tất! Idol xin phép được làm fan của cưng ạ. Đây mới là đẳng cấp. Cưng là huyền thoại sống! ✨👑']],
+   sign:'— Idol luôn bên cạnh cưng nha 💖✨'},
+ casi:{name:'Ca sĩ đanh đá',icon:'🎤',
+  lines:[
+   ['Ơ kìa cưng?? Trời ơi cái ví này nó rỗng nó kêu leng keng luôn á! 💅 Tiêu kiểu gì mà tay trắng vậy trời?? Thôi chị nói thẳng: dẹp bớt trà sữa với son môi lại, để dành đi cưng ơi. Chị nói vì thương chứ chị đâu rảnh! 🙄','Ú òa, lại đây chị coi… ối giời ơi thảm họa! 😱 Cưng làm quần quật mà không giữ nổi đồng nào là sao?? Chị mà như cưng chị khóc thét. Thôi sửa liền đi, đừng để chị phải nói lần hai! 💅'],
+   ['Ừ thì… tạm coi được, chưa đến nỗi chị phải xỉu 🙄 Nhưng mà cưng ơi, cái quỹ phòng thân mỏng như tờ giấy vậy sao mà an tâm? Lo xa chút đi cưng, đời nó không có nhẹ nhàng với ai đâu! 💅','Nghe chị nè cưng, đừng có tự mãn! Được tí đã vội hài lòng à? 🙄 Chị đanh đá nhưng chị nói đúng: cứ đà lỏng lẻo này là toang. Siết lại! Chị không muốn thấy cưng khổ đâu, thiệt.'],
+   ['Ơ cũng được đấy chứ, chị bất ngờ à nha 💅 Cưng biết lo phết. Nhưng đừng có ngủ quên trên chiến thắng nghen. Chị theo dõi cưng đấy, lơ là một cái là chị réo tên liền! Cứ thế mà phát huy cưng ơi.','Ừ ổn, chị tạm hài lòng 😌 Cưng có kỷ luật, cái này chị chấm. Nhưng chị vẫn phải cà khịa một câu: đừng có mà tự kiêu, đường còn dài lắm cưng! Chị dõi theo nè.'],
+   ['Á à, cưng khá dữ nha! 💅✨ Chị công nhận cưng có gu tài chính đấy. Được lắm cưng ơi, chị tự hào chút chút. Mà nhớ nha, đỉnh cao rồi thì giữ cho chắc, đừng để tụt hạng là chị buồn đó! 🎤','Ui chao cưng làm chị nể luôn á! 😎 Tưởng đâu xoàng xoàng ai dè cao tay. Cứ phong độ này thì miễn chê. Chị đanh đá vậy chứ chị mừng cho cưng thật lòng đó nha!'],
+   ['TRỜI ƠI CƯNG?! 😱💅 Đỉnh nóc kịch trần bay phấp phới luôn á! Cưng giàu cưng sang cưng có tất, chị xin quỳ! Ai dám cà khịa cưng là qua chị trước nha. Cưng là DIVA tài chính đích thực! 🎤👑','Chị SỤP luôn rồi cưng ơi! 😭✨ Cái nền tài chính này nó slay quá đáng! Chị đanh đá cả đời mà giờ chỉ biết vỗ tay cho cưng. Cưng là huyền thoại, cưng là số một, không bàn cãi! 💅🔥']],
+   sign:'— Chị nói vậy vì chị thương, hứ! 🎤💅'}
+};
+const VLIST=[['boi','🔮','Thầy bói'],['gs','🎓','Giáo sư'],['ny','💕','Người yêu'],['bo','👨','Bố'],['vo','💍','Vợ'],['nyc','💔','Người yêu cũ'],['idol','✨','Idol'],['casi','🎤','Ca sĩ đanh đá']];
+let curVoice=localStorage.getItem('fh_voice')||'boi';
+const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
+function verdictLine(total,vid){
+ const V=VOICES[vid]||VOICES.boi;
+ return pick(V.lines[bandOf(total)]);
+}
+/* câu tổng kết ngắn sau mỗi section — theo giọng, theo điểm khối */
+const SECT_QUIP={
+ boi:[['Quẻ khối này hơi động, giữ tâm cho vững cưng.','Thầy thấy khối này còn lận đận, ráng nhé.'],
+   ['Khối này tạm ổn, có căn.','Cung này sáng lên rồi đó cưng.']],
+ gs:[['Khối này còn dư địa cải thiện đáng kể.','Dữ liệu khối này cho tín hiệu cần lưu ý.'],
+   ['Khối này đạt chuẩn tham chiếu, tốt.','Chỉ số khối này khá vững.']],
+ ny:[['Khối này mình lo cho bạn xíu, cùng cố nha.','Chỗ này bạn ráng thêm chút xíu là ổn nè.'],
+   ['Khối này bạn làm tốt lắm đó cưng!','Mình tự hào về bạn ở khối này ghê.']],
+ bo:[['Khối này chưa ổn, con để ý.','Chỗ này bố nhắc, phải chắc chân vào.'],
+   ['Khối này được đấy con.','Ừ, khối này con làm khá.']],
+ vo:[['Khối này em phải nhắc anh đấy nhé.','Chỗ này chưa yên tâm được đâu anh ơi.'],
+   ['Khối này ổn đấy chồng ạ.','Được, khối này anh làm tốt.']],
+ nyc:[['Khối này… vẫn thế nhỉ. Cố lên.','Chỗ này hồi xưa mình nhắc rồi mà, haha.'],
+   ['Ơ khối này khá đấy chứ.','Khối này đổi khác ghê ta.']],
+ idol:[['Khối này cưng ráng xíu nha, idol tin cưng! 🥹','Chưa perfect nhưng fighting nha cưng! 💪'],
+   ['Khối này cưng slay nha! ✨','Idol proud về cưng khối này! 💖']],
+ casi:[['Khối này chị phải cà khịa xíu, sửa liền nha! 💅','Chỗ này lỏng lẻo à nha, siết lại cưng! 🙄'],
+   ['Khối này cưng được đó! 💅','Ơ khối này ổn phết, chị khen! ✨']]
+};
+function sectQuip(sc,vid){
+ const b=sc>=65?1:0; // đơn giản 2 mức cho câu section
+ const V=SECT_QUIP[vid]||SECT_QUIP.boi;
+ return pick(V[b]);
+}
+
+
+/* ================= HỆ MODULE TUỲ CHỌN ================= */
+/* mỗi module = 1 khối nhập (data-s) + trọng số gốc + mô tả chức năng.
+   Khách bật/tắt và đổi thứ tự; trọng số chuẩn hoá lại trên các module đang bật.
+   Ràng buộc: luôn giữ ≥2 khối định lượng. */
+const MODULES=[
+ {id:'inc', s:0, key:'sInc', nm:'Tạo thu nhập',     w:22, quant:true,
+  desc:'Đo nguồn tiền vào: có mấy đường thu nhập, mức độ phụ thuộc một nguồn, tỷ trọng thu nhập thụ động, khả năng phục hồi nếu mất việc.',
+  why:'Trả lời câu hỏi: thu nhập của bạn vững hay mong manh — không chỉ nhiều hay ít.'},
+ {id:'exp', s:1, key:'sExp', nm:'Quản lý chi tiêu', w:26, quant:true,
+  desc:'Đo cách tiền ra đi: tỷ lệ tiết kiệm, cơ cấu 6 nhóm chi, gánh nặng nợ trên thu nhập, hiện tượng chi tiêu phình theo thu nhập.',
+  why:'Trả lời câu hỏi: mỗi tháng bạn thực sự giữ lại được bao nhiêu, và tiền chảy đi đâu.'},
+ {id:'inv', s:2, key:'sInv', nm:'Đầu tư & tích luỹ', w:24, quant:true,
+  desc:'Đo cơ cấu tài sản: tài sản ròng bằng bao nhiêu năm chi phí, danh mục có lệch mô hình theo tuổi không, tính thanh khoản, mức đòn bẩy.',
+  why:'Trả lời câu hỏi: tài sản của bạn đang làm việc hiệu quả hay chỉ nằm im / kẹt vốn.'},
+ {id:'pro', s:3, key:'sPro', nm:'Bảo vệ',            w:28, quant:true,
+  desc:'Đo tấm lưới an toàn: quỹ dự phòng đủ mấy tháng, bảo hiểm nhân thọ che phủ tới đâu, bảo hiểm sức khoẻ và bệnh hiểm nghèo, kế hoạch thừa kế.',
+  why:'Trả lời câu hỏi: nếu điều xấu nhất xảy ra, ba khối trên có tồn tại được không.'}
+];
+let MODON=JSON.parse(localStorage.getItem('fh_modon')||'null')||MODULES.map(m=>m.id);
+let MODORD=JSON.parse(localStorage.getItem('fh_modord')||'null')||MODULES.map(m=>m.id);
+const saveMods=()=>{localStorage.setItem('fh_modon',JSON.stringify(MODON));localStorage.setItem('fh_modord',JSON.stringify(MODORD));};
+const modById=id=>MODULES.find(m=>m.id===id);
+/* danh sách module đang bật, theo thứ tự khách sắp */
+const activeMods=()=>MODORD.filter(id=>MODON.includes(id)).map(modById);
+/* trọng số chuẩn hoá: tổng các module bật = 100% */
+function weights(){
+ const on=activeMods();const sum=on.reduce((a,m)=>a+m.w,0)||1;
+ const w={};on.forEach(m=>w[m.id]=m.w/sum);return w;
+}
+/* thứ tự bước hiển thị = các module bật + dashboard cuối */
+const stepSeq=()=>[...activeMods().map(m=>m.s),4];
+
+STEPS.forEach(s=>{prog.innerHTML+='<div class="seg"></div>';plabs.innerHTML+='<span>'+s+'</span>'});
+/* progress bar dựng lại theo module đang bật + màn Thiết lập + Chẩn đoán */
+function rebuildProg(){
+ const on=activeMods();
+ const labels=['Thiết lập',...on.map(m=>m.nm.split(' ')[0]==='Tạo'?'Thu nhập':m.nm.split(' &')[0].split(' ')[0]==='Quản'?'Chi tiêu':m.nm),'Chẩn đoán'];
+ const nice=['Thiết lập',...on.map(m=>({inc:'Thu nhập',exp:'Chi tiêu',inv:'Đầu tư',pro:'Bảo vệ'}[m.id])),'Chẩn đoán'];
+ prog.innerHTML=nice.map(()=>'<div class="seg"></div>').join('');
+ plabs.innerHTML=nice.map(s=>'<span>'+s+'</span>').join('');
+}
+/* seq đầy đủ gồm màn thiết lập (-1) ở đầu */
+const fullSeq=()=>[-1,...stepSeq()];
+function curIdx(){return fullSeq().indexOf(cur)}
+function paint(){const idx=curIdx();
+ [...prog.children].forEach((e,i)=>e.className='seg'+(i<idx?' done':i===idx?' now':''));
+ [...plabs.children].forEach((e,i)=>e.className=i===idx?'now':'')}
+function go(n){cur=n;onDash=(n===4);
+ document.querySelectorAll('.step').forEach(s=>s.classList.toggle('on',+s.dataset.s===n));
+ paint();scrollTo({top:0,behavior:'smooth'});buildPanel();syncFab();if(isMobile())closeSheet();
+ if(n>=0&&n<4)wireStepNav(n);}
+/* điều hướng Tiếp/Lùi theo trình tự động */
+let pendingNext=null;
+function nextStep(){const seq=fullSeq(),i=seq.indexOf(cur);
+ if(i>=seq.length-1)return;
+ const nx=seq[i+1];
+ /* nếu vừa hoàn thành một khối nhập (0..3), hiện thẻ tổng kết trước */
+ if(cur>=0&&cur<4){
+  const m=modById(MODULES.find(mm=>mm.s===cur).id);
+  const M=model();
+  const scMap={inc:M.sInc,exp:M.sExp,inv:M.sInv,pro:M.sPro};
+  showSectCard(m,Math.round(scMap[m.id]||0),()=>{if(nx===4)firstCalc();else go(nx)});
+ }else{ if(nx===4)firstCalc();else go(nx); }
+}
+function showSectCard(mod,score,after){
+ pendingNext=after;
+ const C=score>=70?'var(--s-green)':score>=48?'var(--s-gold)':'var(--s-warn)';
+ document.getElementById('sectEye').textContent='Khối '+mod.nm+' — hoàn thành';
+ const el=document.getElementById('sectScore');el.textContent='0';el.style.color=C;
+ document.getElementById('sectName').textContent={inc:'Sức khoẻ tạo thu nhập',exp:'Sức khoẻ chi tiêu',inv:'Sức khoẻ đầu tư',pro:'Sức khoẻ bảo vệ'}[mod.id]+' · '+score+'/100';
+ const bar=document.getElementById('sectBar');bar.style.width='0';bar.style.background=C;
+ const V=VOICES[curVoice];
+ document.getElementById('sectQVoice').textContent=V.icon+' '+V.name;
+ document.getElementById('sectQuip').textContent=sectQuip(score,curVoice);
+ const ov=document.getElementById('sectOverlay');ov.classList.add('on');
+ /* animate */
+ setTimeout(()=>{bar.style.width=score+'%';
+  let n=0;const t=setInterval(()=>{n+=Math.max(1,Math.round(score/22));if(n>=score){n=score;clearInterval(t)}el.textContent=n},26);},120);
+}
+function dismissSect(){
+ document.getElementById('sectOverlay').classList.remove('on');
+ const f=pendingNext;pendingNext=null;if(f)f();
+}
+
+/* ===== CÂU PHÁN Ở DASHBOARD ===== */
+let oracleLine=null,oracleBand=null,oracleVoice=null;
+function renderOracle(force){
+ const M=model(),V=VOICES[curVoice],bd=bandOf(M.total);
+ /* phán câu mới khi: ép, lần đầu, đổi giọng, hoặc nhảy bậc điểm */
+ if(force||oracleLine===null||oracleVoice!==curVoice||oracleBand!==bd){
+  oracleLine=verdictLine(M.total,curVoice);oracleBand=bd;oracleVoice=curVoice;
+ }
+ const el=document.getElementById('oracle');if(!el)return;
+ el.innerHTML=`<button class="oreroll" onclick="renderOracle(true)" title="Phán lại câu khác">↻ Phán lại</button>
+  <div class="otop"><span class="oic">${V.icon}</span>
+   <span class="owho">Lời chẩn đoán từ<b>${V.name}</b></span></div>
+  <div class="otext">"${oracleLine}"</div>
+  <div class="osign">${V.sign}</div>
+  <div class="oswap">${VLIST.map(([id,ic])=>`<button class="${id===curVoice?'on':''}" data-v="${id}" title="Đổi sang giọng này">${ic}</button>`).join('')}</div>`;
+ el.querySelectorAll('.oswap button').forEach(b=>b.onclick=()=>{
+  curVoice=b.dataset.v;localStorage.setItem('fh_voice',curVoice);renderOracle(true);renderVoicePick();});
+}
+
+/* ================= SO SÁNH VỚI THIÊN HẠ ================= */
+/* Dán URL Web App của Google Apps Script vào đây (xem file huong-dan-google-sheet.md).
+   Để trống → chạy chế độ DEMO với dữ liệu seeding mô phỏng ngay trong file. */
+const WORLD_ENDPOINT=''; // ví dụ: 'https://script.google.com/macros/s/AKfy.../exec'
+
+/* seeding mô phỏng ~200 điểm để demo khi chưa nối Sheet — phân phối lệch phải nhẹ, đỉnh ~52 */
+function seedWorld(){
+ const rnd=(m,s)=>{let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();
+  return m+s*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)};
+ const arr=[];for(let i=0;i<200;i++)arr.push(Math.max(8,Math.min(96,Math.round(rnd(51,16)))));
+ return arr;
+}
+let WORLD_SUBMITTED=localStorage.getItem('fh_world_done')==='1';
+/* tự xếp nhóm tuổi/thu nhập từ dữ liệu người dùng đã nhập — không hỏi lại */
+function ageBand(a){return a<25?'u25':a<35?'25-34':a<45?'35-44':a<55?'45-54':'55p'}
+function incBand(m){return m<15?'u15':m<30?'15-30':m<60?'30-60':m<120?'60-120':'120p'}
+function worldPayload(){
+ const M=model();
+ const inc=V('i_sal')+V('i_bon')+V('i_biz')+V('i_rent')+V('i_fin');
+ const age=V('p_age')||35;
+ return {total:M.total,inc:Math.round(M.sInc),exp:Math.round(M.sExp),inv:Math.round(M.sInv),pro:Math.round(M.sPro),
+  voice:curVoice,age:ageBand(age),incomeBand:incBand(inc)};
+}
+async function submitToWorld(){
+ const note=document.getElementById('wNote');
+ const btn=document.getElementById('wSubmit');
+ btn.disabled=true;btn.innerHTML='<span class="wspin"></span>Đang gửi & tính toán…';
+ const payload=worldPayload();
+ try{
+  let data;
+  if(WORLD_ENDPOINT){
+   const res=await fetch(WORLD_ENDPOINT,{method:'POST',body:JSON.stringify(payload),
+    headers:{'Content-Type':'text/plain;charset=utf-8'}}); /* text/plain tránh preflight CORS */
+   data=await res.json();
+  }else{
+   /* DEMO: tính cục bộ từ seeding */
+   await new Promise(r=>setTimeout(r,900));
+   const all=seedWorld();all.push(payload.total);
+   data=worldStats(all,payload);
+  }
+  localStorage.setItem('fh_world_done','1');WORLD_SUBMITTED=true;
+  renderWorldResult(data,payload);
+ }catch(e){
+  note.className='wnote err';
+  note.textContent='Không gửi được lên máy chủ. Kiểm tra kết nối mạng hoặc URL Apps Script. (Chi tiết: '+e.message+')';
+  btn.disabled=false;btn.innerHTML='Thử lại →';
+ }
+}
+/* tính thống kê cục bộ (dùng cho DEMO; bản thật Apps Script trả về sẵn) */
+function worldStats(all,p){
+ all.sort((a,b)=>a-b);
+ const n=all.length,below=all.filter(x=>x<p.total).length;
+ const pctile=Math.round(below/n*100);
+ const mean=Math.round(all.reduce((a,b)=>a+b,0)/n);
+ /* histogram 10 bins */
+ const bins=Array(10).fill(0);all.forEach(x=>bins[Math.min(9,Math.floor(x/10))]++);
+ return {count:n,percentile:pctile,mean,yourTotal:p.total,bins,
+  meanInc:mean-2,meanExp:mean+1,meanInv:mean-1,meanPro:mean, /* demo: trụ ~ quanh mean */
+  groupMean:mean+ (p.age==='u25'?-6:p.age==='55p'?5:0),groupCount:Math.round(n*0.18),
+  updated:'vừa xong (demo)'};
+}
+function renderWorldResult(d,p){
+ document.getElementById('worldGate').style.display='none';
+ const box=document.getElementById('worldResult');box.style.display='block';
+ const pctile=d.percentile,mean=d.mean;
+ const diff=p.total-mean;
+ const verdict= pctile>=90?'Bạn thuộc nhóm dẫn đầu — top '+(100-pctile)+'% của cộng đồng. Hiếm người đến được đây.'
+  :pctile>=70?'Bạn ở nửa trên khá vững, hơn phần lớn mọi người.'
+  :pctile>=45?'Bạn ở khoảng giữa — đúng vùng đông người nhất. Một vài thay đổi nhỏ là bứt lên được.'
+  :pctile>=25?'Bạn ở nửa dưới, nhưng đừng lo — phần lớn khoảng cách đến trung bình là những việc sửa được.'
+  :'Bạn đang ở nhóm cần chú ý. Tin tốt: từ đây đi lên là dễ thấy kết quả nhất.';
+ const maxBin=Math.max(...d.bins,1);
+ const yourBin=Math.min(9,Math.floor(p.total/10));
+ const bars=d.bins.map((c,i)=>`<div class="wb${i===yourBin?' you':''}" style="height:${Math.max(3,c/maxBin*100)}%" title="${i*10}–${i*10+9} điểm: ${c} người"></div>`).join('');
+ const pcmp=[['Tạo thu nhập',p.inc,d.meanInc],['Quản lý chi tiêu',p.exp,d.meanExp],['Đầu tư',p.inv,d.meanInv],['Bảo vệ',p.pro,d.meanPro]];
+ const C=v=>v>=70?'var(--s-green)':v>=48?'var(--s-gold)':'var(--s-warn)';
+ box.innerHTML=`
+  <div class="wbig">
+   <div class="wpct">Top ${100-pctile}%</div>
+   <div class="wpctlbl">Bạn cao hơn <b>${pctile}%</b> số người đã làm bài này</div>
+   <div class="wverdict">"${verdict}"</div>
+  </div>
+  <div class="wdist">
+   <div class="wdlabel"><span>0 điểm</span><span>Phân phối điểm của thiên hạ</span><span>100</span></div>
+   <div class="wbars">${bars}</div>
+  </div>
+  <div class="wcompare">
+   <div class="wcmp"><div class="wcl">Điểm của bạn</div><div class="wcv" style="color:${C(p.total)}">${p.total}</div><div class="wcsub">trên thang 100</div></div>
+   <div class="wcmp"><div class="wcl">Trung bình thiên hạ</div><div class="wcv" style="color:var(--s-muted)">${mean}</div>
+    <div class="wcsub">${diff>0?'bạn hơn '+diff+' điểm':diff<0?'bạn kém '+(-diff)+' điểm':'ngang bằng'}</div></div>
+  </div>
+  <div class="wpillcmp">
+   <div class="wdlabel" style="margin-bottom:9px"><span>So từng khối · <span style="color:var(--s-green)">bạn</span> vs <span style="color:var(--s-dim)">trung bình</span></span></div>
+   ${pcmp.map(([nm,you,avg])=>`<div class="wpcrow"><span class="wpn">${nm}</span>
+    <div class="wpcbar"><i style="width:${you}%;background:${C(you)}"></i><span class="val">${you}</span></div>
+    <div class="wpcbar"><i style="width:${avg}%;background:var(--s-dim)"></i><span class="val">${avg}</span></div></div>`).join('')}
+  </div>
+  <div class="wcmp" style="margin-top:14px;background:var(--s-green-soft);border-color:var(--s-green)">
+   <div class="wcl">Nhóm của bạn (${labelAge(p.age)} · ${labelInc(p.incomeBand)})</div>
+   <div class="wcv" style="color:var(--s-green)">${d.groupMean}<span style="font-size:.8rem;color:var(--s-muted)"> điểm TB</span></div>
+   <div class="wcsub">${p.total>=d.groupMean?'Bạn cao hơn trung bình nhóm '+(p.total-d.groupMean)+' điểm':'Trung bình nhóm cao hơn bạn '+(d.groupMean-p.total)+' điểm'} · dựa trên ${d.groupCount} người cùng nhóm</div>
+  </div>
+  <div class="wshare">
+   <button onclick="copyWorldBrag(${p.total},${pctile})">📋 Chép câu khoe</button>
+   <button onclick="resetWorld()">↻ So lại</button>
+  </div>
+  <div class="wmeta">Kho dữ liệu: ${d.count} lượt · cập nhật ${d.updated}${WORLD_ENDPOINT?'':' · CHẾ ĐỘ DEMO (chưa nối Google Sheet)'}</div>`;
+ /* animate bars */
+ requestAnimationFrame(()=>box.querySelectorAll('.wpcbar i').forEach(i=>{const w=i.style.width;i.style.width='0';requestAnimationFrame(()=>i.style.width=w)}));
+}
+function labelAge(a){return {u25:'Dưới 25',['25-34']:'25–34','35-44':'35–44','45-54':'45–54',['55p']:'55+'}[a]||a}
+function labelInc(i){return {u15:'<15tr',['15-30']:'15–30tr','30-60':'30–60tr','60-120':'60–120tr',['120p']:'>120tr'}[i]||i}
+function jumpToWorld(){
+ const card=document.getElementById('worldCard');
+ card.scrollIntoView({behavior:'smooth',block:'center'});
+ /* nếu chưa góp điểm, nháy nhẹ để thu hút */
+ if(!WORLD_SUBMITTED){
+  card.classList.add('wflash');
+  setTimeout(()=>card.classList.remove('wflash'),1400);
+ }
+}
+function resetWorld(){
+ localStorage.removeItem('fh_world_done');WORLD_SUBMITTED=false;
+ document.getElementById('worldResult').style.display='none';
+ const g=document.getElementById('worldGate');g.style.display='block';
+ const btn=document.getElementById('wSubmit');btn.disabled=false;btn.innerHTML='Góp điểm &amp; xem mình đứng đâu →';
+ document.getElementById('wNote').className='wnote';
+ document.getElementById('wNote').textContent='Bấm nút trên để gửi điểm ẩn danh và nhận kết quả so sánh.';
+}
+function copyWorldBrag(total,pct){
+ const V=VOICES[curVoice];
+ const txt=`Điểm sức khoẻ tài chính của tôi: ${total}/100 — cao hơn ${pct}% thiên hạ 💪\n"${oracleLine||''}"\n${V.icon} theo lời ${V.name}\n— Chẩn đoán bởi Omnikey`;
+ navigator.clipboard?.writeText(txt).then(()=>{
+  const n=document.querySelector('#worldResult .wmeta');if(n){const o=n.textContent;n.textContent='✓ Đã chép câu khoe vào clipboard!';setTimeout(()=>n.textContent=o,2000)}
+ }).catch(()=>alert('Câu khoe:\n\n'+txt));
+}
+function prevStep(){const seq=fullSeq(),i=seq.indexOf(cur);if(i>0)go(seq[i-1])}
+/* nút Tiếp/Lùi của mỗi khối trỏ tới hàm động thay vì go(số cứng) */
+function wireStepNav(n){
+ const st=document.querySelector('.step[data-s="'+n+'"]');if(!st)return;
+ const nav=st.querySelector('.nav');if(!nav||nav.dataset.wired)return;
+ const btns=nav.querySelectorAll('.s-btn');
+ btns.forEach(b=>{
+  const t=b.textContent;
+  if(/Quay lại|←/.test(t))b.onclick=prevStep;
+  else if(/Tiếp tục|→/.test(t))b.onclick=nextStep;
+  else if(/chẩn đoán|Xem/.test(t))b.onclick=nextStep;
+ });
+ nav.dataset.wired='1';
+}
+rebuildProg();paint();
+document.querySelectorAll('.ch[data-q]').forEach(b=>b.onclick=()=>{
+ b.parentElement.querySelectorAll('.ch').forEach(x=>x.classList.remove('sel'));
+ b.classList.add('sel');Q[b.dataset.q]=+b.dataset.v;if(onDash)render();});
+
+/* ================= MÀN THIẾT LẬP: render + tương tác ================= */
+const MIN_QUANT=2;
+function quantOnCount(){return activeMods().filter(m=>m.quant).length}
+function renderModList(){
+ const w=weights();
+ const list=document.getElementById('modlist');
+ const ordered=MODORD.map(modById);
+ list.innerHTML=ordered.map((m,i)=>{
+  const on=MODON.includes(m.id);
+  const wpc=on?Math.round(w[m.id]*100):0;
+  const changed=on&&Math.abs(wpc-m.w)>=1;
+  return `<div class="modrow${on?'':' off'}" data-id="${m.id}" draggable="true">
+   <span class="grip" title="Kéo để đổi thứ tự">⠿</span>
+   <div class="updown"><button data-mv="up" data-id="${m.id}" ${i===0?'disabled':''} title="Lên">▲</button>
+    <button data-mv="dn" data-id="${m.id}" ${i===ordered.length-1?'disabled':''} title="Xuống">▼</button></div>
+   <div class="mbody">
+    <div class="mtop"><span class="mname">${m.nm}</span>
+     ${on?`<span class="mw${changed?' changed':''}">${wpc}%${changed?' ↺':''}</span>`:'<span class="mw" style="background:var(--s-line);color:var(--s-dim)">tắt</span>'}</div>
+    <div class="mdesc">${m.desc}</div>
+    <div class="mwhy">${m.why}</div>
+   </div>
+   <label class="sw" title="${on?'Đang bật':'Đang tắt'}"><input type="checkbox" ${on?'checked':''} data-tog="${m.id}"><span class="track"></span></label>
+  </div>`}).join('');
+
+ list.querySelectorAll('input[data-tog]').forEach(c=>c.onchange=()=>toggleMod(c.dataset.tog,c));
+ list.querySelectorAll('button[data-mv]').forEach(b=>b.onclick=()=>moveMod(b.dataset.id,b.dataset.mv));
+ wireDnD();
+ const warn=document.getElementById('modwarn');
+ const qc=quantOnCount();
+ if(qc<=MIN_QUANT){warn.style.display='block';
+  warn.textContent=qc===MIN_QUANT?'Đang ở mức tối thiểu — cần giữ ít nhất 2 khối để điểm tổng còn ý nghĩa. Không thể tắt thêm.':'Cần bật thêm khối.';}
+ else warn.style.display='none';
+ const on=activeMods();
+ document.getElementById('modsummary').textContent=on.length+' khối · '+on.map(m=>({inc:'Thu nhập',exp:'Chi tiêu',inv:'Đầu tư',pro:'Bảo vệ'}[m.id])).join(' → ');
+}
+function toggleMod(id,chk){
+ const m=modById(id);
+ if(MODON.includes(id)){
+  if(m.quant&&quantOnCount()<=MIN_QUANT){chk.checked=true;
+   const warn=document.getElementById('modwarn');warn.style.display='block';
+   warn.textContent='Không thể tắt — cần giữ ít nhất 2 khối định lượng để điểm tổng còn ý nghĩa.';return}
+  MODON=MODON.filter(x=>x!==id);
+ }else MODON.push(id);
+ saveMods();renderModList();rebuildProg();
+}
+function moveMod(id,dir){
+ const i=MODORD.indexOf(id),j=dir==='up'?i-1:i+1;
+ if(j<0||j>=MODORD.length)return;
+ [MODORD[i],MODORD[j]]=[MODORD[j],MODORD[i]];
+ saveMods();renderModList();rebuildProg();
+}
+/* drag & drop desktop */
+let dragId=null;
+function wireDnD(){
+ document.querySelectorAll('.modrow').forEach(row=>{
+  row.ondragstart=e=>{dragId=row.dataset.id;row.classList.add('drag');e.dataTransfer.effectAllowed='move'};
+  row.ondragend=()=>{dragId=null;document.querySelectorAll('.modrow').forEach(r=>r.classList.remove('drag','dragover'))};
+  row.ondragover=e=>{e.preventDefault();if(row.dataset.id!==dragId)row.classList.add('dragover')};
+  row.ondragleave=()=>row.classList.remove('dragover');
+  row.ondrop=e=>{e.preventDefault();row.classList.remove('dragover');
+   if(!dragId||dragId===row.dataset.id)return;
+   const from=MODORD.indexOf(dragId),to=MODORD.indexOf(row.dataset.id);
+   MODORD.splice(from,1);MODORD.splice(to,0,dragId);
+   saveMods();renderModList();rebuildProg();};
+ });
+}
+function startJourney(){
+ const first=activeMods()[0];
+ if(!first){alert('Cần bật ít nhất một khối.');return}
+ go(first.s);
+}
+renderModList();
+
+/* ===== CHỌN GIỌNG ===== */
+function renderVoicePick(){
+ const box=document.getElementById('voicepick');if(!box)return;
+ box.innerHTML=VLIST.map(([id,ic,nm])=>
+  `<button class="vopt${curVoice===id?' on':''}" data-v="${id}"><span class="vic">${ic}</span><span class="vnm">${nm}</span></button>`).join('');
+ box.querySelectorAll('.vopt').forEach(b=>b.onclick=()=>{
+  curVoice=b.dataset.v;localStorage.setItem('fh_voice',curVoice);
+  renderVoicePick();previewVoice();if(onDash)renderOracle();});
+ previewVoice();
+}
+function previewVoice(){
+ const pv=document.getElementById('voiceprev');if(!pv)return;
+ const V=VOICES[curVoice];
+ pv.innerHTML=`<span class="who">${V.icon} ${V.name} sẽ phán kiểu này</span>"${pick(V.lines[2])}"`;
+}
+renderVoicePick();
+
+/* ---------- panel resize / toggle ---------- */
+const panel=document.getElementById('panel'),rz=document.getElementById('resizer');
+const savedW=localStorage.getItem(LS_W); if(savedW)document.documentElement.style.setProperty('--panel',savedW);
+let drag=false;
+rz.addEventListener('mousedown',e=>{if(isMobile())return;drag=true;rz.classList.add('drag');document.body.style.userSelect='none';e.preventDefault()});
+window.addEventListener('mousemove',e=>{if(!drag)return;
+ const p=Math.max(210,Math.min(window.innerWidth*.46,e.clientX));
+ const v=(p/window.innerWidth*100).toFixed(1)+'%';
+ document.documentElement.style.setProperty('--panel',v);});
+window.addEventListener('mouseup',()=>{if(!drag)return;drag=false;rz.classList.remove('drag');document.body.style.userSelect='';
+ localStorage.setItem(LS_W,getComputedStyle(document.documentElement).getPropertyValue('--panel').trim());});
+function togglePanel(){const h=panel.classList.toggle('hidden');rz.classList.toggle('hidden',h);
+ tg.textContent=h?'◨ Hiện bảng điều chỉnh':'◧ Ẩn bảng điều chỉnh';}
+
+/* ---------- MOBILE BOTTOM SHEET ---------- */
+const isMobile=()=>window.matchMedia('(max-width:820px)').matches;
+const scrim=document.getElementById('scrim'),fab=document.getElementById('fab'),grab=document.getElementById('grab');
+function openSheet(){
+ if(!isMobile())return;
+ panel.classList.add('open');scrim.classList.add('on');
+ fab.classList.add('hide');document.body.style.overflow='hidden';
+}
+function closeSheet(){
+ panel.classList.remove('open');scrim.classList.remove('on');
+ fab.classList.remove('hide');document.body.style.overflow='';
+ panel.style.transform='';
+}
+/* kéo grabber để đóng */
+let gy=0,gOn=false;
+const gStart=e=>{gOn=true;gy=(e.touches?e.touches[0]:e).clientY;panel.style.transition='none'};
+const gMove=e=>{if(!gOn)return;
+ const d=(e.touches?e.touches[0]:e).clientY-gy;
+ if(d>0){panel.style.transform=`translateY(${d}px)`;e.preventDefault()}};
+const gEnd=e=>{if(!gOn)return;gOn=false;panel.style.transition='';
+ const d=(e.changedTouches?e.changedTouches[0]:e).clientY-gy;
+ if(d>90)closeSheet();else panel.style.transform='';};
+grab.addEventListener('touchstart',gStart,{passive:true});
+grab.addEventListener('touchmove',gMove,{passive:false});
+grab.addEventListener('touchend',gEnd);
+grab.addEventListener('mousedown',gStart);
+window.addEventListener('mousemove',e=>{if(gOn)gMove(e)});
+window.addEventListener('mouseup',e=>{if(gOn)gEnd(e)});
+/* Esc để đóng */
+window.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.classList.contains('open'))closeSheet()});
+/* đổi hướng màn hình / resize: dọn trạng thái chéo */
+let lastM=isMobile();
+window.addEventListener('resize',()=>{
+ const m=isMobile();
+ if(m!==lastM){lastM=m;closeSheet();
+  if(!m){panel.classList.remove('hidden');rz.classList.remove('hidden');
+   tg.textContent='◧ Ẩn bảng điều chỉnh'}}
+ syncFab();});
+function syncFab(){
+ if(!isMobile()){fab.style.display='none';return}
+ const n=STARS.length;
+ fabN.textContent=onDash?(Object.keys(WHATIF).length?'●':n):n;
+ fab.style.display=n?'flex':'none';
+}
+
+/* ---------- stars ---------- */
+const META={
+ i_sal:['Lương chính','tr/th'],i_bon:['Thưởng & hoa hồng','tr/th'],i_biz:['Kinh doanh / tay trái','tr/th'],
+ i_rent:['Cho thuê tài sản','tr/th'],i_fin:['Lãi đầu tư','tr/th'],
+ e_ess:['Chi thiết yếu','tr/th'],e_hom:['Chi nhà ở','tr/th'],e_deb:['Trả nợ hàng tháng','tr/th'],
+ e_lif:['Chi lối sống','tr/th'],e_fam:['Chi gia đình','tr/th'],e_ins:['Phí bảo hiểm','tr/th'],
+ a_cash:['Tiền mặt','tr'],a_dep:['Tiết kiệm NH','tr'],a_eq:['Cổ phiếu & quỹ','tr'],a_alt:['Vàng/TP/khác','tr'],
+ a_re:['BĐS đầu tư','tr'],a_home:['Nhà đang ở','tr'],
+ d_mor:['Vay mua nhà','tr'],d_con:['Vay tiêu dùng','tr'],d_cc:['Dư nợ thẻ TD','tr'],d_oth:['Vay khác','tr'],
+ d_rate:['Lãi suất vay','%/năm'],p_age:['Tuổi','tuổi'],
+ p_life:['BH nhân thọ','tr'],p_ci:['BH hiểm nghèo','tr'],p_hea:['BH sức khoẻ','tr/năm'],
+ p_pro:['BH tài sản','tr'],p_dep:['Người phụ thuộc','người']
+};
+let STARS=JSON.parse(localStorage.getItem(LS_S)||'null');
+if(STARS){document.querySelectorAll('.star').forEach(b=>b.classList.toggle('on',STARS.includes(b.dataset.k)))}
+else{STARS=[...document.querySelectorAll('.star.on')].map(b=>b.dataset.k)}
+document.querySelectorAll('.star').forEach(b=>{
+ b.title='Đưa chỉ số này vào bảng điều chỉnh';
+ b.onclick=()=>{b.classList.toggle('on');
+  STARS=[...document.querySelectorAll('.star.on')].map(x=>x.dataset.k);
+  localStorage.setItem(LS_S,JSON.stringify(STARS));buildPanel();syncFab();}});
+
+/* ---------- data access ---------- */
+let WHATIF={};                       // key -> giá trị đang kéo
+const RAW=id=>Math.max(0,+document.getElementById(id).value||0);
+const V=id=>(id in WHATIF)?WHATIF[id]:RAW(id);
+const fmt=n=>n>=1000?(n/1000).toFixed(n%1000?2:0).replace(/\.?0+$/,'')+' tỷ':Math.round(n)+' tr';
+const pc=n=>(n*100).toFixed(Math.abs(n)<.1?1:0)+'%';
+const cl=(x,a,b)=>Math.max(a,Math.min(b,x));
+
+/* ---------- range: sàn theo loại + tự nới + bước tự động ---------- */
+const FLOOR={'tr/th':50,'tr':500,'tr/năm':300,'%/năm':25,'người':6,'tuổi':75};
+const DEBTK=['d_mor','d_con','d_cc','d_oth'];
+const INSK=['p_life','p_ci','p_pro'];
+function baseMax(k){
+ const un=(META[k]||[,''])[1],base=RAW(k);
+ if(un==='tuổi')return 75;
+ let fl=FLOOR[un]||50;
+ if(INSK.includes(k))fl=3000;
+ else if(DEBTK.includes(k))fl=1000;
+ else if(k==='a_home'||k==='a_re')fl=5000;
+ return Math.max(fl,Math.ceil(base*1.6/10)*10);
+}
+let MAXES=JSON.parse(localStorage.getItem('fh_maxes')||'{}');
+const getMax=k=>MAXES[k]||baseMax(k);
+const setMax=(k,v)=>{MAXES[k]=v;localStorage.setItem('fh_maxes',JSON.stringify(MAXES))};
+const stepFor=m=>m<20?.5:m<100?1:m<1000?5:m<10000?25:100;
+const MINAGE=k=>(META[k]||[,''])[1]==='tuổi'?18:0;
+const nice=v=>{const n=+(+v).toFixed(1);return n>=1000?n.toLocaleString('vi-VN'):n};
+
+/* ---------- build panel ---------- */
+function buildPanel(){
+ const body=document.getElementById('pnbody');
+ if(!STARS.length){body.innerHTML='<div class="pempty">Chưa có chỉ số nào được đánh dấu.<br><br>Bấm nút <b>★</b> cạnh một ô nhập ở các bước để đưa chỉ số đó vào đây.</div>';
+  pScore.textContent='—';pDelta.textContent='—';pBase.textContent='Gốc: —';return;}
+ if(!onDash){body.innerHTML='<div class="pempty">Đã chọn <b>'+STARS.length+'</b> chỉ số.<br><br>Hoàn tất 4 bước để mở bảng điều chỉnh — khi đó bạn kéo slider và chẩn đoán đổi theo ngay.</div>';
+  pScore.textContent='—';pDelta.textContent='—';pBase.textContent='Gốc: —';return;}
+ body.innerHTML=STARS.map(k=>{
+  const [nm,un]=META[k]||[k,''],base=RAW(k),v=V(k);
+  const mx=Math.max(getMax(k),v),mn=MINAGE(k),ex=MAXES[k]&&MAXES[k]>baseMax(k);
+  return `<div class="pslot" data-k="${k}">
+   <div class="plab"><span class="pn">${nm}<i>${un}</i></span>
+    <span class="pv${v!==base?' ch':''}" id="pv_${k}" data-k="${k}" role="button" tabindex="0" title="Bấm để gõ số">${nice(v)}</span></div>
+   <input type="range" min="${mn}" max="${mx}" step="${stepFor(mx)}" value="${v}" data-k="${k}">
+   <div class="pfoot"><span>${mn}</span><span>gốc ${nice(base)}</span>
+    <span class="mxlab${ex?' ex':''}" data-k="${k}" role="button" tabindex="0" title="${ex?'Bấm để thu trần về mặc định':'Kéo tới cuối để nới trần'}">${nice(mx)}${ex?' ↺':''}</span></div></div>`}).join('');
+
+ body.querySelectorAll('input[type=range]').forEach(r=>{
+  r.oninput=()=>{
+   const k=r.dataset.k;let v=+r.value;
+   const mx=+r.max;
+   /* chạm sát trần → nới ×2 */
+   if(v>=mx*.985&&mx>0){
+    const nm2=Math.round(mx*2/10)*10;setMax(k,nm2);
+    r.max=nm2;r.step=stepFor(nm2);
+    const lb=body.querySelector(`.mxlab[data-k="${k}"]`);
+    if(lb){lb.textContent=nice(nm2)+' ↺';lb.classList.add('ex','flash');setTimeout(()=>lb.classList.remove('flash'),600)}
+   }
+   WHATIF[k]=v;
+   const pv=document.getElementById('pv_'+k);pv.textContent=nice(v);
+   pv.classList.toggle('ch',v!==RAW(k));
+   live();render();syncFab();};
+ });
+
+ /* bấm số → gõ tay */
+ body.querySelectorAll('.pv').forEach(el=>{
+  const edit=()=>{
+   const k=el.dataset.k,cur=V(k);
+   const raw=prompt(`${(META[k]||[k])[0]} (${(META[k]||[,''])[1]})\n\nNhập giá trị bất kỳ — nếu vượt trần hiện tại, thanh trượt sẽ tự giãn theo.`,cur);
+   if(raw===null)return;
+   let v=parseFloat(String(raw).replace(/[.,\s]/g,m=>m===','?'.':''));
+   if(isNaN(v)||v<0){alert('Giá trị không hợp lệ.');return}
+   const mn=MINAGE(k);if(v<mn)v=mn;
+   if(v>getMax(k))setMax(k,Math.ceil(v*1.25/10)*10);
+   WHATIF[k]=v;buildPanel();live();render();syncFab();};
+  el.onclick=edit;
+  el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();edit()}};
+ });
+
+ /* bấm nhãn trần → thu về mặc định */
+ body.querySelectorAll('.mxlab').forEach(el=>{
+  const rst=()=>{
+   const k=el.dataset.k;if(!MAXES[k])return;
+   delete MAXES[k];localStorage.setItem('fh_maxes',JSON.stringify(MAXES));
+   const bm=baseMax(k);
+   if((WHATIF[k]??RAW(k))>bm)WHATIF[k]=bm;
+   buildPanel();live();render();syncFab();};
+  el.onclick=rst;
+  el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();rst()}};
+ });
+ syncFab();
+}
+function resetWhatif(){WHATIF={};MAXES={};localStorage.removeItem('fh_maxes');buildPanel();live();render();syncFab();}
+function applyWhatif(){
+ if(!Object.keys(WHATIF).length)return;
+ if(!confirm('Ghi các giá trị đang kéo vào ô nhập gốc?\n\nCác ô nhập ở 4 bước sẽ đổi theo slider. Không thể hoàn tác — nhưng bạn vẫn kéo lại được bất cứ lúc nào.'))return;
+ Object.entries(WHATIF).forEach(([k,v])=>document.getElementById(k).value=v);
+ WHATIF={};buildPanel();live();render();}
+
+/* ---------- live totals ---------- */
+const EX=[['e_ess','Thiết yếu','#00704A'],['e_hom','Nhà ở','#1E3932'],['e_deb','Trả nợ','#A6603A'],
+ ['e_lif','Lối sống','#C9A227'],['e_fam','Gia đình','#4E7C6B'],['e_ins','Bảo hiểm','#7FA294']];
+function live(){
+ const inc=V('i_sal')+V('i_bon')+V('i_biz')+V('i_rent')+V('i_fin'),pas=V('i_rent')+V('i_fin');
+ s_inc.textContent=fmt(inc);s_pas.textContent=fmt(pas)+' · '+(inc?pc(pas/inc):'0%');
+ const exp=EX.reduce((a,[id])=>a+V(id),0),sur=inc-exp;
+ s_exp.textContent=fmt(exp);s_sur.textContent=fmt(sur)+' · '+(inc?pc(sur/inc):'0%');
+ sl_sur.className='sumline'+(sur<=0?' warn':'');
+ const t=exp||1;
+ livebar.innerHTML=EX.map(([id,n,c])=>{const w=V(id)/t*100;return w<.5?'':`<div style="width:${w}%;background:${c}">${w>8?Math.round(w)+'%':''}</div>`}).join('');
+ lbleg.innerHTML=EX.map(([id,n,c])=>`<span><b style="background:${c}"></b>${n} ${fmt(V(id))}</span>`).join('');
+ const ass=V('a_cash')+V('a_dep')+V('a_eq')+V('a_alt')+V('a_re')+V('a_home');
+ const dbt=V('d_mor')+V('d_con')+V('d_cc')+V('d_oth');
+ s_ass.textContent=fmt(ass);s_dbt.textContent=fmt(dbt);s_net.textContent=fmt(ass-dbt);
+}
+document.querySelectorAll('input[type=number]').forEach(i=>i.oninput=()=>{live();if(onDash)render();buildPanel()});
+
+/* ---------- core model ---------- */
+function model(){
+ const inc=V('i_sal')+V('i_bon')+V('i_biz')+V('i_rent')+V('i_fin')||1,pas=V('i_rent')+V('i_fin');
+ const srcs=[V('i_sal'),V('i_bon'),V('i_biz'),V('i_rent'),V('i_fin')].filter(x=>x>0);
+ const hhi=srcs.reduce((a,x)=>a+Math.pow(x/inc,2),0);
+ const exp=EX.reduce((a,[id])=>a+V(id),0),sur=inc-exp,sav=sur/inc;
+ const debtPay=V('e_deb'),dti=debtPay/inc,essR=(V('e_ess')+V('e_hom'))/inc,lifR=V('e_lif')/inc;
+ const cash=V('a_cash'),dep=V('a_dep'),eq=V('a_eq'),alt=V('a_alt'),re=V('a_re'),home=V('a_home');
+ const ass=cash+dep+eq+alt+re+home,dbt=V('d_mor')+V('d_con')+V('d_cc')+V('d_oth'),net=ass-dbt;
+ const liq=ass?(cash+dep+eq)/ass:0,lev=ass?dbt/ass:0;
+ const age=V('p_age')||35,tgtEq=cl((110-age)/100,.2,.8),curEq=(eq+alt+re)/(ass-home||1);
+ const emg=exp?cash/exp:0,needM=Q.rep>=3?3:Q.rep===2?6:Q.rep===1?9:12;
+ const life=V('p_life'),ci=V('p_ci'),hea=V('p_hea'),pro=V('p_pro'),deps=V('p_dep');
+ const needLife=deps>0?exp*12*(deps>=2?10:7):exp*24,cov=needLife?life/needLife:1;
+ const nwY=exp*12?net/(exp*12):0,passR=pas/inc,fiR=pas/(exp||1);
+ let sInc=cl(Math.log10(inc/8+1)/Math.log10(8),0,1)*22+cl((1-hhi)/.65,0,1)*26+cl(passR/.25,0,1)*22+(Q.grw/3)*15+(Q.rep/3)*15;
+ let sExp=cl(sav/.25,0,1)*40+cl((.6-essR)/.35,0,1)*18+cl((.35-dti)/.35,0,1)*20+(Q.crp/3)*12+(Q.trk/3)*10;
+ let sInv=cl(nwY/8,0,1)*28+(1-cl(Math.abs(curEq-tgtEq)/.5,0,1))*22+cl(liq/.45,0,1)*15+cl((.5-lev)/.5,0,1)*15+(Q.exp/3)*10+(Q.dca/3)*10;
+ let sPro=cl(emg/needM,0,1)*32+cl(cov,0,1)*24+(hea>=100?12:hea>=50?8:hea>0?4:0)+(ci>0?8:0)+(pro>0?4:0)+(Q.cont/3)*14+(Q.wil/2)*6;
+ [sInc,sExp,sInv,sPro]=[sInc,sExp,sInv,sPro].map(x=>cl(x,0,100));
+ const _w=weights(),_sc={inc:sInc,exp:sExp,inv:sInv,pro:sPro};
+ let total=0;activeMods().forEach(m=>total+=(_sc[m.id]||0)*(_w[m.id]||0));
+ total=Math.round(total);
+ return {inc,pas,srcs,hhi,exp,sur,sav,debtPay,dti,essR,lifR,cash,dep,eq,alt,re,home,ass,dbt,net,
+  liq,lev,age,tgtEq,curEq,emg,needM,life,ci,hea,pro,deps,needLife,cov,nwY,passR,fiR,sInc,sExp,sInv,sPro,total};
+}
+let BASE=null;
+
+
+/* ---------- 8 CHÂN DUNG ---------- */
+const PERSONAS=[
+{id:'minh',nm:'Minh, 29',tag:'Lương cao, tay trắng',
+ story:'Kiếm 55tr mỗi tháng, đồng nghiệp nhìn vào đều nghĩ Minh ổn. Thực tế tài sản ròng đang âm. Mỗi lần tăng lương là một lần nâng cấp: căn hộ tốt hơn, xe mới hơn, bạn bè đông hơn. Chi lối sống 19tr/tháng, dư nợ thẻ 35tr. Minh không tiêu hoang theo nghĩa thông thường — chỉ là chi tiêu chạy nhanh bằng đúng tốc độ thu nhập.',
+ D:{i_sal:45,i_bon:10,i_biz:0,i_rent:0,i_fin:0,e_ess:15,e_hom:14,e_deb:5,e_lif:19,e_fam:1,e_ins:0,
+ a_cash:25,a_dep:0,a_eq:15,a_alt:5,a_re:0,a_home:0,d_mor:0,d_con:90,d_cc:35,d_oth:0,d_rate:14,
+ p_age:29,p_life:0,p_ci:0,p_hea:0,p_pro:0,p_dep:0},
+ Q:{grw:3,rep:3,crp:1,trk:0,exp:1,dca:1,wil:0,cont:1}},
+
+{id:'ha',nm:'Hà, 34',tag:'Nhà to, ví mỏng',
+ story:'Hà mua được căn nhà 4,2 tỷ — điều cả nhà tự hào. Nhưng 18tr mỗi tháng đi trả nợ, chiếm gần một nửa thu nhập. Tài khoản còn 22tr, chưa đủ một tháng chi phí. Trên giấy Hà có 3,2 năm chi phí trong tài sản ròng, nhưng toàn bộ nằm trong bốn bức tường không bán được từng phần.',
+ D:{i_sal:38,i_bon:5,i_biz:0,i_rent:0,i_fin:1,e_ess:13,e_hom:3,e_deb:18,e_lif:4,e_fam:4,e_ins:1,
+ a_cash:22,a_dep:30,a_eq:20,a_alt:30,a_re:0,a_home:4200,d_mor:2600,d_con:60,d_cc:0,d_oth:0,d_rate:10.5,
+ p_age:34,p_life:400,p_ci:0,p_hea:100,p_pro:0,p_dep:2},
+ Q:{grw:2,rep:2,crp:2,trk:2,exp:1,dca:2,wil:0,cont:1}},
+
+{id:'tuan',nm:'Tuấn, 41',tag:'Trụ cột trần trụi',
+ story:'Ba người sống dựa hoàn toàn vào thu nhập của Tuấn. Anh tiết kiệm 18%, có 930tr trong tài khoản đầu tư, mọi thứ đều đang đi đúng hướng. Chỉ có một chỗ trống: bảo hiểm nhân thọ 200tr, trong khi nhu cầu bảo vệ thực tế khoảng 7,7 tỷ. Nếu Tuấn không còn, cả kế hoạch sụp trong vòng một năm.',
+ D:{i_sal:55,i_bon:12,i_biz:8,i_rent:0,i_fin:3,e_ess:22,e_hom:10,e_deb:8,e_lif:9,e_fam:14,e_ins:1,
+ a_cash:180,a_dep:400,a_eq:350,a_alt:200,a_re:0,a_home:3000,d_mor:800,d_con:0,d_cc:0,d_oth:0,d_rate:9,
+ p_age:41,p_life:200,p_ci:0,p_hea:50,p_pro:0,p_dep:3},
+ Q:{grw:2,rep:2,crp:2,trk:2,exp:2,dca:2,wil:0,cont:2}},
+
+{id:'lan',nm:'Lan, 37',tag:'Giữ tiền quá kỹ',
+ story:'Lan không nợ đồng nào, tiết kiệm 33% thu nhập, quỹ dự phòng 13 tháng — gấp đôi mức cần thiết. Nhưng 1,45 tỷ đang nằm im trong tiền gửi ngân hàng, chỉ 80tr được đầu tư. Ở tuổi 37, mô hình gợi ý 73% tài sản nên ở dạng tăng trưởng; Lan đang ở mức rất thấp. Kỷ luật của Lan là điểm mạnh, nhưng lạm phát bào mòn âm thầm mỗi năm.',
+ D:{i_sal:32,i_bon:4,i_biz:0,i_rent:0,i_fin:4,e_ess:11,e_hom:6,e_deb:0,e_lif:3,e_fam:5,e_ins:2,
+ a_cash:350,a_dep:1100,a_eq:20,a_alt:60,a_re:0,a_home:1800,d_mor:0,d_con:0,d_cc:0,d_oth:0,d_rate:0,
+ p_age:37,p_life:800,p_ci:300,p_hea:150,p_pro:0,p_dep:1},
+ Q:{grw:1,rep:2,crp:3,trk:3,exp:0,dca:1,wil:1,cont:3}},
+
+{id:'duc',nm:'Đức, 45',tag:'Giàu trên giấy',
+ story:'Tổng tài sản 9,4 tỷ, bốn nguồn thu nhập, thu nhập thụ động 21%. Nhìn con số ai cũng nghĩ Đức đã đến đích. Nhưng nợ 5,8 tỷ, đòn bẩy 62%, và 42tr mỗi tháng chỉ để trả nợ. Tiền mặt còn 60tr — chưa đầy một tháng chi phí. Đức giàu, nhưng nếu thị trường bất động sản đứng lại sáu tháng thì mọi thứ rất khác.',
+ D:{i_sal:40,i_bon:0,i_biz:35,i_rent:18,i_fin:2,e_ess:20,e_hom:5,e_deb:42,e_lif:12,e_fam:10,e_ins:3,
+ a_cash:60,a_dep:100,a_eq:150,a_alt:100,a_re:5500,a_home:3500,d_mor:2800,d_con:200,d_cc:0,d_oth:2800,d_rate:11,
+ p_age:45,p_life:1000,p_ci:0,p_hea:200,p_pro:500,p_dep:2},
+ Q:{grw:2,rep:1,crp:2,trk:1,exp:2,dca:1,wil:1,cont:1}},
+
+{id:'chi',nm:'Chi, 31',tag:'Một chân đứng',
+ story:'Chi sống rất gọn: chi lối sống 4tr/tháng, không tiêu hoang, có 270tr tích luỹ. Vấn đề không nằm ở cách tiêu mà ở cách kiếm — 100% thu nhập đến từ một công việc duy nhất, trong ngành hẹp, và Chi tự đánh giá cần trên 6 tháng để tìm được chỗ mới. Không bảo hiểm. Một cú mất việc là đủ để xoá sạch nhiều năm.',
+ D:{i_sal:28,i_bon:0,i_biz:0,i_rent:0,i_fin:0,e_ess:10,e_hom:7,e_deb:3,e_lif:4,e_fam:2,e_ins:0.5,
+ a_cash:70,a_dep:120,a_eq:60,a_alt:20,a_re:0,a_home:0,d_mor:0,d_con:70,d_cc:5,d_oth:0,d_rate:12,
+ p_age:31,p_life:0,p_ci:0,p_hea:0,p_pro:0,p_dep:1},
+ Q:{grw:1,rep:0,crp:2,trk:2,exp:1,dca:2,wil:0,cont:1}},
+
+{id:'nam',nm:'Nam, 52',tag:'Sắp về đích',
+ story:'Bốn nguồn thu nhập, thụ động chiếm 35%, không nợ, dự phòng 8 tháng, bảo hiểm đầy đủ, tài sản ròng bằng 17 năm chi phí sống. Nam gần chạm ngưỡng tự do tài chính — thu nhập thụ động 40tr/tháng đã lo được gần hai phần ba chi phí. Câu hỏi của Nam không còn là tích luỹ, mà là chuyển giao và mục đích.',
+ D:{i_sal:50,i_bon:8,i_biz:15,i_rent:22,i_fin:18,e_ess:20,e_hom:6,e_deb:0,e_lif:12,e_fam:8,e_ins:4,
+ a_cash:400,a_dep:900,a_eq:2200,a_alt:800,a_re:2500,a_home:3500,d_mor:0,d_con:0,d_cc:0,d_oth:0,d_rate:0,
+ p_age:52,p_life:3000,p_ci:1000,p_hea:400,p_pro:1500,p_dep:1},
+ Q:{grw:2,rep:3,crp:3,trk:3,exp:3,dca:3,wil:2,cont:3}},
+
+{id:'thao',nm:'Thảo, 26',tag:'Bắt đầu đúng cách',
+ story:'Thu nhập 23,5tr — thấp nhất trong tám người. Nhưng Thảo không nợ, tiết kiệm 31%, đầu tư tự động hàng tháng, đã có bảo hiểm sức khoẻ và bệnh hiểm nghèo từ năm 25 tuổi. Tài sản ròng mới bằng 1 năm chi phí, còn rất xa đích. Điều Thảo có mà nhiều người thu nhập gấp ba không có: cấu trúc sạch và ba mươi năm phía trước.',
+ D:{i_sal:18,i_bon:2,i_biz:3,i_rent:0,i_fin:0.5,e_ess:8,e_hom:4,e_deb:0,e_lif:2.5,e_fam:1,e_ins:0.8,
+ a_cash:55,a_dep:40,a_eq:70,a_alt:25,a_re:0,a_home:0,d_mor:0,d_con:0,d_cc:0,d_oth:0,d_rate:0,
+ p_age:26,p_life:300,p_ci:200,p_hea:120,p_pro:0,p_dep:0},
+ Q:{grw:3,rep:3,crp:3,trk:3,exp:2,dca:3,wil:0,cont:2}}];
+
+/* tính model cho persona bằng cùng công thức */
+function personaModel(p){
+ const sv={...WHATIF},sq={...Q};
+ const olds={};Object.keys(p.D).forEach(k=>{olds[k]=document.getElementById(k).value});
+ Object.entries(p.D).forEach(([k,v])=>document.getElementById(k).value=v);
+ Object.assign(Q,p.Q);WHATIF={};
+ const M=model();
+ Object.entries(olds).forEach(([k,v])=>document.getElementById(k).value=v);
+ Object.assign(Q,sq);WHATIF=sv;
+ return M;
+}
+let SELP=null;
+function buildPersonas(){
+ const me=model();
+ const mine=SNAPS.slice().sort((a,b)=>b.ts-a.ts).map(s=>({
+  id:'snap_'+s.id,nm:s.name,tag:s.note||dstr(s.ts).split(' ·')[0],mine:true,
+  story:`Bản ghi đã lưu của ${s.name}, thời điểm ${dstr(s.ts)}.`+(s.note?` Ghi chú: ${s.note}.`:'')
+   +` Điểm khi đó ${s.s.total}/100 — thu nhập ${Math.round(s.s.sInc)}, chi tiêu ${Math.round(s.s.sExp)}, đầu tư ${Math.round(s.s.sInv)}, bảo vệ ${Math.round(s.s.sPro)}.`,
+  D:s.D,Q:s.Q}));
+ const ALL=[...mine,...PERSONAS];
+ pgrid.innerHTML=ALL.map(p=>{const m=personaModel(p);
+  return `<button class="pcard${SELP===p.id?' sel':''}${p.mine?' own':''}" data-p="${p.id}">
+   <div class="pnm">${p.nm}${p.mine?' <span style="font-family:var(--s-mono);font-size:9px;color:var(--s-green)">ĐÃ LƯU</span>':''}</div>
+   <div class="ptag">${p.tag}</div>
+   <div class="psc">${m.total}<small>/100</small></div></button>`}).join('');
+ pgrid.querySelectorAll('.pcard').forEach(b=>b.onclick=()=>{
+  SELP=(SELP===b.dataset.p)?null:b.dataset.p;buildPersonas();});
+ if(!SELP){cmpwrap.style.display='none';return}
+ const p=ALL.find(x=>x.id===SELP);
+ if(!p){SELP=null;cmpwrap.style.display='none';return}
+ const pm=personaModel(p);
+ cmpwrap.style.display='block';
+ cmpName.textContent=p.nm+' — '+p.tag;
+ cmpStory.textContent=p.story;
+ cmpWho.innerHTML='<b style="background:#A6603A"></b>'+p.nm.toUpperCase();
+
+ const ROWS=[
+  ['Điểm tổng',me.total,pm.total,100,v=>v,1],
+  ['Tạo thu nhập',me.sInc,pm.sInc,100,v=>Math.round(v),1],
+  ['Quản lý chi tiêu',me.sExp,pm.sExp,100,v=>Math.round(v),1],
+  ['Đầu tư',me.sInv,pm.sInv,100,v=>Math.round(v),1],
+  ['Bảo vệ',me.sPro,pm.sPro,100,v=>Math.round(v),1],
+  ['Tỷ lệ tiết kiệm',me.sav,pm.sav,.4,v=>pc(v),1],
+  ['Quỹ dự phòng (tháng)',me.emg,pm.emg,12,v=>v.toFixed(1),1],
+  ['Thu nhập thụ động',me.passR,pm.passR,.4,v=>pc(v),1],
+  ['Tập trung nguồn thu',me.hhi,pm.hhi,1,v=>(v*100).toFixed(0),-1],
+  ['Gánh nặng nợ (DTI)',me.dti,pm.dti,.6,v=>pc(v),-1],
+  ['Đòn bẩy',me.lev,pm.lev,.8,v=>pc(v),-1],
+  ['Thanh khoản',me.liq,pm.liq,1,v=>pc(v),1],
+  ['Tài sản ròng (năm chi phí)',me.nwY,pm.nwY,18,v=>v.toFixed(1),1],
+  ['Che phủ nhân thọ',me.cov,pm.cov,1.2,v=>pc(v),1]];
+ vsbars.innerHTML=ROWS.map(([nm,a,b,mx,f])=>
+  `<div class="vsbar">
+   <div class="bl"><i style="width:${cl(a/mx*100,0,100)}%;background:#00704A"></i></div>
+   <div class="mid"><b>${f(a)} · ${f(b)}</b>${nm}</div>
+   <div class="br"><i style="width:${cl(b/mx*100,0,100)}%;background:#A6603A"></i></div></div>`).join('');
+
+ const bet=[],wor=[];
+ ROWS.slice(5).forEach(([nm,a,b,mx,f,dir])=>{
+  const gap=(a-b)*dir; const rel=Math.abs(a-b)/(mx||1);
+  if(rel<.06)return;
+  (gap>0?bet:wor).push(`<div class="li">${nm}<span>bạn ${f(a)} · ${p.nm.split(',')[0]} ${f(b)}</span></div>`);});
+ dBetter.innerHTML=bet.length?bet.join(''):'<div class="li" style="color:var(--s-dim)">Không có chỉ số nào bạn vượt trội rõ rệt so với người này.</div>';
+ dWorse.innerHTML=wor.length?wor.join(''):'<div class="li" style="color:var(--s-dim)">Bạn không thua ở chỉ số nào rõ rệt.</div>';
+}
+function loadPersona(){
+ if(!SELP)return;
+ let p=PERSONAS.find(x=>x.id===SELP);
+ if(!p){const s=SNAPS.find(x=>'snap_'+x.id===SELP);
+  if(s)p={nm:s.name,D:s.D,Q:s.Q}}
+ if(!p)return;
+ if(!confirm(`Nạp toàn bộ số liệu của ${p.nm} vào các ô nhập?\n\nSố liệu hiện tại của bạn sẽ bị ghi đè và không khôi phục được. Các slider what-if cũng được đặt lại. Các thời điểm đã lưu không bị ảnh hưởng.`))return;
+ Object.entries(p.D).forEach(([k,v])=>{const el=document.getElementById(k);if(el)el.value=v});
+ Object.assign(Q,p.Q);
+ document.querySelectorAll('.ch[data-q]').forEach(b=>
+  b.classList.toggle('sel',Q[b.dataset.q]===+b.dataset.v));
+ WHATIF={};BASE=null;live();render();buildPanel();
+}
+
+function firstCalc(){BASE=model().total;go(4);render();}
+
+/* ================= SNAPSHOTS ================= */
+const LS_SNAP='fh_snapshots';
+const INKEYS=Object.keys(META);
+let SNAPS=JSON.parse(localStorage.getItem(LS_SNAP)||'[]');
+let TSEL=null;                       // tên người đang xem đường tiến triển
+const saveSnaps=()=>localStorage.setItem(LS_SNAP,JSON.stringify(SNAPS));
+const dstr=ts=>{const d=new Date(ts);const p=n=>String(n).padStart(2,'0');
+ return p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear()+' · '+p(d.getHours())+':'+p(d.getMinutes())};
+
+function saveSnap(){
+ const nm=(snapName.value||'').trim();
+ if(!nm){alert('Cần nhập tên người được đánh giá để nhóm các thời điểm lại với nhau.');snapName.focus();return}
+ const M=model(),D={};
+ INKEYS.forEach(k=>D[k]=V(k));
+ SNAPS.push({id:Date.now()+'_'+Math.random().toString(36).slice(2,7),name:nm,
+  note:(snapNote.value||'').trim(),ts:Date.now(),D,Q:{...Q},
+  s:{total:M.total,sInc:Math.round(M.sInc),sExp:Math.round(M.sExp),sInv:Math.round(M.sInv),sPro:Math.round(M.sPro),
+     sav:M.sav,emg:M.emg,dti:M.dti,liq:M.liq,lev:M.lev,passR:M.passR,cov:M.cov,nwY:M.nwY,hhi:M.hhi}});
+ saveSnaps();snapNote.value='';
+ if(!TSEL)TSEL=nm;
+ renderSnaps();buildPersonas();
+}
+function delSnap(id){
+ const s=SNAPS.find(x=>x.id===id);if(!s)return;
+ if(!confirm(`Xoá thời điểm "${s.name} — ${dstr(s.ts)}"?\n\nChỉ xoá bản ghi này khỏi máy. Các thời điểm khác của cùng người vẫn giữ nguyên, và số liệu đang hiển thị trên màn hình không bị ảnh hưởng.`))return;
+ SNAPS=SNAPS.filter(x=>x.id!==id);saveSnaps();
+ if(SELP==='snap_'+id)SELP=null;
+ renderSnaps();buildPersonas();
+}
+function loadSnap(id){
+ const s=SNAPS.find(x=>x.id===id);if(!s)return;
+ if(!confirm(`Nạp lại số liệu của "${s.name} — ${dstr(s.ts)}" vào các ô nhập?\n\nSố liệu đang hiển thị sẽ bị ghi đè và không khôi phục được. Bản ghi đã lưu vẫn còn nguyên.`))return;
+ Object.entries(s.D).forEach(([k,v])=>{const el=document.getElementById(k);if(el)el.value=v});
+ Object.assign(Q,s.Q);
+ document.querySelectorAll('.ch[data-q]').forEach(b=>b.classList.toggle('sel',Q[b.dataset.q]===+b.dataset.v));
+ snapName.value=s.name;WHATIF={};BASE=null;live();render();buildPanel();
+}
+function renderSnaps(){
+ if(!SNAPS.length){
+  snapList.innerHTML='<div class="emptyst">Chưa có thời điểm nào được lưu.<br>Nhập tên rồi bấm <b>Lưu thời điểm này</b> — lần sau quay lại, bạn sẽ so được bức tranh mới với chính mình hôm nay.</div>';
+  trendWrap.style.display='none';return}
+ const grp={};SNAPS.forEach(s=>(grp[s.name]=grp[s.name]||[]).push(s));
+ snapList.innerHTML=Object.entries(grp).map(([nm,arr])=>{
+  arr.sort((a,b)=>a.ts-b.ts);
+  const last=arr[arr.length-1],prev=arr.length>1?arr[arr.length-2]:null;
+  const d=prev?last.s.total-prev.s.total:null;
+  const tr=d===null?'<span class="trend eq">lần đầu</span>':
+   `<span class="trend ${d>0?'up':d<0?'dn':'eq'}">${d>0?'+':''}${d} điểm</span>`;
+  return `<div class="person${TSEL===nm?' open':''}" data-nm="${encodeURIComponent(nm)}">
+   <div class="phead"><div class="l"><span class="nm">${nm}</span><span class="ct">${arr.length} thời điểm · mới nhất ${dstr(last.ts)}</span></div>
+    <div class="r">${tr}<span class="sc">${last.s.total}</span></div></div>
+   <div class="plist">${arr.slice().reverse().map((s,i,rev)=>{
+     const nx=rev[i+1],dd=nx?s.s.total-nx.s.total:null;
+     return `<div class="srow"><div>${s.note?`<span class="note">${s.note}</span>`:'<span class="note" style="color:var(--s-dim)">— không ghi chú —</span>'}<span class="when">${dstr(s.ts)}</span></div>
+      <span class="sc2">${s.s.total}${dd!==null?` <small style="font-size:10.5px;color:${dd>0?'var(--s-green)':dd<0?'var(--s-warn)':'var(--s-dim)'}">${dd>0?'+':''}${dd}</small>`:''}</span>
+      <div class="acts"><button class="mini" onclick="event.stopPropagation();loadSnap('${s.id}')">Nạp lại</button>
+      <button class="mini dg" onclick="event.stopPropagation();delSnap('${s.id}')">Xoá</button></div></div>`}).join('')}</div></div>`}).join('');
+ snapList.querySelectorAll('.phead').forEach(h=>h.onclick=()=>{
+  const nm=decodeURIComponent(h.parentElement.dataset.nm);
+  TSEL=(TSEL===nm)?null:nm;renderSnaps()});
+ renderTrend(grp);
+}
+
+const TMETRICS=[
+ ['total','Điểm tổng',v=>v,100,1],
+ ['sav','Tỷ lệ tiết kiệm',v=>pc(v),.4,1],
+ ['emg','Quỹ dự phòng (tháng)',v=>v.toFixed(1),12,1],
+ ['nwY','Tài sản ròng (năm chi phí)',v=>v.toFixed(1),15,1],
+ ['dti','Gánh nặng nợ',v=>pc(v),.6,-1],
+ ['lev','Đòn bẩy',v=>pc(v),.8,-1],
+ ['passR','Thu nhập thụ động',v=>pc(v),.4,1],
+ ['cov','Che phủ nhân thọ',v=>pc(v),1.2,1]];
+let TMET='total';
+
+function renderTrend(grp){
+ if(!TSEL||!grp[TSEL]||grp[TSEL].length<2){
+  if(TSEL&&grp[TSEL]&&grp[TSEL].length===1){
+   trendWrap.style.display='block';
+   trendHint.textContent='"'+TSEL+'" mới có một thời điểm. Lưu thêm ít nhất một mốc nữa để thấy đường tiến triển.';
+   tchips.innerHTML='';tchart.innerHTML='';dImp.innerHTML='';dReg.innerHTML='';
+   dImpTitle.textContent='Đã cải thiện';dRegTitle.textContent='Đã đi lùi';return}
+  trendWrap.style.display='none';return}
+ const arr=grp[TSEL].slice().sort((a,b)=>a.ts-b.ts);
+ trendWrap.style.display='block';
+ const first=arr[0],last=arr[arr.length-1];
+ const days=Math.round((last.ts-first.ts)/864e5);
+ trendHint.textContent=`${TSEL} · ${arr.length} thời điểm, trải ${days>0?days+' ngày':'cùng ngày'} — từ ${dstr(first.ts).split(' ·')[0]} đến ${dstr(last.ts).split(' ·')[0]}.`;
+ tchips.innerHTML=TMETRICS.map(([k,nm])=>`<button class="tchip${TMET===k?' on':''}" data-m="${k}">${nm}</button>`).join('');
+ tchips.querySelectorAll('.tchip').forEach(b=>b.onclick=()=>{TMET=b.dataset.m;renderTrend(grp)});
+
+ const met=TMETRICS.find(m=>m[0]===TMET),f=met[2],dir=met[4];
+ const vals=arr.map(s=>s.s[TMET]||0);
+ const W=760,H=210,PL=52,PR=18,PT=18,PB=34;
+ const lo=Math.min(...vals),hi=Math.max(...vals);
+ const pad=(hi-lo)*.18||Math.abs(hi*.18)||1;
+ const y0=Math.min(lo-pad,TMET==='total'?Math.max(0,lo-pad):lo-pad),y1=hi+pad;
+ const X=i=>PL+(W-PL-PR)*(arr.length===1?.5:i/(arr.length-1));
+ const Yv=v=>PT+(H-PT-PB)*(1-(v-y0)/((y1-y0)||1));
+ let g=`<g font-family="DM Mono, monospace" font-size="10" fill="#637069">`;
+ for(let i=0;i<=3;i++){const v=y0+(y1-y0)*i/3,y=Yv(v);
+  g+=`<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="#DFDBD0" stroke-width="1"/>
+      <text x="${PL-7}" y="${y+3.5}" text-anchor="end">${f(v)}</text>`}
+ const pts=vals.map((v,i)=>[X(i),Yv(v)]);
+ g+=`<polyline points="${pts.map(p=>p.join(',')).join(' ')}" fill="none" stroke="#00704A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+ pts.forEach((p,i)=>{
+  const improved=i===0?null:(vals[i]-vals[i-1])*dir;
+  const col=improved===null?'#00704A':improved>0?'#00704A':improved<0?'#A6603A':'#637069';
+  g+=`<circle cx="${p[0]}" cy="${p[1]}" r="5" fill="#fff" stroke="${col}" stroke-width="2.5"/>
+      <text x="${p[0]}" y="${p[1]-13}" text-anchor="middle" fill="#1E3932" font-size="11">${f(vals[i])}</text>
+      <text x="${p[0]}" y="${H-12}" text-anchor="middle" font-size="9.5">${dstr(arr[i].ts).split(' ·')[0].slice(0,5)}</text>`;
+  if(arr[i].note)g+=`<title>${arr[i].note}</title>`});
+ g+='</g>';
+ tchart.setAttribute('viewBox',`0 0 ${W} ${H}`);tchart.innerHTML=g;
+
+ const imp=[],reg=[];
+ TMETRICS.forEach(([k,nm,ff,mx,dr])=>{
+  const a=first.s[k]||0,b=last.s[k]||0,gap=(b-a)*dr;
+  if(Math.abs(b-a)/(mx||1)<.03)return;
+  const li=`<div class="li">${nm}<span>${ff(a)} → ${ff(b)}</span></div>`;
+  (gap>0?imp:reg).push(li)});
+ dImpTitle.textContent='Đã cải thiện';dRegTitle.textContent='Đã đi lùi';
+ dImp.innerHTML=imp.length?imp.join(''):'<div class="li" style="color:var(--s-dim)">Chưa có chỉ số nào cải thiện rõ rệt giữa hai mốc.</div>';
+ dReg.innerHTML=reg.length?reg.join(''):'<div class="li" style="color:var(--s-dim)">Không có chỉ số nào đi lùi rõ rệt.</div>';
+}
+
+function render(){
+ const M=model(),total=M.total;
+ if(BASE===null)BASE=total;
+ arc.style.strokeDashoffset=477.5-477.5*total/100;
+ scN.textContent=total;
+ pScore.textContent=total; pBase.textContent='Gốc: '+BASE;
+ const d=total-BASE;
+ pDelta.textContent=d===0?'không đổi':(d>0?'+':'')+d+' điểm';
+ pDelta.className='dv'+(d>0?' up':d<0?' dn':'');
+
+ const VD= total>=80?['Cấu trúc vững, đã qua giai đoạn phòng thủ','Bốn khối đều đứng được. Câu hỏi bây giờ không còn là "an toàn chưa" mà là "phân bổ cho mục tiêu nào".']
+  :total>=65?['Nền tốt, còn vài lỗ hổng cụ thể','Bạn đã làm đúng phần khó nhất. Còn 2–3 điểm hở — vá xong là bước sang tầng khác hẳn.']
+  :total>=48?['Kiếm được tiền, giữ chưa chắc','Dòng tiền vào ổn nhưng phòng thủ và cơ cấu tài sản còn mỏng. Giai đoạn dễ ảo tưởng an toàn nhất.']
+  :total>=30?['Đang chạy nhanh, không phanh','Phần lớn thu nhập bị cuốn đi ngay trong tháng. Chưa nguy hiểm tức thì, nhưng không có gì đỡ nếu vấp.']
+  :['Cần dừng lại và dựng nền','Nhiều khối cùng yếu. Tin tốt: khi mọi thứ đều thấp, việc phải làm đầu tiên rất rõ ràng.'];
+ vd.textContent=VD[0];vs.textContent=VD[1];
+ qz.textContent=Object.keys(WHATIF).length
+  ? 'Bạn đang xem kịch bản giả định — '+Object.keys(WHATIF).length+' chỉ số đã đổi so với số gốc. Bấm "Chốt số mới" nếu muốn ghi đè, hoặc "Về gốc" để quay lại.'
+  : 'Kéo slider bên trái để xem chẩn đoán thay đổi theo thời gian thực.';
+
+ const C=v=>v>=70?'var(--s-green)':v>=48?'var(--s-gold)':'var(--s-warn)';
+ const _wp=weights(),_scMap={inc:['Tạo thu nhập',M.sInc],exp:['Quản lý chi tiêu',M.sExp],inv:['Đầu tư',M.sInv],pro:['Bảo vệ',M.sPro]};
+ const _on=activeMods();
+ pillars.style.gridTemplateColumns=`repeat(${Math.min(_on.length,4)},1fr)`;
+ pillars.innerHTML=_on.map(m=>{const [nm,v]=_scMap[m.id],w=Math.round((_wp[m.id]||0)*100);
+  return `<div class="pillbox"><div class="pn">${nm} <span style="font-family:var(--s-mono);color:var(--s-dim)">·${w}%</span></div>
+  <div class="pv" style="color:${C(v)}">${Math.round(v)}</div><div class="pb"><i style="width:${Math.round(v)}%;background:${C(v)}"></i></div></div>`}).join('');
+
+ const mx=M.inc;
+ wf.innerHTML=[['Thu nhập',M.inc,'#00704A'],...EX.map(([id,nm,c])=>[nm,-V(id),c]),['Còn lại',M.sur,M.sur>0?'#C9A227':'#A6603A']]
+  .map(([nm,v,c])=>`<div class="wfr"><span style="color:var(--s-muted)">${nm}</span>
+   <div class="bar"><i style="width:${cl(Math.abs(v)/mx*100,0,100)}%;background:${c};opacity:${v<0?.72:1}"></i></div>
+   <span class="amt" style="color:${v<0?'var(--s-muted)':c}">${v<0?'−':''}${fmt(Math.abs(v))}</span></div>`).join('');
+
+ const AS=[['Tiền mặt',M.cash,'#00704A'],['Tiết kiệm',M.dep,'#4E7C6B'],['Cổ phiếu/quỹ',M.eq,'#C9A227'],
+  ['Vàng/TP/khác',M.alt,'#A6603A'],['BĐS đầu tư',M.re,'#7FA294'],['Nhà đang ở',M.home,'#1E3932']].filter(x=>x[1]>0);
+ const tA=AS.reduce((a,x)=>a+x[1],0)||1;let off=25;
+ donut.innerHTML='<circle cx="21" cy="21" r="15.9" fill="none" stroke="#DFDBD0" stroke-width="5"/>'+
+  AS.map(([nm,v,c])=>{const p=v/tA*100;const s=`<circle cx="21" cy="21" r="15.9" fill="none" stroke="${c}" stroke-width="5" stroke-dasharray="${p.toFixed(2)} ${(100-p).toFixed(2)}" stroke-dashoffset="${off}"/>`;off=(off-p+100)%100;return s}).join('');
+ dleg.innerHTML=AS.map(([nm,v,c])=>`<div class="dl"><span class="k"><b style="background:${c}"></b>${nm}</span><span class="v">${fmt(v)} · ${pc(v/tA)}</span></div>`).join('')
+  +`<div class="dl" style="border-top:1px solid var(--s-line);padding-top:6px;margin-top:2px"><span class="k">Tài sản ròng</span><span class="v" style="color:var(--s-green);font-weight:500">${fmt(M.net)}</span></div>`;
+
+ const T=[
+  ['g','TẠO THU NHẬP'],
+  ['Tỷ trọng thu nhập thụ động',pc(M.passR),'≥ 20%',M.passR>=.2?2:M.passR>=.08?1:0,'Phần thu nhập không đổi bằng thời gian'],
+  ['Mức độ tập trung nguồn thu',(M.hhi*100).toFixed(0)+'/100','≤ 50',M.hhi<=.5?2:M.hhi<=.7?1:0,'100 = phụ thuộc hoàn toàn một nguồn'],
+  ['Số nguồn thu nhập',M.srcs.length+' nguồn','≥ 3',M.srcs.length>=3?2:M.srcs.length===2?1:0,''],
+  ['Tự do tài chính',pc(M.fiR),'100% = tự do',M.fiR>=1?2:M.fiR>=.3?1:0,'Chi phí sống được thu nhập thụ động lo'],
+  ['g','QUẢN LÝ CHI TIÊU'],
+  ['Tỷ lệ tiết kiệm',pc(M.sav),'≥ 20%',M.sav>=.2?2:M.sav>=.1?1:0,'Phần thu nhập giữ lại được'],
+  ['Chi thiết yếu + nhà ở',pc(M.essR),'≤ 50%',M.essR<=.5?2:M.essR<=.62?1:0,''],
+  ['Chi lối sống',pc(M.lifR),'≤ 20%',M.lifR<=.2?2:M.lifR<=.3?1:0,''],
+  ['Gánh nặng nợ (DTI)',pc(M.dti),'≤ 35%',M.dti<=.35?2:M.dti<=.45?1:0,'Trả nợ / thu nhập tháng'],
+  ['g','ĐẦU TƯ'],
+  ['Tài sản ròng / chi phí năm',M.nwY.toFixed(1)+' năm','≥ 5 năm',M.nwY>=5?2:M.nwY>=2?1:0,'Sống được bao lâu nếu ngừng kiếm tiền'],
+  ['Tỷ trọng tài sản tăng trưởng',pc(M.curEq),'≈ '+pc(M.tgtEq)+' (110−tuổi)',Math.abs(M.curEq-M.tgtEq)<=.15?2:Math.abs(M.curEq-M.tgtEq)<=.3?1:0,'Không tính nhà đang ở'],
+  ['Tính thanh khoản danh mục',pc(M.liq),'≥ 30%',M.liq>=.3?2:M.liq>=.15?1:0,'Phần chuyển thành tiền trong 1 tuần'],
+  ['Đòn bẩy (nợ/tài sản)',pc(M.lev),'≤ 40%',M.lev<=.4?2:M.lev<=.55?1:0,''],
+  ['g','BẢO VỆ'],
+  ['Quỹ dự phòng',M.emg.toFixed(1)+' tháng','≥ '+M.needM+' tháng',M.emg>=M.needM?2:M.emg>=M.needM*.5?1:0,'Theo khả năng thay thế thu nhập của bạn'],
+  ['Tỷ lệ che phủ nhân thọ',pc(M.cov),'≥ 100%',M.cov>=1?2:M.cov>=.5?1:0,'Cần ≈ '+fmt(M.needLife)+' cho '+M.deps+' người phụ thuộc'],
+  ['Hạn mức BH sức khoẻ',fmt(M.hea)+'/năm','≥ 100 tr',M.hea>=100?2:M.hea>0?1:0,''],
+  ['Bảo hiểm bệnh hiểm nghèo',M.ci>0?fmt(M.ci):'Chưa có','> 0',M.ci>0?2:0,'']];
+ mtbl.innerHTML=T.map(r=>r[0]==='g'?`<tr class="grp"><td colspan="4">${r[1]}</td></tr>`:
+  `<tr><td>${r[0]}${r[4]?`<span class="sub">${r[4]}</span>`:''}</td>
+   <td class="r m" style="color:${r[3]===2?'var(--s-green)':r[3]===1?'var(--s-gold)':'var(--s-warn)'}">${r[1]}</td>
+   <td class="r m" style="color:var(--s-dim)">${r[2]}</td>
+   <td class="r"><span class="tag ${r[3]===2?'ok':r[3]===1?'wn':'bd'}">${r[3]===2?'Đạt':r[3]===1?'Cận ngưỡng':'Chưa đạt'}</span></td></tr>`).join('');
+
+ /* rule engine */
+ const up=[],dn=[],rk=[],P=(a,t,d)=>a.push([t,d]);
+ if(M.sav>=.2)P(up,'Tỷ lệ tiết kiệm '+pc(M.sav),'Trên ngưỡng 20%. Chỉ số quyết định nhất trong dài hạn — quan trọng hơn cả tỷ suất đầu tư.');
+ if(M.srcs.length>=3&&M.hhi<=.6)P(up,M.srcs.length+' nguồn thu nhập, phân tán tốt','Mất một nguồn không làm sập cả hệ thống.');
+ if(M.passR>=.15)P(up,'Thu nhập thụ động chiếm '+pc(M.passR),'Đã có phần thu nhập không đổi bằng thời gian — hạt giống của tự do tài chính.');
+ if(M.emg>=M.needM)P(up,'Quỹ dự phòng '+M.emg.toFixed(1)+' tháng','Đủ đệm để không phải bán tài sản giá rẻ khi có biến cố.');
+ if(M.cov>=1)P(up,'Bảo hiểm nhân thọ che phủ đủ','Người phụ thuộc được bảo vệ tương xứng với trách nhiệm của bạn.');
+ if(M.dti<=.3&&M.dti>0)P(up,'Gánh nặng nợ chỉ '+pc(M.dti),'Dưới ngưỡng an toàn, còn dư địa vay khi có cơ hội thật.');
+ if(M.nwY>=5)P(up,'Tài sản ròng bằng '+M.nwY.toFixed(1)+' năm chi phí','Đã vượt vạch mà phần lớn người cùng độ tuổi chưa tới.');
+ if(Q.dca>=3)P(up,'Đầu tư tự động hàng tháng','Cơ chế thắng kỷ luật — đã loại cảm xúc khỏi quyết định mua.');
+ if(M.liq>=.3)P(up,'Thanh khoản danh mục '+pc(M.liq),'Có tiền khi cần mà không phải bán tài sản dài hạn.');
+
+ if(M.sav<.1)P(dn,'Tỷ lệ tiết kiệm chỉ '+pc(M.sav),`Mỗi tháng giữ lại ${fmt(M.sur)}. Với nhịp này cần ${M.sur>0?Math.round(M.exp*12*5/M.sur/12):'rất nhiều'} năm để đạt 5 năm chi phí.`);
+ if(M.emg<M.needM)P(dn,'Quỹ dự phòng mới '+M.emg.toFixed(1)+'/'+M.needM+' tháng',`Thiếu ${fmt(Math.max(0,M.needM*M.exp-M.cash))}. Lỗ hổng cần bịt trước mọi khoản đầu tư mới.`);
+ if(M.cov<1&&M.deps>0)P(dn,'Bảo hiểm nhân thọ thiếu '+pc(1-M.cov),`Cần ≈ ${fmt(M.needLife)} cho ${M.deps} người phụ thuộc, hiện có ${fmt(M.life)}.`);
+ if(M.dti>.35)P(dn,'Nợ chiếm '+pc(M.dti)+' thu nhập',`Vượt ngưỡng 35%. Mỗi tháng ${fmt(M.debtPay)} đi trả nợ trước khi bạn tiêu đồng nào cho mình.`);
+ if(M.hhi>.7)P(dn,'Thu nhập tập trung một nguồn',`${pc(Math.max(...M.srcs)/M.inc)} thu nhập đến từ một chỗ — rủi ro mà bảng cân đối không hiện ra.`);
+ if(M.passR<.05)P(dn,'Gần như không có thu nhập thụ động','Toàn bộ thu nhập đổi bằng thời gian. Ngừng làm là ngừng có tiền.');
+ if(Math.abs(M.curEq-M.tgtEq)>.2)P(dn,M.curEq<M.tgtEq?'Danh mục quá thủ so với tuổi':'Danh mục quá mạo hiểm so với tuổi',`Hiện ${pc(M.curEq)} tài sản tăng trưởng, mô hình theo tuổi ${M.age} gợi ý ≈ ${pc(M.tgtEq)}.`);
+ if(M.lifR>.25)P(dn,'Chi lối sống '+pc(M.lifR)+' thu nhập',`${fmt(V('e_lif'))}/tháng — nhóm dễ điều chỉnh nhất. Cắt 30% có ngay ${fmt(V('e_lif')*.3)}/tháng.`);
+ if(Q.trk<=1)P(dn,'Không theo dõi chi tiêu','Không thể tối ưu thứ mình không đo. Việc rẻ nhất mà tác động lớn nhất.');
+ if(M.hea<100)P(dn,'Bảo hiểm sức khoẻ mỏng',`Hạn mức ${fmt(M.hea)}/năm. Một đợt điều trị nghiêm trọng ở bệnh viện tư vượt xa mức này.`);
+ if(M.lev>.5)P(dn,'Đòn bẩy '+pc(M.lev),'Nợ chiếm hơn nửa tài sản. Giá tài sản giảm 20% thì tài sản ròng giảm nhiều hơn thế.');
+ if(M.liq<.15&&M.ass>0)P(dn,'Tài sản kém thanh khoản',`${pc(1-M.liq)} tài sản khó chuyển thành tiền nhanh. Giàu trên giấy nhưng kẹt khi cần.`);
+
+ if(M.home/(M.ass||1)>.6)P(rk,'Nhà đang ở chiếm '+pc(M.home/M.ass)+' tài sản','Tài sản không sinh dòng tiền và không bán được từng phần. Phần lớn gia sản đặt vào một chỗ không thanh khoản.');
+ if(Q.crp<=1)P(rk,'Lifestyle creep','Thu nhập tăng, chi tiêu tăng theo. Sau 10 năm kiếm gấp đôi mà tài sản ròng không đổi — bẫy phổ biến nhất của người thu nhập cao.');
+ if(Q.rep<=1)P(rk,'Khó thay thế thu nhập','Cần trên 3 tháng tìm nguồn thu mới. Quỹ dự phòng của bạn phải dày hơn người khác, không phải mỏng hơn.');
+ if(M.ci===0)P(rk,'Chưa có bảo hiểm bệnh hiểm nghèo','Rủi ro không giết bạn nhưng xoá sạch tích luỹ: điều trị dài, mất thu nhập, chi phí không dừng.');
+ if(Q.wil===0&&(M.net>1000||M.deps>0))P(rk,'Chưa có kế hoạch thừa kế',`Tài sản ròng ${fmt(M.net)} nhưng chưa có văn bản. Chi phí của việc này bằng 0, hậu quả của việc thiếu nó thì không.`);
+ if(V('d_cc')>0)P(rk,'Còn dư nợ thẻ tín dụng '+fmt(V('d_cc')),'Lãi thẻ thường 20–35%/năm — cao hơn mọi tỷ suất đầu tư bền vững bạn có thể kiếm được.');
+ if(Q.dca<=1)P(rk,'Đầu tư theo cảm hứng','Mua khi thị trường sôi động, ngừng khi ảm đạm — đúng ngược với logic.');
+ if(V('d_rate')>8&&M.sav>.15)P(rk,'Lãi vay '+V('d_rate')+'% cao hơn tỷ suất an toàn','Trả nợ sớm đang là khoản "đầu tư" chắc chắn nhất — không rủi ro, tỷ suất bằng đúng lãi vay.');
+ if(M.essR>.6)P(rk,'Chi cố định quá cứng','Thiết yếu + nhà ở chiếm '+pc(M.essR)+'. Cấu trúc chi phí không co giãn khi thu nhập giảm.');
+ if(!rk.length)P(rk,'Chưa phát hiện rủi ro cấu trúc rõ rệt','Ở mức dữ liệu hiện có, không thấy điểm mong manh nghiêm trọng. Rà lại sau mỗi thay đổi lớn.');
+ if(!up.length)P(up,'Bạn đã bắt đầu nhìn thẳng vào con số','Nghe nhỏ, nhưng phần lớn người trưởng thành chưa từng làm bài này.');
+
+ const R=(arr,el)=>document.getElementById(el).innerHTML=arr.map(([t,d])=>
+  `<div class="fi"><span class="dot">◆</span><div><b>${t}</b><br><span style="color:var(--s-muted)">${d}</span></div></div>`).join('');
+ R(up.slice(0,6),'fUp');R(dn.slice(0,6),'fDn');R(rk.slice(0,5),'fRk');
+
+ const cd=[];
+ if(V('d_cc')>0)cd.push([99,'Dứt điểm dư nợ thẻ tín dụng',`<span class="num">${fmt(V('d_cc'))}</span> đang chịu lãi 20–35%/năm. Không khoản đầu tư nào sinh lời chắc chắn bằng việc trả hết khoản này. Ưu tiên tuyệt đối.`]);
+ if(M.emg<M.needM)cd.push([95,'Bịt lỗ hổng quỹ dự phòng',`Cần thêm <span class="num">${fmt(Math.max(0,M.needM*M.exp-M.cash))}</span> để đạt ${M.needM} tháng. Mở tài khoản riêng, lệnh tự động <span class="num">${fmt(Math.max(1,(M.needM*M.exp-M.cash)/9))}</span>/tháng vào ngày nhận lương.`]);
+ if(M.cov<.6&&M.deps>0)cd.push([92,'Nâng bảo hiểm nhân thọ lên mức tương xứng',`${M.deps} người phụ thuộc, nhu cầu ≈ <span class="num">${fmt(M.needLife)}</span>, hiện có <span class="num">${fmt(M.life)}</span>. Khoản chi nhỏ bảo vệ phần lớn nhất.`]);
+ if(M.dti>.4)cd.push([88,'Kéo gánh nặng nợ xuống dưới 35%',`Đang ở <span class="num">${pc(M.dti)}</span>. Dồn trả khoản lãi cao nhất trước, không chia đều. Mục tiêu 90 ngày: giảm xuống <span class="num">${fmt(M.inc*.35)}</span>/tháng.`]);
+ if(M.sav<.1)cd.push([86,'Trả cho mình trước, phần còn lại mới tiêu',`Tiết kiệm hiện <span class="num">${pc(M.sav)}</span>. Mục tiêu 90 ngày: 10% = <span class="num">${fmt(M.inc*.1)}</span>/tháng, chuyển tự động ngay ngày lương về.`]);
+ if(Q.trk<=1)cd.push([80,'Đo trước khi tối ưu — một tháng ghi chép',`Chỉ cần 6 nhóm như bài này. Sau 30 ngày bạn sẽ thấy ít nhất một khoản chi không ngờ tới. Việc rẻ nhất trong danh sách.`]);
+ if(M.hea<100)cd.push([78,'Nâng hạn mức bảo hiểm sức khoẻ',`Hiện <span class="num">${fmt(M.hea)}</span>/năm. Một ca điều trị nghiêm trọng tại bệnh viện tư vượt mức này nhiều lần — phần chênh lấy thẳng từ quỹ dự phòng.`]);
+ if(Math.abs(M.curEq-M.tgtEq)>.2)cd.push([74,M.curEq<M.tgtEq?'Chuyển dần sang tài sản tăng trưởng':'Hạ bớt tỷ trọng tài sản rủi ro',`Danh mục ngoài nhà ở đang <span class="num">${pc(M.curEq)}</span>, mô hình theo tuổi ${M.age} gợi ý ≈ <span class="num">${pc(M.tgtEq)}</span>. Điều chỉnh dần 6–12 tháng.`]);
+ if(Q.dca<=2)cd.push([70,'Biến đầu tư thành cơ chế, không thành quyết định',`Lệnh mua định kỳ <span class="num">${fmt(Math.max(1,M.sur*.6))}</span>/tháng vào quỹ chỉ số. Bỏ hoàn toàn việc chọn thời điểm.`]);
+ if(M.passR<.1&&M.sav>.15)cd.push([66,'Xây dòng thu nhập thụ động đầu tiên',`Thặng dư <span class="num">${fmt(M.sur)}</span>/tháng nhưng thụ động mới <span class="num">${pc(M.passR)}</span>. Mục tiêu 12 tháng: 15% = <span class="num">${fmt(M.inc*.15)}</span>/tháng từ tài sản.`]);
+ if(M.lifR>.25)cd.push([62,'Cắt 30% chi lối sống, chuyển thẳng vào đầu tư',`Đang chi <span class="num">${fmt(V('e_lif'))}</span>/tháng. Cắt 30% cho ngay <span class="num">${fmt(V('e_lif')*.3)}</span>/tháng — sau 10 năm lãi kép 8% khoảng <span class="num">${fmt(V('e_lif')*.3*12*14.5)}</span>.`]);
+ if(M.hhi>.7)cd.push([58,'Mở đường thu nhập thứ hai',`<span class="num">${pc(Math.max(...M.srcs)/M.inc)}</span> thu nhập từ một nguồn. Không cần lớn — một nguồn bằng 15% thu nhập chính đã đổi hoàn toàn thế phòng thủ.`]);
+ if(Q.wil===0&&(M.net>1000||M.deps>0))cd.push([54,'Lập di chúc — chi phí gần bằng 0',`Tài sản ròng <span class="num">${fmt(M.net)}</span>. Một buổi chiều ở phòng công chứng. Việc duy nhất không tốn tiền mà hay bị hoãn nhất.`]);
+ cd.push([20,'Đặt lịch rà soát lại sau 90 ngày',`Điểm số hôm nay không quan trọng bằng hướng nó di chuyển.`]);
+ cd.sort((a,b)=>b[0]-a[0]);
+ acts.innerHTML=cd.slice(0,3).map((c,i)=>`<div class="act"><div class="no">${i+1}</div><div><h4>${c[1]}</h4><p>${c[2]}</p></div></div>`).join('');
+
+ renderSnaps();
+ renderOracle();
+ buildPersonas();
+}
+
+/* ================= XUẤT WORD / PDF ================= */
+function reportHTML(forWord){
+ const M=model();
+ const dt=new Date().toLocaleDateString('vi-VN');
+ const nm=(document.getElementById('snapName')?.value||'').trim();
+ const C=v=>v>=70?'#00704A':v>=48?'#C9A227':'#A6603A';
+ const w=weights(),scMap={inc:['Tạo thu nhập',M.sInc],exp:['Quản lý chi tiêu',M.sExp],inv:['Đầu tư',M.sInv],pro:['Bảo vệ',M.sPro]};
+ const pills=activeMods().map(m=>{const[n,v]=scMap[m.id];
+  return `<td style="text-align:center;padding:10px;border:1px solid #ddd">
+   <div style="font-size:12px;color:#666">${n} · ${Math.round((w[m.id]||0)*100)}%</div>
+   <div style="font-size:26px;color:${C(v)};font-weight:bold">${Math.round(v)}</div></td>`}).join('');
+ /* bảng chỉ số + findings lấy từ DOM đã render */
+ const grab=id=>{const e=document.getElementById(id);return e?e.innerText:''};
+ const mtblRows=[...document.querySelectorAll('#mtbl tr')].map(tr=>{
+  if(tr.classList.contains('grp'))return `<tr><td colspan="4" style="background:#1E3932;color:#fff;padding:6px 10px;font-size:11px;font-weight:bold">${tr.innerText}</td></tr>`;
+  const c=[...tr.children].map(td=>td.innerText);
+  return `<tr>${c.map((x,i)=>`<td style="padding:6px 10px;border-bottom:1px solid #eee;${i>0?'text-align:right':''}">${x}</td>`).join('')}</tr>`}).join('');
+ const findBlock=(title,id,color)=>{
+  const items=[...document.querySelectorAll('#'+id+' .fi')].map(f=>{
+   const b=f.querySelector('b')?.innerText||'',rest=f.innerText.replace(b,'').trim();
+   return `<li style="margin-bottom:7px"><b>${b}</b> — ${rest}</li>`}).join('');
+  return items?`<h3 style="color:${color};margin:16px 0 6px;font-size:15px">${title}</h3><ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.5">${items}</ul>`:''};
+ const acts=[...document.querySelectorAll('#acts .act')].map((a,i)=>{
+  const h=a.querySelector('h4')?.innerText||'',p=a.querySelector('p')?.innerText||'';
+  return `<div style="margin-bottom:11px"><b style="color:#00704A">${i+1}. ${h}</b><div style="font-size:13px;color:#444;margin-top:2px">${p}</div></div>`}).join('');
+ const verdict=grab('vd'),vsub=grab('vs');
+ const V=VOICES[curVoice];
+ const oline=oracleLine||verdictLine(M.total,curVoice);
+
+ return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+  body{font-family:'Segoe UI',Arial,sans-serif;color:#0b0b0b;max-width:760px;margin:0 auto;padding:24px;line-height:1.5}
+  h1{font-size:24px;margin:0 0 4px}h2{font-size:17px;margin:20px 0 8px;color:#00704A}
+  table{width:100%;border-collapse:collapse;margin:8px 0}
+  .hero{text-align:center;padding:16px;background:#F7F5EF;border-radius:10px;margin:14px 0}
+  .hero .big{font-size:48px;font-weight:bold;color:#00704A}
+  .oracle{background:#1E3932;color:#fff;border-radius:10px;padding:18px 20px;margin:14px 0}
+  .oracle .w{font-size:11px;color:#9dbfb2;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+  .oracle .t{font-size:16px;font-style:italic;line-height:1.6;color:#f0f4f2}
+  .oracle .s{font-size:11px;color:#9dbfb2;margin-top:9px}
+  .muted{color:#666;font-size:12px}
+  .okf{margin-top:30px;border-top:2px solid #00704A;padding-top:14px;text-align:center}
+  .okf .l{font-size:19px;font-weight:bold;color:#00704A}
+  .okf .t{font-size:12px;color:#666;margin-top:3px}
+  </style></head><body>
+  <h1>Chẩn đoán Tài chính Cá nhân</h1>
+  <div class="muted">${nm?'Người được đánh giá: <b>'+nm+'</b> · ':''}Ngày lập: ${dt} · Phạm vi: ${activeMods().map(m=>m.nm).join(', ')}</div>
+  <div class="hero"><div class="big">${M.total}<span style="font-size:18px;color:#999">/100</span></div>
+   <div style="font-size:18px;color:#00704A;font-style:italic;margin-top:4px">${verdict}</div>
+   <div class="muted" style="margin-top:6px">${vsub}</div></div>
+  <div class="oracle"><div class="w">${V.icon} Lời chẩn đoán từ ${V.name}</div>
+   <div class="t">"${oline}"</div><div class="s">${V.sign}</div></div>
+  <table><tr>${pills}</tr></table>
+  <h2>Bảng chỉ số</h2>
+  <table style="font-size:12px">${mtblRows}</table>
+  ${findBlock('Điểm mạnh','fUp','#00704A')}
+  ${findBlock('Điểm yếu','fDn','#A6603A')}
+  ${findBlock('Rủi ro âm thầm','fRk','#C9A227')}
+  <h2>Ba việc trong 90 ngày tới</h2>${acts}
+  <p class="muted" style="margin-top:24px;border-top:1px solid #eee;padding-top:10px">
+   Báo cáo minh hoạ, trọng số và ngưỡng chuẩn là giá trị tham chiếu chưa hiệu chỉnh theo dữ liệu thực tế. Không phải lời khuyên đầu tư hoặc tư vấn tài chính cá nhân. Phần giọng chẩn đoán chỉ mang tính giải trí.</p>
+  <div class="okf"><div class="l">Omnikey</div>
+   <div class="t" style="font-size:10px;margin-top:6px;color:#999">Công cụ Chẩn đoán Tài chính Cá nhân · phát triển bởi Omnikey</div></div>
+  </body></html>`;
+}
+function exportWord(){
+ const html=reportHTML(true);
+ const blob=new Blob(['\ufeff'+html],{type:'application/msword'});
+ const nm=(document.getElementById('snapName')?.value||'').trim();
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+ a.download='Chan-doan-tai-chinh'+(nm?'-'+nm.replace(/\s+/g,'-'):'')+'.doc';
+ a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function exportPDF(){
+ const html=reportHTML(false);
+ const w=window.open('','_blank');
+ if(!w){alert('Trình duyệt chặn cửa sổ mới. Hãy cho phép popup rồi thử lại.');return}
+ w.document.write(html);w.document.close();
+ w.onload=()=>{w.focus();w.print();};
+ setTimeout(()=>{try{w.focus();w.print()}catch(e){}},400);
+}
+
+live();buildPanel();renderSnaps();syncFab();
+</script>
+</body>
+</html>
