@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Samsung Việt Nam · Phân tích chuỗi giá trị & cơ hội tài trợ thương mại</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap&subset=latin,latin-ext,vietnamese" rel="stylesheet">
+<style>
+/* ══ THEME SIREN — Showcase class ══════════════════════════ */
+:root{
+  --s-cream:#F7F5EF; --s-cream-warm:#EFEBE0; --s-white:#FFFFFF;
+  --s-green:#00704A; --s-forest:#1E3932; --s-deep:#14261F; --s-green-soft:#D4E9E2;
+  --s-ink:#1E3932; --s-muted:#5C6B66; --s-dim:#637069;
+  --s-line:#DFDBD0; --s-line-dark:#2C4A40;
+  --s-gold:#C9A227; --s-warn:#A6603A; --s-ok:#00704A;
+
+  --s-serif:'Noto Serif Display',Georgia,serif;
+  --s-sans:'Outfit',system-ui,sans-serif;
+  --s-mono:'DM Mono',ui-monospace,monospace;
+  --wrap:1160px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{
+  background:var(--s-cream); color:var(--s-ink);
+  font-family:var(--s-sans); font-size:16px; line-height:1.7;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 32px}
+
+/* ── TYPO ─────────────────────────────────────────── */
+h1,h2{font-family:var(--s-serif);font-weight:600;letter-spacing:-.015em}
+h1{font-size:clamp(30px,5.4vw,52px);line-height:1.12}
+h2{font-size:clamp(22px,3.4vw,30px);line-height:1.2;margin-bottom:8px}
+h3{font-family:var(--s-sans);font-size:17px;font-weight:600;color:var(--s-green);
+   margin:36px 0 12px;letter-spacing:.005em}
+h4{font-family:var(--s-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+   color:var(--s-muted);margin:28px 0 10px}
+h5{font-family:var(--s-sans);font-size:15px;font-weight:600;margin-bottom:5px}
+p{margin-bottom:15px}
+strong{font-weight:600;color:var(--s-forest)}
+em{font-style:italic}
+a{color:var(--s-green);text-decoration:none;border-bottom:1px solid rgba(0,112,74,.28)}
+a:hover{border-bottom-color:var(--s-green)}
+.eyebrow{font-family:var(--s-mono);font-size:11px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--s-muted);margin-bottom:10px}
+.mono{font-family:var(--s-mono)}
+.lede{font-size:17.5px;color:var(--s-muted);line-height:1.65}
+
+/* ── HERO — khối forest ───────────────────────────── */
+.hero{background:var(--s-forest);color:#fff;padding:66px 0 54px}
+.hero .eyebrow{color:var(--s-green-soft)}
+.hero h1{max-width:19ch;margin-bottom:18px}
+.hero h1 em{color:var(--s-green-soft);font-style:normal}
+.hero .lede{color:rgba(255,255,255,.82);max-width:64ch}
+.stamp{display:flex;flex-wrap:wrap;gap:8px;margin-top:28px}
+.stamp span{
+  font-family:var(--s-mono);font-size:10.5px;letter-spacing:.05em;
+  padding:6px 13px;border:1px solid var(--s-line-dark);border-radius:999px;
+  color:rgba(255,255,255,.72)
+}
+.stamp span.hi{border-color:rgba(255,255,255,.55);color:#fff}
+
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:40px}
+.kpi{background:var(--s-deep);border:1px solid var(--s-line-dark);border-radius:14px;padding:20px 22px}
+.kpi .k-lab{font-family:var(--s-mono);font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--s-green-soft);opacity:.72;margin-bottom:10px}
+.kpi .k-val{font-family:var(--s-serif);font-size:30px;color:#fff;line-height:1.05}
+.kpi .k-val u{font-family:var(--s-sans);font-size:15px;text-decoration:none;
+  color:rgba(255,255,255,.6);margin-left:3px}
+.kpi.gold .k-val{color:var(--s-gold)}
+.kpi .k-sub{font-size:13px;color:rgba(255,255,255,.6);margin-top:8px;line-height:1.45}
+
+/* ── NAV ──────────────────────────────────────────── */
+nav{position:sticky;top:0;z-index:60;background:var(--s-cream);
+  border-bottom:1px solid var(--s-line)}
+nav .wrap{display:flex;gap:0;overflow-x:auto;scrollbar-width:none}
+nav .wrap::-webkit-scrollbar{display:none}
+nav a{flex:none;padding:14px 14px 12px;font-size:13px;color:var(--s-dim);
+  border-bottom:2px solid transparent;white-space:nowrap}
+nav a b{font-family:var(--s-mono);font-size:10.5px;color:var(--s-line);margin-right:7px;font-weight:400}
+nav a:hover{color:var(--s-ink)}
+nav a.on{color:var(--s-green);border-bottom-color:var(--s-green)}
+nav a.on b{color:var(--s-green);opacity:.55}
+
+/* ── SECTIONS ─────────────────────────────────────── */
+section{padding:58px 0 12px;border-bottom:1px solid var(--s-line)}
+section:last-of-type{border-bottom:none}
+.sec-head{margin-bottom:26px;max-width:76ch}
+
+/* ── SIGNATURE: KHỐI CHIA ĐÔI ─────────────────────── */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:26px 0 30px;
+  border-radius:16px;overflow:hidden;border:1px solid var(--s-line)}
+.duo-g{background:var(--s-forest);color:#fff;padding:44px 42px;
+  display:flex;flex-direction:column;justify-content:center;text-align:center}
+.duo-g .eyebrow{color:var(--s-green-soft)}
+.duo-g h2{color:#fff;margin-bottom:14px}
+.duo-g p{color:rgba(255,255,255,.8);margin-bottom:0;font-size:15.5px}
+.duo-c{background:var(--s-white);padding:38px 40px}
+.duo-c p:last-child{margin-bottom:0}
+.duo.rev .duo-g{order:2}
+.duo.rev .duo-c{order:1}
+
+/* ── TABLES ───────────────────────────────────────── */
+.tbl-wrap{overflow-x:auto;margin:18px 0 26px;border:1px solid var(--s-line);
+  border-radius:14px;background:var(--s-white)}
+table{width:100%;border-collapse:collapse;font-size:13.8px;min-width:640px}
+thead th{background:var(--s-forest);color:#fff;font-family:var(--s-mono);font-size:11px;
+  letter-spacing:.1em;text-transform:uppercase;font-weight:400;text-align:left;
+  padding:12px 14px;white-space:nowrap;line-height:1.5}
+tbody td{padding:11px 14px;border-bottom:1px solid var(--s-line);vertical-align:top;line-height:1.6}
+tbody tr:nth-child(even) td{background:var(--s-cream-warm)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr.tot td{background:var(--s-green-soft);font-weight:600;color:var(--s-forest)}
+td.n,th.n{text-align:right;font-family:var(--s-mono);white-space:nowrap}
+td.lab{font-weight:500;color:var(--s-forest)}
+td.ind{padding-left:36px;color:var(--s-muted)}
+caption{caption-side:bottom;text-align:left;padding:12px 14px;
+  font-family:var(--s-mono);font-size:10.5px;color:var(--s-dim);line-height:1.6}
+
+/* badges */
+.bx{display:inline-block;font-family:var(--s-mono);font-size:9.5px;letter-spacing:.08em;
+  padding:2px 6px;border-radius:3px;border:1px solid;white-space:nowrap;line-height:1.5}
+.bx.s{color:var(--s-green);border-color:rgba(0,112,74,.4);background:var(--s-green-soft)}
+.bx.e{color:var(--s-dim);border-color:var(--s-line);background:var(--s-cream-warm)}
+.bx.q{color:var(--s-warn);border-color:rgba(166,96,58,.4);background:#FDF6F1}
+.st{font-family:var(--s-mono);font-size:11.5px;white-space:nowrap}
+.st.ok{color:var(--s-green)} .st.wr{color:var(--s-warn)}
+.st b{font-weight:500}
+
+/* ── NOTE ─────────────────────────────────────────── */
+.note{border-left:3px solid var(--s-green);background:var(--s-white);
+  padding:16px 22px;border-radius:0 12px 12px 0;margin:22px 0;font-size:15px}
+.note.warn{border-left-color:var(--s-warn);background:#FDF6F1}
+.note.hi{border-left-color:var(--s-gold);background:#FDFAF0}
+.note .nl{font-family:var(--s-mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--s-green);margin-bottom:6px;display:block}
+.note.warn .nl{color:var(--s-warn)} .note.hi .nl{color:var(--s-gold)}
+.note p:last-child{margin-bottom:0}
+
+/* quote — signature phụ */
+.quote{font-family:var(--s-serif);font-style:italic;font-size:17px;line-height:1.6;
+  border-left:3px solid var(--s-green);background:var(--s-green-soft);
+  padding:16px 20px;border-radius:0 12px 12px 0;margin:22px 0;color:var(--s-forest)}
+
+/* ── VALUE CHAIN ──────────────────────────────────── */
+.band{border:1px solid var(--s-line);border-radius:14px;padding:18px 22px;background:var(--s-white)}
+.band.p1{border-left:4px solid var(--s-green)}
+.band.p2{border-left:4px solid rgba(0,112,74,.35)}
+.band.dead{background:var(--s-cream-warm);border-style:dashed;color:var(--s-muted)}
+.band.dead strong{color:var(--s-muted)}
+.band.anchor{background:var(--s-forest);color:#fff;border-color:var(--s-forest)}
+.band.anchor strong{color:#fff}
+.band.anchor .band-t{color:#fff;font-size:20px}
+.band.anchor .band-v{color:var(--s-gold)}
+.band.anchor .band-d{color:rgba(255,255,255,.78)}
+.band-top{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;margin-bottom:9px}
+.band-t{font-family:var(--s-serif);font-size:17px;font-weight:600;color:var(--s-forest)}
+.band-v{font-family:var(--s-mono);font-size:12px;color:var(--s-green);margin-left:auto}
+.band-d{font-size:14px;color:var(--s-muted);line-height:1.62}
+.arrow{height:28px;position:relative;display:flex;align-items:center;justify-content:center}
+.arrow::before{content:"";width:1px;height:100%;background:var(--s-line)}
+.arrow::after{content:"";position:absolute;bottom:1px;
+  border-left:5px solid transparent;border-right:5px solid transparent;
+  border-top:6px solid var(--s-green)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.sub-band{border:1px solid var(--s-line);border-radius:12px;padding:15px 18px;background:var(--s-cream)}
+.sub-band.on{border-left:4px solid var(--s-green);background:var(--s-white)}
+.sub-band.off{background:var(--s-cream-warm);border-style:dashed;opacity:.85}
+.sub-band .sb-t{font-size:14.5px;font-weight:600;color:var(--s-forest);margin-bottom:5px;
+  display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.sub-band .sb-v{font-family:var(--s-mono);font-size:11.5px;color:var(--s-green);margin-bottom:7px}
+.sub-band .sb-d{font-size:13.5px;color:var(--s-muted);line-height:1.6}
+.pri{font-family:var(--s-mono);font-size:9.5px;letter-spacing:.1em;padding:3px 9px;border-radius:999px}
+.pri.t1{background:var(--s-green);color:#fff}
+.pri.t2{border:1px solid var(--s-green);color:var(--s-green)}
+.pri.no{border:1px solid var(--s-line);color:var(--s-dim)}
+.pri.an{background:var(--s-gold);color:var(--s-deep)}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
+.chip{font-family:var(--s-mono);font-size:11px;padding:5px 12px;border-radius:999px;
+  border:1px solid var(--s-line);color:var(--s-muted);background:var(--s-cream)}
+.chip b{color:var(--s-green);font-weight:500}
+.band.anchor .chip{border-color:var(--s-line-dark);background:var(--s-deep);color:rgba(255,255,255,.75)}
+.band.anchor .chip b{color:var(--s-green-soft)}
+
+/* ── SIMULATOR ────────────────────────────────────── */
+.sim{border:1px solid var(--s-line);border-radius:16px;background:var(--s-white);
+  padding:28px 30px;margin:26px 0}
+.sim-grid{display:grid;grid-template-columns:minmax(250px,1fr) minmax(300px,1.1fr);gap:34px}
+.ctrl{margin-bottom:22px}
+.ctrl-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;gap:12px}
+.ctrl-l{font-size:14px;color:var(--s-muted)}
+.ctrl-v{font-family:var(--s-mono);font-size:14px;color:var(--s-green);font-weight:500}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:3px;
+  border-radius:2px;background:var(--s-line);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;
+  border-radius:50%;background:var(--s-green);border:2px solid var(--s-white);cursor:pointer;
+  box-shadow:0 0 0 0 rgba(0,112,74,0);transition:box-shadow .15s}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;
+  background:var(--s-green);border:2px solid var(--s-white);cursor:pointer}
+input[type=range]:focus::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(0,112,74,.18)}
+input[type=range]:focus-visible{outline:2px solid var(--s-green);outline-offset:5px;border-radius:4px}
+.out{border:1px solid var(--s-line);border-radius:14px;background:var(--s-cream);padding:22px}
+.out-hero{text-align:center;padding-bottom:18px;border-bottom:1px solid var(--s-line);margin-bottom:15px}
+.out-hero .oh-l{font-family:var(--s-mono);font-size:10px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--s-muted);margin-bottom:9px}
+.out-hero .oh-v{font-family:var(--s-serif);font-size:46px;color:var(--s-gold);line-height:1;font-weight:600}
+.out-hero .oh-v u{font-family:var(--s-sans);font-size:18px;text-decoration:none;color:var(--s-muted)}
+.out-hero .oh-s{font-size:13px;color:var(--s-muted);margin-top:9px}
+.brk{display:flex;justify-content:space-between;gap:12px;font-size:13px;padding:6px 0 2px}
+.brk span:first-child{color:var(--s-muted)}
+.brk span:last-child{font-family:var(--s-mono);color:var(--s-forest)}
+.bar{height:4px;border-radius:2px;background:var(--s-line);overflow:hidden;margin-bottom:5px}
+.bar i{display:block;height:100%;background:var(--s-green)}
+.scen{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}
+.sc{border:1.5px solid var(--s-line);border-radius:12px;padding:13px 15px;
+  background:var(--s-white);cursor:pointer;text-align:center;
+  transition:border-color .15s,background .15s}
+.sc:hover{border-color:var(--s-green);background:var(--s-green-soft)}
+.sc:focus-visible{outline:2px solid var(--s-green);outline-offset:3px}
+.sc .sc-n{font-family:var(--s-mono);font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--s-muted);margin-bottom:6px}
+.sc .sc-v{font-family:var(--s-serif);font-size:23px;font-weight:600;color:var(--s-forest)}
+.sc .sc-d{font-family:var(--s-mono);font-size:10.5px;color:var(--s-dim);margin-top:4px}
+
+/* ── CARDS / STEPS ────────────────────────────────── */
+ul,ol{margin:0 0 18px 22px}
+li{margin-bottom:9px}
+li::marker{color:var(--s-green)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:16px;margin:22px 0}
+.cd{border:1px solid var(--s-line);border-radius:14px;padding:20px 22px;
+  background:var(--s-white);box-shadow:none}
+.cd.on{border-left:4px solid var(--s-green)}
+.cd .cd-tag{font-family:var(--s-mono);font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--s-green);margin-bottom:9px}
+.cd.wr .cd-tag{color:var(--s-warn)}
+.cd p{font-size:14px;color:var(--s-muted);margin-bottom:0;line-height:1.62}
+.step{display:flex;gap:20px;padding:20px 0;border-bottom:1px solid var(--s-line)}
+.step:last-child{border-bottom:none}
+.step-n{font-family:var(--s-serif);font-size:32px;font-weight:600;color:var(--s-green-soft);
+  line-height:1;flex:none;width:48px}
+.step-b .st-m{font-family:var(--s-mono);font-size:10.5px;letter-spacing:.1em;
+  color:var(--s-green);margin-bottom:7px;text-transform:uppercase}
+.step-b p{font-size:14.5px;color:var(--s-muted);margin-bottom:0}
+
+footer{background:var(--s-deep);color:rgba(255,255,255,.62);
+  padding:38px 0;font-size:13px;line-height:1.75;margin-top:20px}
+footer strong{color:#fff}
+footer .mono{color:var(--s-green-soft);font-size:11px}
+
+/* ── RESPONSIVE ───────────────────────────────────── */
+@media(max-width:820px){
+  .wrap{padding:0 20px}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .duo{grid-template-columns:1fr}
+  .duo.rev .duo-g{order:0} .duo.rev .duo-c{order:0}
+  .duo-g{padding:34px 26px} .duo-c{padding:28px 26px}
+  .sim-grid{grid-template-columns:1fr;gap:24px}
+  .split{grid-template-columns:1fr}
+  .scen{grid-template-columns:1fr}
+  .hero{padding:46px 0 38px}
+  section{padding:42px 0 8px}
+  .sim{padding:22px}
+}
+@media(prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}
+@media print{
+  body{background:#fff;color:#000;font-size:10.5pt}
+  nav,.sim,.stamp{display:none!important}
+  .hero{background:#fff;color:#000;border-bottom:2px solid #000;padding:0 0 20px}
+  .hero h1,.hero .lede,.hero .eyebrow{color:#000!important}
+  .kpis{grid-template-columns:repeat(4,1fr)}
+  .kpi{background:#fff!important;border:1px solid #999}
+  .kpi .k-val,.kpi .k-lab,.kpi .k-sub{color:#000!important}
+  .duo-g{background:#f0f0f0!important;color:#000!important}
+  .duo-g h2,.duo-g p,.duo-g .eyebrow{color:#000!important}
+  .band.anchor{background:#f0f0f0!important;color:#000!important}
+  .band.anchor .band-t,.band.anchor .band-d,.band.anchor .band-v,.band.anchor strong{color:#000!important}
+  thead th{background:#e4e4e4!important;color:#000!important}
+  .band,.cd,.note,.tbl-wrap,.duo{break-inside:avoid;box-shadow:none!important}
+  footer{background:#fff;color:#000;border-top:1px solid #999}
+  section{break-inside:auto;padding:24px 0 6px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ HERO ══════════════════════════════════════════ -->
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Báo cáo phân tích · Trade Finance Origination</div>
+    <h1>Hệ sinh thái <em>Samsung</em> tại Việt Nam</h1>
+    <p class="lede">Phân tích chuỗi giá trị, sức mạnh tài chính và định cỡ cơ hội tài trợ thương mại —
+      từ góc nhìn một ngân hàng đi tìm danh mục supply chain finance.</p>
+    <div class="stamp">
+      <span class="hi" id="stampVer"></span>
+      <span id="stampDate"></span>
+      <span>Kỳ dữ liệu FY2025</span>
+      <span>Nguồn lõi: BCTC hợp nhất kiểm toán Samsung Electronics</span>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi">
+        <div class="k-lab">Doanh thu 6 pháp nhân lõi</div>
+        <div class="k-val">65,08<u>tỷ USD</u></div>
+        <div class="k-sub">≈ 13,7% kim ngạch XK Việt Nam <span class="bx s">S</span></div>
+      </div>
+      <div class="kpi">
+        <div class="k-lab">LNST 4 pháp nhân SEC</div>
+        <div class="k-val">3,68<u>tỷ USD</u></div>
+        <div class="k-sub">+12,2% so 2024 · biên ròng 5,93% <span class="bx s">S</span></div>
+      </div>
+      <div class="kpi gold">
+        <div class="k-lab">Chi tiêu nội địa bên thứ ba</div>
+        <div class="k-val">19–21<u>tỷ USD</u></div>
+        <div class="k-sub">Đây mới là sân chơi của ngân hàng <span class="bx e">E</span></div>
+      </div>
+      <div class="kpi">
+        <div class="k-lab">Pool dư nợ khả thi</div>
+        <div class="k-val">0,7–1,5<u>tỷ USD</u></div>
+        <div class="k-sub">Toàn hệ thống ngân hàng, funded <span class="bx e">E</span></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ══ NAV ═══════════════════════════════════════════ -->
+<nav>
+  <div class="wrap" id="navBar">
+    <a href="#s0"><b>00</b>Đối chiếu nguồn</a>
+    <a href="#s1"><b>01</b>Tóm tắt điều hành</a>
+    <a href="#s2"><b>02</b>Sức khoẻ anchor</a>
+    <a href="#s3"><b>03</b>Sơ đồ chuỗi giá trị</a>
+    <a href="#s4"><b>04</b>Định giá chuỗi</a>
+    <a href="#s5"><b>05</b>Biến số tài trợ</a>
+    <a href="#s6"><b>06</b>Tìm target ở đâu</a>
+    <a href="#s7"><b>07</b>Sản phẩm đề xuất</a>
+    <a href="#s8"><b>08</b>Rủi ro cấu trúc</a>
+    <a href="#s9"><b>09</b>Dữ liệu còn thiếu</a>
+    <a href="#s10"><b>10</b>Khuyến nghị</a>
+    <a href="#sA"><b>—</b>Phụ lục nguồn</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<!-- ══ 0 ═════════════════════════════════════════════ -->
+<section id="s0">
+  <div class="sec-head">
+    <div class="eyebrow">00 · Data integrity</div>
+    <h2>Đối chiếu nguồn — đọc trước khi dùng bất cứ con số nào</h2>
+  </div>
+
+  <div class="cards">
+    <div class="cd on"><div class="cd-tag">Ký hiệu S</div><h5>Có nguồn</h5>
+      <p>Trích từ BCTC Samsung Electronics hoặc báo chí dẫn lại BCTC. Có link ở Phụ lục.</p></div>
+    <div class="cd"><div class="cd-tag">Ký hiệu E</div><h5>Ước tính</h5>
+      <p>Người phân tích dựng từ benchmark ngành EMS. Giả định nêu rõ trong từng bảng.
+        <strong>Không phải số công bố.</strong></p></div>
+    <div class="cd wr"><div class="cd-tag">Ký hiệu ?</div><h5>Thiếu dữ liệu</h5>
+      <p>Chưa xác minh được. Toàn bộ liệt kê ở Mục 09 với thứ tự ưu tiên thu thập.</p></div>
+  </div>
+
+  <h3>0.1 · Kết quả đối chiếu bộ dữ liệu đầu vào</h3>
+  <p>Phần lõi khớp hoàn toàn với nguồn công khai. <strong>Bốn chi tiết phải đính chính trước khi đưa vào credit memo.</strong></p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Chỉ tiêu</th><th>Số đầu vào</th><th>Số đối chiếu được</th><th>Kết luận</th></tr></thead>
+    <tbody>
+      <tr><td class="lab">Doanh thu 4 nhà máy 2025</td><td class="n">62,12 tỷ USD</td>
+        <td>62,1 tỷ USD, +8% — CafeF / VCCI / Nhà đầu tư (06/03/2026)</td>
+        <td><span class="st ok">✓ <b>Khớp</b></span></td></tr>
+      <tr><td class="lab">LNST 4 nhà máy 2025</td><td class="n">3,68 tỷ · +12,2%</td>
+        <td>3,67–3,68 tỷ USD, +12,2%</td><td><span class="st ok">✓ <b>Khớp</b></span></td></tr>
+      <tr><td class="lab">SEVT</td><td class="n">25,97 / 1,68 tỷ</td><td>25,97 / 1,67 tỷ</td>
+        <td><span class="st ok">✓ <b>Khớp</b></span></td></tr>
+      <tr><td class="lab">% doanh thu tập đoàn</td><td class="n">26,5%</td><td><strong>~25%</strong></td>
+        <td><span class="st wr">! <b>Đính chính</b></span></td></tr>
+      <tr><td class="lab">% lợi nhuận tập đoàn</td><td class="n">11,6%</td><td><strong>~10%</strong></td>
+        <td><span class="st wr">! <b>Đính chính</b></span></td></tr>
+      <tr><td class="lab">% kim ngạch XK Việt Nam</td><td class="n">~13%</td>
+        <td><strong>13,1%</strong> (4 nhà máy) / <strong>13,7%</strong> (6 nhà máy, trên XK 475,04 tỷ USD)</td>
+        <td><span class="st wr">! <b>Làm rõ mẫu số</b></span></td></tr>
+      <tr><td class="lab">Thuế TTTC bổ sung 2025</td><td class="n">302 triệu USD</td>
+        <td><strong>Không xác minh được.</strong> FY2024 tập đoàn ghi nhận 429,82 tỷ won ≈ 315,5 tr. USD</td>
+        <td><span class="st wr">✕ <b>Treo — xem §09</b></span></td></tr>
+      <tr><td class="lab">SDV +4,3% lợi nhuận</td><td class="n">+4,3%</td>
+        <td>Báo chí: SDV là đơn vị <strong>duy nhất suy giảm doanh thu</strong> 2025 (lợi nhuận vẫn tăng nhẹ)</td>
+        <td><span class="st wr">! <b>Cần soi kỹ</b></span></td></tr>
+      <tr><td class="lab">Nguồn <span class="mono">global.samsungassurance.com</span></td><td class="n">—</td>
+        <td><strong>Domain không tồn tại.</strong> IR chính thức: <span class="mono">samsung.com/global/ir</span>
+          + DART <span class="mono">dart.fss.or.kr</span></td>
+        <td><span class="st wr">✕ <b>Bỏ khỏi trích dẫn</b></span></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note warn"><span class="nl">Cảnh báo hồ sơ tín dụng</span>
+    <p>Đừng để một domain không tồn tại lọt vào credit memo. Nguồn gốc duy nhất chấp nhận được cho số liệu
+      cấp pháp nhân là <strong>사업보고서 (Annual Business Report) nộp DART</strong>, mục
+      <em>주요 종속기업 요약재무정보</em>. Toàn bộ báo chí Việt Nam đều dẫn lại từ đây.</p>
+  </div>
+
+  <h3>0.2 · Kiểm tra tính nhất quán nội bộ (cross-foot)</h3>
+  <p>Tôi dựng ngược FY2024 từ tốc độ tăng trưởng trong bộ dữ liệu, rồi so với số FY2024 báo chí đã đăng
+    (Tuổi Trẻ, 20/02/2025).</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Pháp nhân</th><th class="n">LN 2025 <span class="bx s">S</span></th>
+      <th class="n">Tăng <span class="bx s">S</span></th><th class="n">⇒ LN 2024 suy ra <span class="bx e">E</span></th>
+      <th class="n">LN 2024 báo chí <span class="bx s">S</span></th><th class="n">Lệch</th></tr></thead>
+    <tbody>
+      <tr><td class="lab">SEVT</td><td class="n">1.680</td><td class="n">+14,6%</td><td class="n">1.466</td><td class="n">n/a</td><td class="n">—</td></tr>
+      <tr><td class="lab">SEV</td><td class="n">1.090</td><td class="n">+14,4%</td><td class="n">953</td><td class="n">944</td><td class="n st ok">0,9%</td></tr>
+      <tr><td class="lab">SDV</td><td class="n">618</td><td class="n">+4,3%</td><td class="n">592</td><td class="n">584</td><td class="n st ok">1,4%</td></tr>
+      <tr><td class="lab">SEHC</td><td class="n">293</td><td class="n">+8,7%</td><td class="n">270</td><td class="n">265</td><td class="n st ok">1,8%</td></tr>
+      <tr class="tot"><td>TỔNG</td><td class="n">3.681</td><td class="n">+12,2%</td><td class="n">3.281</td><td class="n">"&gt;3,2 tỷ"</td><td class="n">✓</td></tr>
+    </tbody>
+    <caption>Đơn vị: triệu USD. Chênh 1–2% do quy đổi KRW/USD.</caption>
+  </table></div>
+
+  <div class="quote">Bộ số liệu vượt kiểm tra cross-foot. Có một nguồn (Nhadautu, 02/2025) ghi lợi nhuận 2024
+    là 4,66 tỷ USD — con số này mâu thuẫn với chính các cấu phần của nó và nên loại bỏ.</div>
+</section>
+
+<!-- ══ 1 ═════════════════════════════════════════════ -->
+<section id="s1">
+  <div class="sec-head">
+    <div class="eyebrow">01 · Executive summary</div>
+    <h2>Tóm tắt điều hành</h2>
+  </div>
+
+  <div class="duo">
+    <div class="duo-g">
+      <div class="eyebrow">Luận điểm trung tâm</div>
+      <h2>Đừng đuổi theo Samsung.<br>Đuổi theo tiền của Samsung.</h2>
+      <p>65 tỷ USD doanh thu tạo ra 19–21 tỷ USD chi tiêu nội địa mỗi năm.
+        Anchor là công cụ giảm rủi ro — không phải là khách hàng.</p>
+    </div>
+    <div class="duo-c">
+      <p><strong>Samsung không phải là khách hàng tín dụng.</strong> Bốn pháp nhân lõi lãi ròng 3,68 tỷ USD,
+        dòng tiền dương lớn, được công ty mẹ xếp hạng A/A+ hậu thuẫn, và gần như toàn bộ doanh thu là
+        bán nội bộ tập đoàn.</p>
+      <p>Cơ hội nằm ở <em>lớp nhà cung ứng quanh Samsung</em> — và Samsung đóng vai trò
+        <strong>anchor credit</strong> để cấu trúc sản phẩm với rủi ro thấp hơn nhiều so với cho vay
+        doanh nghiệp thông thường.</p>
+    </div>
+  </div>
+
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Lớp</th><th class="n">Doanh số/năm <span class="bx e">E</span></th>
+      <th class="n">Nhu cầu vốn LĐ <span class="bx e">E</span></th>
+      <th class="n">Dư nợ khả thi toàn hệ thống <span class="bx e">E</span></th></tr></thead>
+    <tbody>
+      <tr><td class="lab">Tier-1 FDI (Hàn / Nhật / Đài tại VN)</td><td class="n">14,5 tỷ USD</td><td class="n">2,1 tỷ USD</td><td class="n">270–595 tr. USD</td></tr>
+      <tr><td class="lab">Tier-1 / Tier-2 vốn Việt</td><td class="n">5,0 tỷ USD</td><td class="n">1,7 tỷ USD</td><td class="n">330–490 tr. USD</td></tr>
+      <tr><td class="lab">Dịch vụ (logistics, suất ăn, MRO, nhân lực)</td><td class="n">1,8 tỷ USD</td><td class="n">0,27 tỷ USD</td><td class="n">50–80 tr. USD</td></tr>
+      <tr><td class="lab">Xây lắp / thiết bị (capex)</td><td class="n">2,0 tỷ USD</td><td class="n">bảo lãnh</td><td class="n">150–375 tr. USD (contingent)</td></tr>
+      <tr><td class="lab">Downstream phân phối nội địa</td><td class="n">2,0 tỷ USD</td><td class="n">0,25 tỷ USD</td><td class="n">40–90 tr. USD</td></tr>
+      <tr class="tot"><td>TỔNG</td><td class="n">~25,3 tỷ USD</td><td class="n">~4,3 tỷ USD</td><td class="n">0,72–1,49 tỷ funded</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note hi"><span class="nl">Kết luận chiến lược</span>
+    <p>Một ngân hàng đặt mục tiêu <strong>8–12% thị phần</strong> pool này ⇒ danh mục
+      <strong>80–160 triệu USD dư nợ funded</strong>, doanh số FX 400–700 triệu USD/năm, cộng mandate payroll
+      cho ~90–110 nghìn lao động. Quy mô này đủ để lập một <strong>Vertical Desk chuyên biệt</strong> —
+      không phải một sản phẩm rời rạc gắn vào bộ phận SME hiện hữu.</p>
+  </div>
+</section>
+
+<!-- ══ 2 ═════════════════════════════════════════════ -->
+<section id="s2">
+  <div class="sec-head">
+    <div class="eyebrow">02 · Anchor credit</div>
+    <h2>Sức khoẻ tài chính lớp anchor</h2>
+  </div>
+
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Pháp nhân</th><th>Ngành</th><th class="n">DT 2025<br>tỷ USD <span class="bx s">S</span></th>
+      <th class="n">LNST<br>tr. USD <span class="bx s">S</span></th><th class="n">Biên ròng <span class="bx e">E</span></th>
+      <th class="n">Δ DT <span class="bx e">E</span></th><th class="n">Δ LN <span class="bx s">S</span></th><th>Đánh giá</th></tr></thead>
+    <tbody>
+      <tr><td class="lab">SEVT · Thái Nguyên</td><td>Smartphone, tablet</td><td class="n">25,97</td><td class="n">1.680</td>
+        <td class="n">6,47%</td><td class="n">+11,3%</td><td class="n">+14,6%</td>
+        <td><span class="st ok">✓</span> Đầu tàu, operating leverage dương</td></tr>
+      <tr><td class="lab">SEV · Bắc Ninh</td><td>Smartphone, module</td><td class="n">16,71</td><td class="n">1.090</td>
+        <td class="n">6,52%</td><td class="n">+12,9%</td><td class="n">+14,4%</td>
+        <td><span class="st ok">✓</span> Ổn định, biên tốt nhất</td></tr>
+      <tr><td class="lab">SDV · Bắc Ninh</td><td>Màn hình OLED/LCD</td><td class="n">14,09</td><td class="n">618</td>
+        <td class="n">4,39%</td><td class="n st wr">−0,8%</td><td class="n">+4,3%</td>
+        <td><span class="st wr">!</span> Duy nhất giảm DT — rủi ro dịch chuyển</td></tr>
+      <tr><td class="lab">SEHC · TP.HCM</td><td>CE / TV, gia dụng</td><td class="n">5,35</td><td class="n">293</td>
+        <td class="n">5,48%</td><td class="n">+10,1%</td><td class="n">+8,7%</td>
+        <td><span class="st ok">✓</span> Phục hồi mạnh từ nền thấp</td></tr>
+      <tr class="tot"><td>4 pháp nhân SEC</td><td>—</td><td class="n">62,12</td><td class="n">3.681</td>
+        <td class="n">5,93%</td><td class="n">+8,6%</td><td class="n">+12,2%</td><td>—</td></tr>
+      <tr><td class="lab">SEMV</td><td>Linh kiện thụ động, camera module</td><td class="n">2,08</td>
+        <td class="n"><span class="bx q">?</span></td><td class="n"><span class="bx q">?</span></td>
+        <td class="n"><span class="bx q">?</span></td><td class="n st wr">giảm</td>
+        <td><span class="st wr">!</span> Đơn vị duy nhất giảm LN</td></tr>
+      <tr><td class="lab">SDIV</td><td>Pin di động</td><td class="n">0,88</td>
+        <td class="n"><span class="bx q">?</span></td><td class="n"><span class="bx q">?</span></td>
+        <td class="n"><span class="bx q">?</span></td><td class="n"><span class="bx q">?</span></td><td>—</td></tr>
+      <tr class="tot"><td>6 pháp nhân lõi</td><td>—</td><td class="n">65,08</td>
+        <td class="n"><span class="bx q">?</span></td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td>—</td></tr>
+    </tbody>
+    <caption>Δ DT suy ra từ số FY2024 báo chí công bố [E]; Δ LN là số công bố [S].</caption>
+  </table></div>
+
+  <div class="duo rev">
+    <div class="duo-c">
+      <h3 style="margin-top:0">Đọc gì từ biên lợi nhuận 5,93%?</h3>
+      <ol style="margin-bottom:0">
+        <li><strong>Chi phí đầu vào chiếm ~90% doanh thu</strong> ⇒ pool mua hàng khổng lồ.
+          Đây chính là tài sản cơ hội, không phải P&amp;L của Samsung.</li>
+        <li><strong>Lợi nhuận là biến số chính sách, không phải biến số thị trường.</strong>
+          Đừng đọc biên LN như tín hiệu sức khoẻ vận hành. Chỉ số vận hành thật nằm ở sản lượng,
+          headcount, tỷ lệ chạy máy và kim ngạch XNK hải quan.</li>
+        <li><strong>Thuế tối thiểu toàn cầu đang nén dòng tiền sau thuế.</strong>
+          Samsung xác nhận thuế suất hiệu dụng GloBE tại VN dưới 15% nên phải nộp bổ sung QDMTT;
+          Nghị định 236/2025/NĐ-CP đã cụ thể hoá cơ chế.</li>
+      </ol>
+    </div>
+    <div class="duo-g">
+      <div class="eyebrow">Chữ ký tài chính</div>
+      <h2>Đây là mô hình gia công có chuyển giá — không phải nhà sản xuất độc lập.</h2>
+      <p>Hệ quả gián tiếp cho supply chain: áp lực siết giá mua và kéo dài payment terms với nhà cung ứng.
+        Tức là <em>làm tăng nhu cầu SCF</em>.</p>
+    </div>
+  </div>
+
+  <h3>Rủi ro tập trung dội xuống chuỗi</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Rủi ro</th><th>Bằng chứng</th><th>Mức độ</th></tr></thead>
+    <tbody>
+      <tr><td class="lab">Single-anchor concentration</td>
+        <td>Đa số Tier-1/2 Việt có &gt;60–80% doanh thu từ Samsung <span class="bx e">E</span></td>
+        <td><span class="st wr">✕ <b>Cao</b></span></td></tr>
+      <tr><td class="lab">Dịch chuyển công suất sang Ấn Độ</td>
+        <td>Samsung đã tăng công suất Noida; VN vẫn giữ tỷ trọng lớn <span class="bx q">?</span></td>
+        <td><span class="st wr">! <b>Trung bình</b></span></td></tr>
+      <tr><td class="lab">SDV — thu hẹp mảng display</td>
+        <td>Đơn vị duy nhất giảm doanh thu 2025 <span class="bx s">S</span></td>
+        <td><span class="st wr">! <b>Trung bình</b></span></td></tr>
+      <tr><td class="lab">Thuế đối ứng Mỹ</td>
+        <td>Được nêu là headwind 2025 nhưng KQKD vẫn tăng <span class="bx s">S</span></td>
+        <td><span class="st wr">! <b>Trung bình</b></span></td></tr>
+      <tr><td class="lab">Rủi ro vật lý — lũ lụt Thái Nguyên 2025</td>
+        <td>Được nêu trong tổng kết năm <span class="bx s">S</span></td>
+        <td><span class="st wr">! <b>Kiểm tra bảo hiểm BI của bên vay</b></span></td></tr>
+      <tr><td class="lab">GMT làm mất hiệu lực ưu đãi FDI</td>
+        <td>ND 236/2025/NĐ-CP <span class="bx s">S</span></td>
+        <td><span class="st wr">! <b>Trung bình</b></span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ══ 3 ═════════════════════════════════════════════ -->
+<section id="s3">
+  <div class="sec-head">
+    <div class="eyebrow">03 · Value chain map</div>
+    <h2>Sơ đồ chuỗi giá trị</h2>
+    <p class="lede">Đọc từ trên xuống. Viền xanh đậm = target ưu tiên, viền nhạt = target thứ cấp,
+      nét đứt xám = không tiếp cận được.</p>
+  </div>
+
+  <div class="band dead">
+    <div class="band-top"><span class="pri no">KHÔNG TARGET</span>
+      <span class="band-t" style="color:var(--s-muted)">Upstream — ngoài Việt Nam</span>
+      <span class="band-v" style="color:var(--s-muted)">~30–35 tỷ USD/năm <span class="bx e">E</span></span></div>
+    <div class="band-d">Chip / SoC (Qualcomm, Samsung LSI) · DRAM &amp; NAND (SEC Korea) · Camera sensor (Sony) ·
+      Tấm nền &amp; vật liệu OLED (Samsung Display KR, Dow, Merck) · Kính (Corning) · PMIC.<br>
+      <strong>Nhập khẩu chủ yếu intercompany</strong> — dùng hạn mức tập đoàn, ngân hàng Việt gần như không chạm được.</div>
+  </div>
+  <div class="arrow"></div>
+
+  <div class="band p1">
+    <div class="band-top"><span class="pri t1">TARGET #1</span>
+      <span class="band-t">Tier-2 / Tier-3 tại Việt Nam</span>
+      <span class="band-v">~2,0–2,5 tỷ USD <span class="bx e">E</span></span></div>
+    <div class="band-d">Ép nhựa kỹ thuật · Khuôn mẫu &amp; cơ khí chính xác CNC · Dập kim loại · Mạ &amp; sơn phủ ·
+      Bao bì carton &amp; in ấn · Xốp EPS chống sốc · Cáp &amp; dây dẫn · Ốc vít · Linh kiện phụ.<br>
+      <strong>Đặc điểm tín dụng:</strong> DN vừa &amp; nhỏ, DSO 60–90 ngày, thiếu vốn lưu động,
+      ít quan hệ ngân hàng ngoại — <em>đây là nơi biên lợi nhuận cho ngân hàng tốt nhất.</em></div>
+    <div class="chips">
+      <span class="chip">Nhựa <b>An Lập</b> · BN</span>
+      <span class="chip">Nhựa KT <b>Vân Long</b> · HP</span>
+      <span class="chip"><b>Vina Technology</b> · TN</span>
+      <span class="chip">Đồng KT <b>Korea VN (KCT)</b> · NB</span>
+      <span class="chip">In &amp; Bao bì <b>Goldsun</b></span>
+      <span class="chip"><b>An Trung Industries</b> (NHH)</span>
+    </div>
+  </div>
+  <div class="arrow"></div>
+
+  <div class="band">
+    <div class="band-top"><span class="band-t">Tier-1 tại Việt Nam</span>
+      <span class="band-v">~17,5 tỷ USD mua hàng nội địa <span class="bx e">E</span></span></div>
+    <div class="split" style="margin-top:12px">
+      <div class="sub-band on" style="border-left-color:rgba(0,112,74,.35)">
+        <div class="sb-t"><span class="pri t2">TARGET #2</span> Tier-1 FDI</div>
+        <div class="sb-v">~14,5 tỷ USD</div>
+        <div class="sb-d">Vỏ máy &amp; housing · Camera module · Loa / mic / receiver · Sạc &amp; cáp · FPCB.
+          Chủ yếu vốn Hàn Quốc, đặt tại KCN Yên Phong, Quế Võ, VSIP Bắc Ninh, Yên Bình, Điềm Thụy.<br>
+          <strong>Nhu cầu:</strong> LC nhập nguyên liệu, SCF, FX KRW/USD/VND, term loan mở rộng.</div>
+      </div>
+      <div class="sub-band on">
+        <div class="sb-t"><span class="pri t1">TARGET #1</span> Tier-1 vốn Việt</div>
+        <div class="sb-v">~3,0 tỷ USD</div>
+        <div class="sb-d">Tổng DN Việt cấp 1 + cấp 2 trong chuỗi Samsung:
+          <strong>25 (2014) → 257 (2022) → 306 (2023) → 309 (5/2025)</strong> <span class="bx s">S</span><br>
+          Riêng cấp 1: ~52 DN (2022). Bắc Ninh: 19 cấp 1 + 41 cấp 2.</div>
+      </div>
+    </div>
+  </div>
+  <div class="arrow"></div>
+
+  <div class="band anchor">
+    <div class="band-top"><span class="pri an">★ ANCHOR</span>
+      <span class="band-t">6 pháp nhân lõi Samsung</span>
+      <span class="band-v">65,08 tỷ USD DT 2025 <span class="bx s" style="background:transparent;color:var(--s-green-soft);border-color:var(--s-line-dark)">S</span></span></div>
+    <div class="chips" style="margin-bottom:12px">
+      <span class="chip"><b>SEVT</b> 25,97</span><span class="chip"><b>SEV</b> 16,71</span>
+      <span class="chip"><b>SDV</b> 14,09</span><span class="chip"><b>SEHC</b> 5,35</span>
+      <span class="chip"><b>SEMV</b> 2,08</span><span class="chip"><b>SDIV</b> 0,88</span>
+    </div>
+    <div class="band-d">Ngoài ra: Samsung R&amp;D Việt Nam (SRV, ~2.000 kỹ sư), Samsung SDS VN,
+      Samsung C&amp;T / Engineering.<br>
+      <strong>Không phải khách hàng tín dụng.</strong> Là anchor credit + nguồn payroll + FX + cash management.</div>
+  </div>
+  <div class="arrow"></div>
+
+  <div class="split">
+    <div class="band p2">
+      <div class="band-top"><span class="pri t2">TARGET #3</span>
+        <span class="band-t" style="font-size:15.5px">Dịch vụ vệ tinh</span></div>
+      <div class="band-v" style="margin:0 0 8px">~1,8 tỷ USD <span class="bx e">E</span></div>
+      <div class="band-d">Logistics &amp; forwarding (Nippon Express, Kerry, ITL, ALS, Bee, Interlog) ·
+        Suất ăn công nghiệp (Ba Sao) · Cung ứng nhân lực · Vệ sinh · Bảo vệ · Bảo trì MRO ·
+        Xử lý chất thải · Tiện ích.</div>
+    </div>
+    <div class="band p2">
+      <div class="band-top"><span class="pri t2">TARGET #4</span>
+        <span class="band-t" style="font-size:15.5px">Hạ tầng &amp; capex</span></div>
+      <div class="band-v" style="margin:0 0 8px">~1,5–2,5 tỷ USD/năm <span class="bx e">E</span></div>
+      <div class="band-d">Chủ đầu tư KCN: KBC, Viglacera (VGC), VSIP · Nhà thầu xây lắp &amp; M&amp;E ·
+        Cung cấp máy móc, dây chuyền.<br>
+        <strong>Sản phẩm:</strong> bảo lãnh tạm ứng / thực hiện / bảo hành + tài trợ retention.</div>
+    </div>
+  </div>
+  <div class="arrow"></div>
+
+  <div class="band">
+    <div class="band-top"><span class="band-t">Downstream — đầu ra</span></div>
+    <div class="split" style="margin-top:12px">
+      <div class="sub-band off">
+        <div class="sb-t"><span class="pri no">KHÔNG TARGET</span> Xuất khẩu ~85–90%</div>
+        <div class="sb-d">Bán cho SEC HQ &amp; các công ty bán hàng khu vực (Mỹ, EU, Ấn Độ, ASEAN).
+          <strong>Giao dịch nội bộ tập đoàn</strong> ⇒ không có cơ hội factoring bên thứ ba.</div>
+      </div>
+      <div class="sub-band on" style="border-left-color:rgba(0,112,74,.35)">
+        <div class="sb-t"><span class="pri t2">TARGET #5</span> Nội địa ~10%</div>
+        <div class="sb-v">~2 tỷ USD <span class="bx e">E</span></div>
+        <div class="sb-d">Samsung Vina → nhà phân phối → Thế Giới Di Động, FPT Shop, CellphoneS,
+          Viettel Store, Điện Máy Xanh.<br><strong>Sản phẩm:</strong> distributor / dealer finance.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 4 ═════════════════════════════════════════════ -->
+<section id="s4">
+  <div class="sec-head">
+    <div class="eyebrow">04 · Chain valuation</div>
+    <h2>Định giá chuỗi — mô hình bóc tách chi phí</h2>
+    <p class="lede">Samsung không công bố cấu trúc chi phí pháp nhân Việt Nam. Tôi dựng ngược từ biên LN ròng
+      5,93% <span class="bx s">S</span> và benchmark ngành EMS / lắp ráp điện thoại.</p>
+  </div>
+
+  <h3>4.1 · Từ doanh thu về pool mua hàng</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Khoản mục</th><th class="n">% doanh thu</th><th class="n">Giá trị (tỷ USD)</th><th>Cơ sở</th></tr></thead>
+    <tbody>
+      <tr class="tot"><td>Doanh thu 6 pháp nhân lõi</td><td class="n">100,0%</td><td class="n">65,08</td><td><span class="bx s">S</span></td></tr>
+      <tr><td class="lab">Giá vốn hàng bán (COGS)</td><td class="n">89–91%</td><td class="n">58,6</td>
+        <td>Biên gộp 9–11%, chuẩn EMS/OEM lắp ráp <span class="bx e">E</span></td></tr>
+      <tr><td class="ind">├ Nguyên vật liệu trực tiếp</td><td class="n">76–78%</td>
+        <td class="n"><strong>50,0</strong></td><td>85% COGS, đặc thù lắp ráp điện tử <span class="bx e">E</span></td></tr>
+      <tr><td class="ind">├ Nhân công trực tiếp</td><td class="n">4,3–4,7%</td><td class="n">2,9</td>
+        <td>~95–110k lao động × chi phí bình quân <span class="bx e">E</span></td></tr>
+      <tr><td class="ind">└ Chi phí SX chung (KH, điện, MRO, khuôn)</td><td class="n">5,5–6,5%</td><td class="n">3,9</td>
+        <td><span class="bx e">E</span></td></tr>
+      <tr><td class="lab">Chi phí bán hàng &amp; QLDN + R&amp;D</td><td class="n">3,0–4,0%</td><td class="n">2,3</td>
+        <td><span class="bx e">E</span></td></tr>
+      <tr><td class="lab">Lợi nhuận trước thuế</td><td class="n">~6,5%</td><td class="n">4,2</td>
+        <td>Suy từ LNST + thuế suất hiệu dụng <span class="bx e">E</span></td></tr>
+      <tr class="tot"><td>Lợi nhuận sau thuế (4 pháp nhân SEC)</td><td class="n">5,93%</td><td class="n">3,68</td>
+        <td><span class="bx s">S</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>4.2 · Bóc tách 50,0 tỷ USD nguyên vật liệu</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Nguồn</th><th class="n">Tỷ trọng</th><th class="n">Giá trị</th><th>Cơ hội cho ngân hàng Việt</th></tr></thead>
+    <tbody>
+      <tr><td class="lab">Nhập khẩu trực tiếp (chip, DRAM/NAND, sensor, tấm nền, kính)</td>
+        <td class="n">62–68%</td><td class="n">32,5 tỷ USD</td>
+        <td>Rất thấp — phần lớn intercompany, dùng hạn mức tập đoàn</td></tr>
+      <tr><td class="lab">Mua trong nước</td><td class="n">32–38%</td><td class="n"><strong>17,5 tỷ USD</strong></td>
+        <td><span class="st ok">✓</span> Đây là toàn bộ sân chơi</td></tr>
+      <tr><td class="ind">├ Tier-1 FDI đặt tại VN</td><td class="n">80–85%</td><td class="n">14,5 tỷ USD</td>
+        <td><span class="st ok">✓</span> Pool lớn nhất, cạnh tranh cao (NH Hàn phủ dày)</td></tr>
+      <tr><td class="ind">└ DN vốn Việt (Tier-1 + Tier-2)</td><td class="n">15–20%</td><td class="n">3,0 tỷ USD</td>
+        <td><span class="st ok">✓</span> Ít cạnh tranh nhất, biên tốt nhất</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note hi"><span class="nl">Kiểm chứng chéo — quan trọng</span>
+    <p>Tỷ lệ nội địa hoá 32–38% (tính cả FDI đặt tại VN) khớp với thực tế Việt Nam nhập khẩu &gt;120 tỷ USD
+      linh kiện điện tử mỗi năm. Nếu tài liệu nào nói <em>"tỷ lệ nội địa hoá Samsung &gt;60%"</em>, con số đó tính
+      theo <strong>số lượng nhà cung cấp</strong> hoặc theo cách tính khác — <strong>không phải theo giá trị
+      mua hàng</strong>. Đừng dùng nhầm mẫu số này trong credit memo.</p>
+  </div>
+
+  <h3>4.3 · Chi tiêu nội địa ngoài nguyên vật liệu</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Khoản</th><th class="n">Giá trị/năm</th><th>Đặc điểm</th></tr></thead>
+    <tbody>
+      <tr><td class="lab">Lương &amp; phúc lợi</td><td class="n">2,9 tỷ USD</td>
+        <td>100% nội địa — mandate <strong>payroll + tiền gửi</strong>, không phải tín dụng</td></tr>
+      <tr><td class="lab">Logistics &amp; giao nhận</td><td class="n">0,9–1,2 tỷ USD</td>
+        <td>DSO 45–60 ngày, tài sản nhẹ ⇒ factoring</td></tr>
+      <tr><td class="lab">Điện, nước, tiện ích</td><td class="n">0,6 tỷ USD</td><td>Chủ yếu EVN — không phải cơ hội</td></tr>
+      <tr><td class="lab">Suất ăn CN, vệ sinh, bảo vệ, nhân lực thuê ngoài</td><td class="n">0,25–0,35 tỷ USD</td>
+        <td>DN Việt 100% ⇒ target tốt</td></tr>
+      <tr><td class="lab">Bảo trì, phụ tùng, MRO, khuôn mẫu</td><td class="n">0,3–0,4 tỷ USD</td><td>Target tốt</td></tr>
+      <tr><td class="lab">Thuê hạ tầng KCN</td><td class="n">~0,1 tỷ USD</td><td>Quan hệ với chủ KCN, không phải NCC</td></tr>
+      <tr><td class="lab">Capex hàng năm</td><td class="n">1,5–2,5 tỷ USD</td><td>Bảo lãnh + tài trợ nhà thầu</td></tr>
+      <tr class="tot"><td>Tổng chi tiêu nội địa cho bên thứ ba (trừ lương)</td><td class="n">19–21 tỷ USD</td>
+        <td>Trong đó chảy vào DN vốn Việt: <strong>4,5–6,0 tỷ USD/năm</strong></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ══ 5 ═════════════════════════════════════════════ -->
+<section id="s5">
+  <div class="sec-head">
+    <div class="eyebrow">05 · Financing variables</div>
+    <h2>Biến số tài trợ theo từng nguồn</h2>
+    <p class="lede">Mỗi dòng đọc theo một công thức duy nhất:
+      <span class="mono" style="color:var(--s-green)">Base × Ngày ÷ 365 × Ứng trước × Thâm nhập = Dư nợ</span></p>
+  </div>
+
+  <div class="sim">
+    <div class="eyebrow" style="margin-bottom:18px">Sensitivity engine · tự tính lại toàn bộ chuỗi</div>
+    <div class="sim-grid">
+      <div>
+        <div class="ctrl">
+          <div class="ctrl-top"><label class="ctrl-l" for="g">Tăng trưởng doanh thu anchor</label><span class="ctrl-v" id="gv"></span></div>
+          <input type="range" id="g" min="-15" max="20" step="1" value="5">
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-top"><label class="ctrl-l" for="loc">Tỷ lệ nội địa hoá theo giá trị</label><span class="ctrl-v" id="locv"></span></div>
+          <input type="range" id="loc" min="22" max="55" step="1" value="35">
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-top"><label class="ctrl-l" for="dso">DSO của Samsung với NCC</label><span class="ctrl-v" id="dsov"></span></div>
+          <input type="range" id="dso" min="30" max="90" step="1" value="52">
+        </div>
+        <div class="ctrl" style="margin-bottom:0">
+          <div class="ctrl-top"><label class="ctrl-l" for="pen">Thị phần ngân hàng giành được</label><span class="ctrl-v" id="penv"></span></div>
+          <input type="range" id="pen" min="1" max="25" step="1" value="9">
+        </div>
+        <div class="scen">
+          <div class="sc" tabindex="0" role="button" data-s="-5,30,45,5"><div class="sc-n">Bear</div><div class="sc-v" id="scBear">—</div><div class="sc-d">−5 · 30% · 45d · 5%</div></div>
+          <div class="sc" tabindex="0" role="button" data-s="5,35,52,9"><div class="sc-n">Base</div><div class="sc-v" id="scBase">—</div><div class="sc-d">+5 · 35% · 52d · 9%</div></div>
+          <div class="sc" tabindex="0" role="button" data-s="12,42,60,14"><div class="sc-n">Bull</div><div class="sc-v" id="scBull">—</div><div class="sc-d">+12 · 42% · 60d · 14%</div></div>
+        </div>
+      </div>
+      <div class="out">
+        <div class="out-hero">
+          <div class="oh-l">Dư nợ funded của ngân hàng</div>
+          <div class="oh-v"><span id="bookV">—</span> <u>tr. USD</u></div>
+          <div class="oh-s">Trên pool toàn hệ thống <span class="mono" id="poolV">—</span> tr. USD ·
+            doanh thu anchor <span class="mono" id="revV">—</span> tỷ USD</div>
+        </div>
+        <div id="brkBox"></div>
+        <div style="margin-top:15px;padding-top:13px;border-top:1px solid var(--s-line);
+             font-size:12.5px;color:var(--s-dim);line-height:1.6">
+          Toàn bộ đầu ra là <span class="bx e">E</span>. Engine dùng cùng bộ hằng số cấu trúc với bảng 5.1
+          bên dưới — ba kịch bản và bảng đều sinh từ một hàm duy nhất, không hardcode.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3>5.1 · Bảng biến số đầy đủ</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>#</th><th>Nút tài trợ</th><th class="n">Base <span class="bx e">E</span></th><th class="n">Ngày</th>
+      <th class="n">Ứng trước</th><th class="n">Thâm nhập TT</th><th class="n">Dư nợ <span class="bx e">E</span></th>
+      <th class="n">Kỳ hạn</th><th>Pricing gợi ý <span class="bx e">E</span></th></tr></thead>
+    <tbody>
+      <tr><td class="mono lab">A1</td><td class="lab">Reverse factoring — phải trả của SEV/SEVT/SDV/SEHC cho Tier-1 FDI</td>
+        <td class="n">14,5 tỷ</td><td class="n">45–60</td><td class="n">90–100%</td><td class="n">15–25%</td>
+        <td class="n">270–595 tr.</td><td class="n">60–90d</td><td>SOFR + 1,2–2,0%</td></tr>
+      <tr><td class="mono lab">A2</td><td class="lab">LC nhập khẩu NVL của Tier-1 FDI</td>
+        <td class="n">8,7 tỷ</td><td class="n">40–50</td><td class="n">100%</td><td class="n">8–15%</td>
+        <td class="n">76–179 tr.</td><td class="n">90–180d</td><td>Phí 0,15–0,3%/quý + SOFR+1,0%</td></tr>
+      <tr><td class="mono lab">B1</td><td class="lab">Factoring khoản phải thu Tier-1/2 vốn Việt</td>
+        <td class="n">5,0 tỷ</td><td class="n">60–75</td><td class="n">75–85%</td><td class="n">25–35%</td>
+        <td class="n">154–306 tr.</td><td class="n">60–120d</td><td>VNIBOR + 2,5–4,0%</td></tr>
+      <tr><td class="mono lab">B2</td><td class="lab">Tài trợ tồn kho &amp; đơn hàng (PO / packing credit)</td>
+        <td class="n">5,0 tỷ</td><td class="n">50–65</td><td class="n">60–70%</td><td class="n">18–25%</td>
+        <td class="n">73–156 tr.</td><td class="n">90–150d</td><td>VNIBOR + 3,0–4,5%</td></tr>
+      <tr><td class="mono lab">B3</td><td class="lab">Vay trung hạn — khuôn mẫu, CNC, nhà máy thông minh</td>
+        <td class="n">0,4 tỷ/năm</td><td class="n">—</td><td class="n">60–70%</td><td class="n">30–40%</td>
+        <td class="n">72–112 tr.</td><td class="n">3–5 năm</td><td>VNIBOR + 3,0–4,0%</td></tr>
+      <tr><td class="mono lab">C</td><td class="lab">Factoring nhà cung cấp dịch vụ (logistics, suất ăn, nhân lực, MRO)</td>
+        <td class="n">1,8 tỷ</td><td class="n">45–60</td><td class="n">80%</td><td class="n">25–30%</td>
+        <td class="n">44–72 tr.</td><td class="n">30–90d</td><td>VNIBOR + 3,0–4,0%</td></tr>
+      <tr><td class="mono lab">D</td><td class="lab">Bảo lãnh nhà thầu xây lắp / M&amp;E (contingent)</td>
+        <td class="n">2,0 tỷ</td><td class="n">—</td><td class="n">10–15% GT HĐ</td><td class="n">30–40%</td>
+        <td class="n">60–120 tr.</td><td class="n">12–36th</td><td>Phí 1,2–2,0%/năm</td></tr>
+      <tr><td class="mono lab">E</td><td class="lab">Distributor finance — kênh bán lẻ nội địa</td>
+        <td class="n">2,0 tỷ</td><td class="n">30–45</td><td class="n">80–90%</td><td class="n">20–30%</td>
+        <td class="n">26–68 tr.</td><td class="n">30–60d</td><td>VNIBOR + 2,0–3,0%</td></tr>
+      <tr class="tot"><td>—</td><td>TỔNG FUNDED (A1…C, E)</td><td class="n">—</td><td class="n">—</td>
+        <td class="n">—</td><td class="n">—</td><td class="n">715–1.488 tr.</td><td class="n">—</td>
+        <td>+ 60–120 tr. contingent</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>5.2 · Doanh thu phi tín dụng đi kèm</h3>
+  <p>Đây là phần thường bị bỏ sót trong tờ trình — nhưng đây mới là nơi tạo ROE.</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Dòng doanh thu</th><th class="n">Base <span class="bx e">E</span></th><th class="n">Biến số</th>
+      <th class="n">Tiềm năng/năm <span class="bx e">E</span></th></tr></thead>
+    <tbody>
+      <tr><td class="lab">FX conversion (USD→VND cho NCC Việt)</td><td class="n">5,0 tỷ USD</td>
+        <td class="n">spread 8–15 bps</td><td class="n">4,0–7,5 tr. USD</td></tr>
+      <tr><td class="lab">FX hedging KRW/USD/VND cho Tier-1 Hàn</td><td class="n">14,5 tỷ × 30% hedge</td>
+        <td class="n">spread 15–25 bps</td><td class="n">6,5–10,9 tr. USD</td></tr>
+      <tr><td class="lab">Payroll mandate (Samsung + Tier-1)</td><td class="n">~4,5 tỷ quỹ lương</td>
+        <td class="n">float 15–25 ngày</td><td class="n">CASA 185–310 tr. USD</td></tr>
+      <tr><td class="lab">Thanh toán quốc tế (LC, TT, nhờ thu)</td><td class="n">~20 tỷ luồng</td>
+        <td class="n">phí 5–12 bps</td><td class="n">10–24 tr. USD</td></tr>
+      <tr><td class="lab">Cash management / thu hộ nhà máy</td><td class="n">—</td>
+        <td class="n">phí dịch vụ</td><td class="n">1–3 tr. USD</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="quote">Nếu chỉ nhìn NIM trên 80–160 triệu USD dư nợ, deal này trông vừa phải. Cộng CASA từ payroll
+    và phí FX vào, ROE của vertical này vượt xa cho vay doanh nghiệp thông thường. Đây là lập luận phải đưa
+    vào tờ trình — không phải phần phụ lục.</div>
+</section>
+
+<!-- ══ 6 ═════════════════════════════════════════════ -->
+<section id="s6">
+  <div class="sec-head">
+    <div class="eyebrow">06 · Origination</div>
+    <h2>Tìm target ở đâu</h2>
+  </div>
+
+  <h3>6.1 · Nguồn công khai, tra được ngay</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Nguồn</th><th>Cho ra cái gì</th><th class="n">Ưu tiên</th></tr></thead>
+    <tbody>
+      <tr><td class="lab">Chương trình Nhà máy thông minh — Bộ Công Thương × Samsung</td>
+        <td>Danh sách đích danh DN Việt được Samsung tư vấn — <strong>đây là danh sách nuôi để lên Tier-1.</strong>
+          Đợt 2025 phía Bắc: Nhựa An Lập (BN), Nhựa KT Vân Long (HP), Vina Technology (TN),
+          Đồng KT Korea VN – KCT (NB), AMA Holdings <span class="bx s">S</span></td>
+        <td class="n"><span class="st ok"><b>Cao nhất</b></span></td></tr>
+      <tr><td class="lab">Sở Công Thương Bắc Ninh / Thái Nguyên / Bắc Giang</td>
+        <td>Danh sách NCC cấp 1, cấp 2 theo địa bàn (BN từng công bố 19 cấp 1 + 41 cấp 2) <span class="bx s">S</span></td>
+        <td class="n"><span class="st ok"><b>Cao</b></span></td></tr>
+      <tr><td class="lab">KOCHAM Việt Nam</td><td>Danh bạ DN Hàn — bắt trọn lớp Tier-1 FDI</td>
+        <td class="n"><span class="st ok"><b>Cao</b></span></td></tr>
+      <tr><td class="lab">Danh sách thuê đất KCN</td>
+        <td>Yên Phong I&amp;II, Quế Võ I/II/III, VSIP Bắc Ninh, Yên Bình, Điềm Thụy, Quang Châu, Vân Trung, Phú Minh.
+          <strong>Bản đồ vật lý toàn bộ chuỗi.</strong> Lấy từ chủ đầu tư: KBC, Viglacera (VGC), VSIP</td>
+        <td class="n"><span class="st ok"><b>Cao</b></span></td></tr>
+      <tr><td class="lab">VASI &amp; VEIA</td><td>Danh bạ hội viên công nghiệp hỗ trợ + năng lực sản xuất</td>
+        <td class="n">Trung bình</td></tr>
+      <tr><td class="lab">Reverse Trade Fair / Hội nghị tìm kiếm NCC</td><td>Danh sách đăng ký tham dự = pipeline sẵn</td>
+        <td class="n">Trung bình</td></tr>
+      <tr><td class="lab">HOSE / HNX — công ty niêm yết trong chuỗi</td>
+        <td>NHH (Nhựa Hà Nội) và công ty con An Trung Industries — cấp linh kiện nhựa cho Samsung, Toyota,
+          Foxconn, Panasonic; NHH rót thêm 364 tỷ VNĐ nâng vốn ATI lên 805 tỷ (7/2025) <span class="bx s">S</span></td>
+        <td class="n">Trung bình</td></tr>
+      <tr><td class="lab">HNX — thị trường trái phiếu doanh nghiệp</td>
+        <td>In &amp; Bao bì Goldsun (KH gồm Samsung, Coca-Cola, Canon) phát hành lô 800 tỷ VNĐ kỳ hạn 36 tháng
+          (24/12/2025) <span class="bx s">S</span> → chỉ dấu quy mô và nhu cầu vốn của lớp Tier-2</td>
+        <td class="n">Trung bình</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>6.2 · Nguồn phải mua / phải xin</h3>
+  <div class="cards">
+    <div class="cd on"><div class="cd-tag">Ưu tiên tuyệt đối</div><h5>Dữ liệu tờ khai hải quan</h5>
+      <p>Tổng cục Hải quan hoặc nhà cung cấp thương mại (Panjiva, ImportGenius, data broker VN).
+        Đây là <strong>nguồn vàng</strong>: cho ra chính xác ai bán gì cho SEV/SEVT, khối lượng, tần suất, mã HS.</p></div>
+    <div class="cd on"><div class="cd-tag">Ưu tiên cao</div><h5>FiinGroup / Vietdata / CRIF D&amp;B</h5>
+      <p>BCTC doanh nghiệp chưa niêm yết (từ hồ sơ nộp thuế), xếp hạng tín nhiệm, cơ cấu sở hữu.</p></div>
+    <div class="cd on"><div class="cd-tag">Ưu tiên cao</div><h5>CIC — NHNN</h5>
+      <p>Dư nợ hiện hữu, lịch sử nhóm nợ. Biết được ai đang được ngân hàng nào tài trợ, và ai chưa ai đụng đến.</p></div>
+    <div class="cd on"><div class="cd-tag">Ưu tiên cao</div><h5>DART · dart.fss.or.kr</h5>
+      <p>사업보고서 gốc — mục 주요 종속기업 요약재무정보. Cho số liệu pháp nhân chính xác,
+        không qua trung gian báo chí.</p></div>
+  </div>
+
+  <h3>6.3 · Target có lớn không?</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Nhóm</th><th class="n">Số DN</th><th class="n">DT bình quân/DN <span class="bx e">E</span></th>
+      <th class="n">Hạn mức khả thi/DN <span class="bx e">E</span></th></tr></thead>
+    <tbody>
+      <tr><td class="lab">Tier-1 FDI (Hàn / Nhật / Đài)</td><td class="n">150–250 <span class="bx e">E</span></td>
+        <td class="n">50–120 tr. USD</td><td class="n">3–15 tr. USD</td></tr>
+      <tr><td class="lab">Tier-1 vốn Việt</td><td class="n">~52 (2022) <span class="bx s">S</span></td>
+        <td class="n">25–60 tr. USD</td><td class="n">2–8 tr. USD</td></tr>
+      <tr><td class="lab">Tier-2 vốn Việt</td><td class="n">~257 <span class="bx e">E</span></td>
+        <td class="n">4–15 tr. USD</td><td class="n">0,5–3 tr. USD</td></tr>
+      <tr><td class="lab">Dịch vụ &amp; logistics</td><td class="n">80–150 <span class="bx e">E</span></td>
+        <td class="n">5–40 tr. USD</td><td class="n">0,5–5 tr. USD</td></tr>
+    </tbody>
+    <caption>Tổng DN Việt cấp 1 + cấp 2 trong chuỗi Samsung: 309 tại 5/2025 [S].</caption>
+  </table></div>
+
+  <div class="duo">
+    <div class="duo-g">
+      <div class="eyebrow">Trả lời trực tiếp</div>
+      <h2>Đủ lớn, nhưng phân mảnh.</h2>
+      <p>Không có khách hàng nào chiếm quá 2% pool.</p>
+    </div>
+    <div class="duo-c">
+      <p>⇒ Mô hình đúng là <strong>program lending — chương trình chuẩn hoá</strong>,
+        không phải relationship lending từng deal.</p>
+      <p>Điều này quyết định cả cách thiết kế sản phẩm lẫn cách tổ chức đội ngũ.
+        Chọn sai mô hình thì <em>chi phí thẩm định sẽ ăn hết margin</em> trước khi danh mục kịp đủ lớn.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 7 ═════════════════════════════════════════════ -->
+<section id="s7">
+  <div class="sec-head">
+    <div class="eyebrow">07 · Product catalogue</div>
+    <h2>Danh mục sản phẩm đề xuất</h2>
+  </div>
+
+  <h3>7.1 · Nhóm neo vào tín nhiệm Samsung — rủi ro thấp nhất</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Sản phẩm</th><th>Cấu trúc</th><th>Ai vay</th><th>Rủi ro thực chất</th><th>Điều kiện tiên quyết</th></tr></thead>
+    <tbody>
+      <tr><td class="lab">Reverse Factoring / Approved Payable Finance</td>
+        <td>NCC bán hoá đơn đã được Samsung xác nhận; NH ứng trước; Samsung trả NH khi đáo hạn</td>
+        <td>NCC</td><td><strong>Rủi ro Samsung</strong>, không phải rủi ro NCC</td>
+        <td>Cần Samsung ký thoả thuận chương trình + nền tảng e-invoice <span class="bx q">?</span></td></tr>
+      <tr><td class="lab">Dynamic Discounting</td>
+        <td>Samsung dùng tiền nhàn rỗi trả sớm, hưởng chiết khấu; NH vận hành nền tảng và thu phí</td>
+        <td>—</td><td>Không có rủi ro tín dụng</td><td>Bán như dịch vụ vận hành + phí platform</td></tr>
+      <tr><td class="lab">Distributor / Dealer Finance</td>
+        <td>Tài trợ nhà phân phối mua hàng Samsung nội địa</td>
+        <td>Nhà phân phối, chuỗi bán lẻ</td><td>Nhà phân phối, có bảo lưu quyền sở hữu hàng</td>
+        <td>MOU với Samsung Vina</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>7.2 · Nhóm neo vào giao dịch — bắt buộc thẩm định NCC</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Sản phẩm</th><th>Dùng cho</th><th>Điểm mấu chốt</th></tr></thead>
+    <tbody>
+      <tr><td class="lab">Factoring có / không truy đòi</td><td>Tier-2 bán cho Tier-1 FDI (không có Samsung xác nhận)</td>
+        <td>Phải chấm điểm cả bên mua. Đặt hạn mức theo <em>từng cặp mua–bán</em>, không theo từng pháp nhân</td></tr>
+      <tr><td class="lab">PO Financing / Packing Credit</td><td>Tier-2 nhận đơn lớn, cần vốn mua NVL trước</td>
+        <td>Giải ngân theo tiến độ; kiểm soát dòng tiền về tài khoản tại NH</td></tr>
+      <tr><td class="lab">UPAS LC / LC trả chậm</td><td>Tier-1 &amp; Tier-2 nhập hạt nhựa, thép, đồng, hoá chất, linh kiện</td>
+        <td><strong>Sản phẩm dễ bán nhất để mở quan hệ.</strong> Kỳ hạn 90–180 ngày</td></tr>
+      <tr><td class="lab">Tài trợ tồn kho có kiểm soát</td><td>Nhà phân phối vật tư, kho ngoại quan</td>
+        <td>Cần đơn vị giám định kho độc lập</td></tr>
+      <tr><td class="lab">Vay trung hạn khuôn mẫu &amp; thiết bị</td><td>Nâng cấp CNC, máy ép, nhà máy thông minh</td>
+        <td>Thế chấp chính máy móc + bảo lãnh cá nhân chủ DN.
+          <strong>Ghép với chương trình Samsung tư vấn để giảm rủi ro thực thi</strong></td></tr>
+      <tr><td class="lab">Bảo lãnh (tạm ứng / thực hiện / bảo hành)</td><td>Nhà thầu xây lắp, M&amp;E, cung cấp thiết bị</td>
+        <td>Không tốn vốn, phí tốt, mở đường vào quan hệ</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>7.3 · Nhóm phi tín dụng — nơi tạo ROE</h3>
+  <div class="cards">
+    <div class="cd on"><div class="cd-tag">Khác biệt cạnh tranh</div><h5>FX &amp; phái sinh</h5>
+      <p>Kỳ hạn / hoán đổi USD-VND cho NCC Việt. <strong>KRW-VND cho Tier-1 Hàn Quốc</strong> — điểm khác biệt
+        rất mạnh nếu ngân hàng có Korea Desk. Rất ít NH nội làm được mảng này tử tế.</p></div>
+    <div class="cd on"><div class="cd-tag">Nền tảng quan hệ</div><h5>Payroll &amp; Cash Management</h5>
+      <p>Mandate lương cho các nhà máy Tier-1 (mỗi nhà máy 1.000–8.000 lao động) ⇒ CASA lớn
+        + bán chéo bán lẻ (thẻ, tiết kiệm, cho vay tiêu dùng cho công nhân).</p></div>
+    <div class="cd on"><div class="cd-tag">Switching cost</div><h5>Host-to-host / API ERP</h5>
+      <p>Kết nối trực tiếp với ERP của Tier-1 FDI. Một khi đã tích hợp, khách gần như không rời đi.</p></div>
+    <div class="cd on"><div class="cd-tag">Cửa vào chiến lược</div><h5>Green / Sustainability-linked loan</h5>
+      <p>Samsung chịu áp lực RE100 và phải kéo NCC theo. Tài trợ điện mặt trời áp mái, thiết bị tiết kiệm
+        năng lượng, lãi suất gắn chỉ tiêu ESG. <strong>Có thể tiếp cận nguồn vốn ưu đãi IFC / ADB / JICA.</strong></p></div>
+  </div>
+
+  <h3>7.4 · Lộ trình triển khai</h3>
+  <div class="step"><div class="step-n">1</div><div class="step-b">
+    <div class="st-m">Tháng 1–3</div><h5>Lập bản đồ</h5>
+    <p>Mua dữ liệu hải quan; ghép với CIC + FiinGroup; dựng danh sách 400 DN có xếp hạng.
+      <strong>KPI:</strong> bản đồ chuỗi hoàn chỉnh, 400 DN được chấm điểm.</p></div></div>
+  <div class="step"><div class="step-n">2</div><div class="step-b">
+    <div class="st-m">Tháng 2–6</div><h5>Thắng nhanh — không cần Samsung đồng ý</h5>
+    <p>UPAS LC + bảo lãnh cho 30–50 DN đã nhận diện.
+      <strong>KPI:</strong> 15–25 tr. USD dư nợ, 40 khách hàng mới.</p></div></div>
+  <div class="step"><div class="step-n">3</div><div class="step-b">
+    <div class="st-m">Tháng 4–12</div><h5>Đàm phán Anchor</h5>
+    <p>Tiếp cận Trung tâm mua hàng Samsung Vietnam đề xuất chương trình SCF.
+      <strong>KPI:</strong> ký MOU chương trình.</p></div></div>
+  <div class="step"><div class="step-n">4</div><div class="step-b">
+    <div class="st-m">Năm 2</div><h5>Mở rộng chương trình</h5>
+    <p>Onboard 150–250 NCC lên nền tảng. <strong>KPI:</strong> 80–120 tr. USD dư nợ.</p></div></div>
+  <div class="step"><div class="step-n">5</div><div class="step-b">
+    <div class="st-m">Năm 2–3</div><h5>Nhân bản mô hình</h5>
+    <p>Áp cùng playbook cho LG (Hải Phòng), Foxconn, Luxshare, Goertek, Canon.
+      <strong>KPI:</strong> nhân đôi quy mô vertical.</p></div></div>
+
+  <div class="note hi"><span class="nl">Ghi chú chiến lược</span>
+    <p>Giai đoạn 2 cố tình đặt <strong>trước</strong> giai đoạn 3. Đàm phán chương trình SCF với một tập đoàn
+      cỡ Samsung thường mất 9–18 tháng và có thể thất bại.
+      <strong>Đừng để toàn bộ business case phụ thuộc vào việc Samsung ký.</strong></p>
+  </div>
+</section>
+
+<!-- ══ 8 ═════════════════════════════════════════════ -->
+<section id="s8">
+  <div class="sec-head">
+    <div class="eyebrow">08 · Structural risk</div>
+    <h2>Rủi ro của chính cấu trúc tài trợ</h2>
+  </div>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Rủi ro</th><th>Mô tả</th><th>Biện pháp</th></tr></thead>
+    <tbody>
+      <tr><td class="lab">Rủi ro pha loãng (dilution)</td>
+        <td>NCC điện tử bị trừ tiền do lỗi chất lượng, phạt giao trễ, chiết khấu cuối kỳ.
+          Khoản phải thu 100 có thể chỉ thu được 92</td>
+        <td>Ứng trước tối đa 80–85% với factoring không có anchor xác nhận. Theo dõi tỷ lệ dilution lịch sử</td></tr>
+      <tr><td class="lab">Rủi ro tập trung</td><td>Toàn danh mục cùng một anchor. Samsung hắt hơi, cả sổ cảm cúm</td>
+        <td>Đặt trần cứng: ≤15% tổng dư nợ DN, ≤25% dư nợ tài trợ thương mại</td></tr>
+      <tr><td class="lab">Ràng buộc pháp lý về bao thanh toán</td>
+        <td>Khung pháp lý factoring tại VN — yêu cầu thông báo cho bên mua, cơ chế đăng ký giao dịch bảo đảm
+          <span class="bx q">?</span></td>
+        <td>Rà soát pháp lý <strong>trước</strong> khi thiết kế sản phẩm, không phải sau</td></tr>
+      <tr><td class="lab">True sale vs. cho vay có bảo đảm</td><td>Ảnh hưởng trực tiếp tới hệ số rủi ro và cách trích lập</td>
+        <td>Xin ý kiến pháp lý + kiểm toán ngay từ đầu</td></tr>
+      <tr><td class="lab">Gian lận hoá đơn</td><td>Rủi ro số 1 của factoring: hoá đơn khống, tài trợ trùng</td>
+        <td>Bắt buộc đối chiếu hoá đơn điện tử với hệ thống Tổng cục Thuế; đăng ký khoản phải thu tập trung</td></tr>
+      <tr><td class="lab">Rủi ro FX cho DN Việt</td><td>NCC Việt nhận USD từ Samsung nhưng chi phí VNĐ, hoặc ngược lại</td>
+        <td>Bán kèm hedging; đưa vào điều kiện cấp tín dụng</td></tr>
+      <tr><td class="lab">Kéo dài payment terms sau khi có SCF</td>
+        <td>Hiện tượng phổ biến toàn cầu: anchor triển khai SCF rồi nới terms từ 60 lên 90–120 ngày,
+          đẩy chi phí sang NCC</td>
+        <td>Chốt payment terms trong chính thoả thuận chương trình</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ══ 9 ═════════════════════════════════════════════ -->
+<section id="s9">
+  <div class="sec-head">
+    <div class="eyebrow">09 · Data gaps</div>
+    <h2>Dữ liệu còn thiếu — cần thu thập tiếp</h2>
+    <p class="lede">Sắp xếp theo mức độ quyết định đối với business case.</p>
+  </div>
+
+  <h4>Cấp thiết — không có thì không định lượng nổi</h4>
+  <ol>
+    <li><strong>Điều khoản thanh toán thực tế của Samsung với NCC</strong> (30/45/60/90 ngày, có phân biệt theo tier không).
+      Đây là biến số nhạy cảm nhất trong toàn bộ mô hình §05 — <em>lệch 30 ngày quanh mốc 52 ngày làm dư nợ
+      thay đổi −26% đến +45%</em> (kéo thử slider DSO ở trên để thấy).</li>
+    <li><strong>Samsung đã có chương trình SCF toàn cầu chưa, với ngân hàng nào?</strong>
+      Khả năng cao là có với ngân hàng Hàn Quốc (Shinhan, Woori, KEB Hana, IBK) hoặc HSBC / Standard Chartered.
+      Nếu đã có, chiến lược phải chuyển từ "giành chương trình" sang "giành sub-participation" hoặc dồn về Tier-2.
+      <strong>Câu hỏi này có thể lật ngược cả §07.</strong></li>
+    <li><strong>Dữ liệu tờ khai hải quan cấp giao dịch</strong> — người bán, mã HS, giá trị, tần suất cho SEV/SEVT/SDV/SEHC.</li>
+    <li><strong>BCTC riêng lẻ của 20–30 NCC lớn nhất</strong> — doanh thu, DSO/DIO/DPO thực tế, đòn bẩy, EBITDA.</li>
+    <li><strong>Bản gốc 사업보고서 trên DART</strong> — xác thực 62,12 tỷ USD và lấy thêm chỉ tiêu tài sản / vốn chủ
+      từng pháp nhân (báo chí chỉ đăng doanh thu &amp; lợi nhuận).</li>
+  </ol>
+
+  <h4>Quan trọng</h4>
+  <ol start="6">
+    <li>Bảng cân đối kế toán 4 pháp nhân: tổng tài sản, phải trả người bán, hàng tồn kho ⇒ tính được DPO thực
+      và pool phải trả chính xác thay vì ước tính.</li>
+    <li>Số thuế tối thiểu toàn cầu thực nộp 2025 — con số 302 triệu USD trong dữ liệu đầu vào chưa xác minh được.</li>
+    <li>Tỷ trọng doanh thu nội địa vs xuất khẩu của từng pháp nhân — quyết định quy mô nhánh Distributor Finance.</li>
+    <li>Cơ cấu Tier-1: bao nhiêu FDI, bao nhiêu vốn Việt, <em>theo giá trị</em> (hiện chỉ có số đếm doanh nghiệp).</li>
+    <li>Kế hoạch capex Samsung VN 2026–2028 — quyết định nhánh bảo lãnh xây lắp.</li>
+    <li>Danh sách NCC bị loại / chuyển đổi 3 năm gần nhất — chỉ dấu rủi ro chất lượng, cực kỳ giá trị cho scoring model.</li>
+    <li>Mức độ tập trung khách hàng của từng NCC (% doanh thu từ Samsung) — biến số then chốt trong xếp hạng.</li>
+  </ol>
+
+  <h4>Bổ trợ</h4>
+  <ol start="13">
+    <li>Chuẩn ESG / RE100 Samsung áp cho NCC + lộ trình → định cỡ nhánh green finance.</li>
+    <li>Kết quả 6T/2026. Đã có Q1/2026: SEV 6,85 nghìn tỷ won DT / 610 tỷ won LN; SDV 4,93 / 180;
+      SEHC 1,94 / ~97 — SEVT trở lại vị trí lợi nhuận cao nhất <span class="bx s">S</span>.</li>
+    <li>Benchmark với chuỗi LG Hải Phòng, Foxconn Bắc Giang, Luxshare, Goertek — để đặt giá và định vị.</li>
+    <li>Khung pháp lý bao thanh toán &amp; đăng ký khoản phải thu tại VN — xác nhận với luật sư.</li>
+    <li>Tỷ lệ NPL ngành công nghiệp hỗ trợ điện tử từ NHNN / CIC — hiệu chỉnh giả định tổn thất.</li>
+  </ol>
+</section>
+
+<!-- ══ 10 ════════════════════════════════════════════ -->
+<section id="s10">
+  <div class="sec-head">
+    <div class="eyebrow">10 · Recommendation</div>
+    <h2>Ba khuyến nghị cuối</h2>
+  </div>
+  <div class="step"><div class="step-n">01</div><div class="step-b">
+    <h5>Đừng đuổi theo Samsung. Đuổi theo tiền của Samsung.</h5>
+    <p>65 tỷ USD doanh thu tạo ra ~19–21 tỷ USD chi tiêu nội địa mỗi năm.
+      Anchor là công cụ giảm rủi ro, không phải là khách hàng. Mọi nỗ lực bán tín dụng trực tiếp cho
+      4 pháp nhân này đều sẽ thất bại — họ không cần vốn.</p></div></div>
+  <div class="step"><div class="step-n">02</div><div class="step-b">
+    <h5>Tier-2 vốn Việt là nơi biên lợi nhuận tốt nhất, dù pool nhỏ hơn.</h5>
+    <p>Tier-1 FDI đã bị các ngân hàng Hàn Quốc phủ kín và cạnh tranh gay gắt về giá.
+      Trong ~300 doanh nghiệp Việt thuộc chuỗi, phần lớn chưa được ngân hàng nào phục vụ đúng nhu cầu —
+      họ cần vốn lưu động ngắn hạn theo dòng đơn hàng, chứ không cần một khoản vay thế chấp bất động sản.</p></div></div>
+  <div class="step"><div class="step-n">03</div><div class="step-b">
+    <h5>Mua dữ liệu hải quan trước khi làm bất cứ việc gì khác.</h5>
+    <p>Toàn bộ §04 và §05 của báo cáo này là ước tính dựng từ benchmark ngành.
+      Một bộ dữ liệu hải quan cấp giao dịch sẽ thay <strong>~70% các con số [E] bằng [S]</strong>,
+      và biến báo cáo này từ luận điểm chiến lược thành hồ sơ tín dụng thực sự.</p></div></div>
+</section>
+
+<!-- ══ PHỤ LỤC ═══════════════════════════════════════ -->
+<section id="sA">
+  <div class="sec-head">
+    <div class="eyebrow">Phụ lục</div>
+    <h2>Danh mục nguồn</h2>
+  </div>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th class="n">#</th><th>Nguồn</th><th>Nội dung được dùng</th></tr></thead>
+    <tbody>
+      <tr><td class="n">1</td><td class="lab">CafeF — "6 nhà máy lõi của Samsung tại Việt Nam đạt doanh thu 65 tỷ USD năm 2025", 06/03/2026</td>
+        <td>DT 62,1 tỷ USD 4 nhà máy; LN 3,67 tỷ; SEMV 2,08 tỷ; SDIV 880,7 tr.; tỷ trọng 25% / 10% tập đoàn</td></tr>
+      <tr><td class="n">2</td><td class="lab">Stockbiz / Nhà đầu tư — "Samsung đang đóng góp thế nào cho kinh tế Việt Nam?", 03/2026</td>
+        <td>SEVT 25,97 tỷ / 1,67 tỷ; XK Việt Nam 475,04 tỷ USD; 6 nhà máy = 13,7% XK</td></tr>
+      <tr><td class="n">3</td><td class="lab">VCCI — "Samsung Việt Nam tiếp tục là cứ điểm lợi nhuận của tập đoàn Hàn Quốc", 05/2026</td>
+        <td>62,12 tỷ USD +8,1%; LNST 3,68 tỷ +12,2%; ~12,6% GDP; số liệu Q1/2026</td></tr>
+      <tr><td class="n">4</td><td class="lab">Tuổi Trẻ — "Samsung thu lợi nhuận thế nào từ các nhà máy tại Việt Nam?", 20/02/2025</td>
+        <td>Nền so sánh FY2024: SEV 14,8 tỷ / 944 tr.; SDV 14,2 tỷ / 584 tr.; SEHC 4,86 tỷ / 265 tr.</td></tr>
+      <tr><td class="n">5</td><td class="lab">Nhadautu — "Samsung SDI Việt Nam trả 2 triệu USD thuế tối thiểu toàn cầu", 26/02/2025</td>
+        <td>GMT FY2024: 429,82 tỷ won ≈ 315,5 tr. USD</td></tr>
+      <tr><td class="n">6</td><td class="lab">ZNews — "Samsung chuẩn bị hàng trăm triệu USD đóng bù thuế tại Việt Nam", 02/2025</td>
+        <td>Thuế suất hiệu dụng GloBE tại VN dưới 15%, áp dụng QDMTT</td></tr>
+      <tr><td class="n">7</td><td class="lab">RSM Vietnam — Bản tin Nghị định 236/2025/NĐ-CP</td>
+        <td>Khung pháp lý thuế tối thiểu toàn cầu tại VN, hiệu lực 15/10/2025</td></tr>
+      <tr><td class="n">8</td><td class="lab">Báo Điện tử ĐCSVN / Bộ Công Thương, 08/2025</td>
+        <td>309 DN Việt cấp 1 + cấp 2 (5/2025); mốc 2 tỷ điện thoại sản xuất tại VN</td></tr>
+      <tr><td class="n">9</td><td class="lab">Báo Đầu tư / Công Thương</td>
+        <td>306 DN cuối 2023; 52 NCC cấp 1 (2022); Bắc Ninh 19 cấp 1 + 41 cấp 2</td></tr>
+      <tr><td class="n">10</td><td class="lab">Sở Công Thương — "Bộ Công Thương và Samsung tổng kết Dự án Nhà máy thông minh 2025", 10/2025</td>
+        <td>Danh sách DN tham gia đợt 2025</td></tr>
+      <tr><td class="n">11</td><td class="lab">Vietstock / Doanh nhân &amp; Pháp luật, 07/2025</td>
+        <td>NHH tăng vốn An Trung Industries lên 805 tỷ VNĐ; ATI cấp linh kiện cho Samsung, Foxconn</td></tr>
+      <tr><td class="n">12</td><td class="lab">Doanh nhân &amp; Pháp luật, 04/2026</td>
+        <td>Goldsun phát hành 800 tỷ VNĐ trái phiếu 24/12/2025; khách hàng gồm Samsung, Canon, Coca-Cola</td></tr>
+      <tr><td class="n">13</td><td class="lab">VietnamBiz, 28/02/2025</td>
+        <td>VN xuất khẩu &gt;120 tỷ USD sản phẩm điện tử 2024 (dùng kiểm chứng chéo tỷ lệ nội địa hoá)</td></tr>
+      <tr><td class="n">14</td><td class="lab">Thương hiệu &amp; Công luận</td>
+        <td>Samsung tổng vốn đăng ký 23,2 tỷ USD; DT &amp; XK 2024: 62,5 / 54,4 tỷ USD</td></tr>
+    </tbody>
+    <caption>Nguồn gốc cần truy cập trực tiếp (chưa thực hiện): DART — dart.fss.or.kr, 삼성전자 사업보고서 2025,
+      mục 주요 종속기업 요약재무정보.</caption>
+  </table></div>
+</section>
+
+</main>
+
+<footer><div class="wrap">
+  Toàn bộ số liệu đánh dấu [E] là ước tính của người phân tích, dựng từ benchmark ngành EMS / lắp ráp điện tử
+  và các giả định đã nêu rõ trong từng bảng. <strong>Không phải số liệu công bố.</strong>
+  Cần thay thế bằng dữ liệu thực trước khi dùng cho quyết định tín dụng.
+  <br><br><span class="mono" id="footStamp"></span>
+</div></footer>
+
+<script>
+"use strict";
+/* ── VERSION — single const ──────────────────────────────── */
+const BUILD = { ver:"v1.1", date:"28/07/2026",
+  scope:"Theme Siren (Showcase) · Value chain map · Chain sizing · Financing variable engine" };
+document.getElementById("stampVer").textContent  = "Build " + BUILD.ver;
+document.getElementById("stampDate").textContent = "Lập ngày " + BUILD.date;
+document.getElementById("footStamp").textContent =
+  "Released " + BUILD.date + " " + BUILD.ver + " · Scope: " + BUILD.scope;
+
+/* ── ENGINE ──────────────────────────────────────────────── */
+const K = { rev0:65.08, matPct:0.768, fdiShare:0.825, servPct:0.0277, capexPct:0.031, domSalesPct:0.031 };
+const NODE = { A1:[0.95,0.20], A2:[1.00,0.115], B1:[0.80,0.30],
+               B2:[0.65,0.215], B3:[0.65,0.35], C:[0.80,0.275], E:[0.85,0.25] };
+
+function engine(g, loc, dso){
+  const rev  = K.rev0*(1+g/100);
+  const dom  = rev*K.matPct*(loc/100);
+  const fdi  = dom*K.fdiShare, vn = dom*(1-K.fdiShare);
+  const serv = rev*K.servPct, cap = rev*K.capexPct, ds = rev*K.domSalesPct;
+  const d = n => n/365;
+  const n = {
+    A1: fdi      * d(dso)    * NODE.A1[0]*NODE.A1[1],
+    A2: fdi*0.60 * d(45)     * NODE.A2[0]*NODE.A2[1],
+    B1: vn       * d(dso+15) * NODE.B1[0]*NODE.B1[1],
+    B2: vn       * d(57)     * NODE.B2[0]*NODE.B2[1],
+    B3: cap*0.19             * NODE.B3[0]*NODE.B3[1],
+    C : serv     * d(Math.max(dso-7,20)) * NODE.C[0]*NODE.C[1],
+    E : ds       * d(37)     * NODE.E[0]*NODE.E[1]
+  };
+  return { rev, pool:Object.values(n).reduce((a,b)=>a+b,0), nodes:n };
+}
+
+const LABEL = {
+  A1:"A1 · Reverse factoring Tier-1 FDI", A2:"A2 · LC nhập khẩu NVL",
+  B1:"B1 · Factoring phải thu DN Việt",   B2:"B2 · Tồn kho & PO finance",
+  B3:"B3 · Vay trung hạn thiết bị",       C :"C · Factoring nhà cung cấp dịch vụ",
+  E :"E · Distributor finance"
+};
+
+const $ = id => document.getElementById(id);
+const fmt = (x,d=0) => x.toLocaleString("vi-VN",{minimumFractionDigits:d,maximumFractionDigits:d});
+
+function render(){
+  const g=+$("g").value, loc=+$("loc").value, dso=+$("dso").value, pen=+$("pen").value;
+  $("gv").textContent   = (g>0?"+":"") + g + "%";
+  $("locv").textContent = loc + "%";
+  $("dsov").textContent = dso + " ngày";
+  $("penv").textContent = pen + "%";
+
+  const r = engine(g,loc,dso), book = r.pool*(pen/100)*1000;
+  $("bookV").textContent = fmt(book);
+  $("poolV").textContent = fmt(r.pool*1000);
+  $("revV").textContent  = fmt(r.rev,1);
+
+  const max = Math.max(...Object.values(r.nodes));
+  $("brkBox").innerHTML = Object.keys(r.nodes).map(k=>{
+    const v = r.nodes[k]*(pen/100)*1000, w = (r.nodes[k]/max*100).toFixed(1);
+    return `<div class="brk"><span>${LABEL[k]}</span><span>${fmt(v,1)} tr.</span></div>
+            <div class="bar"><i style="width:${w}%"></i></div>`;
+  }).join("");
+
+  [["scBear",[-5,30,45,5]],["scBase",[5,35,52,9]],["scBull",[12,42,60,14]]]
+    .forEach(([id,[a,b,c,p]])=>{ $(id).textContent = fmt(engine(a,b,c).pool*(p/100)*1000) + " tr."; });
+}
+["g","loc","dso","pen"].forEach(id => $(id).addEventListener("input", render));
+
+document.querySelectorAll(".sc").forEach(el=>{
+  const apply = ()=>{ const [a,b,c,p]=el.dataset.s.split(",");
+    $("g").value=a; $("loc").value=b; $("dso").value=c; $("pen").value=p; render(); };
+  el.addEventListener("click", apply);
+  el.addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); apply(); }});
+});
+render();
+
+/* ── NAV scroll-spy ──────────────────────────────────────── */
+const links = [...document.querySelectorAll("#navBar a")];
+const secs  = links.map(a=>document.querySelector(a.getAttribute("href"))).filter(Boolean);
+const spy = new IntersectionObserver(es=>{
+  es.forEach(en=>{ if(!en.isIntersecting) return;
+    links.forEach(a=>a.classList.toggle("on", a.getAttribute("href")==="#"+en.target.id)); });
+},{rootMargin:"-70px 0px -72% 0px"});
+secs.forEach(s=>spy.observe(s));
+</script>
+</body>
+</html>
