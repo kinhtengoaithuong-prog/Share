@@ -404,7 +404,33 @@ td .sub{display:block;font-size:11px;color:var(--s-dim)}
 .okfoot .oktag{font-size:.78rem;color:var(--s-dim);margin-top:4px}
 .okfoot .okby{font-family:var(--s-mono);font-size:.62rem;color:var(--s-dim);margin-top:9px;letter-spacing:.08em}
 
-/* ===== SO SÁNH VỚI THIÊN HẠ ===== */
+/* ===== NHẬP/XUẤT CSV ===== */
+.csvrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.csvnote{font-size:.78rem;color:var(--s-dim);line-height:1.5;flex:1;min-width:180px}
+.csvnote.ok{color:var(--s-green)}
+.csvnote.err{color:var(--s-warn)}
+@media(max-width:820px){.csvrow .s-btn{width:100%}.csvnote{min-width:0}}
+
+/* ===== DẤU HỎI + POPOVER GIẢI THÍCH ===== */
+.qmark{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;min-width:16px;
+ border-radius:50%;border:1px solid var(--s-green);background:transparent;color:var(--s-green);
+ font-family:var(--s-sans);font-size:.62rem;font-weight:700;cursor:pointer;padding:0;margin-left:5px;
+ line-height:1;transition:.13s;vertical-align:middle}
+.qmark:hover{background:var(--s-green);color:#fff}
+.qmark:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(0,112,74,.25)}
+.helppop{position:absolute;z-index:90;background:var(--s-white);border:1px solid var(--s-green);
+ border-radius:12px;padding:14px 16px;box-shadow:0 10px 34px rgba(20,38,31,.22);
+ opacity:0;transform:translateY(-4px);transition:opacity .16s,transform .16s;pointer-events:none}
+.helppop.on{opacity:1;transform:none;pointer-events:auto}
+.helppop .hp-t{font-family:var(--s-serif);font-size:.98rem;font-weight:600;color:var(--s-forest);margin-bottom:7px}
+.helppop .hp-d{font-size:.82rem;line-height:1.6;color:var(--s-muted);margin-bottom:10px}
+.helppop .hp-e{font-size:.8rem;line-height:1.55;color:var(--s-ink);background:var(--s-green-soft);
+ border-radius:8px;padding:9px 11px}
+.helppop .hp-el{display:block;font-family:var(--s-mono);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;
+ color:var(--s-green);margin-bottom:3px}
+@media(max-width:820px){.helppop{position:fixed;left:12px!important;right:12px;width:auto!important;
+ top:auto!important;bottom:12px;border-radius:16px;padding:16px 18px}
+ .helppop .hp-t{font-size:1.05rem}.helppop .hp-d,.helppop .hp-e{font-size:.9rem}}
 .wcompact{border:1.5px solid var(--s-green);background:linear-gradient(180deg,var(--s-green-soft),var(--s-white) 60%)}
 .wcompact.wflash{animation:wflash 1.4s ease}
 @keyframes wflash{0%,100%{box-shadow:0 0 0 0 rgba(0,112,74,0)}30%,60%{box-shadow:0 0 0 4px rgba(0,112,74,.35)}}
@@ -671,6 +697,16 @@ td .sub{display:block;font-size:11px;color:var(--s-dim)}
  <div class="hint">Cùng một điểm số, tám người sẽ "phán" theo tám kiểu khác nhau. Chọn giọng bạn thích — lời chẩn đoán cuối hành trình sẽ nói theo giọng đó. Đổi lúc nào cũng được.</div>
  <div class="voicepick" id="voicepick"></div>
  <div class="voiceprev" id="voiceprev"></div>
+</div>
+
+<div class="card">
+ <h3>Đã có dữ liệu từ lần trước? <span style="font-family:var(--s-mono);font-size:.6rem;color:var(--s-green);background:var(--s-green-soft);padding:2px 8px;border-radius:999px;vertical-align:middle">CSV</span></h3>
+ <div class="hint">Nếu bạn đã lưu file CSV ở lần làm trước, nhập vào đây để khỏi gõ lại từ đầu. Sau khi làm xong, bạn có thể xuất file CSV ở màn kết quả để dùng cho lần sau.</div>
+ <div class="csvrow">
+  <button class="s-btn" onclick="document.getElementById('csvFile').click()">📂 Nhập từ file CSV</button>
+  <input type="file" id="csvFile" accept=".csv,text/csv" style="display:none" onchange="importCSV(this)">
+  <span class="csvnote" id="csvNote">Chọn file .csv đã xuất từ công cụ này.</span>
+ </div>
 </div>
 
 <div class="nav">
@@ -967,6 +1003,7 @@ td .sub{display:block;font-size:11px;color:var(--s-dim)}
 <div class="nav"><button class="s-btn" onclick="go(-1)">← Thiết lập lại</button><span class="navnote">Không lưu dữ liệu lên máy chủ</span>
  <span style="display:flex;gap:9px;flex-wrap:wrap">
   <button class="s-btn" onclick="jumpToWorld()">↑ So với thiên hạ</button>
+  <button class="s-btn" onclick="exportCSV()">Xuất CSV</button>
   <button class="s-btn" onclick="exportWord()">Xuất Word</button>
   <button class="s-btn s-btn-pri" onclick="exportPDF()">Xuất PDF</button>
  </span></div>
@@ -1000,7 +1037,7 @@ td .sub{display:block;font-size:11px;color:var(--s-dim)}
 </button>
 
 <script>
-const VERSION='v1.2', REL='27/07/2026 · So sánh thiên hạ lên đầu dashboard + nút ghim · tự lấy tuổi/thu nhập';
+const VERSION='v1.4', REL='27/07/2026 · Nhập/xuất CSV để khỏi gõ lại';
 vb.textContent=VERSION; st.textContent='Released '+REL;
 const LS_W='fh_panel_w', LS_S='fh_stars';
 
@@ -1547,6 +1584,93 @@ function syncFab(){
 }
 
 /* ---------- stars ---------- */
+/* ================= GIẢI THÍCH (POPOVER) ================= */
+/* Lớp A — 28 ô nhập: lấy số ở đâu. Lớp B — 17 chỉ số: công thức + ngưỡng + ví dụ.
+   Mỗi mục: {t: tiêu đề, d: giải thích dễ hiểu, e: ví dụ số cụ thể} */
+const HELP={
+ /* ===== LỚP A: Ô NHẬP ===== */
+ i_sal:{t:'Lương chính',d:'Tiền lương thực nhận hàng tháng sau thuế và bảo hiểm — số thật về tài khoản, không phải lương gộp trên hợp đồng.',e:'Hợp đồng ghi 25tr nhưng thực nhận 22tr → nhập 22.'},
+ i_bon:{t:'Thưởng & hoa hồng',d:'Các khoản thu thêm từ công việc chính nhưng không cố định: thưởng doanh số, hoa hồng, thưởng lễ tết. Chia bình quân ra mỗi tháng.',e:'Cả năm thưởng 36tr → chia 12 tháng = 3tr/tháng.'},
+ i_biz:{t:'Kinh doanh / tay trái',d:'Lợi nhuận từ việc làm thêm ngoài công việc chính: bán hàng online, freelance, chạy xe... Lấy phần còn lại sau khi trừ chi phí.',e:'Bán hàng thu 10tr, vốn+ship hết 6tr → lãi 4tr, nhập 4.'},
+ i_rent:{t:'Cho thuê tài sản',d:'Tiền thu từ cho thuê nhà, xe, mặt bằng... Đây là thu nhập thụ động — tiền tự về mà không cần đi làm.',e:'Cho thuê căn hộ 8tr/tháng → nhập 8.'},
+ i_fin:{t:'Lãi đầu tư',d:'Tiền sinh ra từ tiền: lãi tiết kiệm, cổ tức, lãi trái phiếu, lợi nhuận đều đặn từ đầu tư. Cũng là thu nhập thụ động.',e:'Sổ tiết kiệm 200tr lãi 6%/năm = 12tr/năm → 1tr/tháng.'},
+ e_ess:{t:'Chi thiết yếu',d:'Những khoản không thể cắt: ăn uống, điện nước, đi lại, internet, điện thoại. Chi để sống được bình thường.',e:'Ăn uống 8tr + điện nước 1.5tr + xăng xe 1.5tr = 11tr.'},
+ e_hom:{t:'Chi nhà ở',d:'Tiền thuê nhà, hoặc phí quản lý + phí dịch vụ nếu ở nhà riêng. KHÔNG tính khoản trả góp vay mua nhà (cái đó ở mục Trả nợ).',e:'Thuê trọ 5tr/tháng → nhập 5.'},
+ e_deb:{t:'Trả nợ hàng tháng',d:'Tổng số tiền trả góp mỗi tháng cho mọi khoản vay: trả góp nhà, xe, vay tiêu dùng, trả tối thiểu thẻ tín dụng — cả gốc lẫn lãi.',e:'Góp nhà 6tr + góp xe 3tr = 9tr/tháng.'},
+ e_lif:{t:'Chi lối sống',d:'Những khoản làm cuộc sống vui hơn nhưng có thể cắt khi cần: cà phê, xem phim, mua sắm, du lịch, sở thích.',e:'Cà phê + ăn ngoài + mua sắm ~7tr/tháng.'},
+ e_fam:{t:'Chi gia đình',d:'Tiền lo cho người khác: biếu bố mẹ, học phí con, chăm người phụ thuộc.',e:'Biếu bố mẹ 3tr + học phí con 3tr = 6tr.'},
+ e_ins:{t:'Phí bảo hiểm',d:'Phí đóng bảo hiểm bình quân mỗi tháng: nhân thọ, sức khoẻ. Nếu đóng theo năm thì chia 12.',e:'Nhân thọ đóng 24tr/năm → 2tr/tháng.'},
+ a_cash:{t:'Tiền mặt',d:'Tiền có thể dùng ngay lập tức: tiền trong ví, tài khoản thanh toán, tiền mặt ở nhà.',e:'Tài khoản 30tr + ví 5tr = 35tr.'},
+ a_dep:{t:'Tiết kiệm ngân hàng',d:'Tiền gửi tiết kiệm có kỳ hạn ở ngân hàng — an toàn, rút được nhưng mất lãi nếu rút sớm.',e:'Hai sổ tiết kiệm 100tr + 150tr = 250tr.'},
+ a_eq:{t:'Cổ phiếu & quỹ',d:'Giá trị hiện tại của cổ phiếu, chứng chỉ quỹ, trái phiếu đang nắm giữ — tính theo giá thị trường hôm nay.',e:'Danh mục cổ phiếu đang có giá 120tr → nhập 120.'},
+ a_alt:{t:'Vàng / tài sản khác',d:'Vàng, ngoại tệ, tiền số, đồ sưu tầm có giá trị — quy ra tiền theo giá hiện tại.',e:'5 chỉ vàng ~40tr → nhập 40.'},
+ a_re:{t:'BĐS đầu tư',d:'Giá trị nhà đất mua để đầu tư hoặc cho thuê — KHÔNG phải nhà bạn đang ở. Tính theo giá bán được hiện nay.',e:'Mảnh đất mua để đó, giá thị trường 800tr → nhập 800.'},
+ a_home:{t:'Nhà đang ở',d:'Giá trị căn nhà bạn đang sống. Nhập giá thị trường hiện tại, kể cả khi còn đang trả góp (khoản nợ tính riêng ở mục Vay mua nhà).',e:'Căn hộ đang ở trị giá 2.8 tỷ → nhập 2800.'},
+ d_mor:{t:'Vay mua nhà',d:'Số tiền còn NỢ ngân hàng cho khoản vay mua nhà — phần chưa trả hết, không phải tổng đã vay ban đầu.',e:'Vay 1.5 tỷ, đã trả 300tr → còn nợ 1200.'},
+ d_con:{t:'Vay tiêu dùng',d:'Dư nợ còn lại của các khoản vay mua xe, vay trả góp điện máy, vay tín chấp.',e:'Vay mua xe còn nợ 200tr → nhập 200.'},
+ d_cc:{t:'Dư nợ thẻ tín dụng',d:'Số tiền đang nợ trên thẻ tín dụng — phần chưa thanh toán, đang bị tính lãi hoặc sắp tới hạn.',e:'Sao kê thẻ ghi nợ 15tr chưa trả → nhập 15.'},
+ d_oth:{t:'Vay khác',d:'Các khoản nợ còn lại: vay người thân, vay nóng, nợ khác chưa tính ở trên.',e:'Mượn anh chị em 50tr chưa trả → nhập 50.'},
+ d_rate:{t:'Lãi suất vay bình quân',d:'Mức lãi suất trung bình của các khoản vay, tính theo %/năm. Nếu nhiều khoản lãi khác nhau, ước lượng mức phổ biến nhất.',e:'Vay nhà 10%, vay tiêu dùng 15% → ước bình quân ~12.'},
+ p_age:{t:'Tuổi hiện tại',d:'Tuổi của bạn — dùng để tính danh mục đầu tư nên có bao nhiêu phần rủi ro (càng trẻ càng chịu được rủi ro cao hơn).',e:'Sinh 1988, năm nay 2026 → nhập 38.'},
+ p_life:{t:'Bảo hiểm nhân thọ',d:'Số tiền quyền lợi bảo hiểm nhân thọ chi trả nếu người trụ cột gặp rủi ro — mệnh giá hợp đồng, không phải phí đóng.',e:'Hợp đồng chi trả 1 tỷ khi rủi ro → nhập 1000.'},
+ p_ci:{t:'BH bệnh hiểm nghèo',d:'Số tiền bảo hiểm trả khi mắc bệnh hiểm nghèo (ung thư, đột quỵ...) — mệnh giá quyền lợi, không phải phí đóng.',e:'Quyền lợi hiểm nghèo 500tr → nhập 500.'},
+ p_hea:{t:'BH sức khoẻ (phí/năm)',d:'Phí đóng bảo hiểm sức khoẻ mỗi năm — loại chi trả viện phí, khám chữa bệnh.',e:'Gói sức khoẻ đóng 15tr/năm → nhập 15.'},
+ p_pro:{t:'BH tài sản',d:'Giá trị được bảo hiểm cho tài sản lớn: nhà, xe. Nhập mệnh giá bảo hiểm.',e:'Bảo hiểm xe ô tô mệnh giá 600tr → nhập 600.'},
+ p_dep:{t:'Người phụ thuộc',d:'Số người sống dựa vào thu nhập của bạn: con nhỏ, bố mẹ già, người thân không có thu nhập.',e:'2 con nhỏ + 1 mẹ già → nhập 3.'},
+ /* ===== LỚP B: 17 CHỈ SỐ KẾT QUẢ ===== */
+ x_pas:{t:'Tỷ trọng thu nhập thụ động',d:'Bao nhiêu phần thu nhập của bạn tự về mà không cần đi làm (tiền thuê, lãi đầu tư). Càng cao càng tự do — vì không phụ thuộc vào việc phải đi làm mỗi ngày.',e:'Tổng thu 30tr, trong đó thụ động 3tr → 3/30 = 10%. Chuẩn tốt: ≥20%.'},
+ x_conc:{t:'Mức độ tập trung nguồn thu',d:'Đo bạn phụ thuộc vào một nguồn thu tới mức nào. 100 = tất cả trứng một giỏ (chỉ có lương). Càng thấp càng an toàn vì mất một nguồn vẫn còn nguồn khác.',e:'Chỉ sống bằng lương → 100 điểm (rủi ro cao). Có 3 nguồn đều nhau → ~33 (an toàn hơn).'},
+ x_src:{t:'Số nguồn thu nhập',d:'Đếm số dòng tiền vào khác nhau. Nhiều nguồn = lưới an toàn: mất việc vẫn còn tiền thuê nhà, còn tiền tay trái.',e:'Lương + bán hàng online + cho thuê = 3 nguồn. Chuẩn tốt: ≥3.'},
+ x_free:{t:'Tự do tài chính',d:'Thu nhập thụ động che được bao nhiêu phần chi phí sống. Đạt 100% nghĩa là tiền tự về đủ nuôi bạn — không đi làm vẫn sống ổn.',e:'Chi 20tr/tháng, thụ động về 5tr → 5/20 = 25%. Đạt 100% là tự do hoàn toàn.'},
+ x_save:{t:'Tỷ lệ tiết kiệm',d:'Mỗi tháng bạn giữ lại được bao nhiêu phần thu nhập. Đây là chỉ số quan trọng nhất — quyết định bạn giàu lên nhanh hay chậm.',e:'Thu 30tr, chi 24tr → để dành 6tr, tỷ lệ 6/30 = 20%. Chuẩn tốt: ≥20%.'},
+ x_ess:{t:'Tỷ lệ chi thiết yếu',d:'Phần thu nhập dùng cho nhu cầu bắt buộc (ăn, ở, đi lại). Thấp thì bạn còn dư địa xoay xở; cao thì sống sát nút.',e:'Thu 30tr, chi thiết yếu 15tr → 50%. Chuẩn: ≤50% là khoẻ.'},
+ x_debt:{t:'Gánh nặng trả nợ (DTI)',d:'Phần thu nhập phải mang đi trả nợ mỗi tháng. Ngân hàng dùng chính chỉ số này để quyết cho vay. Cao quá thì nghẹt thở khi có biến cố.',e:'Thu 30tr, trả nợ 9tr → 9/30 = 30%. Chuẩn an toàn: ≤35%.'},
+ x_life:{t:'Tỷ lệ chi lối sống',d:'Phần thu nhập cho hưởng thụ (cà phê, mua sắm, du lịch). Không xấu — nhưng cao quá thì khó để dành.',e:'Thu 30tr, chi lối sống 6tr → 20%. Chuẩn: ≤15–20%.'},
+ x_infl:{t:'Chi phình theo thu nhập',d:'Đo hiện tượng "kiếm nhiều tiêu nhiều": thu nhập tăng nhưng tiêu cũng tăng theo, cuối cùng chẳng dư thêm. Càng thấp càng tốt.',e:'Lương tăng 20% mà chi cũng tăng 20% → phình 100%. Giữ chi cũ khi lương tăng là lý tưởng.'},
+ x_nw:{t:'Tài sản ròng / chi phí năm',d:'Tài sản ròng (tài sản trừ nợ) nuôi được bạn bao nhiêu năm nếu ngừng kiếm tiền. Đây là thước đo "của để dành" thật sự.',e:'Tài sản ròng 600tr, chi 20tr/tháng = 240tr/năm → sống được 2.5 năm.'},
+ x_liq:{t:'Thanh khoản',d:'Phần tài sản có thể biến thành tiền mặt nhanh khi cần (tiền mặt, tiết kiệm) so với tổng tài sản. Đủ thanh khoản thì không phải bán tháo nhà đất lúc kẹt.',e:'Tài sản 1 tỷ, trong đó tiền mặt+tiết kiệm 200tr → 20% thanh khoản.'},
+ x_alloc:{t:'Phù hợp mô hình theo tuổi',d:'Danh mục đầu tư của bạn có lệch so với mức rủi ro hợp tuổi không. Trẻ nên nhiều tài sản tăng trưởng; lớn tuổi nên an toàn hơn. Gần 100 là khớp.',e:'38 tuổi nên có ~72% tài sản tăng trưởng. Bạn đang 50% → lệch, nên tăng dần.'},
+ x_lev:{t:'Đòn bẩy (nợ / tài sản)',d:'Tổng nợ chiếm bao nhiêu phần tài sản. Vay để tạo tài sản là tốt, nhưng quá cao thì rủi ro — biến động nhỏ cũng lung lay.',e:'Tài sản 2 tỷ, nợ 800tr → 40%. Chuẩn an toàn: ≤50%.'},
+ x_emer:{t:'Quỹ dự phòng (số tháng)',d:'Tiền mặt + tiết kiệm đủ trả chi phí sống trong bao nhiêu tháng nếu mất hết thu nhập. Đây là tấm đệm đầu tiên phải có.',e:'Tiền mặt+tiết kiệm 90tr, chi 15tr/tháng → 6 tháng. Chuẩn tốt: 3–6 tháng.'},
+ x_lifecov:{t:'Độ phủ bảo hiểm nhân thọ',d:'Bảo hiểm nhân thọ che được bao nhiêu năm thu nhập cho người phụ thuộc nếu trụ cột gặp rủi ro. Có người phụ thuộc thì càng cần cao.',e:'Thu nhập 360tr/năm, BH nhân thọ 1 tỷ → phủ ~2.8 năm. Chuẩn: 5–10 năm nếu có con nhỏ.'},
+ x_health:{t:'Bảo vệ sức khoẻ',d:'Đo bạn có đủ bảo hiểm sức khoẻ và bệnh hiểm nghèo không. Một trận ốm nặng không bảo hiểm có thể thổi bay mọi tích luỹ.',e:'Có BH sức khoẻ + hiểm nghèo 500tr → điểm cao. Không có gì → điểm thấp, rủi ro lớn.'},
+ x_dep:{t:'Áp lực người phụ thuộc',d:'Số người sống dựa vào bạn, đối chiếu với mức bảo vệ đang có. Càng nhiều người phụ thuộc mà càng ít bảo hiểm thì áp lực càng cao.',e:'3 người phụ thuộc nhưng chưa có bảo hiểm → áp lực cao, nên ưu tiên mua BH.'},
+ x_ci:{t:'Bảo hiểm bệnh hiểm nghèo',d:'Loại bảo hiểm trả một khoản tiền lớn ngay khi chẩn đoán mắc bệnh nặng (ung thư, đột quỵ, nhồi máu...) để lo viện phí và bù thu nhập mất đi trong lúc điều trị. Có hay không tạo khác biệt rất lớn.',e:'Mua gói hiểm nghèo quyền lợi 500tr → khi bệnh được nhận 500tr tiền mặt. Chưa có → điểm 0.'}
+};
+let curPop=null,popOpenAt=0;
+function showHelp(key,anchorEl){
+ const h=HELP[key];if(!h)return;
+ closeHelp();
+ const pop=document.createElement('div');pop.className='helppop';
+ pop.innerHTML=`<div class="hp-t">${h.t}</div><div class="hp-d">${h.d}</div>
+  <div class="hp-e"><span class="hp-el">Ví dụ</span>${h.e}</div>`;
+ document.body.appendChild(pop);
+ const r=anchorEl.getBoundingClientRect();
+ const pw=Math.min(300,window.innerWidth-24);pop.style.width=pw+'px';
+ let left=r.left+window.scrollX;
+ if(left+pw>window.scrollX+window.innerWidth-12)left=window.scrollX+window.innerWidth-pw-12;
+ if(left<window.scrollX+8)left=window.scrollX+8;
+ let top=r.bottom+window.scrollY+8;
+ pop.style.left=left+'px';pop.style.top=top+'px';
+ const pr=pop.getBoundingClientRect();
+ if(pr.bottom>window.innerHeight-8){pop.style.top=(r.top+window.scrollY-pr.height-8)+'px';}
+ requestAnimationFrame(()=>pop.classList.add('on'));
+ curPop=pop;popOpenAt=Date.now();
+}
+/* đóng khi click ra ngoài — 1 listener toàn cục, kiểm tra thời gian mở để không tự đóng ngay */
+document.addEventListener('click',e=>{
+ if(!curPop)return;
+ if(Date.now()-popOpenAt<150)return;           /* vừa mở, bỏ qua click mở */
+ if(curPop.contains(e.target))return;            /* click trong popover */
+ if(e.target.classList&&e.target.classList.contains('qmark'))return; /* click dấu ? khác */
+ closeHelp();
+});
+function closeHelp(){if(curPop){curPop.remove();curPop=null}}
+window.addEventListener('scroll',()=>{if(curPop&&Date.now()-popOpenAt>400)closeHelp()},{passive:true});
+window.addEventListener('keydown',e=>{if(e.key==='Escape')closeHelp()});
+/* nút dấu ? dùng chung */
+function qmark(key){return `<button class="qmark" type="button" data-help="${key}" aria-label="Giải thích ${(HELP[key]||{}).t||''}" onclick="showHelp('${key}',this)">?</button>`}
+
 const META={
  i_sal:['Lương chính','tr/th'],i_bon:['Thưởng & hoa hồng','tr/th'],i_biz:['Kinh doanh / tay trái','tr/th'],
  i_rent:['Cho thuê tài sản','tr/th'],i_fin:['Lãi đầu tư','tr/th'],
@@ -1562,6 +1686,17 @@ const META={
 let STARS=JSON.parse(localStorage.getItem(LS_S)||'null');
 if(STARS){document.querySelectorAll('.star').forEach(b=>b.classList.toggle('on',STARS.includes(b.dataset.k)))}
 else{STARS=[...document.querySelectorAll('.star.on')].map(b=>b.dataset.k)}
+
+/* gắn dấu ? vào mọi ô nhập có trong HELP (Lớp A) */
+function attachInputHelp(){
+ document.querySelectorAll('.nrow').forEach(row=>{
+  const inp=row.querySelector('input[id]');if(!inp)return;
+  const key=inp.id;if(!HELP[key])return;
+  const lbl=row.querySelector('.lbl');if(!lbl||lbl.querySelector('.qmark'))return;
+  lbl.insertAdjacentHTML('beforeend',qmark(key));
+ });
+}
+attachInputHelp();
 document.querySelectorAll('.star').forEach(b=>{
  b.title='Đưa chỉ số này vào bảng điều chỉnh';
  b.onclick=()=>{b.classList.toggle('on');
@@ -2020,27 +2155,27 @@ function render(){
 
  const T=[
   ['g','TẠO THU NHẬP'],
-  ['Tỷ trọng thu nhập thụ động',pc(M.passR),'≥ 20%',M.passR>=.2?2:M.passR>=.08?1:0,'Phần thu nhập không đổi bằng thời gian'],
-  ['Mức độ tập trung nguồn thu',(M.hhi*100).toFixed(0)+'/100','≤ 50',M.hhi<=.5?2:M.hhi<=.7?1:0,'100 = phụ thuộc hoàn toàn một nguồn'],
-  ['Số nguồn thu nhập',M.srcs.length+' nguồn','≥ 3',M.srcs.length>=3?2:M.srcs.length===2?1:0,''],
-  ['Tự do tài chính',pc(M.fiR),'100% = tự do',M.fiR>=1?2:M.fiR>=.3?1:0,'Chi phí sống được thu nhập thụ động lo'],
+  ['Tỷ trọng thu nhập thụ động',pc(M.passR),'≥ 20%',M.passR>=.2?2:M.passR>=.08?1:0,'Phần thu nhập không đổi bằng thời gian','x_pas'],
+  ['Mức độ tập trung nguồn thu',(M.hhi*100).toFixed(0)+'/100','≤ 50',M.hhi<=.5?2:M.hhi<=.7?1:0,'100 = phụ thuộc hoàn toàn một nguồn','x_conc'],
+  ['Số nguồn thu nhập',M.srcs.length+' nguồn','≥ 3',M.srcs.length>=3?2:M.srcs.length===2?1:0,'','x_src'],
+  ['Tự do tài chính',pc(M.fiR),'100% = tự do',M.fiR>=1?2:M.fiR>=.3?1:0,'Chi phí sống được thu nhập thụ động lo','x_free'],
   ['g','QUẢN LÝ CHI TIÊU'],
-  ['Tỷ lệ tiết kiệm',pc(M.sav),'≥ 20%',M.sav>=.2?2:M.sav>=.1?1:0,'Phần thu nhập giữ lại được'],
-  ['Chi thiết yếu + nhà ở',pc(M.essR),'≤ 50%',M.essR<=.5?2:M.essR<=.62?1:0,''],
-  ['Chi lối sống',pc(M.lifR),'≤ 20%',M.lifR<=.2?2:M.lifR<=.3?1:0,''],
-  ['Gánh nặng nợ (DTI)',pc(M.dti),'≤ 35%',M.dti<=.35?2:M.dti<=.45?1:0,'Trả nợ / thu nhập tháng'],
+  ['Tỷ lệ tiết kiệm',pc(M.sav),'≥ 20%',M.sav>=.2?2:M.sav>=.1?1:0,'Phần thu nhập giữ lại được','x_save'],
+  ['Chi thiết yếu + nhà ở',pc(M.essR),'≤ 50%',M.essR<=.5?2:M.essR<=.62?1:0,'','x_ess'],
+  ['Chi lối sống',pc(M.lifR),'≤ 20%',M.lifR<=.2?2:M.lifR<=.3?1:0,'','x_life'],
+  ['Gánh nặng nợ (DTI)',pc(M.dti),'≤ 35%',M.dti<=.35?2:M.dti<=.45?1:0,'Trả nợ / thu nhập tháng','x_debt'],
   ['g','ĐẦU TƯ'],
-  ['Tài sản ròng / chi phí năm',M.nwY.toFixed(1)+' năm','≥ 5 năm',M.nwY>=5?2:M.nwY>=2?1:0,'Sống được bao lâu nếu ngừng kiếm tiền'],
-  ['Tỷ trọng tài sản tăng trưởng',pc(M.curEq),'≈ '+pc(M.tgtEq)+' (110−tuổi)',Math.abs(M.curEq-M.tgtEq)<=.15?2:Math.abs(M.curEq-M.tgtEq)<=.3?1:0,'Không tính nhà đang ở'],
-  ['Tính thanh khoản danh mục',pc(M.liq),'≥ 30%',M.liq>=.3?2:M.liq>=.15?1:0,'Phần chuyển thành tiền trong 1 tuần'],
-  ['Đòn bẩy (nợ/tài sản)',pc(M.lev),'≤ 40%',M.lev<=.4?2:M.lev<=.55?1:0,''],
+  ['Tài sản ròng / chi phí năm',M.nwY.toFixed(1)+' năm','≥ 5 năm',M.nwY>=5?2:M.nwY>=2?1:0,'Sống được bao lâu nếu ngừng kiếm tiền','x_nw'],
+  ['Tỷ trọng tài sản tăng trưởng',pc(M.curEq),'≈ '+pc(M.tgtEq)+' (110−tuổi)',Math.abs(M.curEq-M.tgtEq)<=.15?2:Math.abs(M.curEq-M.tgtEq)<=.3?1:0,'Không tính nhà đang ở','x_alloc'],
+  ['Tính thanh khoản danh mục',pc(M.liq),'≥ 30%',M.liq>=.3?2:M.liq>=.15?1:0,'Phần chuyển thành tiền trong 1 tuần','x_liq'],
+  ['Đòn bẩy (nợ/tài sản)',pc(M.lev),'≤ 40%',M.lev<=.4?2:M.lev<=.55?1:0,'','x_lev'],
   ['g','BẢO VỆ'],
-  ['Quỹ dự phòng',M.emg.toFixed(1)+' tháng','≥ '+M.needM+' tháng',M.emg>=M.needM?2:M.emg>=M.needM*.5?1:0,'Theo khả năng thay thế thu nhập của bạn'],
-  ['Tỷ lệ che phủ nhân thọ',pc(M.cov),'≥ 100%',M.cov>=1?2:M.cov>=.5?1:0,'Cần ≈ '+fmt(M.needLife)+' cho '+M.deps+' người phụ thuộc'],
-  ['Hạn mức BH sức khoẻ',fmt(M.hea)+'/năm','≥ 100 tr',M.hea>=100?2:M.hea>0?1:0,''],
-  ['Bảo hiểm bệnh hiểm nghèo',M.ci>0?fmt(M.ci):'Chưa có','> 0',M.ci>0?2:0,'']];
+  ['Quỹ dự phòng',M.emg.toFixed(1)+' tháng','≥ '+M.needM+' tháng',M.emg>=M.needM?2:M.emg>=M.needM*.5?1:0,'Theo khả năng thay thế thu nhập của bạn','x_emer'],
+  ['Tỷ lệ che phủ nhân thọ',pc(M.cov),'≥ 100%',M.cov>=1?2:M.cov>=.5?1:0,'Cần ≈ '+fmt(M.needLife)+' cho '+M.deps+' người phụ thuộc','x_lifecov'],
+  ['Hạn mức BH sức khoẻ',fmt(M.hea)+'/năm','≥ 100 tr',M.hea>=100?2:M.hea>0?1:0,'','x_health'],
+  ['Bảo hiểm bệnh hiểm nghèo',M.ci>0?fmt(M.ci):'Chưa có','> 0',M.ci>0?2:0,'','x_ci']];
  mtbl.innerHTML=T.map(r=>r[0]==='g'?`<tr class="grp"><td colspan="4">${r[1]}</td></tr>`:
-  `<tr><td>${r[0]}${r[4]?`<span class="sub">${r[4]}</span>`:''}</td>
+  `<tr><td>${r[0]}${r[5]?qmark(r[5]):''}${r[4]?`<span class="sub">${r[4]}</span>`:''}</td>
    <td class="r m" style="color:${r[3]===2?'var(--s-green)':r[3]===1?'var(--s-gold)':'var(--s-warn)'}">${r[1]}</td>
    <td class="r m" style="color:var(--s-dim)">${r[2]}</td>
    <td class="r"><span class="tag ${r[3]===2?'ok':r[3]===1?'wn':'bd'}">${r[3]===2?'Đạt':r[3]===1?'Cận ngưỡng':'Chưa đạt'}</span></td></tr>`).join('');
@@ -2173,6 +2308,77 @@ function reportHTML(forWord){
    <div class="t" style="font-size:10px;margin-top:6px;color:#999">Công cụ Chẩn đoán Tài chính Cá nhân · phát triển bởi Omnikey</div></div>
   </body></html>`;
 }
+/* ================= NHẬP / XUẤT CSV ================= */
+/* Danh sách 28 mã ô nhập theo đúng thứ tự hành trình */
+const CSV_KEYS=['i_sal','i_bon','i_biz','i_rent','i_fin',
+ 'e_ess','e_hom','e_deb','e_lif','e_fam','e_ins',
+ 'a_cash','a_dep','a_eq','a_alt','a_re','a_home',
+ 'd_mor','d_con','d_cc','d_oth','d_rate','p_age',
+ 'p_life','p_ci','p_hea','p_pro','p_dep'];
+function csvEscape(s){s=String(s);return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}
+function exportCSV(){
+ const nm=(document.getElementById('snapName')?.value||'').trim();
+ const rows=[['ma_o','nhan','gia_tri','don_vi']];
+ CSV_KEYS.forEach(k=>{const [lbl,unit]=META[k]||[k,''];rows.push([k,lbl,V(k),unit])});
+ /* dòng chú thích tên nếu có */
+ let csv='\ufeff'; /* BOM để Excel đọc đúng tiếng Việt */
+ if(nm)csv+='# Nguoi duoc danh gia: '+nm+'\n';
+ csv+='# Cong cu Chan doan Tai chinh Ca nhan - Omnikey\n';
+ csv+=rows.map(r=>r.map(csvEscape).join(',')).join('\n');
+ const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+ a.download='du-lieu-tai-chinh'+(nm?'-'+nm.replace(/\s+/g,'-'):'')+'.csv';
+ a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function importCSV(input){
+ const file=input.files&&input.files[0];if(!file)return;
+ const note=document.getElementById('csvNote');
+ const reader=new FileReader();
+ reader.onload=e=>{
+  try{
+   const text=String(e.target.result).replace(/^\ufeff/,'');
+   const lines=text.split(/\r?\n/);
+   const found={};let hitHeader=false;
+   for(const line of lines){
+    if(!line.trim()||line.trim().startsWith('#'))continue;
+    const cells=parseCsvLine(line);
+    const key=(cells[0]||'').trim();
+    if(key==='ma_o'){hitHeader=true;continue}     /* bỏ dòng tiêu đề */
+    if(!CSV_KEYS.includes(key))continue;            /* chỉ nhận mã đã biết */
+    const raw=(cells[2]!==undefined?cells[2]:'').trim();
+    const val=parseFloat(raw.replace(/[.,\s]/g,m=>m===','?'.':''));
+    if(!isNaN(val)&&val>=0)found[key]=val;
+   }
+   const n=Object.keys(found).length;
+   if(n===0){note.className='csvnote err';
+    note.textContent='File không đúng định dạng — không tìm thấy dữ liệu hợp lệ. Hãy dùng file CSV đã xuất từ công cụ này.';
+    input.value='';return}
+   /* đổ vào ô + cập nhật BASE */
+   Object.entries(found).forEach(([k,v])=>{
+    const el=document.getElementById(k);if(el){el.value=v}
+   });
+   BASE=null; /* buộc đọc lại từ input khi tính */
+   note.className='csvnote ok';
+   note.textContent='✓ Đã nhập '+n+'/28 ô từ file. Bấm "Bắt đầu" để xem kết quả — bạn vẫn có thể chỉnh sửa từng ô trong lúc đi qua các khối.';
+  }catch(err){
+   note.className='csvnote err';
+   note.textContent='Không đọc được file: '+err.message;
+  }
+  input.value='';
+ };
+ reader.onerror=()=>{note.className='csvnote err';note.textContent='Không mở được file.';input.value=''};
+ reader.readAsText(file,'utf-8');
+}
+/* tách 1 dòng CSV có xử lý dấu ngoặc kép */
+function parseCsvLine(line){
+ const out=[];let cur='',q=false;
+ for(let i=0;i<line.length;i++){const c=line[i];
+  if(q){if(c==='"'){if(line[i+1]==='"'){cur+='"';i++}else q=false}else cur+=c}
+  else{if(c==='"')q=true;else if(c===',')out.push(cur),cur='';else cur+=c}
+ }
+ out.push(cur);return out;
+}
+
 function exportWord(){
  const html=reportHTML(true);
  const blob=new Blob(['\ufeff'+html],{type:'application/msword'});
