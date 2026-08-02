@@ -1,0 +1,1456 @@
+<!doctype html>
+<html lang="vi" data-theme="light"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Theo dõi thai kỳ · Siren</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:ital,wght@0,500;0,600;1,500&family=Outfit:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap&subset=vietnamese,latin-ext" rel="stylesheet">
+<style>
+:root[data-theme="light"]{
+  --bg:#F3F8F8; --surface:#FFFFFF; --surface-2:#EDF5F5; --ink:#0D2A31; --muted:#5A7C81;
+  --line:#D6E6E5; --line-soft:#E6F0EF; --primary:#0E6E75; --primary-ink:#FFFFFF;
+  --aqua:#2FA8A0; --aqua-soft:#DFF2F0; --coral:#E8705C; --coral-soft:#FDE9E4;
+  --pearl:#FDF0E9; --amber:#A9711D; --amber-soft:#FBF0DA;
+  --shadow:0 1px 2px rgba(13,42,49,.04), 0 8px 24px rgba(13,42,49,.06);
+  --ribbon-track:#E2EFEE;
+}
+:root[data-theme="dark"]{
+  --bg:#08202A; --surface:#0F2E38; --surface-2:#143842; --ink:#E3F2F1; --muted:#8FB2B6;
+  --line:#1C4451; --line-soft:#173A46; --primary:#4FD1C5; --primary-ink:#052029;
+  --aqua:#4FD1C5; --aqua-soft:#123C43; --coral:#FF8A73; --coral-soft:#3A2320;
+  --pearl:#2A1E1C; --amber:#E5B36A; --amber-soft:#33291A;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+  --ribbon-track:#153741;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:Outfit,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  font-weight:400; line-height:1.5; -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:"Noto Serif Display",Georgia,serif;font-weight:600;letter-spacing:-.01em;margin:0}
+.num,.kpi b,.stat b,td.n,.metric-val{font-family:"DM Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.app{max-width:1280px;margin:0 auto;padding:18px 16px 64px}
+
+/* ---------- top bar ---------- */
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
+.brand h1{font-size:23px;line-height:1.2}
+.brand .eyebrow{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--aqua);font-weight:600;margin-bottom:5px}
+.brand p{font-size:12.5px;color:var(--muted);margin:5px 0 0}
+.topactions{display:flex;gap:8px;align-items:center}
+.pill{font-size:11px;border:1px solid var(--line);background:var(--surface);color:var(--muted);padding:7px 11px;border-radius:999px;white-space:nowrap}
+.pill.ok{border-color:var(--aqua);color:var(--aqua);background:var(--aqua-soft)}
+.iconbtn{width:36px;height:36px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;font-size:15px;display:grid;place-items:center}
+.iconbtn:hover{border-color:var(--aqua)}
+
+/* ---------- cards ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+.card.flat{box-shadow:none}
+.sect{font-size:15.5px;margin:0 0 4px}
+.sect + .sub{margin-top:0}
+.sub{color:var(--muted);font-size:12.5px;line-height:1.55;margin:6px 0 0}
+.smallmuted{color:var(--muted);font-size:11.5px;line-height:1.5}
+.abbr{font-family:"DM Mono",monospace;font-size:10px;color:var(--muted);letter-spacing:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.stack{display:grid;gap:12px}
+.mt{margin-top:14px}
+
+/* ---------- controls ---------- */
+input,select,textarea{
+  border:1px solid var(--line);border-radius:10px;padding:9px 11px;font:inherit;font-size:13.5px;
+  background:var(--surface);color:var(--ink);width:100%;
+}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--aqua);outline-offset:1px;border-color:var(--aqua)}
+input[type=date]{font-family:"DM Mono",monospace;font-size:13px}
+label{font-size:11px;color:var(--muted);font-weight:500;letter-spacing:.01em}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+button{font:inherit;font-weight:600;border:0;border-radius:10px;padding:9px 14px;cursor:pointer;font-size:13.5px;touch-action:manipulation}
+button:focus-visible,.tab:focus-visible,a:focus-visible{outline:2px solid var(--aqua);outline-offset:2px}
+.primary{background:var(--primary);color:var(--primary-ink)}
+.primary:hover{filter:brightness(1.08)}
+.soft{background:var(--aqua-soft);color:var(--primary);border:1px solid transparent}
+.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.ghost:hover{border-color:var(--aqua)}
+.danger{background:var(--coral-soft);color:var(--coral);border:1px solid var(--coral)}
+.tiny{padding:5px 9px;font-size:11.5px;border-radius:8px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+/* ---------- hero ---------- */
+.hero{margin-top:16px;display:grid;grid-template-columns:1.35fr .95fr;gap:14px}
+.due{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end;max-width:340px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:14px}
+.kpi{border:1px solid var(--line-soft);background:var(--surface-2);border-radius:12px;padding:10px 11px}
+.kpi small{color:var(--muted);font-size:10.5px;display:block;letter-spacing:.02em}
+.kpi b{display:block;font-size:20px;margin-top:3px;font-weight:500}
+.kpi .u{font-size:10.5px;color:var(--muted);font-family:Outfit,sans-serif}
+
+/* ---------- SIGNATURE: dải 40 tuần ---------- */
+.ribbonwrap{margin-top:18px}
+.ribbonhead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
+.ribbonhead span{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.ribbon{position:relative;height:64px;user-select:none}
+.ribbon .track{position:absolute;left:0;right:0;top:20px;height:16px;border-radius:8px;background:var(--ribbon-track);overflow:hidden}
+.ribbon .fill{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--aqua),var(--primary));opacity:.85}
+.ribbon .band{position:absolute;top:12px;height:32px;border-radius:6px;border:1px solid var(--aqua);background:transparent;cursor:pointer}
+.ribbon .band i{position:absolute;left:0;right:0;top:0;bottom:0;background:var(--aqua);opacity:.13;border-radius:5px}
+.ribbon .band.past{border-color:var(--line);opacity:.55}
+.ribbon .band.past i{background:var(--muted)}
+.ribbon .band.open{border-color:var(--coral);border-width:1.5px}
+.ribbon .band.open i{background:var(--coral);opacity:.2}
+.ribbon .band b{position:absolute;top:-15px;left:0;font-size:9.5px;font-weight:600;color:var(--muted);white-space:nowrap;font-family:Outfit,sans-serif}
+.ribbon .tri{position:absolute;top:14px;bottom:12px;width:1px;background:var(--line);}
+.ribbon .tri b{position:absolute;bottom:-14px;left:3px;font-size:9.5px;color:var(--muted);font-weight:500}
+.ribbon .visit{position:absolute;top:24px;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:var(--surface);border:2px solid var(--primary);cursor:pointer}
+.ribbon .now{position:absolute;top:6px;bottom:12px;width:2px;background:var(--coral);border-radius:2px}
+.ribbon .now b{position:absolute;top:-16px;left:50%;transform:translateX(-50%);background:var(--coral);color:#fff;font-size:9.5px;padding:2px 6px;border-radius:999px;white-space:nowrap;font-family:"DM Mono",monospace}
+.ribbonnote{font-size:11.5px;color:var(--muted);margin-top:16px;min-height:17px}
+
+/* ---------- phase box ---------- */
+.phase{background:linear-gradient(150deg,var(--aqua-soft),var(--surface) 70%);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column}
+.phase .eyebrow{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.phase h3{font-size:14px;margin:8px 0 2px;color:var(--muted);font-family:Outfit,sans-serif;font-weight:500}
+.phase .focus{font-size:21px;font-weight:600;font-family:"Noto Serif Display",serif;line-height:1.25;margin:2px 0 10px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:11px;border-radius:999px;padding:5px 10px;background:var(--surface);border:1px solid var(--line);color:var(--ink)}
+.chip.on{background:var(--aqua-soft);border-color:var(--aqua);color:var(--primary)}
+
+/* ---------- tabs ---------- */
+.tabs{display:flex;gap:5px;flex-wrap:wrap;margin:22px 0 14px;border-bottom:1px solid var(--line);padding-bottom:0}
+.tab{background:transparent;border:0;border-bottom:2px solid transparent;color:var(--muted);border-radius:0;padding:9px 12px;font-weight:500}
+.tab:hover{color:var(--ink)}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+.tab .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--coral);margin-left:5px;vertical-align:middle}
+.panel{display:none}
+.panel.active{display:block;animation:fade .18s ease}
+@keyframes fade{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+
+/* ---------- metric cards ---------- */
+.healthgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mcards{display:grid;gap:9px;margin-top:12px}
+.mcard{border:1px solid var(--line);border-radius:12px;padding:11px 13px;background:var(--surface);cursor:pointer;text-align:left;width:100%;font-weight:400;color:var(--ink)}
+.mcard:hover{border-color:var(--aqua);background:var(--surface-2)}
+.mcard .head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.mcard .name{font-weight:600;font-size:13px}
+.mcard .metric-val{font-size:18px;font-weight:500;margin:5px 0 2px;display:block}
+.mcard .meta{font-size:11px;color:var(--muted);line-height:1.45}
+.tag{font-size:10px;border-radius:999px;padding:3px 8px;background:var(--surface-2);color:var(--muted);white-space:nowrap;border:1px solid var(--line-soft);font-weight:500}
+.tag.ok{background:var(--aqua-soft);color:var(--primary);border-color:transparent}
+.tag.amber{background:var(--amber-soft);color:var(--amber);border-color:transparent}
+.tag.coral{background:var(--coral-soft);color:var(--coral);border-color:transparent}
+.tag.empty{background:transparent;color:var(--muted);border-style:dashed}
+
+/* ---------- notes / alerts ---------- */
+.note{border-radius:12px;padding:11px 13px;font-size:12.5px;line-height:1.55;border:1px solid var(--line);background:var(--surface-2)}
+.note b{display:block;margin-bottom:3px;font-size:13px}
+.note.ok{background:var(--aqua-soft);border-color:transparent}
+.note.amber{background:var(--amber-soft);border-color:transparent}
+.note.coral{background:var(--coral-soft);border-color:var(--coral)}
+.note.info{background:var(--pearl);border-color:transparent}
+.notelist{display:grid;gap:9px}
+
+/* ---------- windows / milestones ---------- */
+.wrow{display:grid;grid-template-columns:auto 1fr auto;gap:13px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line-soft)}
+.wrow:last-child{border-bottom:0}
+.wrow .when{font-family:"DM Mono",monospace;font-size:11.5px;color:var(--muted);white-space:nowrap;line-height:1.5}
+.wrow .when b{display:block;color:var(--ink);font-size:12.5px;font-weight:500}
+.wrow .ttl{font-weight:600;font-size:13.5px}
+.wrow .why{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.45}
+.wrow.open{background:var(--coral-soft);margin:0 -12px;padding:13px 12px;border-radius:10px;border-bottom:0}
+.wrow.done .ttl{color:var(--muted)}
+
+/* ---------- timeline ---------- */
+.tl{display:grid;gap:0}
+.ev{display:grid;grid-template-columns:104px 1fr auto;gap:14px;padding:14px 0;border-bottom:1px solid var(--line-soft);align-items:start}
+.ev:last-child{border-bottom:0}
+.ev .d{font-family:"DM Mono",monospace;font-size:12px;color:var(--muted);line-height:1.5}
+.ev .d b{display:block;color:var(--primary);font-size:12.5px}
+.ev .t{font-weight:600;font-size:13.5px}
+.ev .body{font-size:12.5px;color:var(--muted);line-height:1.55;margin-top:3px}
+.ev .row2{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
+.ev.warn{border-left:2px solid var(--coral);padding-left:11px;margin-left:-13px}
+.rowbtns{display:flex;gap:5px}
+
+/* ---------- charts ---------- */
+.chartbox{position:relative;height:320px;margin-top:12px}
+.chartbox canvas{width:100%;height:100%;display:block}
+.metricsbar{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.mbtn{background:var(--surface);border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:6px 11px;font-size:12px;font-weight:500}
+.mbtn.active{background:var(--primary);border-color:var(--primary);color:var(--primary-ink)}
+.legend{font-size:11.5px;color:var(--muted);margin-top:9px}
+.zoom{display:flex;gap:5px;margin-left:auto}
+
+/* ---------- labs ---------- */
+.lgroup{margin-bottom:18px}
+.lgroup h4{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--aqua);margin:0 0 8px;font-family:Outfit,sans-serif;font-weight:600}
+.lrow{display:grid;grid-template-columns:78px 1.5fr 1fr 1fr auto auto;gap:11px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line-soft);font-size:12.5px}
+.lrow:last-child{border-bottom:0}
+.lrow .dt{font-family:"DM Mono",monospace;font-size:11px;color:var(--muted)}
+.lrow .nm{font-weight:600;line-height:1.35}
+.lrow .nm i{display:block;font-style:normal;font-weight:400;font-size:11px;color:var(--muted);margin-top:2px}
+.lrow .vv{font-family:"DM Mono",monospace;font-weight:500}
+.lrow .rf{font-size:11px;color:var(--muted);line-height:1.4}
+
+/* ---------- tables ---------- */
+table.dt{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
+table.dt th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;padding:7px 8px;border-bottom:1px solid var(--line)}
+table.dt td{padding:8px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+table.dt td.n{font-weight:500}
+
+/* ---------- forms ---------- */
+.fg{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-top:12px}
+.fg .s2{grid-column:span 2}
+.fg .s4{grid-column:span 4}
+.editing{border:1px solid var(--coral);background:var(--coral-soft);border-radius:10px;padding:9px 12px;font-size:12.5px;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px}
+
+/* ---------- progress ---------- */
+.bar{height:7px;border-radius:999px;background:var(--ribbon-track);overflow:hidden;margin-top:9px}
+.bar>div{height:100%;background:var(--aqua);border-radius:999px;transition:width .4s ease}
+
+/* ---------- modal ---------- */
+.modal{position:fixed;inset:0;background:rgba(8,32,42,.55);display:none;align-items:flex-end;justify-content:center;z-index:60;padding:0}
+.modal.show{display:flex}
+.sheet{background:var(--surface);width:100%;max-width:860px;border-radius:20px 20px 0 0;padding:20px;max-height:88vh;overflow:auto}
+.sheettop{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;position:sticky;top:-20px;background:var(--surface);padding-top:2px}
+.close{background:var(--surface-2);color:var(--ink);width:32px;height:32px;border-radius:50%;padding:0;font-size:17px;line-height:1}
+@media(min-width:720px){.modal{align-items:center;padding:24px}.sheet{border-radius:18px}}
+
+/* ---------- toast ---------- */
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:999px;font-size:13px;font-weight:500;opacity:0;pointer-events:none;transition:.25s ease;z-index:80;box-shadow:var(--shadow)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- disclaimer ---------- */
+.disclaim{margin-top:26px;padding:14px 16px;border:1px dashed var(--line);border-radius:12px;font-size:11.5px;color:var(--muted);line-height:1.6}
+
+/* ---------- responsive ---------- */
+@media(max-width:900px){
+  .hero,.grid2,.healthgrid{grid-template-columns:1fr}
+  .grid3{grid-template-columns:1fr}
+  .kpis{grid-template-columns:1fr 1fr}
+  .fg{grid-template-columns:1fr 1fr}
+  .fg .s4{grid-column:span 2}
+  .lrow{grid-template-columns:1fr auto;gap:6px}
+  .lrow .rf,.lrow .dt{grid-column:1/-1}
+  .ev{grid-template-columns:82px 1fr}
+  .ev .rowbtns{grid-column:1/-1}
+  .app{padding:14px 12px 56px}
+  .brand h1{font-size:20px}
+  .ribbon .band b{display:none}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media print{
+  .tabs,.topactions,.actions,.rowbtns,.iconbtn{display:none!important}
+  .panel{display:block!important}
+  body{background:#fff}
+  .card{break-inside:avoid;box-shadow:none}
+}
+</style></head>
+<body><div class="app">
+
+<div class="topbar">
+  <div class="brand">
+    <div class="eyebrow">Hồ sơ thai kỳ</div>
+    <h1>Theo dõi mẹ &amp; bé</h1>
+    <p>Siêu âm · sinh trắc · sàng lọc · cân nặng mẹ · cửa sổ khám</p>
+  </div>
+  <div class="topactions">
+    <span class="pill" id="savePill">Đang tải</span>
+    <button class="iconbtn" id="themeBtn" title="Đổi nền sáng/tối" aria-label="Đổi nền sáng tối">◑</button>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="card">
+    <div class="due">
+      <div class="field"><label for="edd">Ngày dự sinh (EDD)</label><input type="date" id="edd"></div>
+      <button class="primary" id="eddBtn">Cập nhật</button>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><small>TUỔI THAI HÔM NAY</small><b class="num" id="kGA">—</b><span class="u" id="kGAd">—</span></div>
+      <div class="kpi"><small>ĐÃ ĐI QUA</small><b class="num" id="kPct">—</b><span class="u">trên 40 tuần</span></div>
+      <div class="kpi"><small>CÒN TỚI EDD</small><b class="num" id="kLeft">—</b><span class="u">ngày</span></div>
+      <div class="kpi"><small>TAM CÁ NGUYỆT</small><b class="num" id="kTri">—</b><span class="u" id="kTriR">—</span></div>
+    </div>
+
+    <div class="ribbonwrap">
+      <div class="ribbonhead"><span>Dải 40 tuần · cửa sổ khám &amp; lần đã đo</span><span id="ribbonWk">—</span></div>
+      <div class="ribbon" id="ribbon"></div>
+      <div class="ribbonnote" id="ribbonNote">Chạm vào một ô để xem khoảng ngày.</div>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="eyebrow">Trọng tâm giai đoạn</div>
+    <h3 id="phName">—</h3>
+    <div class="focus" id="phFocus">—</div>
+    <div class="chips" id="phChips"></div>
+    <p class="sub" id="phWhy"></p>
+  </div>
+</div>
+
+<div class="tabs" role="tablist">
+  <button class="tab active" data-tab="pOverview">Tổng quan</button>
+  <button class="tab" data-tab="pWindows">Cửa sổ khám</button>
+  <button class="tab" data-tab="pTimeline">Lịch sử</button>
+  <button class="tab" data-tab="pChart">Đồ thị</button>
+  <button class="tab" data-tab="pLabs">Xét nghiệm</button>
+  <button class="tab" data-tab="pMother">Mẹ</button>
+  <button class="tab" data-tab="pEntry">Nhập liệu</button>
+  <button class="tab" data-tab="pData">Dữ liệu</button>
+</div>
+
+<!-- ============ TỔNG QUAN ============ -->
+<section id="pOverview" class="panel active">
+  <div class="card" id="issueCard" style="display:none">
+    <h3 class="sect">Cần kiểm tra lại dữ liệu</h3>
+    <p class="sub">Những điểm dưới đây là mâu thuẫn trong chính số liệu đã nhập — nhiều khả năng do gõ nhầm hoặc map sai ô. Tool không tự sửa.</p>
+    <div class="notelist mt" id="issues"></div>
+  </div>
+
+  <div class="healthgrid mt">
+    <div class="card">
+      <h3 class="sect">Mẹ</h3>
+      <p class="sub">Huyết áp · sàng lọc · di truyền · cân nặng</p>
+      <div class="mcards" id="motherCards"></div>
+    </div>
+    <div class="card">
+      <h3 class="sect">Bé</h3>
+      <p class="sub">Tăng trưởng · sinh trắc · sàng lọc</p>
+      <div class="mcards" id="babyCards"></div>
+    </div>
+  </div>
+
+  <div class="grid2 mt">
+    <div class="card">
+      <h3 class="sect">Điểm cần chú ý</h3>
+      <p class="sub">Tổng hợp từ cờ trên phiếu và kết luận đã ghi trong lịch sử.</p>
+      <div class="notelist mt" id="alerts"></div>
+    </div>
+    <div class="card">
+      <h3 class="sect">Độ đầy đủ hồ sơ</h3>
+      <p class="sub">Dấu ○ chỉ có nghĩa dashboard chưa có dữ liệu, không đồng nghĩa bất thường.</p>
+      <div id="completeness" class="mt"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CỬA SỔ KHÁM ============ -->
+<section id="pWindows" class="panel">
+  <div class="grid2">
+    <div class="card">
+      <h3 class="sect">Cửa sổ đang mở &amp; sắp tới</h3>
+      <p class="sub">Ngày tính từ EDD trong hồ sơ. Đây là lịch tham khảo theo thực hành sản khoa phổ biến — phải khớp với chỉ định thực tế của bác sĩ.</p>
+      <div class="mt" id="winUpcoming"></div>
+    </div>
+    <div class="card">
+      <h3 class="sect">Đã qua</h3>
+      <p class="sub">Đánh dấu ✓ khi hồ sơ đã có dữ liệu tương ứng.</p>
+      <div class="mt" id="winPast"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LỊCH SỬ ============ -->
+<section id="pTimeline" class="panel">
+  <div class="card">
+    <h3 class="sect">Lịch sử thai kỳ</h3>
+    <p class="sub">Siêu âm, xét nghiệm và ghi nhận của mẹ theo thời gian. Chạm “Sửa” để mở lại bản ghi trong tab Nhập liệu.</p>
+    <div class="tl mt" id="timeline"></div>
+  </div>
+</section>
+
+<!-- ============ ĐỒ THỊ ============ -->
+<section id="pChart" class="panel">
+  <div class="card">
+    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+      <h3 class="sect">Diễn biến theo tuần thai</h3>
+      <div class="zoom">
+        <button class="mbtn active" data-zoom="data">Quanh dữ liệu</button>
+        <button class="mbtn" data-zoom="full">Cả 40 tuần</button>
+      </div>
+    </div>
+    <div class="metricsbar" id="metricBtns"></div>
+    <div class="chartbox"><canvas id="chart"></canvas></div>
+    <div class="legend" id="legend"></div>
+    <div class="note info mt" id="metricDesc"></div>
+  </div>
+  <div class="grid2 mt">
+    <div class="card"><h3 class="sect">Đọc xu hướng</h3><div class="sub mt" id="trend"></div></div>
+    <div class="card"><h3 class="sect">Ngoại suy cân nặng lúc sinh</h3><div class="sub mt" id="forecast"></div></div>
+  </div>
+</section>
+
+<!-- ============ XÉT NGHIỆM ============ -->
+<section id="pLabs" class="panel">
+  <div class="card">
+    <h3 class="sect">Kết quả xét nghiệm &amp; sàng lọc</h3>
+    <p class="sub">Ưu tiên tên tiếng Việt; viết tắt giữ lại để đối chiếu với phiếu gốc.</p>
+    <div class="mt" id="labGroups"></div>
+  </div>
+  <div class="card mt">
+    <h3 class="sect">Cách tool đọc xét nghiệm</h3>
+    <div class="note mt">Tool lấy khoảng tham chiếu và cờ ghi trên chính phiếu xét nghiệm, không tự đặt ngưỡng. Một kết quả “bất thường” đơn lẻ chỉ là tín hiệu để hỏi bác sĩ, không phải chẩn đoán.</div>
+  </div>
+</section>
+
+<!-- ============ MẸ ============ -->
+<section id="pMother" class="panel">
+  <div class="grid2">
+    <div class="card">
+      <h3 class="sect">Cân nặng &amp; BMI</h3>
+      <p class="sub">Dải tham chiếu theo khuyến nghị IOM 2009, tính từ BMI trước mang thai. Cần bác sĩ xác nhận cho từng trường hợp.</p>
+      <div id="bmiBox" class="mt"></div>
+      <div class="chartbox" style="height:250px"><canvas id="wchart"></canvas></div>
+      <div class="legend" id="wlegend"></div>
+    </div>
+    <div class="card">
+      <h3 class="sect">Hồ sơ nền</h3>
+      <p class="sub">Thông tin cố định để bác sĩ đối chiếu ở các lần khám sau.</p>
+      <div class="fg mt" style="grid-template-columns:1fr 1fr">
+        <div class="field s2"><label for="bgHistory">Tiền sử sản khoa / phẫu thuật</label><input id="bgHistory" placeholder="VD: mổ lấy thai 2021"></div>
+        <div class="field"><label for="bgHeight">Chiều cao (cm)</label><input type="number" step="0.1" id="bgHeight"></div>
+        <div class="field"><label for="bgPreWeight">Cân nặng trước mang thai (kg)</label><input type="number" step="0.1" id="bgPreWeight"></div>
+        <div class="field s2"><label for="bgConception">Phương pháp thụ thai</label><input id="bgConception"></div>
+        <div class="field s2"><label for="bgNotes">Ghi chú nền</label><textarea id="bgNotes" rows="3"></textarea></div>
+      </div>
+      <div class="actions"><button class="primary" id="bgBtn">Lưu hồ sơ nền</button></div>
+      <div class="mt" id="bgDerived"></div>
+    </div>
+  </div>
+  <div class="card mt">
+    <h3 class="sect">Các lần cân</h3>
+    <div id="weightRows" class="mt"></div>
+  </div>
+</section>
+
+<!-- ============ NHẬP LIỆU ============ -->
+<section id="pEntry" class="panel">
+  <div class="card">
+    <h3 class="sect">Lần khám / siêu âm</h3>
+    <div class="editing" id="vEditing" style="display:none"><span id="vEditingTxt"></span><button class="ghost tiny" id="vCancel">Huỷ sửa</button></div>
+    <div class="fg">
+      <div class="field"><label for="vDate">Ngày khám</label><input type="date" id="vDate"></div>
+      <div class="field"><label for="vReported">Tuổi thai ghi trên phiếu</label><input id="vReported" placeholder="VD: 12w3d"></div>
+      <div class="field"><label for="vFacility">Cơ sở</label><input id="vFacility" placeholder="VD: Tâm Anh"></div>
+      <div class="field"><label for="vBP">Huyết áp (mmHg)</label><input id="vBP" placeholder="VD: 110/70"></div>
+
+      <div class="field"><label for="vEFW">Cân nặng thai <span class="abbr">EFW · g</span></label><input type="number" id="vEFW"></div>
+      <div class="field"><label for="vFHR">Nhịp tim thai <span class="abbr">FHR · bpm</span></label><input type="number" id="vFHR"></div>
+      <div class="field"><label for="vCRL">Đầu–mông <span class="abbr">CRL · mm</span></label><input type="number" step="0.01" id="vCRL"></div>
+      <div class="field"><label for="vPct">Percentile trên phiếu <span class="abbr">%</span></label><input type="number" step="0.1" id="vPct"></div>
+
+      <div class="field"><label for="vBPD">Lưỡng đỉnh <span class="abbr">BPD · mm</span></label><input type="number" step="0.1" id="vBPD"></div>
+      <div class="field"><label for="vHC">Chu vi đầu <span class="abbr">HC · mm</span></label><input type="number" step="0.1" id="vHC"></div>
+      <div class="field"><label for="vAC">Chu vi bụng <span class="abbr">AC · mm</span></label><input type="number" step="0.1" id="vAC"></div>
+      <div class="field"><label for="vFL">Xương đùi <span class="abbr">FL · mm</span></label><input type="number" step="0.1" id="vFL"></div>
+
+      <div class="field"><label for="vNT">Sau gáy <span class="abbr">NT · mm</span></label><input type="number" step="0.01" id="vNT"></div>
+      <div class="field"><label for="vNB">Xương mũi <span class="abbr">NB · mm</span></label><input type="number" step="0.01" id="vNB"></div>
+      <div class="field"><label for="vRPI">ĐM tử cung phải <span class="abbr">PI</span></label><input type="number" step="0.01" id="vRPI"></div>
+      <div class="field"><label for="vLPI">ĐM tử cung trái <span class="abbr">PI</span></label><input type="number" step="0.01" id="vLPI"></div>
+
+      <div class="field"><label for="vAFI">Chỉ số ối <span class="abbr">AFI · mm</span></label><input type="number" step="0.1" id="vAFI"></div>
+      <div class="field s2"><label for="vPlacenta">Nhau / ối / dây rốn</label><input id="vPlacenta"></div>
+      <div class="field"><label for="vExtraK">Số đo khác — tên</label><input id="vExtraK" placeholder="VD: túi thai"></div>
+      <div class="field s4"><label for="vNote">Kết luận trên phiếu / ghi chú</label><textarea id="vNote" rows="3"></textarea></div>
+    </div>
+    <div class="actions"><button class="primary" id="vSave">Lưu lần khám</button><button class="ghost" id="vClear">Xoá form</button></div>
+  </div>
+
+  <div class="grid2 mt">
+    <div class="card">
+      <h3 class="sect">Xét nghiệm</h3>
+      <div class="editing" id="lEditing" style="display:none"><span id="lEditingTxt"></span><button class="ghost tiny" id="lCancel">Huỷ sửa</button></div>
+      <div class="fg" style="grid-template-columns:1fr 1fr">
+        <div class="field"><label for="lDate">Ngày</label><input type="date" id="lDate"></div>
+        <div class="field"><label for="lGroup">Nhóm</label><select id="lGroup"></select></div>
+        <div class="field s2"><label for="lName">Tên xét nghiệm</label><input id="lName"></div>
+        <div class="field"><label for="lValue">Kết quả</label><input id="lValue"></div>
+        <div class="field"><label for="lUnit">Đơn vị</label><input id="lUnit"></div>
+        <div class="field"><label for="lRef">Khoảng tham chiếu</label><input id="lRef"></div>
+        <div class="field"><label for="lFlag">Cờ trên phiếu</label><select id="lFlag">
+          <option value="">Chưa đánh giá</option><option value="normal">Bình thường</option>
+          <option value="low-risk">Nguy cơ thấp</option><option value="low">Thấp</option>
+          <option value="high">Cao</option><option value="abnormal">Bất thường</option>
+          <option value="positive">Dương tính</option><option value="negative">Âm tính</option>
+          <option value="carrier">Người mang gen</option></select></div>
+        <div class="field"><label for="lFacility">Cơ sở</label><input id="lFacility"></div>
+        <div class="field"><label for="lCode">Mã nội bộ</label><input id="lCode" placeholder="tuỳ chọn"></div>
+        <div class="field s2"><label for="lNote">Ghi chú</label><input id="lNote"></div>
+      </div>
+      <div class="actions"><button class="primary" id="lSave">Lưu xét nghiệm</button><button class="ghost" id="lClear">Xoá form</button></div>
+    </div>
+
+    <div class="card">
+      <h3 class="sect">Cân nặng mẹ</h3>
+      <p class="sub">Ghi lại mỗi lần cân để dựng đường tăng cân.</p>
+      <div class="fg" style="grid-template-columns:1fr 1fr">
+        <div class="field"><label for="wDate">Ngày</label><input type="date" id="wDate"></div>
+        <div class="field"><label for="wKg">Cân nặng (kg)</label><input type="number" step="0.1" id="wKg"></div>
+        <div class="field s2"><label for="wSrc">Nguồn</label><input id="wSrc" placeholder="VD: cân tại phòng khám"></div>
+      </div>
+      <div class="actions"><button class="primary" id="wSave">Lưu cân nặng</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DỮ LIỆU ============ -->
+<section id="pData" class="panel">
+  <div class="grid2">
+    <div class="card">
+      <h3 class="sect">Sao lưu &amp; khôi phục</h3>
+      <p class="sub">Dữ liệu chỉ nằm trên thiết bị này. Xoá lịch sử trình duyệt là mất — nên xuất JSON định kỳ.</p>
+      <div class="actions">
+        <button class="primary" id="expJSON">Xuất JSON</button>
+        <button class="soft" id="impBtn">Nhập JSON</button>
+        <input type="file" id="impFile" accept="application/json,.json" hidden>
+        <button class="ghost" id="expCSV">Xuất CSV</button>
+      </div>
+      <div class="note mt" id="backupInfo"></div>
+      <div class="sub" id="impStatus"></div>
+    </div>
+    <div class="card">
+      <h3 class="sect">Bản in mang đi khám</h3>
+      <p class="sub">Một trang gọn: tuổi thai, mốc sinh trắc gần nhất, cờ bất thường, các câu cần hỏi bác sĩ.</p>
+      <div class="actions">
+        <button class="primary" id="expVisit">Tạo phiếu mang đi khám</button>
+        <button class="ghost" id="expReport">Xuất báo cáo đầy đủ</button>
+      </div>
+      <div class="mt" id="summaryGrid"></div>
+    </div>
+  </div>
+  <div class="card mt">
+    <h3 class="sect">Vùng nguy hiểm</h3>
+    <p class="sub">Xoá toàn bộ dữ liệu trên thiết bị. Nên xuất JSON trước.</p>
+    <div class="actions"><button class="danger" id="resetBtn">Xoá toàn bộ dữ liệu</button><button class="ghost" id="seedBtn">Nạp lại dữ liệu mẫu ban đầu</button></div>
+  </div>
+</section>
+
+<div class="disclaim">
+  Tool này tổ chức lại số liệu từ phiếu khám để dễ theo dõi xu hướng và không bỏ sót mốc. Nó <b>không chẩn đoán, không thay thế hồ sơ y tế và không thay chỉ định của bác sĩ</b>. Mọi cờ cảnh báo chỉ là gợi ý để hỏi lại, kể cả khi không có cờ nào.
+</div>
+</div>
+
+<div class="modal" id="modal"><div class="sheet">
+  <div class="sheettop"><div><div class="eyebrow smallmuted" id="mKicker"></div><h3 id="mTitle" style="margin-top:3px;font-size:18px"></h3></div><button class="close" id="mClose">×</button></div>
+  <div id="mBody" class="mt"></div>
+</div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const DAY=86400000, KEY='preg_health_v5', OLDKEY='preg_health_dashboard_v43';
+
+/* ---------- storage ---------- */
+let storageOK=true;
+try{localStorage.setItem('__t','1');localStorage.removeItem('__t')}catch(e){storageOK=false}
+
+const SEED={"schemaVersion": "5.0", "edd": "2027-01-17", "visits": [{"id": 20260519090000, "date": "2026-05-19", "gaDays": 37, "reportedGA": "4w5d", "efw": null, "fhr": null, "crl": null, "bpd": null, "hc": null, "ac": null, "fl": null, "afi": null, "placenta": "", "bp": "", "fluidCord": "", "details": {"gestationalSac": "6.7 mm", "scarDistance": "43.7 mm"}, "note": "Siêu âm Tâm Anh. 01 túi thai trong buồng tử cung, GS 6.7 mm. Chưa có túi noãn hoàng; chưa có phôi thai và hoạt động tim thai. Khoảng cách từ túi thai đến sẹo mổ cũ 43.7 mm. Không có tụ dịch màng nuôi. Hai buồng trứng không thấy khối bất thường; túi cùng Douglas không có dịch. Kết luận trên phiếu: thai tương đương 04 tuần 05 ngày."}, {"id": 20260524090000, "date": "2026-05-24", "gaDays": 42, "reportedGA": "4w6d", "efw": null, "fhr": null, "crl": null, "bpd": null, "hc": null, "ac": null, "fl": null, "afi": null, "placenta": "", "bp": "", "fluidCord": "", "details": {"sacLength": "14.8 mm"}, "note": "Siêu âm Phòng khám Phụ sản Vinhomes Ocean Park. Tử cung kích thước to theo tuổi thai, tư thế ngả trước. Phôi thai: chưa có. Chiều dài túi ối/túi thai ghi trên phiếu: 14.8 mm. Túi noãn hoàng: chưa rõ. Không có tụ dịch màng nuôi. Hai buồng trứng không thấy khối bất thường; Douglas không có dịch. Kết luận: thai 04 tuần 06 ngày. Phiếu ghi dự kiến sinh 25/01/2027; tool giữ EDD chuẩn 17/01/2027."}, {"id": 20260612090000, "date": "2026-06-12", "gaDays": 61, "reportedGA": "8w4d", "efw": null, "fhr": 173, "crl": 20, "bpd": null, "hc": null, "ac": null, "fl": null, "afi": null, "placenta": "", "bp": "", "fluidCord": "", "details": {"gestationalSac": "47x27 mm", "yolkSac": "5 mm"}, "note": "Siêu âm Tâm Anh. 01 túi thai trong buồng tử cung, GS 47x27 mm; túi noãn hoàng 5 mm. CRL 20 mm; tim thai 173 bpm. Không có tụ dịch màng nuôi. Hai buồng trứng bình thường; tiểu khung không thấy bất thường; Douglas không có dịch. Kết luận: thai tương đương 08 tuần 04 ngày."}, {"id": 20260624090000, "date": "2026-06-24", "gaDays": 73, "reportedGA": "10w4d", "efw": null, "fhr": 158, "crl": 36.8, "bpd": null, "hc": null, "ac": null, "fl": null, "afi": null, "placenta": "", "bp": "", "fluidCord": "", "details": {"subchorionicCollection": "6x16 mm"}, "note": "Siêu âm Tâm Anh. CRL 36.8 mm; tim thai 158 bpm. Tụ dịch mép dưới bánh rau kích thước 6x16 mm. Hai buồng trứng không thấy khối bất thường; tiểu khung không thấy bất thường; Douglas không có dịch. Kết luận: 01 thai tương đương 10 tuần 04 ngày, tụ dịch mép dưới bánh rau."}, {"id": 20260708090000, "date": "2026-07-08", "gaDays": 87, "reportedGA": "12w3d", "efw": 56, "fhr": 171, "crl": 59.26, "bpd": 19, "hc": 71, "ac": 56, "fl": 6.4, "afi": null, "placenta": "Mặt trước", "bp": "", "fluidCord": "Thể tích ối bình thường; gốc dây rốn cắm trung tâm bánh rau; mặt cắt 3 mạch máu quan sát thấy", "details": {"nb": 1.77, "nt": 1.28, "uterineArteryRightPI": 2.6, "uterineArteryLeftPI": 1.2, "hadlockPercentile": 16}, "note": "Ngày khám 08/07/2026 được suy ra từ tuổi thai 12w3d và EDD 17/01/2027 vì ngày khám không nằm trong khung ảnh. 01 thai, cử động (+). EFW 56 g ±10%, tương đương percentile 16 theo Hadlock. NT 1.28 mm; xương mũi 1.77 mm. Đầu và cấu trúc não bình thường; tim 4 buồng bình thường; mặt cắt 3 mạch máu quan sát thấy; dạ dày quan sát thấy; thành bụng nguyên vẹn; bàng quang bình thường; thể tích ối bình thường; có đầy đủ bốn chi. PI động mạch tử cung phải 2.6, trái 1.2. Kết luận ghi tăng sức cản động mạch tử cung bên phải. Phiếu in EDD 17/01/2026, nhiều khả năng sai năm; file sử dụng EDD 17/01/2027."}, {"id": 20260716181910, "date": "2026-07-16", "gaDays": 95, "reportedGA": "13w4d", "efw": 38, "fhr": 152, "crl": null, "bpd": 22, "hc": null, "ac": 74, "fl": 14, "afi": null, "placenta": "Rau bám đáy mặt trước", "bp": "", "fluidCord": "Dịch ối trong, ối bình thường; dây rốn 2 động mạch, 1 tĩnh mạch", "details": {"nb": 3.6, "tcd": 13.5, "lateralVentricle": 3.5, "cisternaMagna": 3, "humerus": 12, "foot": 10, "interorbital": 13.5}, "note": "01 thai; ngôi thai chưa cố định. Xương hộp sọ và hàm mặt: hiện không thấy bất thường. Cột sống – hệ xương: hiện không thấy bất thường. Tim thai: cấu trúc tim thai 4 buồng. Ổ bụng kín; cơ hoành bình thường; dạ dày trong ổ bụng; hai bể thận bình thường; bàng quang trong hố chậu; lồng ngực/cấu trúc phổi đồng nhất, không có nang tuyến. Mép bánh rau bình thường. Lưu ý trên phiếu: tụ dịch màng nuôi 5×9 mm (5%). Tuổi thai theo kết quả khám trên phiếu: 13 tuần 04 ngày; kết luận hình thái ghi thai tương đương 13 tuần 06 ngày. EDD trên bản in có vẻ ghi nhầm năm 2026; file sử dụng EDD 17/01/2027 theo EDD đã xác nhận trước đó. Huyết áp viết tay trên ảnh không đủ rõ nên chưa nhập."}], "labs": [{"id": "lab-20260709-bp", "date": "2026-07-09", "group": "Sàng lọc tiền sản giật", "code": "BP_SCREEN_SUMMARY", "name": "Huyết áp khi sàng lọc tiền sản giật", "value": "Tay trái 95/60, 96/60; tay phải 99/60, 91/62", "unit": "mmHg", "reference": "Đọc theo thai kỳ và bối cảnh lâm sàng", "flag": "normal", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Bốn lần đo trên phiếu sàng lọc tiền sản giật."}, {"id": "lab-20260709-plgf", "date": "2026-07-09", "group": "Sàng lọc tiền sản giật", "code": "PLGF", "name": "Yếu tố tăng trưởng nhau thai (PlGF)", "value": 51.7, "unit": "pg/mL", "reference": "Diễn giải theo MoM và mô hình FMF", "flag": "normal", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Kết quả kèm 0.872 MoM."}, {"id": "lab-20260709-plgf-mom", "date": "2026-07-09", "group": "Sàng lọc tiền sản giật", "code": "PLGF_MOM", "name": "PlGF quy đổi theo trung vị (MoM)", "value": 0.872, "unit": "MoM", "reference": "Mô hình sàng lọc của labo", "flag": "normal", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "MoM = multiple of median, dùng để chuẩn hóa theo tuổi thai."}, {"id": "lab-20260709-pi-l", "date": "2026-07-09", "group": "Sàng lọc tiền sản giật", "code": "UTERINE_PI_LEFT", "name": "Chỉ số xung động mạch tử cung trái (PI)", "value": 1.2, "unit": "", "reference": "Đọc theo tuổi thai / mô hình sàng lọc", "flag": "normal", "facility": "Bệnh viện Đa khoa Tâm Anh"}, {"id": "lab-20260709-pi-r", "date": "2026-07-09", "group": "Sàng lọc tiền sản giật", "code": "UTERINE_PI_RIGHT", "name": "Chỉ số xung động mạch tử cung phải (PI)", "value": 2.6, "unit": "", "reference": "Đọc theo tuổi thai / mô hình sàng lọc", "flag": "abnormal", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Trên siêu âm cùng giai đoạn có ghi tăng sức cản động mạch tử cung bên phải."}, {"id": "lab-20260709-pe34", "date": "2026-07-09", "group": "Sàng lọc tiền sản giật", "code": "PE_RISK_34", "name": "Nguy cơ tiền sản giật trước 34 tuần", "value": "1:19.847", "unit": "", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Phiếu kết luận: nguy cơ thấp."}, {"id": "lab-20260709-pe37", "date": "2026-07-09", "group": "Sàng lọc tiền sản giật", "code": "PE_RISK_37", "name": "Nguy cơ tiền sản giật trước 37 tuần", "value": "1:2.987", "unit": "", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Phiếu kết luận: nguy cơ thấp."}, {"id": "lab-20260708-t21", "date": "2026-07-08", "group": "Sàng lọc thai", "code": "NIPT_T21", "name": "NIPT – Tam nhiễm sắc thể 21 (Down)", "value": -1.48, "unit": "Z-score", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Nguy cơ thấp."}, {"id": "lab-20260708-t18", "date": "2026-07-08", "group": "Sàng lọc thai", "code": "NIPT_T18", "name": "NIPT – Tam nhiễm sắc thể 18 (Edwards)", "value": 0.28, "unit": "Z-score", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Nguy cơ thấp."}, {"id": "lab-20260708-t13", "date": "2026-07-08", "group": "Sàng lọc thai", "code": "NIPT_T13", "name": "NIPT – Tam nhiễm sắc thể 13 (Patau)", "value": -0.48, "unit": "Z-score", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Nguy cơ thấp."}, {"id": "lab-20260708-sexchr", "date": "2026-07-08", "group": "Sàng lọc thai", "code": "NIPT_SEX_CHR", "name": "NIPT – Lệch bội nhiễm sắc thể giới tính", "value": "Nguy cơ thấp", "unit": "", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh"}, {"id": "lab-20260708-otherchr", "date": "2026-07-08", "group": "Sàng lọc thai", "code": "NIPT_OTHER_CHR", "name": "NIPT – Các nhiễm sắc thể khác được khảo sát", "value": "Nguy cơ thấp", "unit": "", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh"}, {"id": "lab-20260708-microdel", "date": "2026-07-08", "group": "Sàng lọc thai", "code": "NIPT_MICRODEL", "name": "NIPT – 5 hội chứng vi mất đoạn", "value": "Nguy cơ thấp", "unit": "", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Phạm vi ghi trên phiếu gồm 22q11.2, Angelman, Prader-Willi, Cri-du-Chat, 1p36."}, {"id": "lab-20260708-dominant", "date": "2026-07-08", "group": "Sàng lọc thai", "code": "NIPT_DOMINANT_PANEL", "name": "NIPT – 25 bệnh đơn gen trội / 30 gen", "value": "Chưa phát hiện biến thể gây bệnh / có khả năng gây bệnh", "unit": "", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh"}, {"id": "lab-20260708-cfdna", "date": "2026-07-08", "group": "Sàng lọc thai", "code": "CFDNA_FRACTION", "name": "Tỷ lệ DNA tự do của thai (fetal fraction)", "value": 7.97, "unit": "%", "reference": "Thông tin kỹ thuật trên phiếu", "flag": "normal", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Tỷ lệ cfDNA thai trong mẫu dùng cho xét nghiệm NIPT đơn gen."}, {"id": "lab-20260708-pah", "date": "2026-07-08", "group": "Di truyền của mẹ", "code": "CARRIER_PAH", "name": "Sàng lọc người mang gen – PAH", "value": "c.516G>T (p.Gln172His), dị hợp tử", "unit": "", "reference": "Kết luận xét nghiệm 18 bệnh di truyền lặn phổ biến", "flag": "carrier", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Phát hiện 1 biến thể gây bệnh trên gen PAH ở trạng thái dị hợp tử. Kết quả người mang gen không đồng nghĩa mẹ mắc bệnh; cần đánh giá nguy cơ cho con theo tư vấn di truyền và xét nghiệm người bố khi phù hợp."}, {"id": "lab-20260708-carrier-other", "date": "2026-07-08", "group": "Di truyền của mẹ", "code": "CARRIER_PANEL_OTHER", "name": "Các gen còn lại trong panel người mang gen", "value": "Chưa phát hiện biến thể được phân lớp gây bệnh", "unit": "", "reference": "Trong phạm vi panel 18 bệnh", "flag": "normal", "facility": "Bệnh viện Đa khoa Tâm Anh"}, {"id": "lab-20260708-sma", "date": "2026-07-08", "group": "Di truyền của mẹ", "code": "SMA_SMN1", "name": "Sàng lọc người mang gen teo cơ tủy sống (SMA / SMN1)", "value": "Không phát hiện biến thể được phân lớp gây bệnh", "unit": "", "reference": "Khảo sát mất exon 7 trên SMN1 theo phiếu xét nghiệm", "flag": "normal", "facility": "Bệnh viện Đa khoa Tâm Anh"}], "source": "Ultrasound history through 2026-07-16; lab schema prepared for structured import", "maternal": [{"date": "2026-07-09", "type": "anthropometry", "name": "Cân nặng mẹ", "value": 60.9, "unit": "kg", "source": "Phiếu sàng lọc tiền sản giật"}, {"date": "2026-07-09", "type": "anthropometry", "name": "Chiều cao mẹ", "value": 165.0, "unit": "cm", "source": "Phiếu sàng lọc tiền sản giật"}, {"date": "2026-07-09", "type": "pregnancy", "name": "Phương pháp thụ thai", "value": "Tự nhiên", "unit": "", "source": "Phiếu sàng lọc tiền sản giật"}], "sourceNote": "Tổng hợp từ các phiếu siêu âm, NIPT, sàng lọc tiền sản giật và sàng lọc gen người mang bệnh do người dùng cung cấp."};
+
+function blankState(){return{schemaVersion:'5.0',edd:'',visits:[],labs:[],weights:[],background:{},savedAt:null}}
+function normalize(s){
+  const st=Object.assign(blankState(),s||{});
+  st.visits=Array.isArray(st.visits)?st.visits:[];
+  st.labs=Array.isArray(st.labs)?st.labs:[];
+  st.weights=Array.isArray(st.weights)?st.weights:[];
+  st.background=st.background&&typeof st.background==='object'?st.background:{};
+  // migrate legacy maternal[] -> weights[] + background
+  (Array.isArray(s&&s.maternal)?s.maternal:[]).forEach(m=>{
+    const n=String(m.name||'').toLowerCase();
+    if(n.includes('cân nặng')&&isFinite(+m.value)) st.weights.push({id:'w-'+m.date,date:m.date,kg:+m.value,source:m.source||''});
+    else if(n.includes('chiều cao')&&isFinite(+m.value)) st.background.heightCm=+m.value;
+    else if(n.includes('thụ thai')) st.background.conception=m.value;
+  });
+  st.visits.forEach(v=>{v.id=v.id||('v-'+v.date); v.details=v.details||{}});
+  st.labs.forEach(l=>{l.id=l.id||('l-'+l.date+'-'+(l.code||l.name))});
+  st.weights.forEach(w=>{w.id=w.id||('w-'+w.date)});
+  return st;
+}
+let state=normalize(JSON.parse(JSON.stringify(SEED)));
+try{
+  const raw=storageOK?(localStorage.getItem(KEY)||localStorage.getItem(OLDKEY)):null;
+  if(raw){const p=JSON.parse(raw); if(p) state=normalize(p);}
+}catch(e){}
+function persist(){
+  if(!storageOK)return;
+  state.savedAt=new Date().toISOString();
+  try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){storageOK=false;toast('Không lưu được — bộ nhớ trình duyệt bị chặn')}
+}
+
+/* ---------- utils ---------- */
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function parseDate(s){if(!s)return null;const p=String(s).split('-').map(Number);if(p.length<3||!p.every(isFinite))return null;return new Date(p[0],p[1]-1,p[2])}
+function iso(d){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${dd}`} // local, không dùng toISOString
+function today(){const d=new Date();return new Date(d.getFullYear(),d.getMonth(),d.getDate())}
+function vn(s){const d=parseDate(s);return d?`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`:'—'}
+function vnShort(s){const d=parseDate(s);return d?`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`:'—'}
+function vnY(s){const d=parseDate(s);return d?`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getFullYear()).slice(2)}`:'—'}
+function dayDiff(a,b){return Math.round((a-b)/DAY)}
+function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove('show'),2600)}
+function num(id){const x=parseFloat($(id).value);return Number.isFinite(x)?x:null}
+function val(id){return $(id).value.trim()}
+function numOf(o,k){const x=o?o[k]:null;if(x==null||x==='')return null;const n=+x;return Number.isFinite(n)?n:null}
+function fmt(n,d){return n==null||!isFinite(n)?'—':(Math.round(n*Math.pow(10,d||0))/Math.pow(10,d||0)).toLocaleString('vi-VN')}
+
+/* ---------- tuổi thai ---------- */
+function lmpRef(){const e=parseDate(state.edd);return e?new Date(e.getTime()-280*DAY):null}
+function gaOn(d){const l=lmpRef();if(!l||!d)return null;const days=dayDiff(d,l);return{days,weeks:Math.floor(days/7),rem:((days%7)+7)%7}}
+function gaLabel(g){return g?`${g.weeks}w${g.rem}d`:'—'}
+function parseGA(s){const m=String(s||'').match(/(\d+)\s*w\s*(\d+)?/i);return m?(+m[1])*7+(+(m[2]||0)):null}
+function visitGA(v){const g=gaOn(parseDate(v.date));if(g)return g;const d=v.gaDays;return d==null?null:{days:d,weeks:Math.floor(d/7),rem:d%7}}
+function dateAtGA(days){const l=lmpRef();return l?new Date(l.getTime()+days*DAY):null}
+
+/* ---------- giai đoạn ---------- */
+function phaseFor(g){
+  const w=g?g.weeks:0;
+  if(w<14)return{name:'Tam cá nguyệt I',focus:'Xác lập tuổi thai và sàng lọc sớm',chips:['CRL / tuổi thai','NT · NIPT','Tim thai','Xét nghiệm nền của mẹ'],why:'Ưu tiên chốt tuổi thai, sàng lọc nhiễm sắc thể và dựng hồ sơ nền cho mẹ.'};
+  if(w<22)return{name:'Tam cá nguyệt II · đầu',focus:'Siêu âm hình thái 18–22 tuần',chips:['Hình thái chi tiết','HC · AC · FL','Tim và các cơ quan','Huyết áp mẹ'],why:'Đây là cửa sổ quan trọng nhất để khảo sát hình thái. Bỏ lỡ thì các lần sau khó bù.'};
+  if(w<28)return{name:'Tam cá nguyệt II · sau',focus:'Tăng trưởng và dung nạp đường',chips:['EFW · AC','OGTT 24–28w','Hb · tiểu cầu','Protein niệu'],why:'Theo dõi tăng trưởng và sàng lọc đái tháo đường thai kỳ.'};
+  if(w<37)return{name:'Tam cá nguyệt III',focus:'Tăng trưởng · nhau ối · huyết áp mẹ',chips:['EFW percentile','AC · FL · HC','AFI · vị trí nhau','Huyết áp + protein niệu'],why:'Bám xu hướng tăng trưởng của bé và các dấu hiệu liên quan tăng huyết áp thai kỳ.'};
+  return{name:'Đủ tháng',focus:'Sẵn sàng sinh',chips:['Ngôi thai','Cử động thai','Nước ối','Huyết áp mẹ'],why:'Theo dõi dấu hiệu chuyển dạ và tình trạng thai sát ngày sinh.'};
+}
+
+/* ---------- tra cứu lab ---------- */
+function byCode(code){return state.labs.filter(l=>(l.code||'')===code).sort((a,b)=>a.date.localeCompare(b.date)).pop()||null}
+function findLab(names){
+  const ns=names.map(x=>x.toLowerCase());
+  return state.labs.filter(l=>ns.some(n=>(l.code||'').toLowerCase()===n||(l.name||'').toLowerCase().includes(n)))
+    .sort((a,b)=>a.date.localeCompare(b.date)).pop()||null;
+}
+function sortedVisits(){return state.visits.slice().sort((a,b)=>a.date.localeCompare(b.date))}
+function latestVisit(){return sortedVisits().pop()||null}
+function lastWith(k){return sortedVisits().filter(v=>v[k]!=null&&v[k]!=='').pop()||null}
+
+/* ---------- cửa sổ khám ---------- */
+const MILESTONES=[
+  {id:'m_early', name:'Siêu âm xác định tuổi thai và tim thai', a:6*7, b:10*7+6,
+   why:'Chốt tuổi thai và ghi nhận hoạt động tim thai.',
+   done:()=>state.visits.some(v=>v.fhr!=null)},
+  {id:'m_base', name:'Xét nghiệm nền quý I', a:6*7, b:13*7+6,
+   why:'Công thức máu, nhóm máu và Rh, HIV / HBsAg / giang mai, đường huyết đói, TSH, nước tiểu.',
+   done:()=>!!findLab(['hgb','hemoglobin','huyết sắc tố'])&&!!findLab(['abo','nhóm máu'])},
+  {id:'m_nt', name:'Siêu âm khoảng sáng sau gáy (NT)', a:11*7, b:13*7+6,
+   why:'Cửa sổ đo NT chỉ có hiệu lực trong khoảng này.',
+   done:()=>state.visits.some(v=>v.details&&v.details.nt!=null)},
+  {id:'m_pe', name:'Sàng lọc tiền sản giật quý I', a:11*7, b:13*7+6,
+   why:'Kết hợp huyết áp, PlGF và Doppler động mạch tử cung.',
+   done:()=>!!byCode('PE_RISK_37')},
+  {id:'m_nipt', name:'NIPT hoặc sàng lọc nhiễm sắc thể', a:10*7, b:20*7,
+   why:'Sàng lọc lệch bội từ DNA tự do của thai trong máu mẹ.',
+   done:()=>!!byCode('NIPT_T21')},
+  {id:'m_morpho', name:'Siêu âm hình thái 18–22 tuần', a:18*7, b:22*7,
+   why:'Khảo sát hình thái chi tiết nhất trong cả thai kỳ.',
+   done:()=>state.visits.some(v=>{const g=visitGA(v);return g&&g.days>=18*7&&g.days<=22*7+6&&v.hc!=null&&v.ac!=null&&v.fl!=null})},
+  {id:'m_ogtt', name:'Nghiệm pháp dung nạp đường (OGTT)', a:24*7, b:28*7,
+   why:'Sàng lọc đái tháo đường thai kỳ.',
+   done:()=>state.labs.some(l=>/ogtt|dung nạp|glucose|đường huyết/i.test(l.name||'')&&(gaOn(parseDate(l.date))||{days:0}).days>=22*7)},
+  {id:'m_tdap', name:'Tiêm vắc xin bạch hầu – ho gà – uốn ván (Tdap)', a:27*7, b:36*7,
+   why:'Truyền kháng thể sang con trước sinh. Lịch cụ thể theo chỉ định.',
+   done:()=>state.labs.some(l=>/tdap|ho gà|uốn ván/i.test(l.name||''))},
+  {id:'m_growth3', name:'Siêu âm tăng trưởng quý III', a:30*7, b:34*7,
+   why:'Đánh giá tăng trưởng, nước ối và vị trí bánh nhau.',
+   done:()=>state.visits.some(v=>{const g=visitGA(v);return g&&g.days>=30*7&&v.efw!=null})},
+  {id:'m_gbs', name:'Sàng lọc liên cầu khuẩn nhóm B (GBS)', a:36*7, b:37*7+6,
+   why:'Quyết định dự phòng kháng sinh khi chuyển dạ.',
+   done:()=>state.labs.some(l=>/gbs|liên cầu/i.test(l.name||''))}
+];
+function milestoneStatus(m){
+  const g=gaOn(today()); if(!g)return{state:'unknown'};
+  const d=g.days, done=m.done();
+  const from=dateAtGA(m.a), to=dateAtGA(m.b);
+  let st;
+  if(done) st='done';
+  else if(d>m.b) st='missed';
+  else if(d>=m.a) st='open';
+  else st='future';
+  return{state:st,from,to,daysToOpen:m.a-d,daysToClose:m.b-d};
+}
+
+/* ---------- kiểm tra chất lượng dữ liệu ---------- */
+const BIOM=[['efw','Cân nặng thai (EFW)','g'],['crl','Chiều dài đầu–mông (CRL)','mm'],['bpd','Đường kính lưỡng đỉnh (BPD)','mm'],['hc','Chu vi đầu (HC)','mm'],['ac','Chu vi bụng (AC)','mm'],['fl','Chiều dài xương đùi (FL)','mm']];
+function dataIssues(){
+  const out=[];
+  if(!state.edd) out.push({level:'coral',title:'Chưa có ngày dự sinh',text:'Mọi tính toán tuổi thai và cửa sổ khám đều dựa trên EDD. Nhập ở ô đầu trang.'});
+  // 1. chỉ số sinh trắc đi lùi
+  BIOM.forEach(([k,label,unit])=>{
+    const pts=sortedVisits().filter(v=>numOf(v,k)!=null);
+    for(let i=1;i<pts.length;i++){
+      if(numOf(pts[i],k) < numOf(pts[i-1],k)){
+        out.push({level:'coral',title:`${label} giảm giữa hai lần đo`,
+          text:`${vn(pts[i-1].date)}: ${fmt(numOf(pts[i-1],k),2)} ${unit} → ${vn(pts[i].date)}: ${fmt(numOf(pts[i],k),2)} ${unit}. Chỉ số này không giảm theo thời gian, nên nhiều khả năng một trong hai số bị gõ nhầm hoặc ô trên phiếu bị map sai. Đối chiếu lại phiếu gốc trước khi dùng số này.`});
+      }
+    }
+  });
+  // 2. lệch tuổi thai so với phiếu
+  state.visits.forEach(v=>{
+    const r=parseGA(v.reportedGA), e=gaOn(parseDate(v.date));
+    if(r!=null&&e&&Math.abs(e.days-r)>3){
+      out.push({level:'amber',title:`Tuổi thai lệch ${Math.abs(e.days-r)} ngày · ${vn(v.date)}`,
+        text:`Theo EDD trong hồ sơ: ${gaLabel(e)}. Trên phiếu: ${esc(v.reportedGA)}. Lệch ở giai đoạn rất sớm là bình thường vì dating sẽ được hiệu chỉnh, nhưng cần biết tool đang tính theo EDD, không theo phiếu.`});
+    }
+  });
+  // 3. ngày ở tương lai
+  const t=iso(today());
+  state.visits.filter(v=>v.date>t).forEach(v=>out.push({level:'amber',title:`Lần khám ghi ngày tương lai · ${vn(v.date)}`,text:'Kiểm tra lại ngày nhập.'}));
+  // 4. trùng ngày
+  const seen={};
+  sortedVisits().forEach(v=>{if(seen[v.date])out.push({level:'amber',title:`Hai lần khám cùng ngày ${vn(v.date)}`,text:'Có thể là bản ghi trùng khi import. Xoá bớt ở tab Lịch sử nếu đúng vậy.'});seen[v.date]=1});
+  // 5. cân nặng mẹ đi lùi mạnh
+  const ws=state.weights.slice().sort((a,b)=>a.date.localeCompare(b.date));
+  for(let i=1;i<ws.length;i++) if(ws[i-1].kg-ws[i].kg>2)
+    out.push({level:'amber',title:'Cân nặng mẹ giảm trên 2 kg',text:`${vn(ws[i-1].date)}: ${ws[i-1].kg} kg → ${vn(ws[i].date)}: ${ws[i].kg} kg. Nếu số đúng thì đây là điều nên nói với bác sĩ ở lần khám tới.`});
+  return out;
+}
+
+/* ---------- đọc kết luận trong note, bỏ qua mệnh đề phủ định ---------- */
+function noteHit(note,re){
+  return String(note||'').split(/[.;\n]/).some(cl=>re.test(cl)&&!/kh\u00f4ng|ch\u01b0a/i.test(cl));
+}
+
+/* ---------- tham chiếu sinh trắc (trung vị Hadlock) ---------- */
+const REF={
+  efw:{12:58,13:73,14:93,15:117,16:146,17:181,18:223,19:273,20:330,21:399,22:478,23:568,24:670,25:785,26:913,27:1055,28:1210,29:1379,30:1559,31:1751,32:1953,33:2162,34:2377,35:2595,36:2813,37:3028,38:3236,39:3435,40:3619},
+  bpd:{14:27,15:31,16:35,17:39,18:42,19:46,20:49,21:52,22:55,23:58,24:61,25:64,26:67,27:70,28:73,29:75,30:78,31:80,32:82,33:84,34:86,35:88,36:90,37:92,38:93,39:95,40:96},
+  hc:{14:101,15:113,16:126,17:139,18:151,19:164,20:176,21:189,22:201,23:213,24:225,25:237,26:249,27:260,28:271,29:282,30:293,31:303,32:313,33:323,34:333,35:342,36:351,37:359,38:367,39:375,40:382},
+  ac:{14:82,15:93,16:105,17:117,18:129,19:141,20:153,21:166,22:178,23:190,24:202,25:214,26:226,27:238,28:250,29:262,30:274,31:286,32:298,33:310,34:322,35:334,36:346,37:358,38:370,39:382,40:394},
+  fl:{14:14,15:17,16:20,17:23,18:26,19:29,20:32,21:35,22:38,23:41,24:44,25:47,26:50,27:52,28:55,29:57,30:60,31:62,32:64,33:66,34:68,35:70,36:72,37:74,38:75,39:77,40:78},
+  crl:{6:5,7:10,8:16,9:23,10:31,11:41,12:53,13:66,14:79},
+  fhr:{6:110,7:130,8:155,9:170,10:170,11:165,12:160,13:155,14:150,15:150,16:147,17:146,18:145,19:145,20:145,22:144,24:143,26:143,28:142,30:141,32:140,34:140,36:139,38:138,40:137}
+};
+function refAt(k,w){
+  const r=REF[k]; if(!r)return null;
+  const ks=Object.keys(r).map(Number).sort((a,b)=>a-b);
+  if(w<ks[0]||w>ks[ks.length-1])return null;
+  let lo=ks[0],hi=ks[ks.length-1];
+  for(let i=0;i<ks.length-1;i++){if(w>=ks[i]&&w<=ks[i+1]){lo=ks[i];hi=ks[i+1];break}}
+  if(lo===hi)return r[lo];
+  return r[lo]+(r[hi]-r[lo])*(w-lo)/(hi-lo);
+}
+
+/* ---------- BMI & dải tăng cân IOM 2009 ---------- */
+function bmiInfo(){
+  const h=state.background.heightCm, pw=state.background.preWeightKg;
+  const first=state.weights.slice().sort((a,b)=>a.date.localeCompare(b.date))[0];
+  const base=pw!=null?pw:(first?first.kg:null);
+  if(!h||!base)return null;
+  const bmi=base/Math.pow(h/100,2);
+  let cat,total,lo,hi;
+  if(bmi<18.5){cat='Thiếu cân';total='12,5–18 kg';lo=(12.5-.5)/27;hi=(18-2)/27}
+  else if(bmi<25){cat='Bình thường';total='11,5–16 kg';lo=(11.5-.5)/27;hi=(16-2)/27}
+  else if(bmi<30){cat='Thừa cân';total='7–11,5 kg';lo=(7-.5)/27;hi=(11.5-2)/27}
+  else{cat='Béo phì';total='5–9 kg';lo=(5-.5)/27;hi=(9-2)/27}
+  return{bmi,cat,total,base,estimated:pw==null,
+    band:w=>({lo:.5+Math.max(0,w-13)*lo, hi:2+Math.max(0,w-13)*hi})};
+}
+
+/* ================= RENDER ================= */
+function cssv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+
+function renderHeader(){
+  $('edd').value=state.edd||'';
+  const g=gaOn(today());
+  if(!g){['kGA','kGAd','kPct','kLeft','kTri','kTriR'].forEach(i=>$(i).textContent='—');return}
+  const ed=parseDate(state.edd), left=dayDiff(ed,today()), pct=Math.max(0,Math.min(100,g.days/280*100));
+  $('kGA').textContent=gaLabel(g); $('kGAd').textContent=`${g.days} ngày`;
+  $('kPct').textContent=Math.round(pct)+'%';
+  $('kLeft').textContent=left;
+  $('kTri').textContent=g.weeks<14?'I':g.weeks<28?'II':'III';
+  $('kTriR').textContent=g.weeks<14?'đến 13w6d':g.weeks<28?'14–27w6d':'28w trở đi';
+  const p=phaseFor(g);
+  $('phName').textContent=p.name; $('phFocus').textContent=p.focus;
+  $('phChips').innerHTML=p.chips.map(c=>`<span class="chip">${esc(c)}</span>`).join('');
+  $('phWhy').textContent=p.why;
+  $('savePill').textContent=storageOK?'Lưu trên thiết bị này':'Chỉ xem — không lưu được';
+  $('savePill').className='pill'+(storageOK?' ok':'');
+  $('ribbonWk').textContent=gaLabel(g);
+}
+
+const RIBBON_BANDS=['m_nt','m_morpho','m_ogtt','m_growth3','m_gbs'];
+const RIBBON_SHORT={m_nt:'NT',m_morpho:'Hình thái',m_ogtt:'OGTT',m_growth3:'Tăng trưởng',m_gbs:'GBS'};
+function renderRibbon(){
+  const g=gaOn(today()); const R=$('ribbon');
+  if(!g){R.innerHTML='<div class="track"></div>';return}
+  const X=d=>Math.max(0,Math.min(100,d/280*100));
+  let h=`<div class="track"><div class="fill" style="width:${X(g.days)}%"></div></div>`;
+  [14,28,37].forEach(w=>{h+=`<div class="tri" style="left:${X(w*7)}%"><b>${w}w</b></div>`});
+  RIBBON_BANDS.forEach(id=>{
+    const m=MILESTONES.find(x=>x.id===id), s=milestoneStatus(m);
+    const cls=s.state==='done'||s.state==='missed'?'past':s.state==='open'?'open':'';
+    h+=`<button class="band ${cls}" data-ms="${id}" style="left:${X(m.a)}%;width:${X(m.b)-X(m.a)}%" aria-label="${esc(m.name)}"><i></i><b>${RIBBON_SHORT[id]}</b></button>`;
+  });
+  sortedVisits().forEach(v=>{const vg=visitGA(v);if(vg)h+=`<button class="visit" data-visit="${esc(v.id)}" style="left:${X(vg.days)}%" title="${esc(vn(v.date))}"></button>`});
+  h+=`<div class="now" style="left:${X(g.days)}%"><b>${gaLabel(g)}</b></div>`;
+  R.innerHTML=h;
+  R.querySelectorAll('[data-ms]').forEach(b=>b.onclick=()=>{
+    const m=MILESTONES.find(x=>x.id===b.dataset.ms), s=milestoneStatus(m);
+    const lbl={done:'đã có dữ liệu',missed:'đã qua cửa sổ',open:'ĐANG MỞ',future:'chưa tới'}[s.state];
+    $('ribbonNote').innerHTML=`<b>${esc(m.name)}</b> — ${vn(iso(s.from))} → ${vn(iso(s.to))} · ${lbl}. ${esc(m.why)}`;
+  });
+  R.querySelectorAll('[data-visit]').forEach(b=>b.onclick=()=>{
+    const v=state.visits.find(x=>x.id===b.dataset.visit); if(!v)return;
+    $('ribbonNote').innerHTML=`<b>${vn(v.date)} · ${gaLabel(visitGA(v))}</b> — ${esc(visitSummary(v))||'không có số đo'}`;
+  });
+}
+
+function visitSummary(v){
+  const bits=[];
+  if(v.efw!=null)bits.push(`EFW ${v.efw} g`);
+  if(v.fhr!=null)bits.push(`tim thai ${v.fhr} bpm`);
+  if(v.crl!=null)bits.push(`CRL ${v.crl} mm`);
+  ['bpd','hc','ac','fl'].forEach(k=>{if(v[k]!=null)bits.push(`${k.toUpperCase()} ${v[k]} mm`)});
+  const d=v.details||{};
+  if(d.nt!=null)bits.push(`NT ${d.nt} mm`);
+  if(d.nb!=null)bits.push(`NB ${d.nb} mm`);
+  if(d.hadlockPercentile!=null)bits.push(`percentile ${d.hadlockPercentile}`);
+  return bits.join(' · ');
+}
+function detailChips(v){
+  const NAMES={gestationalSac:'Túi thai',sacLength:'Chiều dài túi',yolkSac:'Túi noãn hoàng',scarDistance:'Cách sẹo mổ cũ',subchorionicCollection:'Tụ dịch dưới màng nuôi',nt:'NT',nb:'Xương mũi',hadlockPercentile:'Percentile (phiếu)',tcd:'Đường kính ngang tiểu não',lateralVentricle:'Não thất bên',cisternaMagna:'Hố sau',humerus:'Xương cánh tay',foot:'Bàn chân',interorbital:'Khoảng cách hai hốc mắt',uterineArteryRightPI:'PI ĐM tử cung phải',uterineArteryLeftPI:'PI ĐM tử cung trái'};
+  const d=v.details||{};
+  return Object.keys(d).filter(k=>d[k]!=null&&d[k]!=='').map(k=>`<span class="chip">${esc(NAMES[k]||k)}: ${esc(d[k])}</span>`).join('');
+}
+
+function renderIssues(){
+  const it=dataIssues();
+  $('issueCard').style.display=it.length?'':'none';
+  $('issues').innerHTML=it.map(i=>`<div class="note ${i.level}"><b>${esc(i.title)}</b>${esc(i.text)}</div>`).join('');
+  const tab=document.querySelector('[data-tab="pOverview"]');
+  tab.innerHTML='Tổng quan'+(it.some(x=>x.level==='coral')?'<span class="dot"></span>':'');
+}
+
+function card(id,name,value,meta,tagTxt,tagCls){
+  return `<button class="mcard" data-metric="${id}"><div class="head"><span class="name">${esc(name)}</span><span class="tag ${tagCls||''}">${esc(tagTxt)}</span></div><span class="metric-val">${value}</span><div class="meta">${meta}</div></button>`;
+}
+function renderCards(){
+  const lv=latestVisit();
+  const bp=byCode('BP_SCREEN_SUMMARY'), pe34=byCode('PE_RISK_34'), pe37=byCode('PE_RISK_37'),
+        plgf=byCode('PLGF_MOM'), pah=byCode('CARRIER_PAH'), sma=byCode('SMA_SMN1'),
+        hgb=findLab(['hgb','hemoglobin','huyết sắc tố']), glu=findLab(['glucose','đường huyết','ogtt']),
+        tsh=findLab(['tsh']), ur=findLab(['protein niệu','protein urine']), abo=findLab(['abo','nhóm máu']);
+  // huyết áp: ưu tiên lần khám có ghi, sau đó phiếu sàng lọc
+  const bpVisit=lastWith('bp');
+  let bpVal='—',bpMeta='Chưa ghi nhận';
+  if(bpVisit){bpVal=esc(bpVisit.bp);bpMeta=vn(bpVisit.date)}
+  else if(bp){bpVal=esc(bp.value);bpMeta=`${esc(bp.name)} · ${vn(bp.date)}`}
+  const bi=bmiInfo(), lastW=state.weights.slice().sort((a,b)=>a.date.localeCompare(b.date)).pop();
+
+  $('motherCards').innerHTML=
+    card('bp','Huyết áp',bpVal,bpMeta,bpVal==='—'?'Chưa có':'Đã ghi nhận',bpVal==='—'?'empty':'')+
+    card('weight','Cân nặng mẹ',lastW?`${fmt(lastW.kg,1)} kg`:'—',
+        bi?`BMI nền ${fmt(bi.bmi,1)} · ${esc(bi.cat)} · dải khuyến nghị ${esc(bi.total)}`:'Cần chiều cao và cân nặng nền',
+        lastW?vn(lastW.date):'Chưa có',lastW?'':'empty')+
+    card('preeclampsia','Sàng lọc tiền sản giật',pe37?esc(pe37.value):'—',
+        pe37?`PlGF ${plgf?esc(plgf.value)+' MoM':'—'} · &lt;34w ${pe34?esc(pe34.value):'—'} · &lt;37w ${esc(pe37.value)}`:'PlGF · Doppler · huyết áp',
+        pe37?'Nguy cơ thấp':'Chưa có',pe37?'ok':'empty')+
+    card('carrier','Gen mang bệnh của mẹ',pah?'PAH · dị hợp tử':'—',
+        pah?`${esc(pah.value)} · cần đọc cùng tư vấn di truyền`:'Panel người mang gen',
+        pah?'Cần tư vấn':'Chưa có',pah?'amber':'empty')+
+    card('sma','Sàng lọc SMA',sma?'Không phát hiện biến thể':'—',sma?`SMN1 · ${vn(sma.date)}`:'Teo cơ tuỷ sống',sma?'Đã ghi nhận':'Chưa có',sma?'ok':'empty')+
+    card('hematology','Huyết học',hgb?`${esc(hgb.value)} ${esc(hgb.unit||'')}`:'—',hgb?`Hb · ${vn(hgb.date)}`:'Hb · ferritin · tiểu cầu',hgb?'Có dữ liệu':'Chưa có',hgb?'':'empty')+
+    card('bloodgroup','Nhóm máu &amp; Rh',abo?esc(abo.value):'—',abo?vn(abo.date):'Cần cho hồ sơ sinh',abo?'Có dữ liệu':'Chưa có',abo?'':'empty')+
+    card('glucose','Đường huyết',glu?`${esc(glu.value)} ${esc(glu.unit||'')}`:'—',glu?vn(glu.date):'OGTT thường ở 24–28 tuần',glu?'Có dữ liệu':'Chưa có',glu?'':'empty')+
+    card('urine','Nước tiểu / protein',ur?`${esc(ur.value)} ${esc(ur.unit||'')}`:'—',ur?vn(ur.date):'Theo dõi protein niệu',ur?'Có dữ liệu':'Chưa có',ur?'':'empty')+
+    card('thyroid','Tuyến giáp',tsh?`${esc(tsh.value)} ${esc(tsh.unit||'')}`:'—',tsh?`TSH · ${vn(tsh.date)}`:'TSH · FT4',tsh?'Có dữ liệu':'Chưa có',tsh?'':'empty');
+
+  const efwV=lastWith('efw'), fhrV=lastWith('fhr');
+  const pctV=sortedVisits().filter(v=>v.details&&v.details.hadlockPercentile!=null).pop();
+  const t21=byCode('NIPT_T21'), dom=byCode('NIPT_DOMINANT_PANEL'), ff=byCode('CFDNA_FRACTION');
+  const rpi=byCode('UTERINE_PI_RIGHT'), lpi=byCode('UTERINE_PI_LEFT');
+  const rpiBad=rpi&&['abnormal','high'].includes(String(rpi.flag||'').toLowerCase());
+  let growthMeta='Chưa có EFW';
+  const efwSuspect=dataIssues().some(i=>/EFW/.test(i.title)&&/giảm/.test(i.title));
+  if(efwV){const g=visitGA(efwV),r=refAt('efw',g.days/7);
+    growthMeta=`${vn(efwV.date)} · ${gaLabel(g)}`+(r?` · ${Math.round(efwV.efw/r*100)}% trung vị`:'')
+      +(efwSuspect?' · <b style="color:var(--coral)">chuỗi EFW đang mâu thuẫn, xem mục Cần kiểm tra</b>':'');}
+
+  $('babyCards').innerHTML=
+    card('growth','Tăng trưởng',efwV?`${fmt(efwV.efw,0)} g`:'—',growthMeta,efwSuspect?'Cần đối chiếu':(efwV?'Có dữ liệu':'Chưa có'),efwSuspect?'coral':(efwV?'':'empty'))+
+    card('percentile','Percentile trên phiếu',pctV?`${pctV.details.hadlockPercentile}`:'—',
+        pctV?`Hadlock · ${vn(pctV.date)} · đây là số của phòng khám, không phải tool tự tính`:'Nhập từ phiếu siêu âm khi có',
+        pctV?'Theo phiếu':'Chưa có',pctV?'':'empty')+
+    card('fhr','Tim thai',fhrV?`${fhrV.fhr} bpm`:'—',fhrV?vn(fhrV.date):'—',fhrV?'Có dữ liệu':'Chưa có',fhrV?'':'empty')+
+    card('nipt','NIPT nhiễm sắc thể',t21?'T21 · T18 · T13 nguy cơ thấp':'—',
+        t21?`Z-score T21 ${esc(t21.value)} · ${vn(t21.date)}`:'Sàng lọc lệch bội',t21?'Nguy cơ thấp':'Chưa có',t21?'ok':'empty')+
+    card('singleGene','NIPT đơn gen trội',dom?'Không phát hiện biến thể':'—',
+        dom?`${vn(dom.date)}${ff?` · fetal fraction ${esc(ff.value)}%`:''}`:'25 bệnh / 30 gen',dom?'Nguy cơ thấp':'Chưa có',dom?'ok':'empty')+
+    card('anatomy','Sinh trắc gần nhất',lv?(esc(['bpd','hc','ac','fl'].filter(k=>lv[k]!=null).map(k=>k.toUpperCase()).join(' · '))||'—'):'—',
+        lv?`${vn(lv.date)} · ${gaLabel(visitGA(lv))}`:'—',lv?'Có lịch sử':'Chưa có',lv?'':'empty')+
+    card('uterine','Doppler ĐM tử cung',(rpi||lpi)?`P ${rpi?esc(rpi.value):'—'} / T ${lpi?esc(lpi.value):'—'}`:'—',
+        rpi?`PI phải / trái · ${vn(rpi.date)}`:'Chỉ số xung động mạch tử cung',
+        rpiBad?'Có cờ trên phiếu':(rpi?'Đã ghi nhận':'Chưa có'),rpiBad?'amber':(rpi?'':'empty'))+
+    card('placenta','Nhau · ối · dây rốn',lastWith('placenta')?esc(lastWith('placenta').placenta):'—',
+        lastWith('placenta')?vn(lastWith('placenta').date):'Ghi ở từng lần siêu âm',lastWith('placenta')?'Có dữ liệu':'Chưa có',lastWith('placenta')?'':'empty');
+
+  document.querySelectorAll('[data-metric]').forEach(b=>b.onclick=()=>openMetric(b.dataset.metric));
+}
+
+function renderAlerts(){
+  const a=[];
+  // huyết áp
+  const bpv=sortedVisits().filter(v=>v.bp).pop();
+  if(bpv){const m=String(bpv.bp).match(/(\d{2,3})\s*\/\s*(\d{2,3})/);
+    if(m){const s=+m[1],d=+m[2];
+      if(s>=160||d>=110)a.push({level:'coral',title:'Huyết áp ở mức nặng',text:`${s}/${d} mmHg ghi ngày ${vn(bpv.date)}. Đây là ngưỡng cần được đánh giá y tế ngay, không chờ lịch khám.`});
+      else if(s>=140||d>=90)a.push({level:'amber',title:'Huyết áp cần xác nhận lại',text:`${s}/${d} mmHg ghi ngày ${vn(bpv.date)}. Nên đo lại sau khi nghỉ và báo bác sĩ.`});}}
+  // cờ trên phiếu — quét toàn bộ, không chỉ lần cuối
+  state.labs.filter(l=>['abnormal','high','low','positive'].includes(String(l.flag||'').toLowerCase()))
+    .sort((a,b)=>a.date.localeCompare(b.date))
+    .forEach(l=>a.push({level:'amber',title:`${l.name} có cờ trên phiếu`,text:`${esc(String(l.value))} ${esc(l.unit||'')} · ${vn(l.date)}${l.note?' · '+esc(l.note):''}`}));
+  // kết luận đáng lưu trong note — quét TẤT CẢ lần khám, kèm ngày
+  const PATTERNS=[[/tăng sức cản/i,'Ghi nhận tăng sức cản động mạch tử cung'],[/tụ dịch/i,'Ghi nhận tụ dịch'],[/nhau tiền đạo|rau tiền đạo|rau bám thấp/i,'Ghi nhận vị trí bánh nhau'],[/ngôi ngược|ngôi mông/i,'Ghi nhận ngôi thai']];
+  sortedVisits().forEach(v=>PATTERNS.forEach(p=>{
+    if(noteHit(v.note,p[0]))a.push({level:'info',title:`${p[1]} · ${vn(v.date)}`,text:'Kết luận này được giữ lại để đối chiếu ở các lần khám sau. Câu có chữ “không / chưa” đã được bỏ qua.'});
+  }));
+  const pah=byCode('CARRIER_PAH'), pe37=byCode('PE_RISK_37'), t21=byCode('NIPT_T21');
+  if(pah)a.unshift({level:'amber',title:'Mẹ mang biến thể PAH ở dạng dị hợp tử',text:'Đây là kết quả người mang gen, không đồng nghĩa mẹ hay thai đang mắc bệnh. Ý nghĩa nguy cơ cho con phụ thuộc kết quả của bố — nên hỏi tư vấn di truyền.'});
+  if(pe37)a.unshift({level:'ok',title:'Sàng lọc tiền sản giật: nguy cơ thấp',text:`Theo phiếu: dưới 34 tuần ${byCode('PE_RISK_34')?esc(byCode('PE_RISK_34').value):'—'}; dưới 37 tuần ${esc(pe37.value)}.`});
+  if(t21)a.unshift({level:'ok',title:'NIPT: nguy cơ thấp',text:'T21, T18, T13 và các nhóm được báo cáo đều ở mức nguy cơ thấp. Đây là sàng lọc, không phải chẩn đoán.'});
+  $('alerts').innerHTML=a.length?a.map(x=>`<div class="note ${x.level}"><b>${esc(x.title)}</b>${x.text}</div>`).join('')
+    :'<div class="note">Chưa có gì được gắn cờ từ dữ liệu hiện có. Điều đó không thay cho đánh giá của bác sĩ.</div>';
+}
+
+function renderCompleteness(){
+  const checks=[
+    ['Ngày dự sinh',!!state.edd],['Siêu âm',state.visits.length>0],
+    ['Huyết áp',state.visits.some(v=>v.bp)||!!byCode('BP_SCREEN_SUMMARY')],
+    ['Cân nặng mẹ',state.weights.length>0],['Chiều cao / BMI',!!bmiInfo()],
+    ['Sàng lọc tiền sản giật',!!byCode('PE_RISK_37')],['NIPT nhiễm sắc thể',!!byCode('NIPT_T21')],
+    ['NIPT đơn gen',!!byCode('NIPT_DOMINANT_PANEL')],['Gen mang bệnh mẹ',!!byCode('CARRIER_PAH')||!!byCode('SMA_SMN1')],
+    ['Công thức máu',!!findLab(['hgb','hemoglobin','huyết sắc tố'])],['Nhóm máu · Rh',!!findLab(['abo','nhóm máu'])],
+    ['Nước tiểu',state.labs.some(l=>l.group==='Nước tiểu')],['Đường huyết · OGTT',!!findLab(['glucose','đường huyết','ogtt'])],
+    ['Tuyến giáp',!!findLab(['tsh'])],['Viêm gan · HIV · giang mai',!!findLab(['hbsag','hiv','giang mai','syphilis'])]
+  ];
+  const n=checks.filter(c=>c[1]).length;
+  $('completeness').innerHTML=
+    `<div class="num" style="font-size:32px;font-weight:500">${n}<span style="font-size:17px;color:var(--muted)">/${checks.length}</span></div>`+
+    `<div class="smallmuted">nhóm dữ liệu đã có trong hồ sơ</div>`+
+    `<div class="bar"><div style="width:${n/checks.length*100}%"></div></div>`+
+    `<div class="chips" style="margin-top:12px">${checks.map(c=>`<span class="chip ${c[1]?'on':''}">${c[1]?'✓':'○'} ${esc(c[0])}</span>`).join('')}</div>`;
+}
+
+function renderWindows(){
+  const g=gaOn(today());
+  if(!g){$('winUpcoming').innerHTML='<p class="sub">Nhập ngày dự sinh để tính cửa sổ khám.</p>';$('winPast').innerHTML='';return}
+  const rows=MILESTONES.map(m=>({m,s:milestoneStatus(m)}));
+  const up=rows.filter(r=>r.s.state==='open'||r.s.state==='future').sort((a,b)=>a.m.a-b.m.a);
+  const past=rows.filter(r=>r.s.state==='done'||r.s.state==='missed').sort((a,b)=>b.m.a-a.m.a);
+  const row=(r,showTag)=>{
+    const {m,s}=r;
+    let when,tag,cls='';
+    if(s.state==='open'){cls='open';when=`còn ${s.daysToClose} ngày`;tag='<span class="tag coral">Đang mở</span>'}
+    else if(s.state==='future'){when=`sau ${s.daysToOpen} ngày`;tag='<span class="tag">Chưa tới</span>'}
+    else if(s.state==='done'){cls='done';when='✓';tag='<span class="tag ok">Đã có dữ liệu</span>'}
+    else {cls='done';when='đã qua';tag='<span class="tag amber">Chưa thấy dữ liệu</span>'}
+    return `<div class="wrow ${cls}">
+      <div class="when"><b>${vnY(iso(s.from))} → ${vnY(iso(s.to))}</b>${esc(when)} · ${Math.floor(m.a/7)}–${Math.floor(m.b/7)}w</div>
+      <div><div class="ttl">${esc(m.name)}</div><div class="why">${esc(m.why)}</div></div>
+      <div>${showTag?tag:''}</div></div>`;
+  };
+  $('winUpcoming').innerHTML=up.length?up.map(r=>row(r,true)).join(''):'<p class="sub">Không còn mốc nào phía trước trong danh sách này.</p>';
+  $('winPast').innerHTML=past.length?past.map(r=>row(r,true)).join(''):'<p class="sub">Chưa có mốc nào đi qua.</p>';
+}
+
+function allEvents(){
+  const ev=[];
+  state.visits.forEach(v=>ev.push({date:v.date,kind:'visit',id:v.id,type:'Siêu âm / khám'+(v.facility?' · '+v.facility:''),
+    title:gaLabel(visitGA(v))+(visitSummary(v)?' · '+visitSummary(v):''),text:v.note||v.placenta||'',chips:detailChips(v)}));
+  const byKey={};
+  state.labs.forEach(l=>{const k=l.date+'|'+(l.group||'Khác');(byKey[k]=byKey[k]||[]).push(l)});
+  Object.keys(byKey).forEach(k=>{
+    const ls=byKey[k], date=k.split('|')[0], group=k.split('|')[1];
+    const flagged=ls.filter(x=>['abnormal','high','low','positive'].includes(String(x.flag||'').toLowerCase()));
+    ev.push({date,kind:'lab',id:'lab|'+k,type:group,
+      title:ls.slice(0,3).map(x=>`${x.name}: ${x.value}${x.unit?' '+x.unit:''}`).join(' · ')+(ls.length>3?` · +${ls.length-3} chỉ số nữa`:''),
+      text:flagged.length?`${flagged.length} chỉ số có cờ trên phiếu: ${flagged.map(x=>x.name).join(', ')}.`:'',chips:''});
+  });
+  state.weights.forEach(w=>ev.push({date:w.date,kind:'weight',id:w.id,type:'Cân nặng mẹ',title:`${fmt(w.kg,1)} kg`,text:w.source||'',chips:''}));
+  return ev.sort((a,b)=>b.date.localeCompare(a.date));
+}
+function renderTimeline(){
+  const ev=allEvents();
+  $('timeline').innerHTML=ev.length?ev.map(x=>{
+    const warn=/cờ|tăng sức cản|tụ dịch/i.test(x.text);
+    const g=gaOn(parseDate(x.date));
+    let btns='';
+    if(x.kind==='visit')btns=`<button class="ghost tiny" data-ev="edit" data-id="${esc(x.id)}">Sửa</button><button class="ghost tiny" data-ev="delv" data-id="${esc(x.id)}">Xoá</button>`;
+    if(x.kind==='weight')btns=`<button class="ghost tiny" data-ev="delw" data-id="${esc(x.id)}">Xoá</button>`;
+    return `<div class="ev ${x.kind} ${warn?'warn':''}">
+      <div class="d"><b>${vn(x.date)}</b>${gaLabel(g)}</div>
+      <div><div class="t">${esc(x.type)}</div><div class="body">${esc(x.title)}</div>
+        ${x.text?`<div class="body">${esc(x.text)}</div>`:''}
+        ${x.chips?`<div class="row2">${x.chips}</div>`:''}</div>
+      <div class="rowbtns">${btns}</div></div>`;
+  }).join(''):'<p class="sub">Chưa có dữ liệu. Thêm ở tab Nhập liệu.</p>';
+  $('timeline').querySelectorAll('[data-ev]').forEach(b=>b.onclick=()=>{
+    const id=b.dataset.id;
+    if(b.dataset.ev==='edit')editVisit(id);
+    else if(b.dataset.ev==='delv'){if(confirm('Xoá lần khám này?')){state.visits=state.visits.filter(v=>v.id!==id);persist();renderAll();toast('Đã xoá lần khám')}}
+    else if(b.dataset.ev==='delw'){if(confirm('Xoá bản ghi cân nặng này?')){state.weights=state.weights.filter(w=>w.id!==id);persist();renderAll();toast('Đã xoá')}}
+  });
+}
+
+/* ---------- đồ thị ---------- */
+const METRICS={
+  efw:{label:'Cân nặng thai',abbr:'EFW',unit:'g',src:'visit',desc:'Ước tính cân nặng của bé từ các số đo siêu âm. Có sai số đáng kể ở từng lần đo, nên giá trị nằm ở xu hướng qua nhiều lần chứ không ở một con số.'},
+  crl:{label:'Đầu–mông',abbr:'CRL',unit:'mm',src:'visit',desc:'Chiều dài từ đỉnh đầu đến mông. Chính xác nhất để xác định tuổi thai trong quý I; sau khoảng 14 tuần thì ngừng đo.'},
+  bpd:{label:'Lưỡng đỉnh',abbr:'BPD',unit:'mm',src:'visit',desc:'Bề ngang đầu thai giữa hai xương đỉnh.'},
+  hc:{label:'Chu vi đầu',abbr:'HC',unit:'mm',src:'visit',desc:'Chu vi vòng đầu, theo dõi phát triển đầu và tăng trưởng chung.'},
+  ac:{label:'Chu vi bụng',abbr:'AC',unit:'mm',src:'visit',desc:'Chỉ số nhạy nhất với thay đổi tăng trưởng, và có trọng số lớn trong công thức ước tính cân nặng.'},
+  fl:{label:'Xương đùi',abbr:'FL',unit:'mm',src:'visit',desc:'Chiều dài xương đùi, phản ánh tăng trưởng chiều dài.'},
+  fhr:{label:'Tim thai',abbr:'FHR',unit:'bpm',src:'visit',desc:'Nhịp tim thai thay đổi theo tuổi thai: nhanh nhất khoảng 9–10 tuần rồi giảm dần. Cần đọc theo bối cảnh khám.'},
+  hgb:{label:'Huyết sắc tố',abbr:'Hb',unit:'',src:'lab',match:['hgb','hemoglobin','huyết sắc tố'],desc:'Giá trị thấp có thể gợi ý thiếu máu; đọc theo khoảng tham chiếu in trên phiếu.'},
+  plt:{label:'Tiểu cầu',abbr:'PLT',unit:'',src:'lab',match:['plt','platelet','tiểu cầu'],desc:'Bác sĩ thường xem tiểu cầu cùng huyết áp, men gan, chức năng thận và protein niệu.'},
+  glucose:{label:'Đường huyết',abbr:'Glu',unit:'',src:'lab',match:['glucose','đường huyết'],desc:'Giai đoạn 24–28 tuần là mốc sàng lọc đái tháo đường thai kỳ.'},
+  tsh:{label:'TSH',abbr:'TSH',unit:'',src:'lab',match:['tsh'],desc:'Hormone điều hoà tuyến giáp; thai kỳ có khoảng tham chiếu riêng.'}
+};
+let activeMetric='efw', zoomMode='data';
+function metricData(k){
+  const m=METRICS[k];
+  if(m.src==='visit')return sortedVisits().filter(v=>numOf(v,k)!=null).map(v=>{const g=visitGA(v);return g?{date:v.date,x:g.days/7,y:numOf(v,k)}:null}).filter(Boolean);
+  const ns=m.match.map(s=>s.toLowerCase());
+  return state.labs.filter(l=>ns.some(n=>(l.code||'').toLowerCase()===n||(l.name||'').toLowerCase().includes(n))&&Number.isFinite(parseFloat(l.value)))
+    .map(l=>{const g=gaOn(parseDate(l.date));return g?{date:l.date,x:g.days/7,y:parseFloat(l.value),unit:l.unit}:null}).filter(Boolean)
+    .sort((a,b)=>a.x-b.x);
+}
+function renderMetricBtns(){
+  $('metricBtns').innerHTML=Object.keys(METRICS).map(k=>{
+    const n=metricData(k).length;
+    return `<button class="mbtn ${k===activeMetric?'active':''}" data-m="${k}"${n?'':' style="opacity:.45"'}>${esc(METRICS[k].label)} <span class="abbr">${esc(METRICS[k].abbr)}</span></button>`;
+  }).join('');
+  $('metricBtns').querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{activeMetric=b.dataset.m;renderMetricBtns();drawChart();renderTrend()});
+  const m=METRICS[activeMetric];
+  $('metricDesc').innerHTML=`<b>${esc(m.label)} (${esc(m.abbr)})</b>${esc(m.desc)}`;
+}
+function drawChart(){
+  const c=$('chart'),box=c.parentElement,r=window.devicePixelRatio||1;
+  const W=box.clientWidth,H=box.clientHeight;
+  c.width=W*r;c.height=H*r;const ctx=c.getContext('2d');ctx.setTransform(r,0,0,r,0,0);ctx.clearRect(0,0,W,H);
+  const data=metricData(activeMetric),m=METRICS[activeMetric];
+  const ink=cssv('--ink'),muted=cssv('--muted'),line=cssv('--line-soft'),primary=cssv('--primary'),aqua=cssv('--aqua'),surf=cssv('--surface');
+  ctx.font='11px "DM Mono", monospace';
+  if(!data.length){ctx.fillStyle=muted;ctx.fillText('Chưa có dữ liệu cho chỉ số này.',16,30);$('legend').textContent='';return}
+  const P={l:46,r:16,t:16,b:34};
+  let x0,x1;
+  if(zoomMode==='full'){x0=4;x1=41}
+  else{x0=Math.max(0,Math.floor(Math.min.apply(null,data.map(d=>d.x))-1));x1=Math.ceil(Math.max.apply(null,data.map(d=>d.x))+2)}
+  if(x1-x0<3)x1=x0+3;
+  const refPts=[];
+  if(REF[activeMetric])for(let w=x0;w<=x1;w+=.5){const v=refAt(activeMetric,w);if(v!=null)refPts.push({x:w,y:v})}
+  const ys=data.map(d=>d.y).concat(refPts.map(d=>d.y));
+  let ymin=Math.min.apply(null,ys),ymax=Math.max.apply(null,ys);
+  if(ymax===ymin){ymin*=.9;ymax*=1.1||1}
+  const pad=(ymax-ymin)*.15||1;ymin=Math.max(0,ymin-pad);ymax+=pad;
+  const X=w=>P.l+(w-x0)/(x1-x0)*(W-P.l-P.r), Y=v=>H-P.b-(v-ymin)/(ymax-ymin)*(H-P.t-P.b);
+  // lưới
+  ctx.strokeStyle=line;ctx.lineWidth=1;ctx.fillStyle=muted;
+  for(let i=0;i<=4;i++){const v=ymin+(ymax-ymin)*i/4,y=Y(v);
+    ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(W-P.r,y);ctx.stroke();
+    ctx.fillText(fmt(v,v<20?1:0),4,y+4)}
+  const step=(x1-x0)>20?4:(x1-x0)>10?2:1;
+  for(let w=Math.ceil(x0);w<=x1;w+=step)ctx.fillText(w+'w',X(w)-9,H-14);
+  // đường tham chiếu
+  if(refPts.length){ctx.beginPath();refPts.forEach((p,i)=>i?ctx.lineTo(X(p.x),Y(p.y)):ctx.moveTo(X(p.x),Y(p.y)));
+    ctx.strokeStyle=muted;ctx.setLineDash([5,4]);ctx.lineWidth=1.5;ctx.stroke();ctx.setLineDash([])}
+  // dữ liệu
+  const d2=data.slice().sort((a,b)=>a.x-b.x);
+  ctx.beginPath();d2.forEach((p,i)=>i?ctx.lineTo(X(p.x),Y(p.y)):ctx.moveTo(X(p.x),Y(p.y)));
+  ctx.strokeStyle=primary;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.stroke();
+  d2.forEach(p=>{ctx.beginPath();ctx.arc(X(p.x),Y(p.y),4.5,0,7);ctx.fillStyle=surf;ctx.fill();ctx.strokeStyle=primary;ctx.lineWidth=2.5;ctx.stroke()});
+  // vạch hôm nay
+  const g=gaOn(today());
+  if(g){const w=g.days/7;if(w>=x0&&w<=x1){ctx.strokeStyle=cssv('--coral');ctx.setLineDash([3,3]);ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(X(w),P.t);ctx.lineTo(X(w),H-P.b);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=cssv('--coral');ctx.fillText('hôm nay',X(w)+4,P.t+10)}}
+  $('legend').textContent=`${m.label} theo tuần thai · ${data.length} điểm${m.unit?' · '+m.unit:''}${refPts.length?' · nét đứt xám = trung vị tham chiếu':''}`;
+}
+function renderTrend(){
+  const d=metricData(activeMetric),m=METRICS[activeMetric];
+  if(!d.length){$('trend').textContent='Chưa có dữ liệu cho chỉ số này.';renderForecast();return}
+  d.sort((a,b)=>a.x-b.x);
+  const last=d[d.length-1],prev=d.length>1?d[d.length-2]:null,rv=refAt(activeMetric,last.x);
+  let h=`<b>${esc(m.label)} gần nhất:</b> ${fmt(last.y,2)} ${esc(last.unit||m.unit||'')} tại ${last.x.toFixed(1)} tuần (${vn(last.date)}).`;
+  if(prev){const dl=last.y-prev.y;
+    h+=` So với lần trước ${dl>=0?'tăng':'<b style="color:var(--coral)">giảm</b>'} ${fmt(Math.abs(dl),2)} ${esc(m.unit||'')} trong ${fmt((last.x-prev.x)*7,0)} ngày.`;
+    if(dl<0&&['efw','crl','bpd','hc','ac','fl'].includes(activeMetric))h+=` <span style="color:var(--coral)">Chỉ số này không giảm theo thời gian — cần đối chiếu lại phiếu gốc.</span>`;}
+  if(rv!=null)h+=`<br>Trung vị tham chiếu cùng tuổi thai khoảng <b>${fmt(rv,1)} ${esc(m.unit||'')}</b>; số đo hiện tại bằng khoảng <b>${Math.round(last.y/rv*100)}%</b> mức đó.`;
+  h+=`<br><span class="smallmuted">So sánh với trung vị chỉ để định hướng. Đánh giá tăng trưởng thật sự cần percentile của phòng khám, sai số phép đo và xu hướng qua nhiều lần.</span>`;
+  $('trend').innerHTML=h;renderForecast();
+}
+function renderForecast(){
+  const xs=sortedVisits().filter(v=>v.efw!=null&&visitGA(v)&&visitGA(v).days>=140);
+  if(!xs.length){$('forecast').innerHTML='Chỉ ngoại suy khi đã có EFW từ 20 tuần trở đi. Hiện chưa đủ dữ liệu.';return}
+  const use=xs.slice(-3);
+  const rs=use.map(v=>v.efw/refAt('efw',visitGA(v).days/7));
+  const wts=rs.map((_,i)=>i+1);
+  const gi=rs.reduce((s,r,i)=>s+r*wts[i],0)/wts.reduce((a,b)=>a+b,0);
+  const f=REF.efw[40]*gi;
+  $('forecast').innerHTML=`Nếu bé giữ nguyên vị trí tăng trưởng hiện tại, ước tính định hướng ở 40 tuần vào khoảng <b>${fmt(Math.round(f/10)*10,0)} g</b> (dải ±10%: ${fmt(Math.round(f*.9/10)*10,0)}–${fmt(Math.round(f*1.1/10)*10,0)} g), dựa trên ${use.length} lần đo gần nhất.<br><span class="smallmuted">Đây chỉ là phép ngoại suy xu hướng. EFW siêu âm có sai số khoảng ±10–15% và không dùng để quyết định can thiệp.</span>`;
+}
+
+/* ---------- xét nghiệm ---------- */
+const FLAGTXT={'low-risk':'Nguy cơ thấp',carrier:'Người mang gen',normal:'Bình thường',abnormal:'Bất thường',high:'Cao',low:'Thấp',positive:'Dương tính',negative:'Âm tính'};
+function flagCls(f){f=String(f||'').toLowerCase();
+  if(['abnormal','high','low','positive','carrier'].includes(f))return 'amber';
+  if(['low-risk','normal','negative'].includes(f))return 'ok';
+  return ''}
+function renderLabs(){
+  const gr={};
+  state.labs.slice().sort((a,b)=>b.date.localeCompare(a.date)).forEach(l=>{(gr[l.group||'Khác']=gr[l.group||'Khác']||[]).push(l)});
+  const keys=Object.keys(gr);
+  $('labGroups').innerHTML=keys.length?keys.map(g=>`<div class="lgroup"><h4>${esc(g)}</h4>${gr[g].map(l=>`
+    <div class="lrow">
+      <div class="dt">${vn(l.date)}</div>
+      <div class="nm">${esc(l.name)}${l.facility?`<i>${esc(l.facility)}</i>`:''}</div>
+      <div class="vv">${esc(String(l.value==null?'—':l.value))} ${esc(l.unit||'')}</div>
+      <div class="rf">${esc(l.reference||'—')}${l.note?`<br>${esc(l.note)}`:''}</div>
+      <span class="tag ${flagCls(l.flag)}">${esc(FLAGTXT[l.flag]||l.flag||'—')}</span>
+      <div class="rowbtns"><button class="ghost tiny" data-lab="edit" data-id="${esc(l.id)}">Sửa</button><button class="ghost tiny" data-lab="del" data-id="${esc(l.id)}">Xoá</button></div>
+    </div>`).join('')}</div>`).join(''):'<p class="sub">Chưa có xét nghiệm nào. Thêm ở tab Nhập liệu.</p>';
+  $('labGroups').querySelectorAll('[data-lab]').forEach(b=>b.onclick=()=>{
+    if(b.dataset.lab==='edit')editLab(b.dataset.id);
+    else if(confirm('Xoá kết quả này?')){state.labs=state.labs.filter(l=>l.id!==b.dataset.id);persist();renderAll();toast('Đã xoá')}
+  });
+}
+
+/* ---------- mẹ ---------- */
+function renderMother(){
+  const bg=state.background;
+  $('bgHeight').value=bg.heightCm!=null?bg.heightCm:'';
+  $('bgPreWeight').value=bg.preWeightKg!=null?bg.preWeightKg:'';
+  $('bgHistory').value=bg.history||''; $('bgConception').value=bg.conception||''; $('bgNotes').value=bg.notes||'';
+  const bi=bmiInfo(), g=gaOn(today());
+  const ws=state.weights.slice().sort((a,b)=>a.date.localeCompare(b.date));
+  if(!bi){
+    $('bmiBox').innerHTML='<div class="note amber"><b>Chưa tính được BMI</b>Cần chiều cao và cân nặng nền (hoặc ít nhất một lần cân) ở khối Hồ sơ nền bên cạnh.</div>';
+    $('bgDerived').innerHTML='';
+  }else{
+    const last=ws[ws.length-1];
+    const gained=last?last.kg-bi.base:null;
+    const gw=last?(gaOn(parseDate(last.date))||{days:0}).days/7:null;
+    const band=gw?bi.band(gw):null;
+    let verdict='';
+    if(gained!=null&&band&&!bi.estimated){
+      if(gained<band.lo)verdict=`<span class="tag amber">dưới dải tham chiếu</span>`;
+      else if(gained>band.hi)verdict=`<span class="tag amber">trên dải tham chiếu</span>`;
+      else verdict=`<span class="tag ok">trong dải tham chiếu</span>`;
+    }
+    $('bmiBox').innerHTML=`<div class="grid3">
+      <div class="kpi"><small>BMI NỀN</small><b class="num">${fmt(bi.bmi,1)}</b><span class="u">${esc(bi.cat)}</span></div>
+      <div class="kpi"><small>ĐÃ TĂNG</small><b class="num">${gained!=null?(gained>=0?'+':'')+fmt(gained,1):'—'}</b><span class="u">kg${last?' · '+vn(last.date):''}</span></div>
+      <div class="kpi"><small>DẢI CẢ THAI KỲ</small><b class="num" style="font-size:16px">${esc(bi.total)}</b><span class="u">IOM 2009</span></div>
+    </div>
+    <p class="sub">${band?`Ở ${gw.toFixed(1)} tuần, dải tham chiếu tích luỹ là <b>${fmt(band.lo,1)}–${fmt(band.hi,1)} kg</b> ${verdict}.`:''}
+    ${bi.estimated?'<br>⚠️ Chưa đối chiếu được vì thiếu cân nặng trước mang thai — đang tạm dùng lần cân sớm nhất trong hồ sơ làm mốc, nên con số tăng cân sẽ thấp hơn thực tế.':''}
+    <br>Dải này là khuyến nghị chung của IOM 2009, không phải chỉ tiêu cá nhân. Bác sĩ có thể đặt mục tiêu khác cho từng trường hợp.</p>`;
+    $('bgDerived').innerHTML=`<div class="note">Nguồn dữ liệu nền: ${bi.estimated?'suy ra từ lần cân đầu tiên':'nhập tay'} · chiều cao ${fmt(state.background.heightCm,0)} cm.</div>`;
+  }
+  $('weightRows').innerHTML=ws.length?`<table class="dt"><thead><tr><th>Ngày</th><th>Tuổi thai</th><th>Cân nặng</th><th>Chênh so với nền</th><th>Nguồn</th><th></th></tr></thead><tbody>`+
+    ws.map(w=>{const wg=gaOn(parseDate(w.date));const df=bi?w.kg-bi.base:null;
+      return `<tr><td class="n">${vn(w.date)}</td><td>${gaLabel(wg)}</td><td class="n">${fmt(w.kg,1)} kg</td><td class="n">${df!=null?(df>=0?'+':'')+fmt(df,1)+' kg':'—'}</td><td>${esc(w.source||'')}</td><td><button class="ghost tiny" data-w="${esc(w.id)}">Xoá</button></td></tr>`}).join('')+
+    '</tbody></table>':'<p class="sub">Chưa có lần cân nào.</p>';
+  $('weightRows').querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>{
+    if(confirm('Xoá bản ghi này?')){state.weights=state.weights.filter(w=>w.id!==b.dataset.w);persist();renderAll();toast('Đã xoá')}});
+  drawWeightChart();
+}
+function drawWeightChart(){
+  const c=$('wchart'),box=c.parentElement,r=window.devicePixelRatio||1;
+  const W=box.clientWidth,H=box.clientHeight;c.width=W*r;c.height=H*r;
+  const ctx=c.getContext('2d');ctx.setTransform(r,0,0,r,0,0);ctx.clearRect(0,0,W,H);
+  const muted=cssv('--muted'),line=cssv('--line-soft'),primary=cssv('--primary'),surf=cssv('--surface'),aqua=cssv('--aqua');
+  ctx.font='11px "DM Mono", monospace';ctx.fillStyle=muted;
+  const bi=bmiInfo();
+  const pts=state.weights.map(w=>{const g=gaOn(parseDate(w.date));return g?{x:g.days/7,y:w.kg}:null}).filter(Boolean).sort((a,b)=>a.x-b.x);
+  if(!bi||!pts.length){ctx.fillText('Cần BMI nền và ít nhất một lần cân để vẽ.',14,28);$('wlegend').textContent='';return}
+  const P={l:44,r:14,t:14,b:30},x0=0,x1=41;
+  const lo=[],hi=[];
+  for(let w=0;w<=41;w+=1){const b=bi.band(w);lo.push({x:w,y:bi.base+b.lo});hi.push({x:w,y:bi.base+b.hi})}
+  const ys=pts.map(p=>p.y).concat(lo.map(p=>p.y),hi.map(p=>p.y));
+  let ymin=Math.min.apply(null,ys)-1.5,ymax=Math.max.apply(null,ys)+1.5;
+  const X=w=>P.l+(w-x0)/(x1-x0)*(W-P.l-P.r),Y=v=>H-P.b-(v-ymin)/(ymax-ymin)*(H-P.t-P.b);
+  ctx.strokeStyle=line;
+  for(let i=0;i<=4;i++){const v=ymin+(ymax-ymin)*i/4,y=Y(v);ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(W-P.r,y);ctx.stroke();ctx.fillStyle=muted;ctx.fillText(fmt(v,1),4,y+4)}
+  for(let w=0;w<=40;w+=8)ctx.fillText(w+'w',X(w)-8,H-11);
+  // dải
+  ctx.beginPath();lo.forEach((p,i)=>i?ctx.lineTo(X(p.x),Y(p.y)):ctx.moveTo(X(p.x),Y(p.y)));
+  for(let i=hi.length-1;i>=0;i--)ctx.lineTo(X(hi[i].x),Y(hi[i].y));
+  ctx.closePath();ctx.fillStyle=aqua;ctx.globalAlpha=.16;ctx.fill();ctx.globalAlpha=1;
+  // điểm
+  ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(X(p.x),Y(p.y)):ctx.moveTo(X(p.x),Y(p.y)));
+  ctx.strokeStyle=primary;ctx.lineWidth=2.5;ctx.stroke();
+  pts.forEach(p=>{ctx.beginPath();ctx.arc(X(p.x),Y(p.y),4.5,0,7);ctx.fillStyle=surf;ctx.fill();ctx.strokeStyle=primary;ctx.lineWidth=2.5;ctx.stroke()});
+  const g=gaOn(today());
+  if(g){ctx.strokeStyle=cssv('--coral');ctx.setLineDash([3,3]);ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(X(g.days/7),P.t);ctx.lineTo(X(g.days/7),H-P.b);ctx.stroke();ctx.setLineDash([])}
+  $('wlegend').textContent=`Vùng xanh = dải tăng cân tham chiếu IOM cho BMI ${fmt(bi.bmi,1)} (${bi.cat}) · mốc nền ${fmt(bi.base,1)} kg`;
+}
+
+/* ---------- modal chi tiết ---------- */
+function labTable(ls){
+  if(!ls.length)return '<p class="sub">Chưa có dữ liệu cho mục này.</p>';
+  return `<table class="dt"><thead><tr><th>Ngày</th><th>Chỉ số</th><th>Kết quả</th><th>Tham chiếu</th><th>Ghi chú</th></tr></thead><tbody>`+
+    ls.map(l=>`<tr><td class="n">${vn(l.date)}</td><td>${esc(l.name)}</td><td class="n">${esc(String(l.value==null?'—':l.value))} ${esc(l.unit||'')}</td><td>${esc(l.reference||'—')}</td><td>${esc(l.note||'')}</td></tr>`).join('')+
+    '</tbody></table>';
+}
+const EXPLAIN={
+  bp:'Huyết áp là áp lực máu trong lòng động mạch. Trong thai kỳ, bác sĩ thường xem huyết áp cùng protein niệu và các xét nghiệm gan, thận, tiểu cầu. Một lần đo cao đơn lẻ chưa phải kết luận.',
+  weight:'Tăng cân trong thai kỳ được đọc theo BMI trước mang thai. Dải tham chiếu là khuyến nghị dân số, không phải mục tiêu bắt buộc cho từng người.',
+  preeclampsia:'PlGF là yếu tố tăng trưởng nhau thai. MoM là số lần so với trung vị chuẩn cùng giai đoạn. PI là chỉ số xung Doppler động mạch tử cung. Ba thứ này được đưa vào một mô hình nguy cơ chung, nên không đọc riêng lẻ từng con số.',
+  carrier:'“Người mang gen” nghĩa là có một bản sao biến thể trong một bệnh di truyền lặn, và thường không có biểu hiện bệnh. Nguy cơ cho con phụ thuộc vào việc bố có mang biến thể cùng gen hay không — đây là câu hỏi dành cho tư vấn di truyền.',
+  sma:'Sàng lọc người mang gen teo cơ tuỷ sống, khảo sát số bản sao gen SMN1 ở mẹ.',
+  nipt:'NIPT phân tích DNA tự do của thai lưu hành trong máu mẹ. Z-score là điểm chuẩn hoá dùng trong thuật toán của phòng xét nghiệm; nên ưu tiên kết luận “nguy cơ thấp / cao” in trên phiếu. Đây là sàng lọc, không thay xét nghiệm chẩn đoán khi bác sĩ thấy cần.',
+  singleGene:'Panel bệnh đơn gen trội khảo sát các biến thể mới phát sinh ở thai. Fetal fraction là tỷ lệ DNA của thai trong mẫu — tỷ lệ quá thấp làm kết quả kém tin cậy.',
+  percentile:'Percentile cho biết bé nằm ở vị trí nào so với quần thể cùng tuổi thai. Đây là con số do phòng khám tính theo biểu đồ của họ; tool chỉ lưu lại chứ không tự tính, vì mỗi biểu đồ cho ra kết quả khác nhau.',
+  uterine:'Chỉ số xung (PI) động mạch tử cung phản ánh sức cản dòng máu tới tử cung. Giá trị được đọc theo tuổi thai và trong mô hình nguy cơ tiền sản giật, không đọc rời.',
+  growth:'Tăng trưởng được đánh giá qua xu hướng nhiều lần đo, không qua một lần. Sai số của EFW siêu âm khoảng ±10–15%.',
+  fhr:'Nhịp tim thai thay đổi theo tuổi thai, nhanh nhất khoảng 9–10 tuần rồi giảm dần về mức ổn định.'
+};
+function openMetric(id){
+  let title=id,body='';
+  const V=sortedVisits().slice().reverse();
+  const visitBlock=()=>V.map(v=>`<div style="padding:11px 0;border-bottom:1px solid var(--line-soft)">
+      <b>${vn(v.date)} · ${gaLabel(visitGA(v))}</b>${v.facility?` <span class="smallmuted">${esc(v.facility)}</span>`:''}
+      <div class="sub">${esc(visitSummary(v))||'—'}</div>
+      ${detailChips(v)?`<div class="row2" style="margin-top:6px">${detailChips(v)}</div>`:''}
+      ${v.placenta?`<div class="smallmuted" style="margin-top:5px">${esc(v.placenta)}</div>`:''}
+      ${v.note?`<div class="smallmuted" style="margin-top:5px">${esc(v.note)}</div>`:''}</div>`).join('')||'<p class="sub">Chưa có lần khám nào.</p>';
+  const T={bp:'Huyết áp mẹ',weight:'Cân nặng mẹ',preeclampsia:'Sàng lọc tiền sản giật',carrier:'Gen mang bệnh của mẹ',sma:'Sàng lọc SMA',
+    nipt:'NIPT nhiễm sắc thể',singleGene:'NIPT đơn gen trội',growth:'Tăng trưởng thai',percentile:'Percentile trên phiếu',fhr:'Tim thai',
+    anatomy:'Sinh trắc theo lần khám',placenta:'Nhau · ối · dây rốn',uterine:'Doppler động mạch tử cung',hematology:'Huyết học',
+    bloodgroup:'Nhóm máu và Rh',glucose:'Đường huyết',urine:'Nước tiểu / protein',thyroid:'Tuyến giáp'};
+  title=T[id]||id;
+  if(id==='bp'){
+    const rows=state.visits.filter(v=>v.bp).map(v=>({date:v.date,name:'Huyết áp tại lần khám',value:v.bp,unit:'mmHg',reference:'',note:v.facility||''}));
+    body=labTable(rows.concat(state.labs.filter(l=>l.code==='BP_SCREEN_SUMMARY')).sort((a,b)=>b.date.localeCompare(a.date)));
+  }else if(id==='weight'){
+    const bi=bmiInfo();
+    body=labTable(state.weights.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(w=>({date:w.date,name:'Cân nặng',value:w.kg,unit:'kg',reference:bi?`nền ${fmt(bi.base,1)} kg`:'',note:w.source||''})));
+  }else if(id==='preeclampsia'){body=labTable(state.labs.filter(l=>l.group==='Sàng lọc tiền sản giật'));}
+  else if(id==='carrier'||id==='sma'){body=labTable(state.labs.filter(l=>l.group==='Di truyền của mẹ'&&(id==='sma'?l.code==='SMA_SMN1':l.code!=='SMA_SMN1')));}
+  else if(id==='nipt'||id==='singleGene'){
+    const codes=id==='nipt'?['NIPT_T21','NIPT_T18','NIPT_T13','NIPT_SEX_CHR','NIPT_OTHER_CHR','NIPT_MICRODEL']:['NIPT_DOMINANT_PANEL','CFDNA_FRACTION'];
+    body=labTable(state.labs.filter(l=>codes.includes(l.code)));
+  }else if(['growth','fhr','anatomy','placenta','uterine','percentile'].includes(id)){body=visitBlock();}
+  else{
+    const map={hematology:['Huyết học'],bloodgroup:['Huyết học','Nhóm máu'],glucose:['Sinh hóa'],urine:['Nước tiểu'],thyroid:['Tuyến giáp']};
+    body=labTable(state.labs.filter(l=>(map[id]||[]).includes(l.group)));
+  }
+  if(EXPLAIN[id])body+=`<div class="note info mt">${esc(EXPLAIN[id])}</div>`;
+  $('mKicker').textContent='CHI TIẾT';$('mTitle').textContent=title;$('mBody').innerHTML=body;
+  $('modal').classList.add('show');
+}
+
+/* ---------- nhập & sửa ---------- */
+const LAB_GROUPS=['Huyết học','Sinh hóa','Tuyến giáp','Nước tiểu','Nhiễm trùng & miễn dịch','Đông máu','Sàng lọc thai','Sàng lọc tiền sản giật','Di truyền của mẹ','Nhóm máu','Khác'];
+let editingVisit=null, editingLab=null;
+
+function clearVisitForm(){
+  ['vDate','vReported','vFacility','vBP','vEFW','vFHR','vCRL','vPct','vBPD','vHC','vAC','vFL','vNT','vNB','vRPI','vLPI','vAFI','vPlacenta','vExtraK','vNote'].forEach(i=>$(i).value='');
+  $('vDate').value=iso(today());editingVisit=null;$('vEditing').style.display='none';
+}
+function editVisit(id){
+  const v=state.visits.find(x=>x.id===id);if(!v)return;
+  editingVisit=id;
+  const d=v.details||{};
+  $('vDate').value=v.date||'';$('vReported').value=v.reportedGA||'';$('vFacility').value=v.facility||'';$('vBP').value=v.bp||'';
+  const set=(i,x)=>$(i).value=(x==null?'':x);
+  set('vEFW',v.efw);set('vFHR',v.fhr);set('vCRL',v.crl);set('vBPD',v.bpd);set('vHC',v.hc);set('vAC',v.ac);set('vFL',v.fl);set('vAFI',v.afi);
+  set('vPct',d.hadlockPercentile);set('vNT',d.nt);set('vNB',d.nb);set('vRPI',d.uterineArteryRightPI);set('vLPI',d.uterineArteryLeftPI);
+  $('vPlacenta').value=v.placenta||'';$('vNote').value=v.note||'';
+  $('vEditingTxt').textContent=`Đang sửa lần khám ngày ${vn(v.date)}`;$('vEditing').style.display='';
+  switchTab('pEntry');window.scrollTo({top:0,behavior:'smooth'});
+}
+function saveVisit(){
+  const d=val('vDate');if(!d)return toast('Chọn ngày khám trước');
+  const g=gaOn(parseDate(d));
+  const old=editingVisit?state.visits.find(v=>v.id===editingVisit):null;
+  const details=Object.assign({},old?old.details:{},{
+    nt:num('vNT'),nb:num('vNB'),uterineArteryRightPI:num('vRPI'),uterineArteryLeftPI:num('vLPI'),hadlockPercentile:num('vPct')});
+  Object.keys(details).forEach(k=>{if(details[k]==null)delete details[k]});
+  const rec={id:editingVisit||('v-'+Date.now()),date:d,gaDays:g?g.days:null,reportedGA:val('vReported')||null,
+    facility:val('vFacility'),bp:val('vBP'),efw:num('vEFW'),fhr:num('vFHR'),crl:num('vCRL'),bpd:num('vBPD'),
+    hc:num('vHC'),ac:num('vAC'),fl:num('vFL'),afi:num('vAFI'),placenta:val('vPlacenta'),
+    fluidCord:old?old.fluidCord:'',details,note:val('vNote')};
+  if(editingVisit)state.visits=state.visits.map(v=>v.id===editingVisit?rec:v);
+  else state.visits.push(rec);
+  persist();clearVisitForm();renderAll();toast(editingVisit?'Đã cập nhật lần khám':'Đã lưu lần khám');
+}
+function clearLabForm(){['lDate','lName','lValue','lUnit','lRef','lNote','lFacility','lCode'].forEach(i=>$(i).value='');$('lFlag').value='';$('lDate').value=iso(today());editingLab=null;$('lEditing').style.display='none'}
+function editLab(id){
+  const l=state.labs.find(x=>x.id===id);if(!l)return;
+  editingLab=id;
+  $('lDate').value=l.date||'';$('lGroup').value=l.group||'Khác';$('lName').value=l.name||'';
+  $('lValue').value=l.value==null?'':l.value;$('lUnit').value=l.unit||'';$('lRef').value=l.reference||'';
+  $('lFlag').value=l.flag||'';$('lFacility').value=l.facility||'';$('lCode').value=l.code||'';$('lNote').value=l.note||'';
+  $('lEditingTxt').textContent=`Đang sửa: ${l.name} (${vn(l.date)})`;$('lEditing').style.display='';
+  switchTab('pEntry');
+}
+function saveLab(){
+  const d=val('lDate'),n=val('lName');
+  if(!d||!n)return toast('Cần ít nhất ngày và tên xét nghiệm');
+  const rec={id:editingLab||('l-'+Date.now()),date:d,group:val('lGroup'),name:n,value:val('lValue'),unit:val('lUnit'),
+    reference:val('lRef'),flag:val('lFlag'),facility:val('lFacility'),code:val('lCode'),note:val('lNote'),source:'manual'};
+  if(editingLab)state.labs=state.labs.map(l=>l.id===editingLab?rec:l);
+  else state.labs.push(rec);
+  persist();clearLabForm();renderAll();toast(editingLab?'Đã cập nhật':'Đã lưu xét nghiệm');
+}
+function saveWeight(){
+  const d=val('wDate'),kg=num('wKg');
+  if(!d||kg==null)return toast('Cần ngày và số cân');
+  state.weights=state.weights.filter(w=>w.date!==d);
+  state.weights.push({id:'w-'+Date.now(),date:d,kg,source:val('wSrc')});
+  persist();$('wKg').value='';$('wSrc').value='';renderAll();toast('Đã lưu cân nặng');
+}
+function saveBackground(){
+  state.background=Object.assign({},state.background,{
+    heightCm:num('bgHeight'),preWeightKg:num('bgPreWeight'),
+    history:val('bgHistory'),conception:val('bgConception'),notes:val('bgNotes')});
+  persist();renderAll();toast('Đã lưu hồ sơ nền');
+}
+
+/* ---------- import / export ---------- */
+function download(content,type,name){
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type}));a.download=name;
+  document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},800);
+}
+function stamp(){const d=new Date();return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`}
+function exportJSON(){
+  download(JSON.stringify(Object.assign({},state,{schemaVersion:'5.0',exportedAt:new Date().toISOString()}),null,2),
+    'application/json',`thai-ky_${stamp()}.json`);
+  toast('Đã xuất JSON');
+}
+function csvq(x){return '"'+String(x==null?'':x).replace(/"/g,'""')+'"'}
+function exportCSV(){
+  const rows=[['loai','ngay','tuoi_thai','nhom','ten','gia_tri','don_vi','tham_chieu','co','ghi_chu']];
+  sortedVisits().forEach(v=>{
+    const ga=gaLabel(visitGA(v));
+    [['EFW',v.efw,'g'],['FHR',v.fhr,'bpm'],['CRL',v.crl,'mm'],['BPD',v.bpd,'mm'],['HC',v.hc,'mm'],['AC',v.ac,'mm'],['FL',v.fl,'mm'],['AFI',v.afi,'mm']]
+      .filter(x=>x[1]!=null).forEach(x=>rows.push(['sieu_am',v.date,ga,'Sinh trắc',x[0],x[1],x[2],'','',v.facility||'']));
+    Object.keys(v.details||{}).forEach(k=>rows.push(['sieu_am',v.date,ga,'Chi tiết',k,v.details[k],'','','','']));
+    if(v.note)rows.push(['sieu_am',v.date,ga,'Kết luận','Ghi chú','','','','',v.note]);
+  });
+  state.labs.forEach(l=>rows.push(['xet_nghiem',l.date,gaLabel(gaOn(parseDate(l.date))),l.group,l.name,l.value,l.unit,l.reference,l.flag,l.note]));
+  state.weights.forEach(w=>rows.push(['can_nang',w.date,gaLabel(gaOn(parseDate(w.date))),'Mẹ','Cân nặng',w.kg,'kg','','',w.source]));
+  download('\ufeff'+rows.map(r=>r.map(csvq).join(',')).join('\n'),'text/csv;charset=utf-8',`thai-ky_${stamp()}.csv`);
+  toast('Đã xuất CSV');
+}
+function mergeImported(j){
+  if(!j||typeof j!=='object')throw new Error('bad');
+  const inc=normalize(j);
+  if(!state.edd&&inc.edd)state.edd=inc.edd;
+  let a=0,b=0,c=0;
+  inc.visits.forEach(v=>{if(!state.visits.some(x=>x.date===v.date&&x.efw===v.efw&&x.crl===v.crl&&x.bpd===v.bpd)){state.visits.push(v);a++}});
+  inc.labs.forEach(l=>{if(!state.labs.some(x=>x.date===l.date&&x.name===l.name&&String(x.value)===String(l.value))){state.labs.push(l);b++}});
+  inc.weights.forEach(w=>{if(!state.weights.some(x=>x.date===w.date)){state.weights.push(w);c++}});
+  state.background=Object.assign({},inc.background,state.background);
+  return[a,b,c];
+}
+function printableHTML(title,inner){
+  return `<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title>
+<style>body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:900px;margin:28px auto;padding:0 20px;color:#0D2A31;line-height:1.55}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:15px;margin:26px 0 8px;color:#0E6E75;border-bottom:1px solid #D6E6E5;padding-bottom:5px}
+.m{color:#5A7C81;font-size:12px}table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
+th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:#5A7C81;padding:6px;border-bottom:1px solid #D6E6E5}
+td{padding:7px 6px;border-bottom:1px solid #EDF3F2;vertical-align:top}
+.k{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}
+.k div{border:1px solid #D6E6E5;border-radius:10px;padding:9px}.k b{display:block;font-size:17px}
+.a{border-left:3px solid #E8705C;background:#FDE9E4;padding:9px 12px;border-radius:0 8px 8px 0;margin:7px 0;font-size:13px}
+.ok{border-left-color:#2FA8A0;background:#DFF2F0}
+ul{padding-left:19px}li{margin:5px 0;font-size:13px}
+@media print{button{display:none}body{margin:0}}
+</style></head><body>${inner}
+<p class="m" style="margin-top:26px;border-top:1px dashed #D6E6E5;padding-top:12px">Bản in từ tool theo dõi thai kỳ cá nhân. Đây không phải hồ sơ y tế chính thức và không thay chẩn đoán của bác sĩ. Mọi số liệu cần đối chiếu với phiếu gốc.</p>
+<button onclick="print()" style="margin-top:14px;padding:10px 16px;border:0;border-radius:9px;background:#0E6E75;color:#fff;font-size:14px;cursor:pointer">In / Lưu PDF</button>
+</body></html>`;
+}
+function exportVisitSheet(){
+  const g=gaOn(today()),lv=latestVisit();
+  const issues=dataIssues(),up=MILESTONES.map(m=>({m,s:milestoneStatus(m)})).filter(r=>r.s.state==='open'||(r.s.state==='future'&&r.s.daysToOpen<=42));
+  const flagged=state.labs.filter(l=>['abnormal','high','low','positive','carrier'].includes(String(l.flag||'').toLowerCase()));
+  const bi=bmiInfo(),lastW=state.weights.slice().sort((a,b)=>a.date.localeCompare(b.date)).pop();
+  const qs=[];
+  issues.forEach(i=>qs.push(`${i.title} — cần đối chiếu lại phiếu gốc.`));
+  flagged.forEach(l=>qs.push(`${l.name} = ${l.value} ${l.unit||''} có cờ trên phiếu ngày ${vn(l.date)} — có cần theo dõi tiếp không?`));
+  up.forEach(r=>qs.push(`${r.m.name}: cửa sổ ${vn(iso(r.s.from))} → ${vn(iso(r.s.to))} — đặt lịch khi nào?`));
+  if(byCode('CARRIER_PAH'))qs.push('Mẹ mang biến thể PAH dị hợp tử — bố có cần làm xét nghiệm người mang gen không?');
+  const inner=`<h1>Phiếu mang đi khám</h1>
+<p class="m">In ngày ${vn(iso(today()))} · EDD ${vn(state.edd)}</p>
+<div class="k"><div>Tuổi thai<b>${gaLabel(g)}</b></div><div>Còn tới EDD<b>${parseDate(state.edd)?dayDiff(parseDate(state.edd),today()):'—'} ngày</b></div>
+<div>Cân nặng mẹ<b>${lastW?fmt(lastW.kg,1)+' kg':'—'}</b></div><div>BMI nền<b>${bi?fmt(bi.bmi,1):'—'}</b></div></div>
+<h2>Lần siêu âm gần nhất</h2>${lv?`<p><b>${vn(lv.date)} · ${gaLabel(visitGA(lv))}</b>${lv.facility?' · '+esc(lv.facility):''}<br>${esc(visitSummary(lv))||'—'}</p><p class="m">${esc(lv.note||'')}</p>`:'<p class="m">Chưa có.</p>'}
+<h2>Câu cần hỏi bác sĩ</h2>${qs.length?`<ul>${qs.map(q=>`<li>${esc(q)}</li>`).join('')}</ul>`:'<p class="m">Không có điểm nào tool gắn cờ.</p>'}
+<h2>Chỉ số có cờ trên phiếu</h2>${flagged.length?`<table><tr><th>Ngày</th><th>Chỉ số</th><th>Kết quả</th><th>Tham chiếu</th><th>Cờ</th></tr>${flagged.map(l=>`<tr><td>${vn(l.date)}</td><td>${esc(l.name)}</td><td>${esc(String(l.value))} ${esc(l.unit||'')}</td><td>${esc(l.reference||'—')}</td><td>${esc(FLAGTXT[l.flag]||l.flag)}</td></tr>`).join('')}</table>`:'<p class="m">Không có.</p>'}
+<h2>Cửa sổ khám tới</h2>${up.length?`<table><tr><th>Mốc</th><th>Khoảng ngày</th><th>Tuần</th></tr>${up.map(r=>`<tr><td>${esc(r.m.name)}</td><td>${vn(iso(r.s.from))} → ${vn(iso(r.s.to))}</td><td>${Math.floor(r.m.a/7)}–${Math.floor(r.m.b/7)}w</td></tr>`).join('')}</table>`:'<p class="m">Không có mốc nào trong 6 tuần tới.</p>'}`;
+  download(printableHTML('Phiếu mang đi khám',inner),'text/html;charset=utf-8',`phieu-kham_${stamp()}.html`);
+  toast('Đã tạo phiếu mang đi khám');
+}
+function exportReport(){
+  const g=gaOn(today()),ev=allEvents();
+  const inner=`<h1>Báo cáo thai kỳ đầy đủ</h1><p class="m">Xuất ${vn(iso(today()))} · EDD ${vn(state.edd)}</p>
+<div class="k"><div>Tuổi thai<b>${gaLabel(g)}</b></div><div>Lần khám<b>${state.visits.length}</b></div><div>Kết quả XN<b>${state.labs.length}</b></div><div>Lần cân<b>${state.weights.length}</b></div></div>
+<h2>Cần kiểm tra lại dữ liệu</h2>${dataIssues().length?dataIssues().map(i=>`<div class="a"><b>${esc(i.title)}</b><br>${esc(i.text)}</div>`).join(''):'<p class="m">Không có mâu thuẫn nào trong dữ liệu.</p>'}
+<h2>Lịch sử</h2><table><tr><th>Ngày</th><th>Tuổi thai</th><th>Loại</th><th>Nội dung</th></tr>${ev.map(x=>`<tr><td>${vn(x.date)}</td><td>${gaLabel(gaOn(parseDate(x.date)))}</td><td>${esc(x.type)}</td><td>${esc(x.title)}${x.text?'<br><span class="m">'+esc(x.text)+'</span>':''}</td></tr>`).join('')}</table>
+<h2>Xét nghiệm</h2><table><tr><th>Ngày</th><th>Nhóm</th><th>Chỉ số</th><th>Kết quả</th><th>Tham chiếu</th><th>Cờ</th></tr>${state.labs.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(l=>`<tr><td>${vn(l.date)}</td><td>${esc(l.group)}</td><td>${esc(l.name)}</td><td>${esc(String(l.value))} ${esc(l.unit||'')}</td><td>${esc(l.reference||'—')}</td><td>${esc(FLAGTXT[l.flag]||l.flag||'—')}</td></tr>`).join('')}</table>`;
+  download(printableHTML('Báo cáo thai kỳ',inner),'text/html;charset=utf-8',`bao-cao-thai-ky_${stamp()}.html`);
+  toast('Đã xuất báo cáo');
+}
+function renderSummary(){
+  const g=gaOn(today());
+  $('summaryGrid').innerHTML=`<div class="grid3">
+    <div class="kpi"><small>LẦN KHÁM</small><b class="num">${state.visits.length}</b></div>
+    <div class="kpi"><small>KẾT QUẢ XN</small><b class="num">${state.labs.length}</b></div>
+    <div class="kpi"><small>LẦN CÂN</small><b class="num">${state.weights.length}</b></div></div>`;
+  const s=state.savedAt?new Date(state.savedAt):null;
+  $('backupInfo').innerHTML=storageOK
+    ? `<b>Lưu lần cuối</b>${s?s.toLocaleString('vi-VN'):'chưa lưu lần nào trong phiên này'} · dữ liệu nằm trong bộ nhớ trình duyệt của thiết bị này.`
+    : `<b>Không lưu được</b>Trình duyệt đang chặn bộ nhớ cục bộ. Mọi thay đổi sẽ mất khi đóng tab — hãy xuất JSON trước khi rời đi.`;
+}
+
+/* ---------- tabs, theme, init ---------- */
+function switchTab(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===id));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===id));
+  if(id==='pChart')setTimeout(drawChart,20);
+  if(id==='pMother')setTimeout(drawWeightChart,20);
+}
+function renderAll(){
+  renderHeader();renderRibbon();renderIssues();renderCards();renderAlerts();renderCompleteness();
+  renderWindows();renderTimeline();renderMetricBtns();drawChart();renderTrend();renderLabs();renderMother();renderSummary();
+}
+function applyTheme(t){document.documentElement.dataset.theme=t;try{localStorage.setItem('preg_theme',t)}catch(e){};drawChart();drawWeightChart()}
+
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
+document.querySelectorAll('[data-zoom]').forEach(b=>b.onclick=()=>{
+  zoomMode=b.dataset.zoom;document.querySelectorAll('[data-zoom]').forEach(x=>x.classList.toggle('active',x===b));drawChart()});
+$('themeBtn').onclick=()=>applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
+$('eddBtn').onclick=()=>{state.edd=$('edd').value;persist();renderAll();toast('Đã cập nhật ngày dự sinh')};
+$('vSave').onclick=saveVisit; $('vClear').onclick=clearVisitForm; $('vCancel').onclick=clearVisitForm;
+$('lSave').onclick=saveLab; $('lClear').onclick=clearLabForm; $('lCancel').onclick=clearLabForm;
+$('wSave').onclick=saveWeight; $('bgBtn').onclick=saveBackground;
+$('expJSON').onclick=exportJSON; $('expCSV').onclick=exportCSV; $('expReport').onclick=exportReport; $('expVisit').onclick=exportVisitSheet;
+$('impBtn').onclick=()=>$('impFile').click();
+$('impFile').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{try{
+    const res=mergeImported(JSON.parse(r.result));persist();renderAll();
+    $('impStatus').textContent=`Đã thêm ${res[0]} lần khám, ${res[1]} kết quả xét nghiệm, ${res[2]} lần cân. Bản ghi trùng được bỏ qua.`;
+    toast('Nhập dữ liệu xong');
+  }catch(err){$('impStatus').textContent='File JSON không đọc được. Kiểm tra lại định dạng.';toast('Không đọc được file')}};
+  r.readAsText(f);e.target.value='';
+};
+$('resetBtn').onclick=()=>{
+  if(!confirm('Xoá toàn bộ dữ liệu trên thiết bị này? Nên xuất JSON trước.'))return;
+  if(!confirm('Xác nhận lần hai: thao tác này không hoàn tác được.'))return;
+  state=blankState();persist();renderAll();toast('Đã xoá toàn bộ dữ liệu');
+};
+$('seedBtn').onclick=()=>{if(confirm('Nạp lại dữ liệu mẫu ban đầu? Dữ liệu hiện tại sẽ bị thay thế.')){state=normalize(JSON.parse(JSON.stringify(SEED)));persist();renderAll();toast('Đã nạp lại dữ liệu mẫu')}};
+$('mClose').onclick=()=>$('modal').classList.remove('show');
+$('modal').onclick=e=>{if(e.target===$('modal'))$('modal').classList.remove('show')};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('modal').classList.remove('show')});
+window.addEventListener('resize',()=>{drawChart();drawWeightChart()});
+
+$('lGroup').innerHTML=LAB_GROUPS.map(g=>`<option>${g}</option>`).join('');
+try{const t=localStorage.getItem('preg_theme');if(t)document.documentElement.dataset.theme=t}catch(e){}
+$('vDate').value=iso(today());$('lDate').value=iso(today());$('wDate').value=iso(today());
+renderAll();
+</script></body></html>
