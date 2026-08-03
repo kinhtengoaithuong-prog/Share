@@ -1,0 +1,2090 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Digital Twin Lab — HTML Publisher V5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:wght@600;700&family=Outfit:wght@400;600;800&family=DM+Mono:wght@400;500&display=swap&subset=vietnamese" rel="stylesheet">
+<style>
+:root{
+  /* FINAN LIGHT — EMERALD EXECUTIVE (default) */
+  --bg-0:#f4f6f4; --bg-1:#eef1ee; --bg-2:#e9ede9; --card:#ffffff; --card-2:#f4f6f4;
+  --line:#e3e8e4; --line-soft:#eef1ee;
+  --ink:#16201C; --ink-dim:#3a453f; --muted:#6a746e;
+  --own:#0B5D4B; --own-deep:#0B2E24;
+  --gold:#0B5D4B; --gold-dim:#0e7a63;            /* brand → emerald */
+  --teal:#0B5D4B; --teal-dim:#0e7a63;            /* active/primary → emerald */
+  --rose:#B3402E;
+  --green:#14532d; --green-bg:#eaf6ec;
+  --red:#B3402E; --red-bg:#fdeceb;
+  --amber:#8a5a12; --amber-bg:#fff9e8;
+  --alloc:#5146A6;                               /* synced/allocated accent (tím) */
+  --soft:#eaf3ef;
+  --white:#fff;
+  --grad-1:rgba(11,93,75,.05); --grad-2:rgba(11,93,75,.03);
+  --radius:9px; --radius-lg:12px;
+  --font-serif:'Noto Serif Display',Georgia,serif;
+  --font-sans:'Outfit',Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  --font-mono:'DM Mono',ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+}
+body.dark{
+  /* MIDNIGHT EXECUTIVE (optional) */
+  --bg-0:#080b14; --bg-1:#0d1220; --bg-2:#121a2e; --card:#101828; --card-2:#0c1220;
+  --line:#233047; --line-soft:#1a2338;
+  --ink:#e7ecf7; --ink-dim:#aab4cc; --muted:#6b7794;
+  --own:#4fd1c5; --own-deep:#0B2E24;
+  --gold:#d4af6a; --gold-dim:#8c6f3f;
+  --teal:#4fd1c5; --teal-dim:#2f7a72;
+  --rose:#e08a9e;
+  --green:#4ade80; --green-bg:rgba(74,222,128,.12);
+  --red:#f87171; --red-bg:var(--red-bg);
+  --amber:#fbbf24; --amber-bg:rgba(251,191,36,.12);
+  --alloc:#a99bef;
+  --soft:rgba(11,93,75,.1);
+  --grad-1:rgba(11,93,75,.05); --grad-2:rgba(11,93,75,.04);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg-0);font-family:var(--font-sans);color:var(--ink);min-height:100vh;padding:20px 20px 60px;font-size:13.5px;transition:background .3s,color .3s}
+.wrap{max-width:1240px;margin:0 auto;transition:max-width .2s}
+.wrap.wide{max-width:min(1840px,98vw)}
+body:has(.wrap.wide){padding-top:20px}
+
+.topbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 16px;margin-bottom:14px}
+.tb-id h1{font-family:var(--font-serif);font-weight:700;font-size:19px;line-height:1.1;margin:0;letter-spacing:.1px;display:flex;align-items:center;flex-wrap:wrap}
+.tb-id .rel-stamp{display:block;font-size:10.5px;color:var(--muted);margin-top:3px}
+.tb-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ver-badge{background:var(--own);color:#fff;font-size:11px;font-weight:800;padding:2px 8px;border-radius:8px;margin-left:8px;vertical-align:middle}
+.rel-stamp{font-size:10.5px;color:var(--muted)}
+.status-pill{font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:8px;display:none}
+.status-pill.show{display:inline-block}
+.status-pill.ok{background:var(--green-bg);color:var(--green)}
+.status-pill.warn{background:var(--amber-bg);color:var(--amber)}
+.status-pill.err{background:var(--red-bg);color:var(--red)}
+
+.tabbar{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;background:var(--card-2);border:1px solid var(--line);border-radius:999px;padding:5px}
+.tabbtn{flex:1;min-width:120px;text-align:center;background:transparent;border:0;color:var(--muted);font-family:var(--font-sans);font-weight:600;font-size:13.5px;padding:11px 16px;border-radius:999px;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;gap:7px}
+.tabbtn:hover{color:var(--ink-dim)}
+.tabbtn.active{background:var(--own);color:#fff}
+.subtabbar{display:flex;gap:0;margin:-6px 0 16px;border:1px solid var(--line);border-radius:8px;overflow:hidden;max-width:520px}
+.subtabbtn{flex:1;background:var(--card);border:0;border-right:1px solid var(--line);color:var(--muted);font-family:var(--font-sans);font-weight:700;font-size:11.5px;padding:8px 12px;cursor:pointer;transition:.12s}
+.subtabbtn:last-child{border-right:0}
+.subtabbtn:hover{color:var(--ink-dim)}
+.subtabbtn.active{background:var(--own);color:#fff}
+
+.view{display:none}
+.view.active{display:block}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.card.full{grid-column:1/-1}
+.head{padding:20px 24px;border-bottom:1px solid var(--line-soft);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.head h2{font-family:var(--font-serif);font-weight:600;font-size:17px;margin:0;color:var(--ink)}
+.head .sub{font-size:12px;color:var(--muted);margin-top:2px}
+.body{padding:22px 24px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+.field{margin-bottom:14px}
+.field label{display:block;font-weight:800;font-size:11px;margin-bottom:5px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+.hint{font-size:11.5px;color:var(--muted);line-height:1.5;margin-top:6px}
+.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 13px;font-size:14px;background:var(--card-2);color:var(--ink);outline:none;font-family:var(--font-sans)}
+.field input::placeholder,.field textarea::placeholder{color:var(--muted)}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(11,93,75,.12)}
+textarea{min-height:180px;font-family:var(--font-mono);resize:vertical;font-size:12.5px}
+.token-row{display:grid;grid-template-columns:1fr auto auto;gap:8px}
+
+.btn{border:0;background:var(--card-2);border:1px solid var(--line);color:var(--ink);border-radius:11px;padding:11px 15px;font-weight:650;cursor:pointer;font-size:13px;font-family:var(--font-sans);transition:.15s}
+.btn:hover{border-color:var(--teal);color:var(--teal)}
+.btn.primary{background:var(--own);color:#fff;border:0;font-weight:700}
+.btn.primary:hover{filter:brightness(1.08);color:#fff}
+.btn.green{background:var(--green-bg);color:var(--green);border:1px solid rgba(20,83,45,.25)}
+.btn.red{background:var(--red-bg);color:var(--red);border:1px solid rgba(179,64,46,.25)}
+.btn.red:hover{background:var(--red-bg);color:var(--red)}
+.btn.ghost{background:transparent;border:1px solid var(--line)}
+.btn.small{padding:7px 10px;font-size:11.5px;border-radius:9px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn:disabled:hover{border-color:var(--line);color:var(--ink)}
+
+.drop{border:2px dashed var(--line);border-radius:10px;background:var(--card-2);min-height:170px;padding:20px;text-align:center;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;transition:.15s;cursor:pointer}
+.drop.drag{border-color:var(--teal);background:rgba(11,93,75,.05)}
+.drop strong{font-size:15.5px;font-weight:650}
+.drop input{display:none}
+.file-meta{display:none;margin-top:14px;padding:12px 14px;background:var(--card-2);border:1px solid var(--line);border-radius:12px;font-size:12.5px}
+.bar{height:8px;background:var(--card-2);border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+.bar>div{height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--gold));transition:.25s}
+.log{background:var(--own-deep);color:#c8d6d0;border-radius:9px;padding:14px;min-height:140px;max-height:260px;overflow:auto;font-family:var(--font-mono);font-size:11.5px;line-height:1.6;border:1px solid var(--own-deep)}
+.log .ok{color:#6ee7b7}
+.log .warn{color:#fcd34d}
+.log .err{color:#fca5a5}
+.ok{color:var(--green)}
+.warn{color:var(--amber)}
+.err{color:var(--red)}
+.result{display:none;background:var(--green-bg);border:1px solid rgba(20,83,45,.22);color:var(--ink);border-radius:10px;padding:15px;margin-top:14px}
+.result a{color:var(--teal);font-weight:700;word-break:break-all;text-decoration:none}
+.result a:hover{text-decoration:underline}
+
+.muted{color:var(--muted);font-size:12px}
+.notice{background:rgba(11,93,75,.05);border-left:3px solid var(--gold);padding:12px 14px;border-radius:10px;color:var(--ink-dim);font-size:12.5px;line-height:1.55}
+.notice.teal{border-left-color:var(--teal);background:rgba(11,93,75,.05)}
+.notice.red{border-left-color:var(--red);background:var(--red-bg)}
+.switch{display:flex;gap:8px;align-items:center;font-size:12.5px;font-weight:600;color:var(--ink-dim)}
+.switch input{width:auto}
+.mode-tabs{display:flex;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.mode-tabs button{flex:1;background:var(--card);border:0;border-right:1px solid var(--line);color:var(--muted);font-weight:700;font-size:11.5px;padding:7px 12px;cursor:pointer;font-family:var(--font-sans)}
+.mode-tabs button:last-child{border-right:0}
+.mode-tabs button.active{background:var(--own);color:#fff}
+.link-row{display:grid;grid-template-columns:1fr auto;gap:8px}
+.kbd{background:var(--card-2);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-family:var(--font-mono);font-size:11px;color:var(--teal)}
+
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.toolbar .field{margin:0;flex:1;min-width:180px}
+.linktable{display:grid;gap:10px}
+.linkrow{background:var(--card-2);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
+.linkrow.editing{border-color:var(--teal)}
+.linkrow .title{font-weight:700;font-size:14.5px;color:var(--ink)}
+.linkrow .title a{color:var(--ink);text-decoration:none}
+.linkrow .title a:hover{color:var(--teal)}
+.linkrow .path{font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:4px;word-break:break-all}
+.linkrow .meta{font-size:11px;color:var(--muted);margin-top:3px}
+.linkrow .actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.badge{display:inline-block;font-size:9.5px;font-weight:800;padding:1px 7px;border-radius:6px;letter-spacing:.3px;text-transform:uppercase}
+.badge.local{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(138,90,18,.25)}
+.badge.synced{background:#e7e3f5;color:var(--alloc);border:1px solid rgba(81,70,166,.25)}
+.badge.org{background:var(--soft);color:var(--own);border:1px solid rgba(11,93,75,.22)}
+.badge.product{background:#f1f4f1;color:var(--muted);border:1px solid var(--line)}
+.badge.tgt-pub{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(138,90,18,.3)}
+.badge.tgt-prv{background:var(--soft);color:var(--own);border:1px solid rgba(11,93,75,.3)}
+.badge.tgt-none{background:var(--red-bg);color:var(--red);border:1px solid rgba(179,64,46,.3)}
+.tgt-card{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--bg-0)}
+.tgt-card.pub{border-left:3px solid var(--amber)}
+.tgt-card.prv{border-left:3px solid var(--own)}
+.tgt-card .tgt-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.tgt-card .tgt-head .tgt-name{font-weight:800;font-size:14px;color:var(--ink)}
+.tgt-card .tgt-head .tgt-vis{font-size:10px;font-weight:800;text-transform:uppercase;padding:2px 8px;border-radius:6px}
+.tgt-card .tgt-head .tgt-vis.pub{background:var(--amber-bg);color:var(--amber)}
+.tgt-card .tgt-head .tgt-vis.prv{background:var(--soft);color:var(--own)}
+.tgt-card .tgt-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tgt-card .tgt-grid .full{grid-column:1/-1}
+.tgt-card label{display:block;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:3px}
+.tgt-card input,.tgt-card select{width:100%;border:1px solid var(--line);border-radius:7px;padding:6px 9px;font-size:12.5px;background:var(--card);color:var(--ink);font-family:var(--font-sans)}
+.tgt-card input:focus,.tgt-card select:focus{outline:none;border-color:var(--own);box-shadow:0 0 0 3px rgba(11,93,75,.15)}
+.tgt-card .tgt-foot{display:flex;gap:6px;margin-top:10px;align-items:center}
+@media(max-width:900px){.tgt-card .tgt-grid{grid-template-columns:1fr}}
+.badge.status-draft{background:#eef2f9;color:#1e3a8a;border:1px solid #dbe3f2}
+.badge.status-active{background:var(--green-bg);color:var(--green);border:1px solid rgba(20,83,45,.2)}
+.badge.status-needs_update{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(138,90,18,.3)}
+.badge.status-archived{background:var(--red-bg);color:var(--red);border:1px solid rgba(179,64,46,.25)}
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px}
+/* in-UI modal (thay prompt/confirm gốc — không bị iframe/sandbox chặn) */
+.ui-modal-overlay{position:fixed;inset:0;background:rgba(10,20,16,.45);z-index:99;display:none;align-items:center;justify-content:center;padding:20px}
+.ui-modal-overlay.show{display:flex}
+.ui-modal{background:var(--card);border:1px solid var(--line);border-radius:10px;max-width:460px;width:100%;padding:18px 20px}
+.ui-modal .um-title{font-family:var(--font-serif);font-size:15px;font-weight:700;color:var(--own);margin-bottom:8px}
+.ui-modal .um-msg{font-size:12.5px;color:var(--ink);white-space:pre-wrap;line-height:1.55;max-height:300px;overflow-y:auto;margin-bottom:12px}
+.ui-modal input{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:13px;background:var(--bg-0);color:var(--ink);font-family:var(--font-sans);margin-bottom:12px}
+.ui-modal input:focus{outline:none;border-color:var(--own);box-shadow:0 0 0 3px rgba(11,93,75,.12)}
+.ui-modal .um-actions{display:flex;gap:8px;justify-content:flex-end}
+.dim{opacity:.22;transition:opacity .15s}
+.filter-hidden{display:none!important}
+.dim:hover{opacity:.5}
+.filter-flag{display:inline-block;font-size:10.5px;font-weight:700;color:var(--amber);background:var(--amber-bg);border:1px solid rgba(138,90,18,.25);padding:1px 8px;border-radius:6px;margin-left:6px}
+.welcome{max-width:560px;margin:40px auto;text-align:center}
+.welcome h3{font-family:var(--font-serif);font-size:18px;color:var(--own);margin:0 0 6px}
+.welcome p{color:var(--muted);font-size:13px;margin:0 0 20px}
+.welcome-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:left}
+.welcome-card{border:1px solid var(--line);border-radius:9px;padding:16px;cursor:pointer;transition:.12s;background:var(--card)}
+.welcome-card:hover{border-color:var(--own)}
+.welcome-card .wc-ico{font-size:22px;margin-bottom:6px}
+.welcome-card .wc-t{font-weight:700;font-size:13px;color:var(--ink);margin-bottom:3px}
+.welcome-card .wc-d{font-size:11px;color:var(--muted);line-height:1.4}
+.edit-row{margin-top:10px}
+.edit-row input,.edit-row select{padding:9px 10px;border-radius:9px;border:1px solid var(--line);background:var(--bg-0);color:var(--ink);font-size:12.5px}
+.filter-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.filter-row select{padding:10px 12px;border-radius:11px;border:1px solid var(--line);background:var(--card-2);color:var(--ink);font-size:12.5px;font-family:var(--font-sans);min-width:160px}
+.filter-row select:focus{outline:none;border-color:var(--teal)}
+
+.tpl-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.tpl-preview{background:#fff;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.tpl-preview iframe{width:100%;height:520px;border:0;display:block}
+
+/* ============ LINKS WORKSPACE (16:9 optimized) ============ */
+#view-links.active{display:block}
+.workspace{display:flex;gap:0;height:calc(100vh - 150px);min-height:520px;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.ws-side{width:22%;min-width:230px;max-width:460px;flex-shrink:0;overflow-y:auto;border-right:1px solid var(--line-soft);background:var(--card-2)}
+.ws-side-inner{padding:16px}
+.ws-block{margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--line-soft)}
+.ws-block:last-child{border-bottom:0;margin-bottom:0}
+.ws-block-head{font-family:var(--font-serif);font-size:12.5px;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.ws-mini-label{font-size:11px;color:var(--muted);display:block;margin-bottom:5px}
+.ws-select,.ws-input{width:100%;border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:12.5px;background:var(--card-2);color:var(--ink);outline:none;font-family:var(--font-sans)}
+.ws-select:focus,.ws-input:focus{border-color:var(--teal)}
+.ws-hint{font-size:11px;color:var(--muted);line-height:1.5}
+.viewmode-tabs{display:flex;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.vm-btn{flex:1;background:var(--card);border:0;border-right:1px solid var(--line);color:var(--muted);padding:8px 4px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:var(--font-sans);transition:.12s}
+.vm-btn:last-child{border-right:0}
+.vm-btn:hover{color:var(--ink-dim)}
+.vm-btn.active{background:var(--own);color:#fff}
+.seg{display:flex;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg-btn{flex:1;background:var(--card);border:0;border-right:1px solid var(--line);color:var(--muted);padding:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-sans)}
+.seg-btn:last-child{border-right:0}
+.seg-btn.active{background:var(--own);color:#fff}
+.ws-add-field{background:rgba(11,93,75,.1);border:1px solid rgba(11,93,75,.3);color:var(--teal);width:22px;height:22px;border-radius:6px;font-size:15px;line-height:1;cursor:pointer;font-weight:700;padding:0}
+.ws-add-field:hover{background:rgba(11,93,75,.18)}
+.ws-cf-list{display:flex;flex-direction:column;gap:6px}
+.ws-cf-item{display:flex;justify-content:space-between;align-items:center;background:var(--card-2);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:11.5px}
+.ws-cf-item .cf-name{font-weight:650;color:var(--ink-dim)}
+.ws-cf-item .cf-type{font-size:10px;color:var(--muted);font-family:var(--font-mono)}
+.ws-cf-item button{background:none;border:0;color:var(--red);cursor:pointer;font-size:14px;padding:0 2px}
+.ws-filter-item{margin-bottom:6px}
+details.flt{border:1px solid var(--line);border-radius:8px;margin-bottom:6px;background:var(--card)}
+details.flt summary{cursor:pointer;padding:8px 11px;font-size:12px;font-weight:700;color:var(--ink-dim);list-style:none;display:flex;align-items:center;gap:6px}
+details.flt summary::before{content:'▸';font-size:10px;color:var(--muted);transition:transform .12s}
+details.flt[open] summary::before{transform:rotate(90deg)}
+details.flt summary::-webkit-details-marker{display:none}
+.flt-cnt{background:var(--own);color:#fff;font-size:10px;font-weight:800;border-radius:8px;padding:0 6px;margin-left:auto}
+.flt-body{padding:4px 11px 9px;max-height:170px;overflow-y:auto;border-top:1px solid var(--line-soft)}
+.flt-opt{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink);padding:4px 0;cursor:pointer}
+.flt-opt input{accent-color:var(--own)}
+details.tax{border:1px solid var(--line);border-radius:8px;margin-bottom:6px;background:var(--card)}
+details.tax summary{cursor:pointer;padding:8px 11px;font-size:12px;font-weight:700;color:var(--ink-dim);list-style:none}
+details.tax summary::-webkit-details-marker{display:none}
+.tax-body{padding:4px 11px 9px;border-top:1px solid var(--line-soft);max-height:170px;overflow-y:auto}
+.tax-val{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:3px 0;color:var(--ink)}
+.tax-val .tax-sub{color:var(--muted);font-size:10.5px}
+.tax-val button{background:none;border:0;color:var(--red);cursor:pointer;font-size:14px;padding:0 3px;font-weight:700}
+.ws-empty-small{font-size:11.5px;color:var(--muted);font-style:italic}
+
+.ws-splitter{width:6px;flex-shrink:0;cursor:col-resize;background:var(--line-soft);position:relative;transition:background .15s}
+.ws-splitter:hover,.ws-splitter.dragging{background:var(--teal)}
+.ws-splitter::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:2px;height:32px;background:var(--muted);border-radius:2px}
+
+.ws-main{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
+.ws-main-head{padding:12px 18px;border-bottom:1px solid var(--line-soft);flex-shrink:0}
+.ws-canvas{flex:1;overflow:auto;padding:16px 18px;position:relative}
+
+/* Inspector */
+.insp-field{margin-bottom:10px}
+.insp-field label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:800;text-transform:uppercase;letter-spacing:.3px}
+.insp-field input,.insp-field select{width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:12px;background:var(--bg-0);color:var(--ink);font-family:var(--font-sans)}
+.insp-actions{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.insp-saved{font-size:11px;color:var(--green);font-weight:600;margin-top:10px;opacity:0;transition:opacity .2s}
+.insp-saved.show{opacity:1}
+.insp-open{display:inline-block;font-size:11px;color:var(--teal);text-decoration:none;word-break:break-all;margin-top:4px}
+
+/* LIST VIEW */
+.lv-group{margin-bottom:20px}
+.lv-group-head{font-family:var(--font-serif);font-size:13px;color:var(--gold);font-weight:600;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:8px}
+.lv-group-head .cnt{font-size:11px;color:var(--muted);font-family:var(--font-mono)}
+.lv-subgroup{margin:8px 0 8px 16px}
+.lv-subgroup-head{font-size:11.5px;color:var(--teal);font-weight:650;margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px}
+.lv-row{background:var(--card-2);border:1px solid var(--line);border-radius:11px;padding:10px 13px;margin-bottom:7px;cursor:pointer;transition:.12s}
+.lv-row:hover{border-color:var(--teal)}
+.lv-row.selected{border-color:var(--teal);box-shadow:0 0 0 2px rgba(11,93,75,.18)}
+.lv-row .lv-title{font-weight:700;font-size:13.5px;color:var(--ink);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.lv-row .lv-meta{font-size:10.5px;color:var(--muted);margin-top:4px;font-family:var(--font-mono);word-break:break-all}
+
+/* BOARD VIEW */
+.board{display:flex;gap:12px;align-items:flex-start;min-height:100%}
+.board-col{background:var(--card-2);border:1px solid var(--line-soft);border-radius:12px;width:260px;min-width:260px;flex-shrink:0;display:flex;flex-direction:column;max-height:100%}
+.board-col-head{padding:11px 13px;border-bottom:1px solid var(--line-soft);font-weight:700;font-size:12.5px;color:var(--ink);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--card)}
+.board-col-head .cnt{font-size:10.5px;color:var(--muted);background:var(--card-2);padding:1px 7px;border-radius:999px}
+.board-col-body{padding:10px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+.board-card{background:var(--card-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;transition:.12s}
+.board-card:hover{border-color:var(--teal)}
+.board-card.selected{border-color:var(--teal);box-shadow:0 0 0 2px rgba(11,93,75,.18)}
+.board-card .bc-title{font-weight:700;font-size:12.5px;color:var(--ink);margin-bottom:5px}
+.board-card .bc-sub{font-size:10px;color:var(--muted);font-family:var(--font-mono)}
+.board-subhead{font-size:10px;color:var(--teal);font-weight:700;text-transform:uppercase;letter-spacing:.3px;margin:6px 0 2px}
+
+/* MINDMAP VIEW */
+.mindmap-wrap{position:relative;width:100%;min-height:100%}
+.mm-node{position:absolute;background:var(--card-2);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:650;color:var(--ink);cursor:pointer;transition:.12s;white-space:nowrap;z-index:2;max-width:220px;overflow:hidden;text-overflow:ellipsis}
+.mm-node:hover{border-color:var(--teal)}
+.mm-node.selected{border-color:var(--teal);box-shadow:0 0 0 2px rgba(79,209,197,.25)}
+.mm-node.root{background:var(--own);color:#fff;border:0;font-family:var(--font-serif)}
+.mm-node.g1{border-color:rgba(11,93,75,.35);color:var(--gold)}
+.mm-node.g2{border-color:rgba(11,93,75,.3);color:var(--teal)}
+.mm-node.leaf{font-weight:600}
+.mm-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1}
+.mm-path{fill:none;stroke:var(--line);stroke-width:1.5}
+
+@media(max-width:900px){
+  .workspace{flex-direction:column;height:auto;max-height:none}
+  .ws-side{width:100%!important;max-width:none;border-right:0;border-bottom:1px solid var(--line-soft)}
+  .ws-splitter{display:none}
+  .ws-canvas{min-height:400px}
+}
+
+@media(max-width:900px){
+  .grid,.two,.tpl-grid{grid-template-columns:1fr}
+  .hero{display:block}
+  .token-row,.link-row{grid-template-columns:1fr}
+  .card.full{grid-column:auto}
+  .linkrow{grid-template-columns:1fr}
+  .linkrow .actions{justify-content:flex-start}
+  .tabbtn{min-width:80px;font-size:12px;padding:10px 8px}
+  .edit-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar" id="topbar">
+    <div class="tb-id">
+      <h1>Digital Twin Lab — Publisher<span class="ver-badge" id="verBadge"></span></h1>
+      <span class="rel-stamp" id="relStamp"></span>
+    </div>
+    <div class="tb-actions">
+      <span class="status-pill" id="statusPill"></span>
+      <button class="btn small" id="undoBtn" title="Hoàn tác thao tác sửa/xóa gần nhất" disabled>↩ Undo (0)</button>
+      <button class="btn small" id="themeToggle" title="Chuyển sáng/tối">🌙 Tối</button>
+    </div>
+  </div>
+
+  <div class="tabbar">
+    <button class="tabbtn active" data-main="links">1 · Quản lý Links</button>
+    <button class="tabbtn" data-main="tool">2 · Tool</button>
+  </div>
+
+  <div class="subtabbar" id="toolSubtabs" style="display:none">
+    <button class="subtabbtn active" data-tab="publisher">2.1 · Publisher</button>
+    <button class="subtabbtn" data-tab="homepage">2.2 · Homepage</button>
+    <button class="subtabbtn" data-tab="config">2.3 · Cấu hình</button>
+  </div>
+
+  <!-- ===================== TAB 1: PUBLISHER (in Tool) ===================== -->
+  <div class="view" id="view-publisher">
+    <div class="grid">
+      <section class="card"><div class="head"><h2>1. Target repo</h2><span class="sub" id="cfgStatus">Bắt buộc chọn</span></div><div class="body">
+        <div class="field"><label>Publish tới <span class="muted">(chọn 1 profile — không có mặc định)</span></label><select id="targetSelect"></select><div class="hint" id="targetHint">Mỗi profile = 1 repo đích + 1 token riêng. Quản lý danh sách profile ở tab <b>2.3 · Cấu hình</b>. Fail-safe: chưa chọn thì không publish được.</div></div>
+        <div id="targetInfo" class="notice" style="display:none;margin-top:4px"></div>
+        <div class="field" style="margin-top:10px"><label>Hoặc — Đè lên link có sẵn <span class="muted">(thay thế phiên bản, URL giữ nguyên, không tạo rác)</span></label><select id="overwriteSelect"><option value="">— Tạo file mới —</option></select><div class="hint">Chọn 1 link để <b>đè phiên bản</b>: target + đường dẫn của link đó được cố định, file mới ghi đè lên đúng chỗ đó. Metadata (dự án/product/category) giữ nguyên.</div></div>
+        <div id="updateBanner" class="notice" style="display:none;margin-top:4px;background:var(--amber-bg);border-color:var(--amber);color:var(--amber)"></div>
+        <div style="display:flex;gap:8px"><button class="btn ghost" id="gotoTargetsBtn">Quản lý profiles →</button><button class="btn ghost" id="testBtnTop">Test target</button></div>
+      </div></section>
+
+      <section class="card"><div class="head"><h2>2. Nội dung HTML</h2><div class="mode-tabs"><button class="btn small active" data-mode="file">File</button><button class="btn small" data-mode="paste">Paste</button></div></div><div class="body">
+        <div id="fileMode"><label class="drop" id="dropZone"><input id="fileInput" type="file" accept=".html,.htm,text/html"><strong>Kéo file HTML vào đây</strong><span class="muted">hoặc click để chọn file</span></label><div class="file-meta" id="fileMeta"></div></div>
+        <div id="pasteMode" style="display:none"><div class="field"><label>Paste HTML vào đây</label><textarea id="htmlText" placeholder="<!DOCTYPE html>..."></textarea></div></div>
+        <div class="two"><div class="field"><label>Project slug</label><input id="slug" placeholder="hsv-board"></div><div class="field"><label>Page title / tên hiển thị</label><input id="projectTitle" placeholder="HSV Board Proposal"></div></div>
+        <div class="field"><label>Category <span class="muted">(loại nội dung)</span></label><select id="category"></select></div>
+        <div class="two">
+          <div class="field"><label>Dự án <span class="muted">(portfolio org)</span></label><select id="orgSelect"></select></div>
+          <div class="field"><label>Trạng thái</label><select id="statusSelect"><option value="draft">Draft</option><option value="active" selected>Active</option><option value="needs_update">Needs Update</option><option value="archived">Archived</option></select></div>
+        </div>
+        <div class="field"><label>Product name <span class="muted">(tên sản phẩm gốc — dùng chung cho nhiều version/bản build)</span></label><input id="productName" placeholder="vd: VFX Planning Model, Staff Cost Simulator, HLB Loyalty Proposal"><div class="hint">Khác với Title: Title là tên bản cụ thể ("Báo cáo Margin VFX Q3"), Product name là tên dòng sản phẩm gốc ("VFX Planning Model") để nhóm các version lại với nhau.</div></div>
+        <div class="two"><label class="switch"><input type="checkbox" id="rootIndex"> Publish làm trang chủ repo <span class="muted">/index.html</span></label><label class="switch"><input type="checkbox" id="updateHome"> Auto update homepage <span class="muted">tắt mặc định</span></label></div>
+      </div></section>
+
+      <section class="card full"><div class="head"><h2>3. Publish</h2><div><button class="btn ghost" id="testBtn">Test token/repo</button> <button class="btn primary" id="publishBtn">Publish lên GitHub</button></div></div><div class="body"><div class="bar"><div id="progress"></div></div><div class="result" id="result"><div><b>Published:</b></div><div class="link-row"><a id="resultLink" target="_blank"></a><button class="btn green" id="copyLinkBtn">Copy link</button></div></div><div style="margin-top:14px" class="log" id="log"></div></div></section>
+    </div>
+  </div>
+
+  <!-- ===================== TAB 2: LINKS MANAGER (MAIN, full-screen) ===================== -->
+  <div class="view active" id="view-links">
+    <div class="workspace" id="linksWorkspace">
+      <!-- LEFT SIDEBAR (~20%, resizable) -->
+      <aside class="ws-side" id="wsSide">
+        <div class="ws-side-inner">
+          <div class="ws-block">
+            <div class="ws-block-head">Hiển thị</div>
+            <div class="viewmode-tabs">
+              <button class="vm-btn active" data-view="list">☰ List</button>
+              <button class="vm-btn" data-view="board">▦ Board</button>
+              <button class="vm-btn" data-view="mindmap">⟀ Mindmap</button>
+            </div>
+          </div>
+
+          <div class="ws-block">
+            <div class="ws-block-head">Group by</div>
+            <select id="groupBy1" class="ws-select"></select>
+            <select id="groupBy2" class="ws-select" style="margin-top:6px"></select>
+            <div class="ws-hint" id="mindmapConnWrap" style="display:none;margin-top:8px">
+              <label class="ws-mini-label">Connector mindmap</label>
+              <div class="seg">
+                <button class="seg-btn active" data-conn="curved">Cong</button>
+                <button class="seg-btn" data-conn="elbow">Gấp khúc</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="browseSection">
+          <div class="ws-block">
+            <div class="ws-block-head">Bộ lọc</div>
+            <input id="searchLinks" class="ws-input" placeholder="Tìm tên / slug / product / path...">
+            <div id="dynamicFilters" style="margin-top:8px"></div>
+            <label class="ws-mini-label" style="margin-top:10px">Mục không khớp</label>
+            <div class="seg" id="filterModeSeg">
+              <button class="seg-btn active" data-fmode="dim" title="Làm mờ mục không khớp — giữ nguyên định vị trong danh sách/cây">Làm mờ</button>
+              <button class="seg-btn" data-fmode="hide" title="Ẩn hẳn mục không khớp — danh sách gọn, dễ tìm">Ẩn</button>
+              <button class="seg-btn" data-fmode="count" title="Không đổi hiển thị, chỉ đếm số khớp ở tiêu đề">Chỉ đếm</button>
+            </div>
+            <button class="btn small ghost" id="clearFiltersBtn" style="width:100%;margin-top:8px">Xóa filter</button>
+          </div>
+
+          <div class="ws-block">
+            <div class="ws-block-head">Trường tùy chỉnh <button class="ws-add-field" id="addFieldBtn" title="Thêm trường">+</button></div>
+            <div id="customFieldsList" class="ws-cf-list"></div>
+          </div>
+
+          <div class="ws-block">
+            <div class="ws-block-head">Phân loại <span class="ws-hint" style="font-weight:400;text-transform:none">(xóa giá trị)</span></div>
+            <div id="taxonomyManager"></div>
+          </div>
+
+          <div class="ws-block">
+            <div class="ws-block-head">Danh sách</div>
+            <div style="display:flex;gap:6px;margin-bottom:8px">
+              <button class="btn ghost small" id="wsExportLinksBtn" style="flex:1" title="Xuất danh sách links (kèm dự án/product/trạng thái/custom fields) ra .json. KHÔNG chứa token. Import lại được.">⬇ Export</button>
+              <label class="btn ghost small" style="flex:1;cursor:pointer;text-align:center" title="Nạp file danh sách links .json. Sẽ hỏi Gộp thêm hay Thay thế danh sách hiện tại.">⬆ Import<input type="file" id="wsImportLinksInput" accept=".json" style="display:none"></label>
+            </div>
+            <button class="btn ghost" id="syncGithubBtn" style="width:100%;margin-bottom:8px">🔄 Sync từ GitHub</button>
+            <button class="btn red small" id="clearAllLocalBtn" style="width:100%">Xóa history local</button>
+            <div class="ws-hint" id="syncNotice" style="margin-top:8px">Sync để quét repo qua Git Tree API, không mất dữ liệu khi đổi máy.</div>
+          </div>
+          </div>
+
+          <div id="editorSection" style="display:none">
+            <div class="ws-block ws-inspector" id="inspector">
+              <div class="ws-block-head">✎ Sửa item <span class="ws-hint" style="font-weight:400;text-transform:none">— click ra ngoài để đóng</span></div>
+              <div id="inspectorBody"><div class="ws-empty-small">Chọn 1 item để xem / sửa.</div></div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- SPLITTER -->
+      <div class="ws-splitter" id="wsSplitter" title="Kéo để đổi tỉ lệ"></div>
+
+      <!-- RIGHT CANVAS (~80%) -->
+      <main class="ws-main" id="wsMain">
+        <div class="ws-main-head">
+          <div class="sub" id="linksSubtitle">—</div>
+        </div>
+        <div class="ws-canvas" id="wsCanvas"></div>
+      </main>
+    </div>
+  </div>
+
+  <!-- ===================== TAB 3: HOMEPAGE ===================== -->
+  <div class="view" id="view-homepage">
+    <div class="tpl-grid">
+      <section class="card"><div class="head"><h2>Homepage — Digital Twin Lab</h2></div><div class="body">
+        <div class="field"><label>Tiêu đề trang chủ</label><input id="homeTitle" value="Digital Twin Lab"></div>
+        <div class="field"><label>Mô tả ngắn</label><input id="homeDesc" value="AI-powered simulators, dashboards &amp; proposals — CFO Digital Twin ecosystem."></div>
+        <div class="field"><label>Sắp xếp theo</label><select id="homeSort"><option value="time_desc">Mới nhất trước</option><option value="time_asc">Cũ nhất trước</option><option value="title_asc">Tên A→Z</option><option value="category">Theo category</option></select></div>
+        <div class="hint" style="margin-bottom:14px">Homepage sẽ liệt kê toàn bộ item hiện có trong danh sách Links (kể cả item đã sync từ GitHub). Preview bên phải cập nhật khi bấm Refresh.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn ghost" id="refreshPreviewBtn">Refresh preview</button><button class="btn primary" id="publishHomeBtn">Publish Homepage lên GitHub</button></div>
+        <div class="log" id="homeLog" style="margin-top:14px;min-height:60px"></div>
+      </div></section>
+      <section class="card"><div class="head"><h2>Preview</h2><span class="sub" id="homeItemCount">0 item</span></div><div class="body" style="padding:14px">
+        <div class="tpl-preview"><iframe id="homePreviewFrame"></iframe></div>
+      </div></section>
+    </div>
+  </div>
+
+  <!-- ===================== TAB 4: CONFIG / UTILITIES ===================== -->
+  <div class="view" id="view-config">
+    <div class="grid">
+      <section class="card full"><div class="head"><h2>Target repos (profiles)</h2><span class="sub" id="targetsCount"></span></div><div class="body">
+        <div class="hint" style="margin-bottom:12px">Mỗi <b>profile</b> = 1 repo GitHub đích + 1 <b>token fine-grained riêng</b> (least-privilege — token lộ chỉ đụng đúng 1 repo). Khi publish một link, bạn <b>bắt buộc chọn</b> profile; link nhớ nó thuộc profile nào để publish/xóa/sync route đúng chỗ. Ví dụ: <span class="kbd">GitHub Pages công khai</span> cho tài liệu chia sẻ · <span class="kbd">Finan riêng</span> (private.basicnlogic.com) cho BCQT/staff cost.</div>
+        <div id="targetsList" style="display:flex;flex-direction:column;gap:10px"></div>
+        <div style="display:flex;gap:8px;margin-top:14px"><button class="btn primary" id="addTargetBtn">＋ Thêm profile</button></div>
+        <div class="log" id="targetsLog" style="margin-top:14px;min-height:40px"></div>
+      </div></section>
+
+      <section class="card full"><div class="head"><h2>Tiện ích — Lấy GitHub Token</h2></div><div class="body">
+        <div class="notice"><b>Lấy token nhanh:</b> mở link tạo Fine-grained Personal Access Token, chọn repo cần publish, rồi cấp quyền <b>Repository permissions → Contents → Read and write</b>. GitHub chỉ hiện token 1 lần, nên copy ngay vào ô token của tool.</div>
+        <div class="two" style="margin-top:14px">
+          <div class="field"><label>Link tạo Fine-grained token</label><input id="tokenGuideUrl" value="https://github.com/settings/personal-access-tokens/new" readonly></div>
+          <div class="field"><label>Permission cần cấp</label><input value="Repository permissions → Contents → Read and write" readonly></div>
+        </div>
+        <div style="display:flex;gap:8px"><button class="btn ghost" id="openTokenBtn">Mở trang tạo GitHub Token</button><button class="btn ghost" id="copyTokenLinkBtn">Copy link token</button></div>
+      </div></section>
+
+      <section class="card full"><div class="head"><h2>Snapshot toàn bộ trạng thái tool</h2></div><div class="body">
+        <div class="hint" style="margin-bottom:14px">Export/Import <b>toàn bộ trạng thái tool</b>: config GitHub + token, danh sách links, trường tùy chỉnh, danh sách dự án, và tùy chọn giao diện (theme, view, splitter). Dùng để backup hoặc bê nguyên tool sang máy khác. ⚠ V8: token của các target <b>KHÔNG</b> được export (an toàn PAT) — sau khi import cần nhập lại token ở tab Cấu hình.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn primary" id="exportSnapshotBtn">⬇ Export snapshot (.json)</button>
+          <label class="btn ghost" style="cursor:pointer">⬆ Import snapshot<input type="file" id="importSnapshotInput" accept=".json" style="display:none"></label>
+        </div>
+        <div class="log" id="configLog" style="margin-top:14px;min-height:50px"></div>
+      </div></section>
+
+      <section class="card full"><div class="head"><h2>Danh sách links (tái sử dụng)</h2></div><div class="body">
+        <div class="hint" style="margin-bottom:14px">Export riêng <b>danh sách links</b> (kèm dự án, product, trạng thái, trường tùy chỉnh) ra file để chia sẻ hoặc nạp vào tool khác. Không chứa token/config. Khi import, bạn chọn <b>gộp thêm</b> (merge) hoặc <b>thay thế</b> toàn bộ danh sách hiện tại.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn ghost" id="exportLinksBtn">⬇ Export danh sách links (.json)</button>
+          <label class="btn ghost" style="cursor:pointer">⬆ Import danh sách links<input type="file" id="importLinksInput" accept=".json" style="display:none"></label>
+        </div>
+        <div class="log" id="linksIoLog" style="margin-top:14px;min-height:50px"></div>
+      </div></section>
+
+      <section class="card full"><div class="head"><h2>Reset</h2></div><div class="body">
+        <div class="notice red">Xóa toàn bộ config + token + history khỏi trình duyệt này. Không ảnh hưởng file đã publish trên GitHub.</div>
+        <button class="btn red" id="resetAllBtn" style="margin-top:12px">Reset toàn bộ dữ liệu local</button>
+      </div></section>
+    </div>
+  </div>
+
+</div>
+<div class="ui-modal-overlay" id="uiModalOverlay">
+  <div class="ui-modal">
+    <div class="um-title" id="umTitle"></div>
+    <div class="um-msg" id="umMsg"></div>
+    <input id="umInput" style="display:none">
+    <div class="um-actions">
+      <button class="btn ghost small" id="umCancel">Hủy</button>
+      <button class="btn primary small" id="umOk">OK</button>
+    </div>
+  </div>
+</div>
+<script>
+/* ============================================================
+   CONSTANTS (declared first — TDZ safe)
+   ============================================================ */
+const APP_VERSION='V8.1';
+const APP_RELEASE='Released 04/07/2026 · V8.1 · Cập nhật/đè phiên bản (upsert theo filePath — hết rác), lọc + group-by theo Target, upsert addHistory';
+const STORAGE_KEY='digitalTwinLabPublisher.config';
+const TARGETS_KEY='digitalTwinLabPublisher.targets';
+const ACTIVE_TARGET_KEY='digitalTwinLabPublisher.activeTarget';
+/* ---- N-PROFILE PUBLISH TARGETS (V8) ----
+   Mỗi profile = 1 repo đích + 1 token riêng (least-privilege).
+   Shape: {id,name,owner,repo,branch,folder,token,baseUrl,visibility:'public'|'private'} */
+function makeTargetId(name){
+  const base=(name||'target').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'target';
+  const ids=new Set(loadTargets().map(t=>t.id));
+  let id=base,i=2;while(ids.has(id)){id=base+'-'+i;i++}return id;
+}
+function loadTargets(){
+  try{const r=localStorage.getItem(TARGETS_KEY);if(r){const a=JSON.parse(r);if(Array.isArray(a))return a}}catch(e){}
+  // migrate: V7 single config -> profile #1 (public by default, since V7 only published to GitHub Pages)
+  let mig=null;
+  try{const raw=localStorage.getItem(STORAGE_KEY);if(raw){const c=JSON.parse(raw);if(c&&(c.owner||c.repo||c.token)){
+    mig=[{id:'public',name:'GitHub Pages (công khai)',owner:c.owner||'',repo:c.repo||'',branch:c.branch||'main',folder:c.folder||'',token:c.token||'',baseUrl:c.baseUrl||'',visibility:'public'}];
+  }}}catch(e){}
+  const list=mig||[];
+  localStorage.setItem(TARGETS_KEY,JSON.stringify(list));
+  return list;
+}
+function saveTargets(list){localStorage.setItem(TARGETS_KEY,JSON.stringify(list||[]))}
+function getTargetById(id){return loadTargets().find(t=>t.id===id)||null}
+function getActiveTargetId(){try{return localStorage.getItem(ACTIVE_TARGET_KEY)||''}catch(e){return ''}}
+function setActiveTargetId(id){try{if(id)localStorage.setItem(ACTIVE_TARGET_KEY,id);else localStorage.removeItem(ACTIVE_TARGET_KEY)}catch(e){}}
+/* Resolve the cfg object a link/publish should use. Fail-safe: returns null if unresolved. */
+function cfgFromTarget(t){if(!t)return null;return {owner:(t.owner||'').trim(),repo:(t.repo||'').trim(),branch:(t.branch||'main').trim()||'main',folder:(t.folder||'').trim().replace(/^\/+|\/+$/g,''),token:(t.token||'').trim(),baseUrl:(t.baseUrl||'').trim().replace(/\/+$/,''),visibility:t.visibility||'private',_targetId:t.id,_targetName:t.name}}
+function cfgForItem(it){const t=it&&it.targetId?getTargetById(it.targetId):null;return t?cfgFromTarget(t):null}
+
+const HISTORY_KEY='digitalTwinLabPublisher.history';
+const LEGACY_CONFIG_KEYS=['htmlPublisherGithubV33.config','htmlPublisherGithubV32.config'];
+const LEGACY_HISTORY_KEYS=['htmlPublisherGithubV33.history','htmlPublisherGithubV32.history'];
+const CATEGORY_LABEL={simulator:'Simulator',dashboard:'Dashboard',proposal:'Proposal',training:'Training',report:'Report',other:'Khác',uncategorized:'Chưa phân loại'};
+const STATUS_LABEL={draft:'Draft',active:'Active',needs_update:'Needs Update',archived:'Archived'};
+const ORG_KEY='digitalTwinLabPublisher.orgs';
+const ORG_SEED=['Finan/SBH','Rabity','VFX Auto','NEG','Idealab','F5/Omnikey','Training','HSV'];
+
+let currentFile=null,currentHtml='',mode='file';
+let updateTargetFP=null; // khi != null: publish sẽ ĐÈ lên đúng link này (filePath+target cố định)
+let syncedTree=[];
+
+const $=id=>document.getElementById(id);
+
+/* ---------- IN-UI DIALOGS (prompt/confirm gốc bị chặn trong iframe/sandbox) ---------- */
+function _uiDialog({title,message,withInput,defaultVal,okLabel,cancelLabel}){
+  return new Promise(resolve=>{
+    const ov=$('uiModalOverlay');
+    $('umTitle').textContent=title||'Xác nhận';
+    $('umMsg').textContent=message||'';
+    const inp=$('umInput');
+    inp.style.display=withInput?'block':'none';
+    inp.value=defaultVal||'';
+    $('umOk').textContent=okLabel||'OK';
+    $('umCancel').textContent=cancelLabel||'Hủy';
+    ov.classList.add('show');
+    if(withInput)setTimeout(()=>inp.focus(),50);
+    const done=val=>{ov.classList.remove('show');$('umOk').onclick=null;$('umCancel').onclick=null;inp.onkeydown=null;resolve(val)};
+    $('umOk').onclick=()=>done(withInput?inp.value:true);
+    $('umCancel').onclick=()=>done(withInput?null:false);
+    inp.onkeydown=e=>{if(e.key==='Enter')done(inp.value);if(e.key==='Escape')done(null)};
+  });
+}
+function uiPrompt(message,defaultVal,title){return _uiDialog({title:title||'Nhập giá trị',message,withInput:true,defaultVal})}
+function uiConfirm(message,title){return _uiDialog({title:title||'Xác nhận',message})}
+
+/* ---------- STATUS PILL (§3) ---------- */
+let _statusTimer=null;
+function status(msg,cls='ok'){
+  const el=$('statusPill');if(!el)return;
+  el.textContent=msg;el.className='status-pill show '+cls;
+  clearTimeout(_statusTimer);
+  _statusTimer=setTimeout(()=>{el.className='status-pill';},4000);
+}
+
+/* ---------- UNDO STACK (§3, edit/delete of items) ---------- */
+const UNDO_MAX=40;
+let undoStack=[];
+function pushUndo(label){
+  // snapshot current history before a mutation
+  try{
+    undoStack.push({label,snapshot:JSON.stringify(loadHistory())});
+    if(undoStack.length>UNDO_MAX)undoStack.shift();
+    refreshUndoBtn();
+  }catch(e){}
+}
+function refreshUndoBtn(){
+  const b=$('undoBtn');if(!b)return;
+  b.textContent=`↩ Undo (${undoStack.length})`;
+  b.disabled=undoStack.length===0;
+}
+function doUndo(){
+  if(!undoStack.length)return;
+  const {label,snapshot}=undoStack.pop();
+  try{
+    localStorage.setItem(HISTORY_KEY,snapshot);
+  }catch(e){}
+  refreshUndoBtn();
+  exitEditorMode&&exitEditorMode();
+  renderLinks();
+  status('Đã hoàn tác: '+label,'ok');
+}
+
+function log(msg,cls='',target='log'){const box=$(target);const d=document.createElement('div');d.className=cls;d.textContent=`[${new Date().toLocaleTimeString()}] ${msg}`;box.appendChild(d);box.scrollTop=box.scrollHeight}
+function setProgress(n){$('progress').style.width=Math.max(0,Math.min(100,n))+'%'}
+function slugify(s){return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,80)}
+function encUtf8ToB64(str){const bytes=new TextEncoder().encode(str);let bin='';bytes.forEach(b=>bin+=String.fromCharCode(b));return btoa(bin)}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+
+/* ============================================================
+   ORG (DỰ ÁN) LIST — seeded from portfolio, extendable
+   ============================================================ */
+function loadOrgs(){
+  try{
+    const raw=localStorage.getItem(ORG_KEY);
+    if(raw){
+      const arr=JSON.parse(raw);
+      // ensure seed orgs are always present even if user's saved list predates them
+      ORG_SEED.forEach(o=>{if(!arr.includes(o))arr.push(o)});
+      return arr;
+    }
+  }catch(e){}
+  localStorage.setItem(ORG_KEY,JSON.stringify(ORG_SEED));
+  return [...ORG_SEED];
+}
+function saveOrgs(list){localStorage.setItem(ORG_KEY,JSON.stringify(list))}
+function addOrg(name){
+  name=(name||'').trim();
+  if(!name)return null;
+  const list=loadOrgs();
+  if(!list.includes(name)){list.push(name);saveOrgs(list)}
+  return name;
+}
+function renderOrgSelects(){
+  const orgs=loadOrgs();
+  const publisherSel=$('orgSelect');
+  if(!publisherSel)return;
+  const publisherCurrent=publisherSel.value;
+  publisherSel.innerHTML=orgs.map(o=>`<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('')+'<option value="__new__">+ Thêm dự án mới…</option>';
+  if(orgs.includes(publisherCurrent))publisherSel.value=publisherCurrent;
+}
+
+let currentToolSubtab='publisher';
+function showView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const el=$('view-'+id);if(el)el.classList.add('active');
+  if(id==='links'){renderLinks();}
+  if(id==='homepage'){refreshHomePreview();}
+}
+function activateMain(main){
+  document.querySelectorAll('.tabbtn').forEach(x=>x.classList.toggle('active',x.dataset.main===main));
+  const isLinks=main==='links';
+  $('toolSubtabs').style.display=isLinks?'none':'flex';
+  document.querySelector('.wrap').classList.toggle('wide',isLinks);
+  if(isLinks){
+    showView('links');
+  }else{
+    // show current tool subtab
+    document.querySelectorAll('.subtabbtn').forEach(x=>x.classList.toggle('active',x.dataset.tab===currentToolSubtab));
+    showView(currentToolSubtab);
+  }
+}
+document.querySelectorAll('.tabbtn').forEach(b=>b.onclick=()=>activateMain(b.dataset.main));
+document.querySelectorAll('.subtabbtn').forEach(b=>b.onclick=()=>{
+  currentToolSubtab=b.dataset.tab;
+  document.querySelectorAll('.subtabbtn').forEach(x=>x.classList.toggle('active',x===b));
+  showView(currentToolSubtab);
+});
+
+/* V8: single-config DOM inputs removed. These are DOM-safe legacy shims kept so the
+   old snapshot export/import path still round-trips a "config" object without throwing.
+   Real publish config now comes from the profile registry (cfgFromTarget). */
+function getConfig(){try{const raw=localStorage.getItem(STORAGE_KEY);if(raw)return JSON.parse(raw)}catch(e){}return {owner:'',repo:'',branch:'main',folder:'',token:'',baseUrl:''}}
+function setConfig(c={}){try{const cur=getConfig();localStorage.setItem(STORAGE_KEY,JSON.stringify({...cur,...c}))}catch(e){}}
+function saveConfig(silent){/* no-op in V8 — kept for legacy call sites; profiles auto-persist */}
+function loadConfig(){/* no-op in V8 — profiles loaded via loadTargets() */}
+
+function headers(cfg){const c=cfg||getConfig();return {'Authorization':'Bearer '+c.token,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}}
+function repoApi(cfg){const c=cfg||getConfig();return `https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}`}
+function contentApi(filePath,cfg){return repoApi(cfg)+`/contents/${encodeURIComponent(filePath).replace(/%2F/g,'/')}`}
+async function safeFetch(url,opts={}){try{return await fetch(url,opts)}catch(e){throw new Error('Không gọi được GitHub API. Nếu đang mở bằng file://, hãy thử mở bằng localhost. Chi tiết: '+e.message)}}
+
+async function test(){try{$('log').innerHTML='';setProgress(20);const tid=getActiveTargetId();const prof=tid?getTargetById(tid):null;if(!prof)throw new Error('Chưa chọn Target repo để test.');const c=cfgFromTarget(prof);if(!c.owner||!c.repo||!c.token)throw new Error(`Target "${prof.name}" thiếu owner/repo/token.`);log(`Test target "${prof.name}" (${c.owner}/${c.repo})...`);const r=await safeFetch(repoApi(c),{headers:headers(c)});const text=await r.text();if(!r.ok)throw new Error(`GitHub API lỗi ${r.status}: ${text.slice(0,500)}`);const repo=JSON.parse(text);log(`OK: ${repo.full_name} · default branch ${repo.default_branch}`,'ok');setProgress(100)}catch(e){log(e.message||String(e),'err');setProgress(0)}}
+
+async function getExistingSha(filePath,cfg){const c=cfg||getConfig();const r=await safeFetch(contentApi(filePath,c)+`?ref=${encodeURIComponent(c.branch)}`,{headers:headers(c)});if(r.status===404)return null;const text=await r.text();if(!r.ok)throw new Error(`Check file lỗi ${r.status}: ${text.slice(0,500)}`);const data=JSON.parse(text);return data.sha||null}
+
+async function putContent(filePath,content,message,cfg){const c=cfg||getConfig();const sha=await getExistingSha(filePath,c);const body={message,content:encUtf8ToB64(content),branch:c.branch};if(sha)body.sha=sha;const r=await safeFetch(contentApi(filePath,c),{method:'PUT',headers:{...headers(c),'Content-Type':'application/json'},body:JSON.stringify(body)});const text=await r.text();if(!r.ok)throw new Error(`Upload lỗi ${r.status}: ${text.slice(0,800)}`);return JSON.parse(text)}
+
+async function deleteContent(filePath,message,cfg){const c=cfg||getConfig();const sha=await getExistingSha(filePath,c);if(!sha)throw new Error('Không tìm thấy file trên GitHub (có thể đã bị xóa trước đó).');const r=await safeFetch(contentApi(filePath,c),{method:'DELETE',headers:{...headers(c),'Content-Type':'application/json'},body:JSON.stringify({message,sha,branch:c.branch})});const text=await r.text();if(!r.ok)throw new Error(`Xóa file lỗi ${r.status}: ${text.slice(0,500)}`);return JSON.parse(text)}
+
+async function getBranchTree(cfg){
+  const c=cfg||getConfig();
+  const brRes=await safeFetch(repoApi(c)+`/branches/${encodeURIComponent(c.branch)}`,{headers:headers(c)});
+  const brText=await brRes.text();
+  if(!brRes.ok)throw new Error(`Không lấy được branch info ${brRes.status}: ${brText.slice(0,400)}`);
+  const br=JSON.parse(brText);
+  const treeSha=br.commit.sha;
+  const treeRes=await safeFetch(repoApi(c)+`/git/trees/${treeSha}?recursive=1`,{headers:headers(c)});
+  const treeText=await treeRes.text();
+  if(!treeRes.ok)throw new Error(`Không lấy được tree ${treeRes.status}: ${treeText.slice(0,400)}`);
+  const tree=JSON.parse(treeText);
+  return (tree.tree||[]).filter(t=>t.type==='blob' && /\.html?$/i.test(t.path));
+}
+
+function getTarget(cfg){const c=cfg||getConfig();const slug=slugify($('slug').value || $('projectTitle').value || (currentFile?currentFile.name.replace(/\.html?$/i,''):'project'));$('slug').value=slug;if($('rootIndex').checked){const fp=(c.folder?c.folder+'/':'')+'index.html';return {slug:'',filePath:fp,url:c.baseUrl+'/'};}const fp=(c.folder?c.folder+'/':'')+slug+'/index.html';return {slug,filePath:fp,url:c.baseUrl+'/'+slug+'/'};}
+
+async function getHtml(){if(mode==='paste'){const h=$('htmlText').value.trim();if(!h)throw new Error('Chưa có HTML paste.');return h}if(!currentHtml)throw new Error('Chưa chọn file HTML.');return currentHtml}
+
+function loadHistory(){
+  try{
+    let raw=localStorage.getItem(HISTORY_KEY);
+    if(!raw){for(const k of LEGACY_HISTORY_KEYS){const legacy=localStorage.getItem(k);if(legacy){raw=legacy;localStorage.setItem(HISTORY_KEY,legacy);break}}}
+    return raw?JSON.parse(raw):[];
+  }catch(e){return []}
+}
+function saveHistory(h){localStorage.setItem(HISTORY_KEY,JSON.stringify(h.slice(0,300)))}
+function addHistory(item){const h=loadHistory();const idx=h.findIndex(x=>x.filePath===item.filePath);if(idx>=0){/* đè: giữ metadata cũ, cập nhật nội dung/time; không tạo dòng mới */h[idx]={...h[idx],...item};}else{h.unshift(item);}saveHistory(h)}
+function updateHistoryItem(filePath,patch){
+  const h=loadHistory();
+  const idx=h.findIndex(x=>x.filePath===filePath);
+  if(idx>=0){h[idx]={...h[idx],...patch};saveHistory(h);return h}
+  // item chỉ tồn tại trong syncedTree (quét từ GitHub) → adopt vào history để edit được
+  const synced=syncedTree.find(x=>x.filePath===filePath);
+  if(synced){
+    const adopted={...synced,...patch,source:'local',time:synced.time||new Date().toISOString()};
+    h.unshift(adopted);saveHistory(h);
+    syncedTree=syncedTree.filter(x=>x.filePath!==filePath);
+  }
+  return h;
+}
+function removeHistoryItem(filePath){const h=loadHistory().filter(x=>x.filePath!==filePath);saveHistory(h)}
+
+function buildHomepage(items,opts){
+  const title=(opts&&opts.title)||'Digital Twin Lab';
+  const desc=(opts&&opts.desc)||'AI-powered simulators, dashboards & proposals — CFO Digital Twin ecosystem.';
+  return `<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title>
+<style>
+:root{--bg-0:#080b14;--bg-1:#0d1220;--card:#101828;--line:#233047;--ink:#e7ecf7;--ink-dim:#aab4cc;--muted:#6b7794;--gold:#d4af6a;--teal:#4fd1c5}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(1100px 600px at 12% -8%,rgba(212,175,106,.08),transparent 60%),radial-gradient(900px 700px at 100% 0%,rgba(79,209,197,.07),transparent 55%),linear-gradient(160deg,var(--bg-0),var(--bg-1) 45%,#121a2e);font-family:Outfit,Inter,system-ui,Arial,sans-serif;color:var(--ink);padding:40px 24px 60px;min-height:100vh}
+.wrap{max-width:1080px;margin:auto}
+.hero{margin-bottom:32px}
+h1{font-family:'Noto Serif Display',Georgia,serif;font-weight:600;margin:0 0 10px;font-size:36px}
+.hero p{color:var(--ink-dim);margin:0;font-size:15px}
+.catgroup{margin-bottom:30px}
+.catgroup h2{font-family:'Noto Serif Display',Georgia,serif;font-size:16px;color:var(--gold);margin:0 0 12px;letter-spacing:.3px;text-transform:uppercase;font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.card{background:linear-gradient(180deg,rgba(16,24,40,.9),rgba(12,18,32,.9));border-radius:16px;padding:18px;text-decoration:none;color:var(--ink);border:1px solid var(--line);display:block;transition:.15s}
+.card:hover{border-color:var(--teal);transform:translateY(-2px)}
+.title{font-weight:700;font-size:15.5px;margin-bottom:8px}
+.url,.time{font-size:11px;color:var(--muted);word-break:break-all;margin-top:6px;font-family:'DM Mono',monospace}
+</style></head><body><div class="wrap"><div class="hero"><h1>${escapeHtml(title)}</h1><p>${escapeHtml(desc)}</p></div>${renderHomeGroups(items)}</div></body></html>`;
+}
+function renderHomeGroups(items){
+  if(!items.length)return '<div style="color:var(--muted)">Chưa có project nào.</div>';
+  const groups={};
+  items.forEach(it=>{const cat=it.category||'uncategorized';(groups[cat]=groups[cat]||[]).push(it)});
+  const order=['simulator','dashboard','proposal','training','report','other','uncategorized'];
+  return order.filter(c=>groups[c]).map(cat=>`<div class="catgroup"><h2>${CATEGORY_LABEL[cat]||cat}</h2><div class="grid">${groups[cat].map(it=>`<a class="card" href="${it.url}"><div class="title">${escapeHtml(it.title||it.slug||'Untitled')}</div><div class="url">${escapeHtml(it.url)}</div><div class="time">${it.time?new Date(it.time).toLocaleString():''}</div></a>`).join('')}</div></div>`).join('');
+}
+
+async function publish(){
+  try{
+    $('result').style.display='none';$('log').innerHTML='';setProgress(5);
+    const pinned=updateTargetFP?mergedLinks().find(x=>x.filePath===updateTargetFP):null;
+    if(updateTargetFP&&!pinned)throw new Error('Link cần đè không còn tồn tại trong danh sách. Hủy chế độ cập nhật rồi thử lại.');
+    const tid=pinned?pinned.targetId:getActiveTargetId();
+    const prof=tid?getTargetById(tid):null;
+    if(!prof)throw new Error(pinned?`Link "${pinned.title||pinned.slug}" chưa gắn Target repo — không biết đè vào repo nào. Gắn target cho link này trước.`:'Chưa chọn Target repo. Chọn một profile ở mục "Target" trước khi publish (bắt buộc — không có mặc định).');
+    const c=cfgFromTarget(prof);
+    if(!c.owner||!c.repo||!c.token||!c.baseUrl)throw new Error(`Target "${prof.name}" thiếu owner/repo/token/base URL. Vào tab Cấu hình để bổ sung.`);
+    const html=await getHtml();
+    // ĐÈ: dùng nguyên filePath/url/slug của link cũ. TẠO MỚI: tính từ slug hiện tại.
+    const target=pinned?{slug:pinned.slug,filePath:pinned.filePath,url:pinned.url}:getTarget(c);
+    const title=$('projectTitle').value.trim()||target.slug||c.repo;
+    const category=$('category').value||'';
+    const org=$('orgSelect').value==='__new__'?'':$('orgSelect').value||'';
+    const product=$('productName').value.trim();
+    const status=$('statusSelect').value||'active';
+    log(`Target: ${prof.name} (${c.visibility==='public'?'công khai':'riêng'}) · ${c.owner}/${c.repo}`,c.visibility==='public'?'warn':'ok');
+    log('Kiểm tra repo/token...');setProgress(15);
+    const r=await safeFetch(repoApi(c),{headers:headers(c)});if(!r.ok)throw new Error(`Repo/token lỗi ${r.status}: ${(await r.text()).slice(0,500)}`);
+    log('Repo/token OK.','ok');setProgress(35);
+    log('Upload: '+target.filePath);
+    await putContent(target.filePath,html,`Publish ${title} via Digital Twin Lab Publisher V8`,c);
+    setProgress(80);
+    const item=pinned?{...pinned,title:title||pinned.title,filePath:target.filePath,url:target.url,slug:target.slug,time:new Date().toISOString(),source:'local',targetId:prof.id}:{title,slug:target.slug,filePath:target.filePath,url:target.url,category,org,group2:'',product,status,custom:{},time:new Date().toISOString(),source:'local',targetId:prof.id};
+    if($('updateHome').checked&&!$('rootIndex').checked){
+      const homePath=(c.folder?c.folder+'/':'')+'index.html';
+      log('Update homepage: '+homePath,'warn');
+      const h=loadHistory().filter(x=>x.targetId===prof.id);
+      const items=[item,...h].filter((it,i,a)=>a.findIndex(x=>x.filePath===it.filePath)===i);
+      await putContent(homePath,buildHomepage(items,{}),'Update homepage via Digital Twin Lab Publisher V8',c);
+    }
+    addHistory(item);
+    $('resultLink').href=target.url;$('resultLink').textContent=target.url;$('result').style.display='block';
+    navigator.clipboard.writeText(target.url).catch(()=>{});
+    log(pinned?`ĐÈ phiên bản thành công lên "${target.filePath}" (URL không đổi — bản cũ đã bị thay thế, không tạo rác).`:'Published thành công. Chờ GitHub Pages deploy 1-3 phút nếu link chưa cập nhật ngay.','ok');
+    if(updateTargetFP)exitUpdateMode();
+    renderLinks();
+    setProgress(100);
+  }catch(e){log(e.message||String(e),'err');setProgress(0)}
+}
+
+function mergedLinks(){
+  const h=loadHistory();
+  const byPath={};
+  h.forEach(it=>byPath[it.filePath]=it);
+  syncedTree.forEach(it=>{if(!byPath[it.filePath])byPath[it.filePath]=it});
+  return Object.values(byPath).sort((a,b)=>new Date(b.time||0)-new Date(a.time||0));
+}
+
+/* ============================================================
+   LINKS WORKSPACE — custom fields, group-by, 3 views, splitter
+   ============================================================ */
+const CF_KEY='digitalTwinLabPublisher.customFields';
+const WS_PREF_KEY='digitalTwinLabPublisher.wsPrefs';
+const CAT_KEY='digitalTwinLabPublisher.categories';
+const SUBGROUP_KEY='digitalTwinLabPublisher.subgroups';
+const PRODUCT_DESC_KEY='digitalTwinLabPublisher.productDesc';
+const CAT_SEED=['simulator','dashboard','proposal','training','report','other'];
+
+/* dynamic category list (deletable/extendable); legacy keys keep labels via CATEGORY_LABEL */
+function loadCats(){try{const r=localStorage.getItem(CAT_KEY);if(r)return JSON.parse(r)}catch(e){}localStorage.setItem(CAT_KEY,JSON.stringify(CAT_SEED));return [...CAT_SEED]}
+function saveCats(l){localStorage.setItem(CAT_KEY,JSON.stringify(l))}
+function addCat(name){name=(name||'').trim();if(!name)return null;const l=loadCats();if(!l.includes(name)){l.push(name);saveCats(l)}return name}
+function catLabel(k){return CATEGORY_LABEL[k]||k}
+
+/* subgroups per org: {orgName:[sub1,sub2]} */
+function loadSubgroups(){try{const r=localStorage.getItem(SUBGROUP_KEY);return r?JSON.parse(r):{}}catch(e){return {}}}
+function saveSubgroups(m){localStorage.setItem(SUBGROUP_KEY,JSON.stringify(m))}
+function addSubgroup(org,name){name=(name||'').trim();if(!org||!name)return null;const m=loadSubgroups();(m[org]=m[org]||[]);if(!m[org].includes(name)){m[org].push(name);saveSubgroups(m)}return name}
+function subgroupsOf(org){const m=loadSubgroups();return (org&&m[org])?m[org]:[]}
+function allSubgroups(){const m=loadSubgroups();return [...new Set(Object.values(m).flat())]}
+
+/* product description registry: {productName:desc} */
+function loadProductDesc(){try{const r=localStorage.getItem(PRODUCT_DESC_KEY);return r?JSON.parse(r):{}}catch(e){return {}}}
+function saveProductDesc(m){localStorage.setItem(PRODUCT_DESC_KEY,JSON.stringify(m))}
+function allProducts(){return [...new Set(mergedLinks().map(it=>it.product).filter(Boolean))].sort((a,b)=>a.localeCompare(b))}
+
+/* clear a taxonomy value from all items using it (used when deleting a value) */
+function clearValueFromItems(fieldKey,value){
+  const h=loadHistory();let n=0;
+  h.forEach(it=>{
+    if(fieldKey==='org'&&it.org===value){it.org='';n++}
+    else if(fieldKey==='category'&&it.category===value){it.category='';n++}
+    else if(fieldKey==='group2'&&it.group2===value){it.group2='';n++}
+    else if(fieldKey==='product'&&it.product===value){it.product='';n++}
+  });
+  saveHistory(h);return n;
+}
+
+// Built-in fields available for group-by / filter
+const BUILTIN_FIELDS=[
+  {key:'org',label:'Dự án',type:'select',builtin:true},
+  {key:'group2',label:'Nhóm 2',type:'select',builtin:true},
+  {key:'product',label:'Product',type:'select',builtin:true},
+  {key:'status',label:'Trạng thái',type:'select',builtin:true,labels:STATUS_LABEL},
+  {key:'category',label:'Category',type:'select',builtin:true,labels:CATEGORY_LABEL},
+  {key:'target',label:'Target / URL',type:'select',builtin:true}
+];
+/* nhãn động cho field target: id profile -> tên + visibility (đọc registry hiện tại) */
+function targetLabelMap(){const m={};loadTargets().forEach(t=>{m[t.id]=(t.visibility==='public'?'🌐 ':'🔒 ')+t.name});m['']='⚠ chưa gắn target';return m}
+/* dynamic option source per field — always reflects toàn bộ CSDL hiện tại */
+function fieldOptions(f){
+  if(f.key==='org')return loadOrgs();
+  if(f.key==='group2')return allSubgroups();
+  if(f.key==='product')return allProducts();
+  if(f.key==='status')return Object.keys(STATUS_LABEL);
+  if(f.key==='category')return loadCats();
+  if(f.key==='target'){const ids=loadTargets().map(t=>t.id);const hasUnassigned=mergedLinks().some(it=>!it.targetId);return hasUnassigned?[...ids,'']:ids;}
+  if(f.options)return f.options;
+  // custom text/date/number fields: derive from data
+  return [...new Set(mergedLinks().map(it=>fieldValue(it,f.key)).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b)));
+}
+
+let wsState={view:'list',conn:'curved',selected:null,filterMode:'dim'};
+
+function loadCustomFields(){try{const r=localStorage.getItem(CF_KEY);return r?JSON.parse(r):[]}catch(e){return []}}
+function saveCustomFields(list){localStorage.setItem(CF_KEY,JSON.stringify(list))}
+function allFields(){return [...BUILTIN_FIELDS,...loadCustomFields().map(f=>({...f,builtin:false}))]}
+function fieldByKey(k){return allFields().find(f=>f.key===k)}
+
+function loadWsPrefs(){try{const r=localStorage.getItem(WS_PREF_KEY);return r?JSON.parse(r):{}}catch(e){return {}}}
+function saveWsPrefs(p){localStorage.setItem(WS_PREF_KEY,JSON.stringify(p))}
+
+function fieldValue(it,key){
+  const builtinKeys=['org','group2','product','status','category','title','slug'];
+  if(key==='target')return it.targetId||'';
+  let v = builtinKeys.includes(key) ? it[key] : (it.custom&&it.custom[key]);
+  if(key==='status')v=v||'active';
+  return v;
+}
+function fieldValueLabel(it,key){
+  const f=fieldByKey(key);
+  const v=fieldValue(it,key);
+  if(key==='target')return targetLabelMap()[v]||'⚠ chưa gắn target';
+  if(!v)return '(trống)';
+  if(f&&f.labels&&f.labels[v])return f.labels[v];
+  return v;
+}
+function optionLabel(f,v){if(f&&f.key==='target'){return targetLabelMap()[v]||v||'⚠ chưa gắn target'}return (f&&f.labels&&f.labels[v])||v}
+
+/* ---------- POPULATE SIDEBAR CONTROLS ---------- */
+function populateGroupBy(){
+  const fields=allFields();
+  const opts=key=>fields.map(f=>`<option value="${f.key}">${escapeHtml(f.label)}</option>`).join('');
+  const g1=$('groupBy1'),g2=$('groupBy2');
+  const cur1=g1.value,cur2=g2.value;
+  g1.innerHTML='<option value="">— Không group —</option>'+opts();
+  g2.innerHTML='<option value="">— Không group cấp 2 —</option>'+opts();
+  if(fields.some(f=>f.key===cur1))g1.value=cur1; else g1.value=wsState._g1||'org';
+  if(fields.some(f=>f.key===cur2))g2.value=cur2; else g2.value=wsState._g2||'';
+}
+
+function renderDynamicFilters(all){
+  const box=$('dynamicFilters');
+  const fields=allFields();
+  wsState.filters=wsState.filters||{};
+  // preserve open state of dropdowns
+  const openKeys=new Set([...box.querySelectorAll('details[open]')].map(d=>d.dataset.fkey));
+  box.innerHTML=fields.map(f=>{
+    const opts=fieldOptions(f);
+    const sel=new Set(wsState.filters[f.key]||[]);
+    // drop selections whose value no longer exists
+    const validSel=[...sel].filter(v=>opts.includes(v));
+    wsState.filters[f.key]=validSel;
+    const count=validSel.length;
+    const summary=count?`${escapeHtml(f.label)} <span class="flt-cnt">${count}</span>`:escapeHtml(f.label);
+    const boxes=opts.map(o=>`<label class="flt-opt"><input type="checkbox" data-fkey="${f.key}" value="${escapeHtml(o)}" ${validSel.includes(o)?'checked':''}> ${escapeHtml(optionLabel(f,o))}</label>`).join('');
+    return `<details class="flt" data-fkey="${f.key}" ${openKeys.has(f.key)?'open':''}><summary>${summary}</summary><div class="flt-body">${boxes||'<div class="ws-empty-small">Chưa có giá trị.</div>'}</div></details>`;
+  }).join('');
+  box.querySelectorAll('input[type=checkbox][data-fkey]').forEach(cb=>{
+    cb.onchange=()=>{
+      const k=cb.dataset.fkey;
+      const set=new Set(wsState.filters[k]||[]);
+      cb.checked?set.add(cb.value):set.delete(cb.value);
+      wsState.filters[k]=[...set];
+      updateSubtitle();applyFilterEffect();
+      // update count badge without full rebuild
+      const det=cb.closest('details.flt');
+      const f=fieldByKey(k);
+      const n=wsState.filters[k].length;
+      det.querySelector('summary').innerHTML=n?`${escapeHtml(f.label)} <span class="flt-cnt">${n}</span>`:escapeHtml(f.label);
+    };
+  });
+}
+function activeFilterMap(){
+  const out={};
+  const fs=wsState.filters||{};
+  for(const k in fs){if(fs[k]&&fs[k].length)out[k]=fs[k]}
+  return out;
+}
+
+function renderTaxonomyManager(){
+  const box=$('taxonomyManager');
+  if(!box)return;
+  const openKeys=new Set([...box.querySelectorAll('details[open]')].map(d=>d.dataset.tax));
+  const subMap=loadSubgroups();
+  const groups=[
+    {key:'org',label:'Dự án',values:loadOrgs().map(v=>({v}))},
+    {key:'group2',label:'Nhóm 2',values:Object.entries(subMap).flatMap(([org,subs])=>subs.map(s=>({v:s,sub:org})))},
+    {key:'category',label:'Category',values:loadCats().map(v=>({v,lbl:catLabel(v)}))},
+    {key:'product',label:'Product',values:allProducts().map(v=>({v}))}
+  ];
+  box.innerHTML=groups.map(g=>{
+    const rows=g.values.length?g.values.map(x=>`<div class="tax-val"><span>${escapeHtml(x.lbl||x.v)}${x.sub?` <span class="tax-sub">· ${escapeHtml(x.sub)}</span>`:''}</span><button data-tax="${g.key}" data-val="${escapeHtml(x.v)}" ${x.sub?`data-sub="${escapeHtml(x.sub)}"`:''} title="Xóa giá trị này">×</button></div>`).join(''):'<div class="ws-empty-small">Chưa có giá trị.</div>';
+    return `<details class="tax" data-tax="${g.key}" ${openKeys.has(g.key)?'open':''}><summary>${g.label} (${g.values.length})</summary><div class="tax-body">${rows}</div></details>`;
+  }).join('');
+  box.querySelectorAll('button[data-tax]').forEach(b=>b.onclick=()=>deleteTaxonomyValue(b.dataset.tax,b.dataset.val,b.dataset.sub));
+}
+async function deleteTaxonomyValue(fieldKey,value,subOrg){
+  const using=mergedLinks().filter(it=>String(fieldValue(it,fieldKey)||'')===value).length;
+  const msg=`Xóa giá trị "${value}" khỏi danh mục ${fieldKey==='org'?'Dự án':fieldKey==='group2'?'Nhóm 2':fieldKey==='category'?'Category':'Product'}?\n\n`+
+    (using?`• ${using} item đang dùng giá trị này sẽ bị CLEAR VỀ TRỐNG (Undo khôi phục được item).\n`:'• Không item nào đang dùng.\n')+
+    `• Giá trị sẽ biến mất khỏi mọi dropdown chọn.\n\nOK = Xóa · Cancel = Giữ.`;
+  if(!await uiConfirm(msg,'Xóa giá trị phân loại'))return;
+  if(using)pushUndo(`Xóa giá trị "${value}" (${using} item bị clear)`);
+  const n=clearValueFromItems(fieldKey,value);
+  if(fieldKey==='org'){const l=loadOrgs().filter(o=>o!==value);saveOrgs(l);
+    // also drop its subgroups
+    const m=loadSubgroups();delete m[value];saveSubgroups(m);}
+  else if(fieldKey==='category'){saveCats(loadCats().filter(x=>x!==value))}
+  else if(fieldKey==='group2'){const m=loadSubgroups();if(subOrg&&m[subOrg]){m[subOrg]=m[subOrg].filter(s=>s!==value);if(!m[subOrg].length)delete m[subOrg];}else{for(const o in m){m[o]=m[o].filter(s=>s!==value);if(!m[o].length)delete m[o]}}saveSubgroups(m)}
+  else if(fieldKey==='product'){const d=loadProductDesc();delete d[value];saveProductDesc(d)}
+  status(`Đã xóa "${value}"${n?` · ${n} item được clear`:''}`,'warn');
+  renderOrgSelects();renderTaxonomyManager();renderLinks();
+  if(wsState.selected)renderInspector(wsState.selected);
+}
+
+function renderCustomFieldsList(){
+  const box=$('customFieldsList');
+  const cf=loadCustomFields();
+  if(!cf.length){box.innerHTML='<div class="ws-empty-small">Chưa có trường tùy chỉnh.</div>';return}
+  box.innerHTML=cf.map((f,i)=>`<div class="ws-cf-item"><span><span class="cf-name">${escapeHtml(f.label)}</span> <span class="cf-type">${f.type}</span></span><button data-cfi="${i}" title="Xóa">×</button></div>`).join('');
+  box.querySelectorAll('button[data-cfi]').forEach(b=>b.onclick=()=>{
+    const list=loadCustomFields();
+    const removed=list.splice(+b.dataset.cfi,1)[0];
+    saveCustomFields(list);
+    populateGroupBy();renderLinks();renderCustomFieldsList();
+    toastLinks('Đã xóa trường "'+(removed?removed.label:'')+'".');
+  });
+}
+
+/* ---------- FILTER ---------- */
+function itemMatchesFilter(it){
+  const q=($('searchLinks').value||'').toLowerCase().trim();
+  const matchQ=!q||(it.title||'').toLowerCase().includes(q)||(it.slug||'').toLowerCase().includes(q)||(it.product||'').toLowerCase().includes(q)||(it.filePath||'').toLowerCase().includes(q);
+  if(!matchQ)return false;
+  const af=activeFilterMap();
+  for(const k in af){
+    const v=String(fieldValue(it,k)||'');
+    if(!af[k].includes(v))return false; // OR within field, AND across fields
+  }
+  return true;
+}
+function hasActiveFilter(){
+  if(($('searchLinks').value||'').trim())return true;
+  return Object.keys(activeFilterMap()).length>0;
+}
+function getFilteredItems(){
+  return mergedLinks().filter(itemMatchesFilter);
+}
+
+function updateSubtitle(){
+  const all=mergedLinks();
+  const matched=getFilteredItems();
+  const filtering=hasActiveFilter();
+  $('linksSubtitle').innerHTML=`${all.length} link tổng · <b>khớp ${matched.length}</b> · view: ${wsState.view}`
+    + (filtering?` <span class="filter-flag">${filterFlagText()}</span>`:'');
+}
+function filterFlagText(){
+  const m=wsState.filterMode||'dim';
+  if(m==='hide')return 'đang lọc — ẩn mục không khớp';
+  if(m==='count')return 'đang lọc — chỉ đếm, không đổi hiển thị';
+  return 'đang lọc — mục không khớp bị làm mờ';
+}
+
+function renderWelcome(canvas){
+  canvas.innerHTML=`<div class="welcome">
+    <h3>Chưa có link nào trong danh sách</h3>
+    <p>Bắt đầu bằng một trong các cách sau. Danh sách lưu cục bộ trên máy này (localStorage).</p>
+    <div class="welcome-cards">
+      <div class="welcome-card" data-wc="publish"><div class="wc-ico">📤</div><div class="wc-t">Publish link đầu tiên</div><div class="wc-d">Mở tab Publisher, tải file HTML lên GitHub Pages và thêm vào danh sách.</div></div>
+      <div class="welcome-card" data-wc="import"><div class="wc-ico">⬆️</div><div class="wc-t">Import danh sách</div><div class="wc-d">Nạp file .json đã export trước đó để dùng lại trên máy này.</div></div>
+      <div class="welcome-card" data-wc="sync"><div class="wc-ico">🔄</div><div class="wc-t">Sync từ GitHub</div><div class="wc-d">Quét repo qua Git Tree API, tự phát hiện các file .html đã publish.</div></div>
+      <div class="welcome-card" data-wc="config"><div class="wc-ico">⚙️</div><div class="wc-t">Target repos</div><div class="wc-d">Tạo profile (repo + token riêng) cho từng đích: công khai hoặc riêng. Bắt buộc chọn khi publish.</div></div>
+    </div>
+  </div>`;
+  canvas.querySelector('[data-wc=publish]').onclick=()=>{activateMain('tool');currentToolSubtab='publisher';document.querySelectorAll('.subtabbtn').forEach(x=>x.classList.toggle('active',x.dataset.tab==='publisher'));showView('publisher')};
+  canvas.querySelector('[data-wc=import]').onclick=()=>$('wsImportLinksInput').click();
+  canvas.querySelector('[data-wc=sync]').onclick=()=>syncWithPicker();
+  canvas.querySelector('[data-wc=config]').onclick=()=>{activateMain('tool');currentToolSubtab='config';document.querySelectorAll('.subtabbtn').forEach(x=>x.classList.toggle('active',x.dataset.tab==='config'));showView('config')};
+}
+
+/* ---------- MAIN RENDER DISPATCH ---------- */
+function renderLinks(){
+  renderOrgSelects();
+  if(typeof renderOverwriteSelect==='function')renderOverwriteSelect();
+  if(typeof renderUpdateBanner==='function')renderUpdateBanner();
+  populateGroupBy();
+  const all=mergedLinks();
+  renderDynamicFilters(all);
+  renderTaxonomyManager();
+  updateSubtitle();
+  const canvas=$('wsCanvas');
+  canvas.className='ws-canvas';
+  if(!all.length){
+    renderWelcome(canvas);
+    return;
+  }
+  // render ALL items (dim non-matching), so định vị được giữ nguyên (§4)
+  if(wsState.view==='list')renderListView(canvas,all);
+  else if(wsState.view==='board')renderBoardView(canvas,all);
+  else if(wsState.view==='mindmap')renderMindmapView(canvas,all);
+  applyDim();
+}
+function applyFilterEffect(){
+  const filtering=hasActiveFilter();
+  const mode=wsState.filterMode||'dim';
+  const matchedPaths=new Set(getFilteredItems().map(it=>it.filePath));
+  // reset both effect classes first
+  document.querySelectorAll('#wsCanvas .dim, #wsCanvas .filter-hidden').forEach(el=>el.classList.remove('dim','filter-hidden'));
+
+  if(!filtering || mode==='count'){
+    // count mode or no filter: nothing hidden/dimmed; also un-hide empty group wrappers
+    reconcileEmptyGroups();
+    return;
+  }
+
+  const effectClass = mode==='hide' ? 'filter-hidden' : 'dim';
+  document.querySelectorAll('#wsCanvas [data-fp]').forEach(el=>{
+    if(!matchedPaths.has(el.dataset.fp))el.classList.add(effectClass);
+  });
+  // mindmap group nodes: no matched descendant → same effect
+  if(wsState.view==='mindmap'){
+    document.querySelectorAll('#wsCanvas .mm-node.g1, #wsCanvas .mm-node.g2').forEach(g=>{
+      const leaves=g._leafPaths||[];
+      if(leaves.length>0 && !leaves.some(p=>matchedPaths.has(p)))g.classList.add(effectClass);
+    });
+  }
+  reconcileEmptyGroups();
+}
+// hide empty group/column headers when all their children are hidden (hide mode only)
+function reconcileEmptyGroups(){
+  const hideMode=(wsState.filterMode==='hide') && hasActiveFilter();
+  // LIST: group blocks
+  document.querySelectorAll('#wsCanvas .lv-group').forEach(g=>{
+    if(!hideMode){g.classList.remove('filter-hidden');return}
+    const rows=g.querySelectorAll('.lv-row');
+    const allHidden=rows.length>0 && [...rows].every(r=>r.classList.contains('filter-hidden'));
+    g.classList.toggle('filter-hidden', allHidden);
+  });
+  document.querySelectorAll('#wsCanvas .lv-subgroup').forEach(sg=>{
+    if(!hideMode){sg.classList.remove('filter-hidden');return}
+    const rows=sg.querySelectorAll('.lv-row');
+    const allHidden=rows.length>0 && [...rows].every(r=>r.classList.contains('filter-hidden'));
+    sg.classList.toggle('filter-hidden', allHidden);
+  });
+  // BOARD: columns with all cards hidden
+  document.querySelectorAll('#wsCanvas .board-col').forEach(col=>{
+    if(!hideMode){col.classList.remove('filter-hidden');return}
+    const cards=col.querySelectorAll('.board-card');
+    const allHidden=cards.length>0 && [...cards].every(c=>c.classList.contains('filter-hidden'));
+    col.classList.toggle('filter-hidden', allHidden);
+  });
+}
+// backward-compatible alias for existing call sites
+function applyDim(){applyFilterEffect();}
+function toastLinks(msg,cls){
+  const c=cls||(/lỗi|error|thất bại/i.test(msg)?'err':/đã xóa|xóa/i.test(msg)?'warn':'ok');
+  status(msg,c);
+}
+
+/* ---------- GROUPING HELPER ---------- */
+function groupItems(items,keys){
+  // returns nested: {groupVal: {sub: {subVal:[items]}} } or flat if no keys
+  const g1=keys[0],g2=keys[1];
+  if(!g1)return {__all__:{__flat__:items}};
+  const out={};
+  items.forEach(it=>{
+    const k1=fieldValueLabel(it,g1);
+    (out[k1]=out[k1]||{});
+    if(g2){
+      const k2=fieldValueLabel(it,g2);
+      (out[k1][k2]=out[k1][k2]||[]).push(it);
+    }else{
+      (out[k1].__flat__=out[k1].__flat__||[]).push(it);
+    }
+  });
+  return out;
+}
+function currentGroupKeys(){return [$('groupBy1').value,$('groupBy2').value].filter(Boolean)}
+
+/* ---------- ITEM BADGES ---------- */
+function itemBadges(it){
+  const src=it.source==='github'?'<span class="badge synced">Synced</span>':'<span class="badge local">Local</span>';
+  const cat=it.category?`<span class="badge synced">${CATEGORY_LABEL[it.category]||it.category}</span>`:'';
+  const org=it.org?`<span class="badge org">${escapeHtml(it.org)}</span>`:'';
+  const st=`<span class="badge status-${it.status||'active'}">${STATUS_LABEL[it.status]||STATUS_LABEL.active}</span>`;
+  const pr=it.product?`<span class="badge product">${escapeHtml(it.product)}</span>`:'';
+  const _tp=it.targetId?getTargetById(it.targetId):null;
+  const tg=_tp?`<span class="badge tgt-${_tp.visibility==='public'?'pub':'prv'}" title="Target: ${escapeHtml(_tp.name)}">${_tp.visibility==='public'?'🌐':'🔒'} ${escapeHtml(_tp.name)}</span>`:(it.source==='local'?`<span class="badge tgt-none" title="Chưa gắn target repo — publish/xóa sẽ không route được">⚠ target?</span>`:'');
+  return {src,cat,org,st,pr,tg};
+}
+
+/* ---------- LIST VIEW ---------- */
+function renderListView(canvas,items){
+  const keys=currentGroupKeys();
+  const grouped=groupItems(items,keys);
+  let html='';
+  for(const g1 in grouped){
+    const isFlat=g1==='__all__';
+    if(!isFlat)html+=`<div class="lv-group"><div class="lv-group-head">${escapeHtml(g1)} <span class="cnt">${countGroup(grouped[g1])}</span></div>`;
+    else html+='<div class="lv-group">';
+    const sub=grouped[g1];
+    for(const g2 in sub){
+      if(g2!=='__flat__')html+=`<div class="lv-subgroup"><div class="lv-subgroup-head">${escapeHtml(g2)} · ${sub[g2].length}</div>`;
+      const arr=sub[g2];
+      arr.forEach(it=>{const b=itemBadges(it);html+=`<div class="lv-row ${wsState.selected===it.filePath?'selected':''}" data-fp="${escapeHtml(it.filePath)}"><div class="lv-title">${escapeHtml(it.title||it.slug||it.url)} ${b.tg} ${b.org} ${b.st} ${b.pr} ${b.src}${b.cat}</div><div class="lv-meta">${escapeHtml(it.filePath)}</div></div>`});
+      if(g2!=='__flat__')html+='</div>';
+    }
+    html+='</div>';
+  }
+  canvas.innerHTML=html;
+  canvas.querySelectorAll('.lv-row').forEach(r=>r.onclick=()=>selectItem(r.dataset.fp));
+}
+function countGroup(subObj){let n=0;for(const k in subObj)n+=subObj[k].length;return n}
+
+/* ---------- BOARD VIEW ---------- */
+function renderBoardView(canvas,items){
+  const keys=currentGroupKeys();
+  const g1=keys[0];
+  const board=document.createElement('div');
+  board.className='board';
+  if(!g1){
+    // single column
+    const col=makeBoardCol('Tất cả',items,null);
+    board.appendChild(col);
+  }else{
+    const grouped=groupItems(items,keys);
+    for(const gv in grouped){
+      const sub=grouped[gv];
+      const flatItems=[];for(const k in sub)flatItems.push(...sub[k]);
+      const col=makeBoardCol(gv,flatItems,keys[1]?sub:null);
+      board.appendChild(col);
+    }
+  }
+  canvas.innerHTML='';canvas.appendChild(board);
+  canvas.querySelectorAll('.board-card').forEach(c=>c.onclick=()=>selectItem(c.dataset.fp));
+}
+function makeBoardCol(title,items,subGroups){
+  const col=document.createElement('div');
+  col.className='board-col';
+  let bodyHtml='';
+  if(subGroups){
+    for(const sv in subGroups){
+      bodyHtml+=`<div class="board-subhead">${escapeHtml(sv)}</div>`;
+      subGroups[sv].forEach(it=>bodyHtml+=boardCardHtml(it));
+    }
+  }else{
+    items.forEach(it=>bodyHtml+=boardCardHtml(it));
+  }
+  col.innerHTML=`<div class="board-col-head">${escapeHtml(title)} <span class="cnt">${items.length}</span></div><div class="board-col-body">${bodyHtml}</div>`;
+  return col;
+}
+function boardCardHtml(it){
+  const b=itemBadges(it);
+  return `<div class="board-card ${wsState.selected===it.filePath?'selected':''}" data-fp="${escapeHtml(it.filePath)}"><div class="bc-title">${escapeHtml(it.title||it.slug)}</div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:5px">${b.tg} ${b.org} ${b.st} ${b.pr}</div><div class="bc-sub">${escapeHtml(it.filePath)}</div></div>`;
+}
+
+/* ---------- MINDMAP VIEW (auto-generated tree) ---------- */
+function renderMindmapView(canvas,items){
+  const keys=currentGroupKeys();
+  // Build tree: root -> g1 groups -> g2 groups -> leaves
+  const root={name:'Digital Twin Lab',type:'root',children:[]};
+  if(!keys.length){
+    items.forEach(it=>root.children.push({name:it.title||it.slug,type:'leaf',fp:it.filePath}));
+  }else{
+    const grouped=groupItems(items,keys);
+    for(const g1v in grouped){
+      const n1={name:g1v,type:'g1',children:[]};
+      const sub=grouped[g1v];
+      for(const g2v in sub){
+        if(g2v==='__flat__'){
+          sub[g2v].forEach(it=>n1.children.push({name:it.title||it.slug,type:'leaf',fp:it.filePath}));
+        }else{
+          const n2={name:g2v,type:'g2',children:sub[g2v].map(it=>({name:it.title||it.slug,type:'leaf',fp:it.filePath}))};
+          n1.children.push(n2);
+        }
+      }
+      root.children.push(n1);
+    }
+  }
+  layoutAndRenderMindmap(canvas,root);
+}
+function layoutAndRenderMindmap(canvas,root){
+  // simple horizontal tree layout: depth -> x, in-order leaf position -> y
+  const NODE_H=34, V_GAP=14, COL_W=230;
+  let leafY=0;
+  const positioned=[];
+  function assignY(node,depth){
+    node.depth=depth;
+    if(!node.children||!node.children.length){
+      node.y=leafY*(NODE_H+V_GAP)+20;
+      leafY++;
+    }else{
+      node.children.forEach(c=>assignY(c,depth+1));
+      const first=node.children[0].y,last=node.children[node.children.length-1].y;
+      node.y=(first+last)/2;
+    }
+    node.x=depth*COL_W+20;
+    positioned.push(node);
+  }
+  assignY(root,0);
+  const totalH=Math.max(leafY*(NODE_H+V_GAP)+60,300);
+  const maxDepth=Math.max(...positioned.map(n=>n.depth));
+  const totalW=(maxDepth+1)*COL_W+80;
+  const wrap=document.createElement('div');
+  wrap.className='mindmap-wrap';
+  wrap.style.width=totalW+'px';
+  wrap.style.height=totalH+'px';
+  // SVG connectors
+  const svgNS='http://www.w3.org/2000/svg';
+  const svg=document.createElementNS(svgNS,'svg');
+  svg.setAttribute('class','mm-svg');
+  svg.setAttribute('width',totalW);svg.setAttribute('height',totalH);
+  function connect(parent,child){
+    const x1=parent.x+COL_W-30, y1=parent.y+NODE_H/2;
+    const x2=child.x, y2=child.y+NODE_H/2;
+    const path=document.createElementNS(svgNS,'path');
+    let d;
+    if(wsState.conn==='elbow'){
+      const midX=(x1+x2)/2;
+      d=`M ${x1} ${y1} H ${midX} V ${y2} H ${x2}`;
+    }else{
+      const dx=(x2-x1)/2;
+      d=`M ${x1} ${y1} C ${x1+dx} ${y1}, ${x2-dx} ${y2}, ${x2} ${y2}`;
+    }
+    path.setAttribute('d',d);path.setAttribute('class','mm-path');
+    svg.appendChild(path);
+  }
+  function walk(node){if(node.children)node.children.forEach(c=>{connect(node,c);walk(c)})}
+  walk(root);
+  wrap.appendChild(svg);
+  // collect descendant leaf paths per node (for dim logic)
+  function collectLeaves(node){
+    if(node.fp)return [node.fp];
+    let acc=[];
+    (node.children||[]).forEach(c=>{acc=acc.concat(collectLeaves(c))});
+    node._leafPaths=acc;
+    return acc;
+  }
+  collectLeaves(root);
+  // nodes
+  positioned.forEach(node=>{
+    const el=document.createElement('div');
+    el.className='mm-node '+node.type+(node.fp&&wsState.selected===node.fp?' selected':'');
+    el.style.left=node.x+'px';el.style.top=node.y+'px';
+    el.textContent=node.name;
+    if(node.fp){el.dataset.fp=node.fp;el.onclick=()=>selectItem(node.fp)}
+    else if(node._leafPaths&&node._leafPaths.length){el._leafPaths=node._leafPaths}
+    wrap.appendChild(el);
+  });
+  canvas.innerHTML='';canvas.appendChild(wrap);
+}
+
+/* ---------- SELECT + INSPECTOR ---------- */
+function enterEditorMode(fp){
+  $('browseSection').style.display='none';
+  $('editorSection').style.display='block';
+  renderInspector(fp);
+}
+function exitEditorMode(){
+  wsState.selected=null;
+  $('editorSection').style.display='none';
+  $('browseSection').style.display='block';
+  document.querySelectorAll('#wsCanvas [data-fp]').forEach(el=>el.classList.remove('selected'));
+  renderDynamicFilters(mergedLinks());
+  renderTaxonomyManager();
+}
+function selectItem(fp){
+  wsState.selected=fp;
+  enterEditorMode(fp);
+  document.querySelectorAll('#wsCanvas [data-fp]').forEach(el=>el.classList.toggle('selected',el.dataset.fp===fp));
+}
+// click outside editor (and not on an item node) → exit editor, back to filters
+document.addEventListener('click',e=>{
+  const editorOpen=$('editorSection')&&$('editorSection').style.display!=='none';
+  if(!editorOpen)return;
+  if(!$('view-links').classList.contains('active'))return;
+  if(e.target.closest('#editorSection'))return;      // clicks inside editor stay
+  if(e.target.closest('#uiModalOverlay'))return;     // clicks in modal are not "outside"
+  if(e.target.closest('[data-fp]'))return;           // clicking an item = switch item
+  exitEditorMode();
+});
+function selWithNew(id,options,current,labels,emptyLabel){
+  const opts=options.map(o=>`<option value="${escapeHtml(o)}" ${current===o?'selected':''}>${escapeHtml((labels&&labels[o])||o)}</option>`).join('');
+  return `<select id="${id}"><option value="">${emptyLabel||'—'}</option>${opts}<option value="__new__">＋ Tạo mới…</option></select>`;
+}
+function renderInspector(fp){
+  const it=mergedLinks().find(x=>x.filePath===fp);
+  const box=$('inspectorBody');
+  if(!it){box.innerHTML='<div class="ws-empty-small">Không tìm thấy item.</div>';return}
+  const descMap=loadProductDesc();
+  const curDesc=it.product?(descMap[it.product]||''):'';
+  let cfHtml='';
+  loadCustomFields().forEach(f=>{
+    const v=(it.custom&&it.custom[f.key])||'';
+    if(f.type==='select'&&f.options){
+      cfHtml+=`<div class="insp-field"><label>${escapeHtml(f.label)}</label><select data-cf="${f.key}"><option value="">—</option>${f.options.map(o=>`<option value="${escapeHtml(o)}" ${v===o?'selected':''}>${escapeHtml(o)}</option>`).join('')}<option value="__newcf__">＋ Tạo mới…</option></select></div>`;
+    }else{
+      const inputType=f.type==='number'?'number':f.type==='date'?'date':'text';
+      cfHtml+=`<div class="insp-field"><label>${escapeHtml(f.label)}</label><input type="${inputType}" data-cf="${f.key}" value="${escapeHtml(v)}"></div>`;
+    }
+  });
+  box.innerHTML=`
+    <div class="insp-field"><label>Title</label><input id="inspTitle" value="${escapeHtml(it.title||'')}"></div>
+    <div class="insp-field"><label>Dự án</label>${selWithNew('inspOrg',loadOrgs(),it.org||'')}</div>
+    <div class="insp-field"><label>Nhóm 2 <span style="color:var(--muted);font-weight:400;text-transform:none">(theo dự án)</span></label>${selWithNew('inspGroup2',subgroupsOf(it.org),it.group2||'')}</div>
+    <div class="insp-field"><label>Product</label>${selWithNew('inspProduct',allProducts(),it.product||'')}</div>
+    <div class="insp-field"><label>Mô tả product <span style="color:var(--muted);font-weight:400;text-transform:none">(chung cho mọi item cùng product)</span></label><textarea id="inspProductDesc" rows="2" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:12px;background:var(--bg-0);color:var(--ink);font-family:var(--font-sans);resize:vertical" ${it.product?'':'disabled placeholder="Chọn product trước"'}>${escapeHtml(curDesc)}</textarea></div>
+    <div class="insp-field"><label>Trạng thái</label><select id="inspStatus">${Object.keys(STATUS_LABEL).map(k=>`<option value="${k}" ${(it.status||'active')===k?'selected':''}>${STATUS_LABEL[k]}</option>`).join('')}</select></div>
+    <div class="insp-field"><label>Category</label>${selWithNew('inspCat',loadCats(),it.category||'',CATEGORY_LABEL)}</div>
+    <div class="insp-field"><label>Target repo <span style="color:var(--muted);font-weight:400;text-transform:none">(publish/xóa route theo đây)</span></label><select id="inspTarget"><option value="">— chưa gắn —</option>${loadTargets().map(t=>`<option value="${escapeHtml(t.id)}" ${it.targetId===t.id?'selected':''}>${escapeHtml(t.name)} (${t.visibility==='public'?'công khai':'riêng'})</option>`).join('')}</select></div>
+    ${cfHtml}
+    <a class="insp-open" href="${it.url}" target="_blank">↗ ${escapeHtml(it.url)}</a>
+    <div class="insp-saved" id="inspSaved">Tự động lưu ✓</div>
+    <div class="insp-actions">
+      <button class="btn small primary" id="inspUpdate" title="Thả file HTML mới để ĐÈ lên đúng phiên bản này (URL không đổi)">⟳ Cập nhật file này</button>
+      <button class="btn small ghost" id="inspCopy">Copy link</button>
+      <button class="btn small red" id="inspDelete">Xóa</button>
+    </div>`;
+
+  const flashSaved=()=>{const s=$('inspSaved');if(!s)return;s.classList.add('show');clearTimeout(s._t);s._t=setTimeout(()=>s.classList.remove('show'),900)};
+  let _undoPushedForThis=false;
+  const autoSave=()=>{
+    if(!_undoPushedForThis){pushUndo('Sửa "'+(it.title||it.slug)+'"');_undoPushedForThis=true;}
+    const custom={...(it.custom||{})};
+    box.querySelectorAll('[data-cf]').forEach(el=>{if(el.value!=='__newcf__')custom[el.dataset.cf]=el.value});
+    const patch={title:$('inspTitle').value.trim(),org:$('inspOrg').value,group2:$('inspGroup2').value,product:$('inspProduct').value,status:$('inspStatus').value,category:$('inspCat').value,targetId:$('inspTarget').value,custom};
+    updateHistoryItem(it.filePath,patch);
+    Object.assign(it,patch);
+    // save product description to registry
+    if(it.product){const d=loadProductDesc();d[it.product]=$('inspProductDesc').value;saveProductDesc(d)}
+    flashSaved();
+    populateGroupBy();
+    renderCanvasOnly();
+  };
+  // helper: handle "+Tạo mới" on a select
+  function wireNew(id,promptText,onCreate){
+    $(id).addEventListener('change',async()=>{
+      if($(id).value==='__new__'){
+        const name=await uiPrompt(promptText,'','Tạo mới');
+        if(name&&name.trim()){onCreate(name.trim());renderInspector(fp);autoSaveAfterNew(name.trim(),id)}
+        else{$(id).value='';}
+        return;
+      }
+      if(id==='inspOrg'){autoSave();renderInspector(fp);return} // org change → refresh Nhóm 2 options
+      if(id==='inspProduct'){autoSave();renderInspector(fp);return} // product change → refresh desc
+      autoSave();
+    });
+  }
+  function autoSaveAfterNew(name,id){
+    // after re-render, set the new value on the fresh select and save
+    const map={inspOrg:'org',inspGroup2:'group2',inspProduct:'product',inspCat:'category'};
+    const el=$(id);if(el){el.value=name}
+    const patch={};patch[map[id]]=name;
+    pushUndo('Sửa "'+(it.title||it.slug)+'"');
+    updateHistoryItem(it.filePath,patch);Object.assign(it,patch);
+    populateGroupBy();renderCanvasOnly();renderInspector(fp);
+  }
+  wireNew('inspOrg','Tên dự án mới:',n=>addOrg(n));
+  wireNew('inspGroup2','Tên Nhóm 2 mới cho dự án "'+(it.org||'?')+'":',n=>{if(it.org)addSubgroup(it.org,n)});
+  wireNew('inspProduct','Tên product mới:',n=>{/* product registers implicitly via item */});
+  wireNew('inspCat','Tên category mới:',n=>addCat(n));
+  $('inspTitle').addEventListener('input',autoSave);
+  $('inspStatus').addEventListener('change',autoSave);
+  $('inspTarget').addEventListener('change',autoSave);
+  $('inspProductDesc').addEventListener('input',autoSave);
+  box.querySelectorAll('[data-cf]').forEach(el=>el.addEventListener(el.tagName==='SELECT'?'change':'input',async()=>{
+    if(el.value==='__newcf__'){
+      const f=loadCustomFields().find(x=>x.key===el.dataset.cf);
+      const nv=await uiPrompt('Giá trị mới cho "'+(f?f.label:'')+'":');
+      if(nv&&nv.trim()&&f){f.options=f.options||[];if(!f.options.includes(nv.trim()))f.options.push(nv.trim());
+        const list=loadCustomFields().map(x=>x.key===f.key?f:x);saveCustomFields(list);
+        renderInspector(fp);const el2=box.querySelector('[data-cf="'+f.key+'"]');if(el2)el2.value=nv.trim();}
+      else{el.value=''}
+      return;
+    }
+    autoSave();
+  }));
+
+  $('inspCopy').onclick=()=>{navigator.clipboard.writeText(it.url);toastLinks('Đã copy link.')};
+  $('inspDelete').onclick=()=>confirmDeleteLink(it);
+  $('inspUpdate').onclick=()=>enterUpdateMode(it.filePath);
+}
+// re-render only the canvas (keep inspector focus intact during typing)
+function renderCanvasOnly(){
+  const all=mergedLinks();
+  updateSubtitle();
+  const canvas=$('wsCanvas');
+  if(!all.length){renderWelcome(canvas);return}
+  if(wsState.view==='list')renderListView(canvas,all);
+  else if(wsState.view==='board')renderBoardView(canvas,all);
+  else if(wsState.view==='mindmap')renderMindmapView(canvas,all);
+  applyDim();
+}
+
+async function confirmDeleteLink(it){
+  const modalMsg=`Xóa "${it.title||it.slug}"?\n\nFile: ${it.filePath}\n\n• Xóa file THẬT trên GitHub (target ${(getTargetById(it.targetId)?.name)||'chưa gắn'} · repo ${(getTargetById(it.targetId)?.repo)||'?'}) — không phục hồi được.\n• Xóa khỏi danh sách local.\n• Undo chỉ khôi phục lại DÒNG trong danh sách local, KHÔNG phục hồi file đã xóa trên GitHub.\n\nOK = Xóa · Cancel = Giữ nguyên.`;
+  if(!await uiConfirm(modalMsg,'Xóa link'))return;
+  doDeleteLink(it);
+}
+
+async function doDeleteLink(it){
+  try{
+    const c=cfgForItem(it);
+    if(!c)throw new Error('Link này chưa gắn Target repo (targetId trống) — không biết xóa ở repo nào. Gắn target trong editor, hoặc gỡ dòng bằng "Xóa history local".');
+    if(!c.owner||!c.repo||!c.token)throw new Error(`Target "${c._targetName}" thiếu owner/repo/token — vào tab Cấu hình để bổ sung trước khi xóa.`);
+    toastLinks(`Đang kiểm tra file trên GitHub (${c._targetName})...`,'warn');
+    const sha=await getExistingSha(it.filePath,c);
+    if(!sha){
+      // file already gone on GitHub → offer local-only removal instead of erroring
+      if(await uiConfirm(`File "${it.filePath}" KHÔNG còn tồn tại trên GitHub (có thể đã bị xóa trước đó).\n\nXóa dòng này khỏi danh sách local? (Có Undo)`,'File đã mất trên GitHub')){
+        pushUndo('Xóa dòng local "'+(it.title||it.slug)+'" (file đã mất trên GitHub)');
+        removeHistoryItem(it.filePath);
+        syncedTree=syncedTree.filter(x=>x.filePath!==it.filePath);
+        exitEditorMode();
+        toastLinks('Đã gỡ khỏi danh sách local.','warn');
+        renderLinks();
+      }
+      return;
+    }
+    toastLinks('Đang xóa '+it.filePath+' trên GitHub...','warn');
+    await deleteContent(it.filePath,`Delete ${it.title||it.slug} via Digital Twin Lab Publisher V8`,c);
+    pushUndo('Xóa "'+(it.title||it.slug)+'" (Undo chỉ khôi phục danh sách local, không phục hồi file trên GitHub)');
+    removeHistoryItem(it.filePath);
+    syncedTree=syncedTree.filter(x=>x.filePath!==it.filePath);
+    exitEditorMode();
+    toastLinks('Đã xóa "'+(it.title||it.slug)+'" khỏi GitHub và local.','warn');
+    renderLinks();
+  }catch(e){
+    toastLinks('Lỗi khi xóa: '+(e.message||String(e)),'err');
+  }
+}
+
+/* V8 sync: quét theo profile. profileId='' => quét TẤT CẢ profiles.
+   Mỗi synced item mang targetId của profile phát hiện ra nó.
+   Dead-detection scoped per-profile: 1 link chỉ "chết" nếu tree của ĐÚNG target của nó không còn nó. */
+async function syncFromGithub(profileId){
+  try{
+    let profiles=loadTargets();
+    if(profileId)profiles=profiles.filter(p=>p.id===profileId);
+    if(!profiles.length)throw new Error('Chưa có Target repo nào để sync. Vào tab Cấu hình tạo profile trước.');
+    const scanned=[];      // {cfg, blobs}
+    const allFound=[];     // synced items across profiles
+    for(const p of profiles){
+      const c=cfgFromTarget(p);
+      if(!c.owner||!c.repo||!c.token){log&&0;toastLinks(`Bỏ qua "${p.name}" — thiếu owner/repo/token.`,'warn');continue}
+      toastLinks(`Đang quét "${p.name}" (${c.owner}/${c.repo})...`);
+      let blobs;
+      try{blobs=await getBranchTree(c)}catch(e){toastLinks(`Lỗi quét "${p.name}": ${e.message||e}`,'err');continue}
+      scanned.push({cfg:c,blobs});
+      const h=loadHistory();
+      const knownPaths=new Set(h.map(x=>x.filePath));
+      blobs.filter(b=>!knownPaths.has(b.path)).forEach(b=>{
+        const parts=b.path.split('/');
+        const isIndex=parts[parts.length-1]==='index.html';
+        const slug=isIndex && parts.length>1 ? parts[parts.length-2] : parts[parts.length-1].replace(/\.html?$/i,'');
+        const relFromFolder=c.folder && b.path.startsWith(c.folder+'/') ? b.path.slice(c.folder.length+1) : b.path;
+        const url=relFromFolder==='index.html' ? c.baseUrl+'/' : c.baseUrl+'/'+relFromFolder.replace(/index\.html$/,'');
+        allFound.push({title:slug,slug,filePath:b.path,url,category:'',org:'',group2:'',product:'',status:'active',custom:{},time:null,source:'github',targetId:p.id});
+      });
+    }
+    // merge synced (dedupe by filePath, keep first)
+    const seen=new Set();
+    syncedTree=allFound.filter(x=>{if(seen.has(x.filePath))return false;seen.add(x.filePath);return true});
+    // dead detection: for each scanned profile, local links WITH that targetId whose path is absent from that profile's tree
+    let deadAll=[];
+    for(const sc of scanned){
+      const treePaths=new Set(sc.blobs.map(b=>b.path));
+      const tid=sc.cfg._targetId;
+      deadAll=deadAll.concat(loadHistory().filter(x=>x.targetId===tid && !treePaths.has(x.filePath)));
+    }
+    const totalFile=scanned.reduce((n,sc)=>n+sc.blobs.length,0);
+    if(deadAll.length){
+      const names=deadAll.slice(0,8).map(d=>'• '+(d.title||d.slug||d.filePath)).join('\n')+(deadAll.length>8?`\n… và ${deadAll.length-8} link khác`:'');
+      if(await uiConfirm(`Phát hiện ${deadAll.length} link trong danh sách KHÔNG còn tồn tại trên GitHub (đối chiếu đúng target của từng link):\n\n${names}\n\nXóa các link này khỏi danh sách local? (Có Undo — chỉ xóa dòng local, GitHub không bị đụng tới)`,'Dọn link chết')){
+        pushUndo(`Dọn ${deadAll.length} link chết sau sync`);
+        const deadPaths=new Set(deadAll.map(d=>d.filePath));
+        saveHistory(loadHistory().filter(x=>!deadPaths.has(x.filePath)));
+        if(wsState.selected&&deadPaths.has(wsState.selected))exitEditorMode();
+      }
+    }
+    toastLinks(`Sync xong: ${scanned.length} profile · ${totalFile} file trên GitHub · ${syncedTree.length} file mới chưa có local${deadAll.length?` · ${deadAll.length} link chết đã xử lý`:''}`);
+    renderLinks();
+  }catch(e){
+    toastLinks('Lỗi sync: '+(e.message||String(e)));
+  }
+}
+/* Pick which profile(s) to sync. 0 profiles -> error; 1 -> sync it; >1 -> ask all vs choose one. */
+async function syncWithPicker(){
+  const list=loadTargets();
+  if(!list.length){toastLinks('Chưa có Target repo nào để sync. Vào tab Cấu hình tạo profile trước.','err');return}
+  if(list.length===1){return syncFromGithub(list[0].id)}
+  // multiple: active target if set, else scan all — offer choice
+  const active=getActiveTargetId();const act=active?getTargetById(active):null;
+  if(act){
+    const one=await uiConfirm(`Có ${list.length} profile.\n\nOK = Chỉ sync profile đang chọn: "${act.name}"\nCancel = Sync TẤT CẢ ${list.length} profiles`,'Sync profile nào?');
+    return syncFromGithub(one?act.id:'');
+  }
+  const all=await uiConfirm(`Có ${list.length} profile, chưa chọn profile nào ở tab Publisher.\n\nOK = Sync TẤT CẢ ${list.length} profiles\nCancel = Hủy`,'Sync tất cả?');
+  if(all)return syncFromGithub('');
+}
+
+/* ---------- WORKSPACE WIRING ---------- */
+$('searchLinks').oninput=renderLinks;
+$('groupBy1').onchange=()=>{wsState._g1=$('groupBy1').value;renderLinks()};
+$('groupBy2').onchange=()=>{wsState._g2=$('groupBy2').value;renderLinks()};
+$('clearFiltersBtn').onclick=()=>{
+  $('searchLinks').value='';
+  wsState.filters={};
+  renderLinks();
+};
+$('syncGithubBtn').onclick=()=>syncWithPicker();
+$('clearAllLocalBtn').onclick=async()=>{if(await uiConfirm('Xóa toàn bộ history LOCAL (không đụng tới file trên GitHub)?','Xóa history local')){saveHistory([]);exitEditorMode();renderLinks();toastLinks('Đã xóa history local.')}};
+
+// view-mode buttons
+document.querySelectorAll('.vm-btn').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.vm-btn').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  wsState.view=b.dataset.view;
+  $('mindmapConnWrap').style.display=wsState.view==='mindmap'?'block':'none';
+  const p=loadWsPrefs();p.view=wsState.view;saveWsPrefs(p);
+  renderLinks();
+});
+// connector toggle
+document.querySelectorAll('#mindmapConnWrap .seg-btn').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#mindmapConnWrap .seg-btn').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  wsState.conn=b.dataset.conn;
+  const p=loadWsPrefs();p.conn=wsState.conn;saveWsPrefs(p);
+  if(wsState.view==='mindmap')renderLinks();
+});
+// filter-mode segmented control (dim / hide / count)
+document.querySelectorAll('#filterModeSeg .seg-btn').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#filterModeSeg .seg-btn').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  wsState.filterMode=b.dataset.fmode;
+  const p=loadWsPrefs();p.filterMode=wsState.filterMode;saveWsPrefs(p);
+  applyFilterEffect();
+  updateSubtitle();
+});
+// add custom field
+$('addFieldBtn').onclick=async()=>{
+  const label=await uiPrompt('Tên trường mới (vd: Ưu tiên, Ngày review, Client...):','','Thêm trường tùy chỉnh');
+  if(!label||!label.trim())return;
+  const type=await uiPrompt('Loại trường: text / select / date / number','text','Loại trường');
+  const t=(type||'text').trim().toLowerCase();
+  if(!['text','select','date','number'].includes(t)){alert('Loại không hợp lệ. Dùng: text / select / date / number');return}
+  const key='cf_'+slugify(label)+'_'+Date.now().toString(36).slice(-4);
+  const field={key,label:label.trim(),type:t};
+  if(t==='select'){
+    const optsRaw=await uiPrompt('Nhập các option, phân tách bằng dấu phẩy (vd: Cao,Trung bình,Thấp):','','Options');
+    field.options=(optsRaw||'').split(',').map(s=>s.trim()).filter(Boolean);
+  }
+  const list=loadCustomFields();list.push(field);saveCustomFields(list);
+  populateGroupBy();renderCustomFieldsList();renderLinks();
+  if(wsState.selected)renderInspector(wsState.selected);
+  toastLinks('Đã thêm trường "'+field.label+'". Trường này giờ dùng được cho group-by, filter và inspector.');
+};
+
+// splitter drag
+(function(){
+  const splitter=$('wsSplitter'),side=$('wsSide'),ws=$('linksWorkspace');
+  let dragging=false;
+  const prefs=loadWsPrefs();
+  if(prefs.sideWidth)side.style.width=prefs.sideWidth;
+  splitter.addEventListener('mousedown',e=>{dragging=true;splitter.classList.add('dragging');e.preventDefault()});
+  window.addEventListener('mousemove',e=>{
+    if(!dragging)return;
+    const rect=ws.getBoundingClientRect();
+    let w=e.clientX-rect.left;
+    w=Math.max(230,Math.min(rect.width*0.55,w));
+    side.style.width=w+'px';
+  });
+  window.addEventListener('mouseup',()=>{
+    if(!dragging)return;
+    dragging=false;splitter.classList.remove('dragging');
+    const p=loadWsPrefs();p.sideWidth=side.style.width;saveWsPrefs(p);
+    if(wsState.view==='mindmap')renderLinks();
+  });
+})();
+
+// restore view prefs on init
+(function(){
+  const p=loadWsPrefs();
+  if(p.view){wsState.view=p.view;document.querySelectorAll('.vm-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===p.view));$('mindmapConnWrap').style.display=p.view==='mindmap'?'block':'none';}
+  if(p.conn){wsState.conn=p.conn;document.querySelectorAll('#mindmapConnWrap .seg-btn').forEach(b=>b.classList.toggle('active',b.dataset.conn===p.conn));}
+  if(p.filterMode){wsState.filterMode=p.filterMode;document.querySelectorAll('#filterModeSeg .seg-btn').forEach(b=>b.classList.toggle('active',b.dataset.fmode===p.filterMode));}
+  renderCustomFieldsList();
+})();
+
+function sortedHomeItems(){
+  const items=mergedLinks();
+  const m=$('homeSort').value;
+  const arr=[...items];
+  if(m==='time_desc')arr.sort((a,b)=>new Date(b.time||0)-new Date(a.time||0));
+  else if(m==='time_asc')arr.sort((a,b)=>new Date(a.time||0)-new Date(b.time||0));
+  else if(m==='title_asc')arr.sort((a,b)=>(a.title||'').localeCompare(b.title||''));
+  else if(m==='category')arr.sort((a,b)=>(a.category||'zzz').localeCompare(b.category||'zzz'));
+  return arr;
+}
+function refreshHomePreview(){
+  const items=sortedHomeItems();
+  $('homeItemCount').textContent=items.length+' item';
+  const html=buildHomepage(items,{title:$('homeTitle').value.trim(),desc:$('homeDesc').value.trim()});
+  $('homePreviewFrame').srcdoc=html;
+}
+async function publishHomepage(){
+  try{
+    $('homeLog').innerHTML='';
+    const tid=getActiveTargetId();const prof=tid?getTargetById(tid):null;
+    if(!prof)throw new Error('Chưa chọn Target repo (mục "Target" ở tab Publisher) — homepage sẽ publish vào repo nào?');
+    const c=cfgFromTarget(prof);
+    if(!c.owner||!c.repo||!c.token||!c.baseUrl)throw new Error(`Target "${prof.name}" thiếu owner/repo/token/base URL.`);
+    const items=sortedHomeItems().filter(it=>!it.targetId||it.targetId===prof.id);
+    const html=buildHomepage(items,{title:$('homeTitle').value.trim(),desc:$('homeDesc').value.trim()});
+    const homePath=(c.folder?c.folder+'/':'')+'index.html';
+    log(`Publishing homepage vào "${prof.name}": ${homePath}`,'','homeLog');
+    await putContent(homePath,html,'Update homepage via Digital Twin Lab Publisher V8',c);
+    log('Homepage published: '+c.baseUrl+'/','ok','homeLog');
+  }catch(e){log(e.message||String(e),'err','homeLog')}
+}
+$('refreshPreviewBtn').onclick=refreshHomePreview;
+$('publishHomeBtn').onclick=publishHomepage;
+$('homeSort').onchange=refreshHomePreview;
+
+$('openTokenBtn').onclick=()=>window.open($('tokenGuideUrl').value,'_blank','noopener');
+$('copyTokenLinkBtn').onclick=()=>navigator.clipboard.writeText($('tokenGuideUrl').value).then(()=>log('Đã copy link tạo GitHub token.','ok','configLog'));
+
+/* ---------- FILE DOWNLOAD HELPER ---------- */
+function downloadJson(obj,filename){
+  const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=filename;a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+/* ---------- FULL SNAPSHOT (entire tool state) ---------- */
+function buildSnapshot(){
+  return {
+    kind:'digital-twin-lab-snapshot',
+    version:'V4.1',
+    exportedAt:new Date().toISOString(),
+    targets:loadTargets().map(t=>({...t,token:''})), // V8: export loại token khỏi file (an toàn PAT)
+    activeTargetId:getActiveTargetId(),
+    history:loadHistory(),
+    customFields:loadCustomFields(),
+    orgs:loadOrgs(),
+    wsPrefs:loadWsPrefs(),
+    theme:document.body.classList.contains('dark')?'dark':'light'
+  };
+}
+$('exportSnapshotBtn').onclick=()=>{
+  downloadJson(buildSnapshot(),`digital-twin-lab-snapshot-${new Date().toISOString().slice(0,10)}.json`);
+  log('Đã export snapshot toàn bộ trạng thái tool.','ok','configLog');
+};
+$('importSnapshotInput').onchange=async(e)=>{
+  const f=e.target.files[0];if(!f)return;
+  try{
+    const payload=JSON.parse(await f.text());
+    if(!await uiConfirm('Import snapshot sẽ GHI ĐÈ toàn bộ config, danh sách links, trường tùy chỉnh, dự án và tùy chọn giao diện hiện tại. Tiếp tục?','Import snapshot'))return;
+    if(payload.targets)saveTargets(payload.targets);
+    if(payload.activeTargetId)setActiveTargetId(payload.activeTargetId);
+    if(payload.config)setConfig(payload.config);
+    if(payload.history)saveHistory(payload.history);
+    if(payload.customFields)saveCustomFields(payload.customFields);
+    if(payload.orgs)saveOrgs(payload.orgs);
+    if(payload.wsPrefs)saveWsPrefs(payload.wsPrefs);
+    if(payload.theme)applyTheme(payload.theme);
+    saveConfig(true);
+    renderTargetsUI();renderOrgSelects();populateGroupBy();renderCustomFieldsList();renderLinks();
+    log('Đã import snapshot từ '+f.name+'. Targets đã khôi phục — TOKEN để trống, nhập lại ở tab Cấu hình.','warn','configLog');
+  }catch(err){log('Import snapshot lỗi: '+err.message,'err','configLog')}
+  e.target.value='';
+};
+
+/* ---------- LINKS LIST (reusable) ---------- */
+function exportLinksList(){
+  const payload={kind:'digital-twin-lab-links',version:'V4.1',exportedAt:new Date().toISOString(),customFields:loadCustomFields(),links:mergedLinks()};
+  downloadJson(payload,`digital-twin-lab-links-${new Date().toISOString().slice(0,10)}.json`);
+}
+async function importLinksList(file,logTarget){
+  const payload=JSON.parse(await file.text());
+  const incoming=Array.isArray(payload)?payload:(payload.links||[]);
+  if(!incoming.length){log('File không có link nào.','warn',logTarget);return}
+  const mode=await uiConfirm(`Tìm thấy ${incoming.length} link trong file.\n\nOK = GỘP THÊM vào danh sách hiện tại (trùng filePath sẽ được cập nhật).\nHủy = THAY THẾ toàn bộ danh sách hiện tại.`,'Import danh sách');
+  if(payload.customFields&&payload.customFields.length){
+    const existing=loadCustomFields();const keys=new Set(existing.map(f=>f.key));
+    payload.customFields.forEach(f=>{if(!keys.has(f.key))existing.push(f)});
+    saveCustomFields(existing);
+  }
+  incoming.forEach(it=>{if(it.org)addOrg(it.org)});
+  if(mode){
+    const cur=loadHistory();
+    const byPath={};cur.forEach(it=>byPath[it.filePath]=it);
+    incoming.forEach(it=>{byPath[it.filePath]={...byPath[it.filePath],...it,source:it.source||'local'}});
+    saveHistory(Object.values(byPath));
+    log(`Đã gộp ${incoming.length} link vào danh sách. Tổng: ${Object.keys(byPath).length}.`,'ok',logTarget);
+  }else{
+    saveHistory(incoming.map(it=>({...it,source:it.source||'local'})));
+    log(`Đã thay thế danh sách bằng ${incoming.length} link từ file.`,'ok',logTarget);
+  }
+  renderOrgSelects();populateGroupBy();renderCustomFieldsList();renderLinks();
+}
+$('exportLinksBtn').onclick=()=>{exportLinksList();log('Đã export danh sách links.','ok','linksIoLog')};
+$('importLinksInput').onchange=async(e)=>{const f=e.target.files[0];if(!f)return;try{await importLinksList(f,'linksIoLog')}catch(err){log('Import lỗi: '+err.message,'err','linksIoLog')}e.target.value=''};
+$('wsExportLinksBtn').onclick=()=>{exportLinksList();toastLinks('Đã export danh sách links.')};
+$('wsImportLinksInput').onchange=async(e)=>{const f=e.target.files[0];if(!f)return;try{await importLinksList(f,'syncNotice')}catch(err){toastLinks('Import lỗi: '+err.message)}e.target.value=''};
+
+/* ============================================================
+   V8.1 — UPDATE / OVERWRITE MODE (đè phiên bản, hết rác)
+   ============================================================ */
+function renderOverwriteSelect(){
+  const sel=$('overwriteSelect');if(!sel)return;
+  const items=mergedLinks();
+  const cur=updateTargetFP||'';
+  sel.innerHTML='<option value="">— Tạo file mới —</option>'+items.map(it=>{
+    const t=it.targetId?getTargetById(it.targetId):null;
+    const tag=t?(t.visibility==='public'?'🌐':'🔒')+' '+t.name:'⚠ chưa gắn';
+    return `<option value="${escapeHtml(it.filePath)}">${escapeHtml(it.title||it.slug||it.filePath)} · ${tag} · ${escapeHtml(it.filePath)}</option>`;
+  }).join('');
+  sel.value=cur;
+}
+function renderUpdateBanner(){
+  const box=$('updateBanner');if(!box)return;
+  if(!updateTargetFP){box.style.display='none';return}
+  const it=mergedLinks().find(x=>x.filePath===updateTargetFP);
+  if(!it){box.style.display='none';return}
+  const t=it.targetId?getTargetById(it.targetId):null;
+  box.style.display='block';
+  box.innerHTML=`⟳ <b>Đang ĐÈ phiên bản</b> lên: "${escapeHtml(it.title||it.slug)}" — <span class="kbd">${escapeHtml(it.filePath)}</span>${t?` @ ${t.visibility==='public'?'🌐':'🔒'} ${escapeHtml(t.name)}`:''}. Thả file HTML mới rồi bấm Publish. <a href="#" id="cancelUpdateLink" style="color:var(--amber);text-decoration:underline;font-weight:700">Hủy đè, tạo file mới</a>`;
+  const cancel=$('cancelUpdateLink');if(cancel)cancel.onclick=(e)=>{e.preventDefault();exitUpdateMode()};
+}
+function enterUpdateMode(fp){
+  const it=mergedLinks().find(x=>x.filePath===fp);
+  if(!it){toastLinks('Không tìm thấy link để cập nhật.','err');return}
+  updateTargetFP=fp;
+  // set active target to the link's own target so guard/UI reflect it
+  if(it.targetId)setActiveTargetId(it.targetId);
+  // prefill publisher fields from the pinned link so title/slug hiển thị đúng
+  if($('slug'))$('slug').value=it.slug||'';
+  if($('projectTitle'))$('projectTitle').value=it.title||'';
+  // jump to Publisher tab
+  activateMain('tool');currentToolSubtab='publisher';
+  document.querySelectorAll('.subtabbtn').forEach(x=>x.classList.toggle('active',x.dataset.tab==='publisher'));
+  showView('publisher');
+  renderTargetSelect();renderOverwriteSelect();renderUpdateBanner();updatePublishGuard();
+  const pb=$('publishBtn');if(pb)pb.textContent='⟳ Đè phiên bản (Publish)';
+  status('Chế độ ĐÈ phiên bản: thả file mới rồi Publish.','warn');
+}
+function exitUpdateMode(){
+  updateTargetFP=null;
+  if($('overwriteSelect'))$('overwriteSelect').value='';
+  renderUpdateBanner();updatePublishGuard();
+  const pb=$('publishBtn');if(pb)pb.textContent='Publish lên GitHub';
+}
+
+/* ============================================================
+   V8 — N-PROFILE PUBLISH TARGETS: UI engine
+   ============================================================ */
+function renderTargetSelect(){
+  const sel=$('targetSelect');if(!sel)return;
+  const list=loadTargets();
+  const active=getActiveTargetId();
+  if(!list.length){
+    sel.innerHTML='<option value="">— chưa có profile nào —</option>';
+    sel.value='';
+    $('targetInfo').style.display='none';
+    $('cfgStatus').textContent='Chưa có profile';
+    updatePublishGuard();
+    return;
+  }
+  sel.innerHTML='<option value="">— Chọn target (bắt buộc) —</option>'+
+    list.map(t=>`<option value="${escapeHtml(t.id)}">${escapeHtml(t.name)} · ${t.visibility==='public'?'🌐 công khai':'🔒 riêng'} · ${escapeHtml(t.owner)}/${escapeHtml(t.repo)}</option>`).join('');
+  sel.value=(active&&getTargetById(active))?active:'';
+  renderTargetInfo();
+  updatePublishGuard();
+}
+function renderTargetInfo(){
+  const id=$('targetSelect').value;const t=id?getTargetById(id):null;const box=$('targetInfo');
+  if(!t){box.style.display='none';$('cfgStatus').textContent='Bắt buộc chọn';return}
+  const missing=[];if(!t.owner)missing.push('owner');if(!t.repo)missing.push('repo');if(!t.token)missing.push('token');if(!t.baseUrl)missing.push('baseUrl');
+  box.style.display='block';
+  box.innerHTML=`<b>${t.visibility==='public'?'🌐':'🔒'} ${escapeHtml(t.name)}</b> — <span class="kbd">${escapeHtml(t.owner||'?')}/${escapeHtml(t.repo||'?')}</span> @ ${escapeHtml(t.branch||'main')}${t.folder?' /'+escapeHtml(t.folder):''} → ${escapeHtml(t.baseUrl||'(chưa có base URL)')}`+
+    (missing.length?`<div style="color:var(--red);font-weight:700;margin-top:4px">⚠ Thiếu: ${missing.join(', ')} — bổ sung ở tab Cấu hình.</div>`:'');
+  $('cfgStatus').textContent=t.visibility==='public'?'🌐 Công khai':'🔒 Riêng';
+}
+function updatePublishGuard(){
+  const btn=$('publishBtn');if(!btn)return;
+  let id=$('targetSelect')?$('targetSelect').value:'';
+  if(updateTargetFP){const pin=mergedLinks().find(x=>x.filePath===updateTargetFP);if(pin&&pin.targetId)id=pin.targetId;}
+  const t=id?getTargetById(id):null;
+  const ready=!!(t&&t.owner&&t.repo&&t.token&&t.baseUrl);
+  btn.disabled=!ready;
+  btn.title=ready?'':'Chọn một Target repo đầy đủ owner/repo/token/base URL trước khi publish.';
+  btn.style.opacity=ready?'':'.5';btn.style.cursor=ready?'':'not-allowed';
+}
+function renderTargetsUI(){
+  renderTargetSelect();
+  if(typeof renderOverwriteSelect==='function')renderOverwriteSelect();
+  const wrap=$('targetsList');if(!wrap)return;
+  const list=loadTargets();
+  $('targetsCount').textContent=list.length?`${list.length} profile`:'chưa có profile';
+  if(!list.length){wrap.innerHTML='<div class="ws-empty-small" style="padding:10px;color:var(--muted)">Chưa có profile nào. Bấm "＋ Thêm profile" để tạo target đầu tiên (vd: GitHub Pages công khai, hoặc Finan riêng private.basicnlogic.com).</div>';return}
+  wrap.innerHTML=list.map(t=>{
+    const vis=t.visibility==='public'?'pub':'prv';
+    const usedCount=loadHistory().filter(x=>x.targetId===t.id).length;
+    return `<div class="tgt-card ${vis}" data-id="${escapeHtml(t.id)}">
+      <div class="tgt-head"><span class="tgt-name">${escapeHtml(t.name)}</span><span class="tgt-vis ${vis}">${t.visibility==='public'?'🌐 công khai':'🔒 riêng'}</span><span style="color:var(--muted);font-size:11px;margin-left:auto">${usedCount} link đang dùng · id: ${escapeHtml(t.id)}</span></div>
+      <div class="tgt-grid">
+        <div><label>Tên hiển thị</label><input data-f="name" value="${escapeHtml(t.name||'')}"></div>
+        <div><label>Chế độ</label><select data-f="visibility"><option value="private" ${t.visibility!=='public'?'selected':''}>🔒 Riêng (private)</option><option value="public" ${t.visibility==='public'?'selected':''}>🌐 Công khai (public)</option></select></div>
+        <div><label>GitHub owner / org</label><input data-f="owner" value="${escapeHtml(t.owner||'')}" placeholder="kinhtengoaithuong-prog"></div>
+        <div><label>Repo</label><input data-f="repo" value="${escapeHtml(t.repo||'')}" placeholder="lab-private"></div>
+        <div><label>Branch</label><input data-f="branch" value="${escapeHtml(t.branch||'main')}"></div>
+        <div><label>Publish folder <span style="text-transform:none;font-weight:400">(trống nếu root)</span></label><input data-f="folder" value="${escapeHtml(t.folder||'')}" placeholder="docs"></div>
+        <div class="full"><label>Base URL</label><input data-f="baseUrl" value="${escapeHtml(t.baseUrl||'')}" placeholder="${t.visibility==='public'?'https://owner.github.io/lab':'https://private.basicnlogic.com'}"></div>
+        <div class="full"><label>Fine-grained token <span style="text-transform:none;font-weight:400">(riêng repo này · Contents: R/W)</span></label><input data-f="token" type="password" value="${escapeHtml(t.token||'')}" placeholder="github_pat_..." autocomplete="off"></div>
+      </div>
+      <div class="tgt-foot">
+        <button class="btn small ghost" data-act="save">Lưu profile</button>
+        <button class="btn small ghost" data-act="test">Test</button>
+        <button class="btn small ghost" data-act="showtoken">Hiện token</button>
+        <button class="btn small red" data-act="del" style="margin-left:auto">Xóa profile</button>
+        <span class="tgt-msg" style="font-size:11px;color:var(--muted)"></span>
+      </div>
+    </div>`;
+  }).join('');
+  wrap.querySelectorAll('.tgt-card').forEach(card=>{
+    const id=card.dataset.id;
+    const read=()=>{const o={};card.querySelectorAll('[data-f]').forEach(el=>o[el.dataset.f]=el.value);return o};
+    const msg=(t,c)=>{const m=card.querySelector('.tgt-msg');m.textContent=t;m.style.color=c==='err'?'var(--red)':c==='ok'?'var(--green)':'var(--muted)'};
+    card.querySelector('[data-act=save]').onclick=()=>{
+      const o=read();if(!o.name.trim()){msg('Tên không được để trống','err');return}
+      const list=loadTargets();const i=list.findIndex(x=>x.id===id);if(i<0)return;
+      list[i]={...list[i],name:o.name.trim(),visibility:o.visibility==='public'?'public':'private',owner:o.owner.trim(),repo:o.repo.trim(),branch:o.branch.trim()||'main',folder:o.folder.trim().replace(/^\/+|\/+$/g,''),baseUrl:o.baseUrl.trim().replace(/\/+$/,''),token:o.token.trim()};
+      saveTargets(list);renderTargetSelect();
+      const usedCount=loadHistory().filter(x=>x.targetId===id).length;
+      msg('Đã lưu ✓','ok');log(`Đã lưu profile "${list[i].name}".`,'ok','targetsLog');
+      renderLinks();
+    };
+    card.querySelector('[data-act=test]').onclick=async()=>{
+      const o=read();const c=cfgFromTarget({...o,id});
+      if(!c.owner||!c.repo||!c.token){msg('Thiếu owner/repo/token','err');return}
+      msg('Đang test...','');
+      try{const r=await safeFetch(repoApi(c),{headers:headers(c)});const txt=await r.text();if(!r.ok)throw new Error(`${r.status}: ${txt.slice(0,200)}`);const repo=JSON.parse(txt);msg('OK · '+repo.full_name,'ok');log(`Test "${o.name}" OK: ${repo.full_name}`,'ok','targetsLog')}catch(e){msg('Lỗi: '+(e.message||e),'err');log(`Test "${o.name}" lỗi: ${e.message||e}`,'err','targetsLog')}
+    };
+    card.querySelector('[data-act=showtoken]').onclick=()=>{const t=card.querySelector('[data-f=token]');t.type=t.type==='password'?'text':'password'};
+    card.querySelector('[data-act=del]').onclick=async()=>{
+      const t=getTargetById(id);if(!t)return;
+      const used=loadHistory().filter(x=>x.targetId===id);
+      const conf=await uiConfirm(`Xóa profile "${t.name}"?\n\n• ${used.length} link đang gắn target này sẽ bị GỠ target (targetId về trống) — publish/xóa các link đó sẽ không route được cho tới khi bạn gắn target khác. (Có Undo)\n• KHÔNG đụng tới file trên GitHub, KHÔNG xóa repo.\n\nOK = Xóa profile · Cancel = Giữ.`,'Xóa profile');
+      if(!conf)return;
+      pushUndo(`Xóa profile "${t.name}" (gỡ target khỏi ${used.length} link)`);
+      // clear targetId on affected local items
+      const h=loadHistory().map(x=>x.targetId===id?{...x,targetId:''}:x);saveHistory(h);
+      saveTargets(loadTargets().filter(x=>x.id!==id));
+      if(getActiveTargetId()===id)setActiveTargetId('');
+      renderTargetsUI();renderLinks();
+      log(`Đã xóa profile "${t.name}" · gỡ target khỏi ${used.length} link.`,'warn','targetsLog');
+    };
+  });
+}
+async function addTargetProfile(){
+  const name=await uiPrompt('Tên profile mới (vd: GitHub Pages công khai, Finan riêng):','','Thêm profile');
+  if(!name||!name.trim())return;
+  const vis=await uiConfirm(`Profile "${name.trim()}" là loại nào?\n\nOK = 🔒 Riêng (private) — mặc định an toàn\nCancel = 🌐 Công khai (public)`,'Chế độ profile');
+  const t={id:makeTargetId(name.trim()),name:name.trim(),owner:'',repo:'',branch:'main',folder:'',token:'',baseUrl:'',visibility:vis?'private':'public'};
+  const list=loadTargets();list.push(t);saveTargets(list);
+  renderTargetsUI();
+  log(`Đã tạo profile "${t.name}" (${t.visibility==='public'?'công khai':'riêng'}). Điền owner/repo/token/base URL rồi Lưu profile.`,'ok','targetsLog');
+}
+
+/* ---------- THEME ---------- */
+function applyTheme(theme){
+  const dark=theme==='dark';
+  document.body.classList.toggle('dark',dark);
+  const btn=$('themeToggle');
+  if(btn)btn.textContent=dark?'☀️ Sáng':'🌙 Tối';
+  const p=loadWsPrefs();p.theme=theme;saveWsPrefs(p);
+  if($('view-links')&&$('view-links').classList.contains('active')&&wsState&&wsState.view==='mindmap')renderLinks();
+}
+$('themeToggle').onclick=()=>applyTheme(document.body.classList.contains('dark')?'light':'dark');
+
+$('resetAllBtn').onclick=async()=>{
+  if(await uiConfirm('Reset toàn bộ config + token + history local? Hành động này không thể hoàn tác (file trên GitHub không bị ảnh hưởng).','Reset toàn bộ')){
+    [STORAGE_KEY,HISTORY_KEY,CF_KEY,ORG_KEY,WS_PREF_KEY,TARGETS_KEY,ACTIVE_TARGET_KEY].forEach(k=>localStorage.removeItem(k));
+    LEGACY_CONFIG_KEYS.forEach(k=>localStorage.removeItem(k));
+    LEGACY_HISTORY_KEYS.forEach(k=>localStorage.removeItem(k));
+    log('Đã reset toàn bộ dữ liệu local.','ok','configLog');
+    renderTargetsUI();renderOrgSelects();populateGroupBy();renderCustomFieldsList();renderLinks();
+  }
+};
+
+$('publishBtn').onclick=publish;
+$('testBtn').onclick=test;
+$('testBtnTop').onclick=test;
+$('targetSelect').onchange=()=>{const v=$('targetSelect').value;setActiveTargetId(v);renderTargetInfo();updatePublishGuard()};
+$('overwriteSelect').onchange=()=>{const v=$('overwriteSelect').value;if(v)enterUpdateMode(v);else exitUpdateMode();};
+$('gotoTargetsBtn').onclick=()=>{activateMain('tool');currentToolSubtab='config';document.querySelectorAll('.subtabbtn').forEach(x=>x.classList.toggle('active',x.dataset.tab==='config'));showView('config');renderTargetsUI()};
+$('addTargetBtn').onclick=addTargetProfile;
+$('copyLinkBtn').onclick=()=>navigator.clipboard.writeText($('resultLink').href).then(()=>log('Đã copy link.','ok'));
+
+document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('[data-mode]').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');mode=b.dataset.mode;
+  $('fileMode').style.display=mode==='file'?'block':'none';
+  $('pasteMode').style.display=mode==='paste'?'block':'none';
+});
+
+const dz=$('dropZone');
+dz.onclick=()=>$('fileInput').click();
+['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag')}));
+['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag')}));
+dz.addEventListener('drop',e=>handleFile(e.dataTransfer.files[0]));
+$('fileInput').onchange=e=>handleFile(e.target.files[0]);
+async function handleFile(f){
+  if(!f)return;
+  currentFile=f;currentHtml=await f.text();
+  $('fileMeta').style.display='block';
+  $('fileMeta').innerHTML=`<b>${escapeHtml(f.name)}</b><br>${(f.size/1024).toFixed(1)} KB`;
+  if(!$('slug').value)$('slug').value=slugify(f.name.replace(/\.html?$/i,''));
+  if(!$('projectTitle').value)$('projectTitle').value=f.name.replace(/\.html?$/i,'').replace(/[-_]+/g,' ');
+  log('Đã load file: '+f.name,'ok');
+}
+
+function renderPublisherCategory(){
+  const sel=$('category');if(!sel)return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">— Chọn category —</option>'+loadCats().map(k=>`<option value="${escapeHtml(k)}">${escapeHtml(catLabel(k))}</option>`).join('')+'<option value="__new__">＋ Tạo category mới…</option>';
+  if(loadCats().includes(cur))sel.value=cur;
+}
+$('category').addEventListener('change',async()=>{
+  if($('category').value==='__new__'){
+    const n=await uiPrompt('Tên category mới:','','Category mới');
+    if(n&&n.trim()){addCat(n.trim());renderPublisherCategory();$('category').value=n.trim();}
+    else $('category').value='';
+  }
+});
+$('orgSelect').addEventListener('change',async()=>{
+  if($('orgSelect').value==='__new__'){
+    const name=await uiPrompt('Tên dự án mới (vd: Rabity, VFX Auto...):','','Dự án mới');
+    if(name && name.trim()){
+      addOrg(name.trim());
+      renderOrgSelects();
+      $('orgSelect').value=name.trim();
+    }else{
+      $('orgSelect').selectedIndex=0;
+    }
+  }
+});
+
+loadTargets(); // trigger V7->V8 migration if needed
+renderTargetsUI();
+renderOrgSelects();
+wsState._g1='org';
+populateGroupBy();
+applyTheme((loadWsPrefs().theme)||'light');
+activateMain('links');
+
+/* ---------- VERSION from single const (§1) + undo wiring ---------- */
+$('verBadge').textContent=APP_VERSION;
+$('relStamp').textContent=APP_RELEASE;
+document.title='Digital Twin Lab — Publisher '+APP_VERSION;
+$('undoBtn').onclick=doUndo;
+refreshUndoBtn();
+renderPublisherCategory();
+</script>
+</body>
+</html>
