@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Khung lượng hóa tác động CX — MB bank × SOI.Pro</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Display:wght@400;600;700&family=Outfit:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap&subset=latin,latin-ext,vietnamese');
+
+:root{
+  --bg:#F4F7FC; --panel:#FFFFFF; --panel-2:#F7F9FD; --panel-3:#EEF3FA;
+  --line:#DCE4F0; --line-2:#C3D0E4;
+  --ink:#1B2C4A; --navy:#0B2265; --muted:#5A6E90; --dim:#8C9BB4;
+  --mb:#E4002B; --mb-blue:#1B29D4; --soi:#8B1A2B;
+  --gold:#B8860B;
+  --cx:#1F5FBF; --beh:#0E8A6E; --out:#B8860B;
+  --assume:#7A4FBF;
+  --ok:#0E8A6E; --warn:#C77800;
+  --src-do:#0E8A6E; --src-kp:#C77800; --src-bm:#1F5FBF; --src-mb:#5A6E90; --src-qd:#E4002B;
+  --rail:236px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--ink);font-family:'Outfit',sans-serif;line-height:1.45;
+  display:flex;flex-direction:column;font-size:13px}
+
+/* ============ TOP BAR ============ */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:8px 16px;background:var(--panel);border-bottom:2px solid var(--navy);flex-shrink:0}
+.tb-left{display:flex;align-items:center;gap:14px;min-width:0}
+.tb-title{font-family:'Noto Serif Display',serif;font-size:15.5px;font-weight:600;color:var(--navy);line-height:1.2}
+.tb-title small{display:block;font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--mb);font-weight:500;margin-bottom:2px}
+.tb-right{display:flex;align-items:center;gap:8px}
+
+/* roadmap mini */
+.rmini{display:flex;align-items:center;gap:0;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.rmini div{padding:4px 10px;font-size:10px;color:var(--dim);border-right:1px solid var(--line);white-space:nowrap;font-weight:500}
+.rmini div:last-child{border-right:none}
+.rmini div.on{background:#FFEFF2;color:var(--mb);font-weight:700}
+.rmini div b{font-family:'DM Mono',monospace;font-size:8.5px;margin-right:4px;opacity:.75}
+
+/* ============ TABS ============ */
+.tabs{display:flex;gap:0;background:var(--panel);border-bottom:1px solid var(--line);flex-shrink:0;padding:0 16px;align-items:center}
+.tab{background:none;border:none;color:var(--muted);font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:500;
+  padding:9px 15px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:.15s;display:flex;align-items:center;gap:7px}
+.tab .n{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--dim)}
+.tab:hover{color:var(--navy)}
+.tab.on{color:var(--mb);border-bottom-color:var(--mb)}
+.tab.on .n{color:var(--mb)}
+.tabs .spacer{flex:1}
+.tag{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;
+  border-radius:3px;padding:3px 7px;color:var(--assume);border:1px solid #D9CCF0;background:#F7F4FD}
+
+/* ============ STAGE ============ */
+.stage{flex:1;display:flex;min-height:0;overflow:hidden}
+.view{display:none;flex:1;min-width:0;overflow:hidden}
+.view.on{display:flex}
+
+/* ---- RAIL ---- */
+.rail{width:var(--rail);flex-shrink:0;background:var(--panel);border-right:1px solid var(--line);
+  overflow-y:auto;padding:11px;transition:margin-left .22s ease}
+.rail.hide{margin-left:calc(-1 * var(--rail))}
+.rail-blk[hidden]{display:none}
+.rl-tag{font-family:'Outfit',sans-serif;font-size:8.5px;font-weight:500;letter-spacing:0;
+  text-transform:none;color:var(--dim);float:right;margin-top:1px}
+.zero-hint{background:#FFEFF2;border:1px solid var(--mb);border-radius:6px;padding:9px 12px;
+  font-size:11px;color:var(--ink);line-height:1.5;margin-top:10px}
+.zero-hint b{color:var(--mb)}
+.wk{display:flex;gap:7px;align-items:flex-start;padding:6px 7px;border-radius:5px;cursor:pointer;
+  transition:.12s;border-left:2.5px solid transparent;margin-bottom:2px}
+.wk:hover{background:var(--panel-3)}
+.wk.on{background:var(--panel-3)}
+.wk .wd{width:7px;height:7px;border-radius:2px;flex-shrink:0;margin-top:4px}
+.wk .wt{font-size:10.8px;color:var(--ink);line-height:1.35;font-weight:500}
+.wk .wn{font-family:'DM Mono',monospace;font-size:8.5px;color:var(--dim);margin-top:1px}
+.mn-tag{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:.04em;font-weight:500}
+.mnode.hl .nbox{stroke-width:3}
+.rail-toggle{position:absolute;left:0;top:50%;transform:translateY(-50%);z-index:20;
+  width:15px;height:52px;background:var(--panel);border:1px solid var(--line);border-left:none;
+  border-radius:0 6px 6px 0;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--muted);font-size:11px;transition:.15s;padding:0}
+.rail-toggle:hover{background:var(--panel-3);color:var(--mb)}
+.stage-inner{flex:1;display:flex;min-width:0;position:relative}
+
+.rl-h{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--navy);margin:12px 0 7px;padding-bottom:4px;border-bottom:1px solid var(--line);font-weight:500}
+.rl-h:first-child{margin-top:0}
+.chk{display:flex;align-items:center;gap:7px;padding:4px 5px;border-radius:5px;cursor:pointer;
+  font-size:11.5px;color:var(--ink);transition:.12s;user-select:none}
+.chk:hover{background:var(--panel-3)}
+.chk input{accent-color:var(--mb);cursor:pointer;width:12px;height:12px;flex-shrink:0}
+.chk .sw{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.chk .ct{font-family:'DM Mono',monospace;font-size:9px;color:var(--dim);margin-left:auto}
+.rt-btn{width:100%;text-align:left;background:var(--panel-2);border:1px solid var(--line);
+  color:var(--ink);font-family:'Outfit',sans-serif;font-size:11.5px;padding:6px 9px;border-radius:6px;
+  cursor:pointer;transition:.13s;margin-bottom:4px;font-weight:500;line-height:1.25}
+.rt-btn:hover{border-color:var(--mb);color:var(--navy)}
+.rt-btn.on{background:#FFEFF2;border-color:var(--mb);color:var(--mb);font-weight:600}
+.rt-btn small{display:block;font-size:9.5px;color:var(--dim);font-weight:400;margin-top:1px}
+.rt-btn.on small{color:var(--mb);opacity:.8}
+
+.ctrl{margin-bottom:9px}
+.ctrl-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;gap:6px}
+.ctrl-name{font-size:11.5px;font-weight:500;color:var(--ink);line-height:1.25}
+.ctrl-val{font-family:'DM Mono',monospace;font-size:12.5px;color:var(--mb);font-weight:500;white-space:nowrap}
+input[type=range]{-webkit-appearance:none;width:100%;height:3px;border-radius:2px;background:var(--line);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;
+  background:var(--mb);cursor:pointer;border:2px solid #fff;box-shadow:0 1px 3px rgba(228,0,43,.35)}
+input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;background:var(--mb);cursor:pointer;border:2px solid #fff}
+input[type=range]:focus{box-shadow:0 0 0 3px rgba(228,0,43,.16)}
+.btn{background:var(--panel-2);border:1px solid var(--line-2);color:var(--ink);font-family:'Outfit',sans-serif;
+  font-size:11px;padding:6px 11px;border-radius:5px;cursor:pointer;transition:.14s;font-weight:500}
+.btn:hover{background:var(--panel-3);border-color:var(--mb);color:var(--navy)}
+.btn.primary{background:var(--mb);border-color:var(--mb);color:#fff}
+.btn.primary:hover{background:#B80022}
+.btn-row{display:flex;gap:6px;margin-top:11px;flex-wrap:wrap}
+
+/* ---- CANVAS ---- */
+.canvas{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.canvas-head{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:9px 16px;border-bottom:1px solid var(--line);background:var(--panel);flex-shrink:0}
+.ch-t{font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--navy)}
+.legend{display:flex;gap:11px;flex-wrap:wrap}
+.lg{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);cursor:pointer;
+  padding:2px 5px;border-radius:4px;transition:.12s}
+.lg:hover{background:var(--panel-3)}
+.lg.off{opacity:.32}
+.lg .d{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.canvas-body{flex:1;overflow:hidden;padding:8px 12px;min-height:0;display:flex}
+svg.mindmap{display:block;width:100%;height:100%}
+
+.medge{fill:none;stroke-width:1.5;opacity:.42;transition:.16s}
+.medge.hot{opacity:1;stroke-width:2.6}
+.medge.dashed{stroke-dasharray:5 4}
+.medge.off{opacity:.06}
+.medge-lbl{font-family:'DM Mono',monospace;font-size:9px;fill:var(--muted);opacity:.75;transition:.16s}
+.medge-lbl.hot{fill:var(--navy);opacity:1;font-weight:500}
+.medge-lbl.off{opacity:.08}
+.mnode{cursor:pointer;transition:.16s}
+.mnode.dim{opacity:.16}
+.mnode.off{opacity:.1;pointer-events:none}
+.mnode.sel .nbox{stroke-width:2.6}
+.mn-title{font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;fill:var(--navy)}
+.mn-val{font-family:'DM Mono',monospace;font-size:13px;font-weight:500}
+.mn-src{font-family:'DM Mono',monospace;font-size:7.5px;letter-spacing:.04em}
+.col-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.13em;text-transform:uppercase;fill:var(--dim)}
+.col-sub{font-family:'Outfit',sans-serif;font-size:9px;fill:var(--dim)}
+.badge-t{font-family:'DM Mono',monospace;font-size:6.6px;letter-spacing:.05em;font-weight:500}
+.swim{fill:none;stroke:var(--line);stroke-width:1;stroke-dasharray:3 4}
+
+/* ---- DETAIL PANEL ---- */
+.detail{width:288px;flex-shrink:0;background:var(--panel);border-left:1px solid var(--line);
+  overflow-y:auto;padding:13px}
+.dt-empty{color:var(--dim);font-size:11.5px;line-height:1.65;padding:10px 2px}
+.dt-h{font-family:'Noto Serif Display',serif;font-size:15px;font-weight:600;color:var(--navy);margin-bottom:3px;line-height:1.25}
+.dt-layer{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;margin-bottom:10px}
+.dt-val{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;margin-bottom:2px}
+.dt-vl{font-size:10px;color:var(--dim);margin-bottom:12px}
+.dt-sec{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--navy);margin:13px 0 7px;padding-bottom:4px;border-bottom:1px solid var(--line);font-weight:500}
+.dt-card{border:1px solid var(--line);border-left:3px solid;border-radius:6px;padding:9px 10px;margin-bottom:7px;background:var(--panel-2)}
+.dt-card .c1{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:3px}
+.dt-card .cn{font-size:11.5px;font-weight:600;color:var(--navy);line-height:1.3}
+.dt-card .cb{font-family:'DM Mono',monospace;font-size:7.4px;letter-spacing:.05em;padding:2px 5px;
+  border-radius:3px;white-space:nowrap;flex-shrink:0}
+.dt-card .cd{font-size:10.5px;color:var(--muted);line-height:1.45}
+.dt-card .cm{font-family:'DM Mono',monospace;font-size:8.8px;color:var(--dim);margin-top:4px}
+.dt-note{background:#F7F4FD;border:1px solid #D9CCF0;border-radius:6px;padding:9px 11px;
+  font-size:10.8px;color:var(--ink);line-height:1.55;margin-top:11px}
+.dt-note b{color:var(--assume)}
+.dt-warn{background:#FFEFF2;border:1px solid var(--mb);border-left:3px solid var(--mb);border-radius:6px;
+  padding:9px 11px;font-size:10.8px;color:var(--ink);line-height:1.55;margin-top:11px}
+.dt-warn b{color:var(--mb)}
+
+/* ---- MODEL VIEW ---- */
+.mv-body{flex:1;overflow-y:auto;padding:14px 16px;min-height:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:15px;
+  box-shadow:0 1px 3px rgba(11,34,101,.05)}
+.card + .card{margin-top:13px}
+.card h2{font-family:'Outfit',sans-serif;font-size:11.5px;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--navy);margin-bottom:12px;padding-bottom:7px;border-bottom:1px solid var(--line)}
+.mech{margin-bottom:11px}
+.mech-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px;gap:9px}
+.mech-name{font-size:12px;font-weight:600;color:var(--navy)}
+.mech-name .src{font-family:'DM Mono',monospace;font-size:8px;color:var(--dim);margin-left:6px;
+  border:1px solid var(--line-2);border-radius:3px;padding:1px 5px;letter-spacing:.04em;font-weight:400}
+.mech-val{font-family:'DM Mono',monospace;font-size:13px;color:var(--gold);white-space:nowrap;font-weight:500}
+.mech-track{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.mech-fill{height:100%;border-radius:4px;transition:width .3s}
+.mech-sub{font-size:10px;color:var(--dim);margin-top:4px;line-height:1.4}
+.total-box{background:#FBF8EF;border:1px solid #E0CE9A;border-top:3px solid var(--gold);
+  border-radius:8px;padding:14px 16px;margin-top:13px}
+.tb-l{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:5px}
+.tb-v{font-family:'DM Mono',monospace;font-size:27px;font-weight:600;color:var(--navy);line-height:1}
+.tb-r{font-size:10.8px;color:var(--muted);margin-top:6px;line-height:1.5}
+.range-row{display:flex;gap:16px;margin-top:11px;flex-wrap:wrap}
+.range-item{flex:1;min-width:100px}
+.range-item .rl{font-size:9.5px;color:var(--dim);letter-spacing:.04em;margin-bottom:2px}
+.range-item .rv{font-family:'DM Mono',monospace;font-size:14px;color:var(--navy)}
+table{width:100%;border-collapse:collapse;font-size:11.5px}
+th{text-align:left;font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--dim);padding:7px 9px;border-bottom:1px solid var(--line);font-weight:400}
+td{padding:8px 9px;border-bottom:1px solid var(--line);color:var(--ink)}
+tr:last-child td{border-bottom:none}
+td.edge{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--muted)}
+.coef-input{background:#fff;border:1px solid var(--line-2);color:var(--navy);
+  font-family:'DM Mono',monospace;font-size:11.5px;padding:3px 6px;border-radius:4px;width:66px;text-align:right}
+.coef-input:focus{outline:none;border-color:var(--mb);box-shadow:0 0 0 3px rgba(228,0,43,.16)}
+.unit{font-family:'DM Mono',monospace;font-size:9px;color:var(--dim);margin-left:5px}
+.src-pill{font-family:'DM Mono',monospace;font-size:7.4px;letter-spacing:.05em;padding:2px 5px;border-radius:3px;white-space:nowrap}
+.callout{background:#F7F4FD;border:1px solid #D9CCF0;border-radius:6px;padding:10px 12px;
+  font-size:11px;color:var(--ink);line-height:1.55;margin-top:11px}
+.callout b{color:var(--assume)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+@media(max-width:1100px){.two{grid-template-columns:1fr}}
+
+/* ---- REPORT ---- */
+.strat{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.strat button{background:var(--panel-2);border:1px solid var(--line-2);color:var(--muted);
+  font-family:'Outfit',sans-serif;font-size:11.5px;padding:6px 12px;border-radius:5px;cursor:pointer;transition:.14s;font-weight:500}
+.strat button:hover{color:var(--navy);border-color:var(--mb)}
+.strat button.on{background:var(--mb);border-color:var(--mb);color:#fff}
+.note{background:var(--panel-2);border:1px solid var(--line);border-left:3px solid var(--mb);
+  border-radius:0 6px 6px 0;padding:10px 13px;font-size:11.5px;color:var(--ink);line-height:1.55;margin-bottom:12px}
+.note b{color:var(--navy);font-weight:600}
+.rank-item{display:flex;align-items:center;gap:12px;padding:11px;background:var(--panel-2);
+  border:1px solid var(--line);border-radius:7px;margin-bottom:7px}
+.rank-item.top{border-color:var(--mb);background:#FFEFF2}
+.rank-n{font-family:'DM Mono',monospace;font-size:14px;color:var(--dim);min-width:22px}
+.rank-item.top .rank-n{color:var(--mb)}
+.rank-body{flex:1;min-width:0}
+.rank-name{font-size:12.5px;font-weight:600;color:var(--navy);margin-bottom:1px}
+.rank-desc{font-size:10px;color:var(--dim);margin-bottom:6px}
+.rank-bar{height:5px;background:var(--line);border-radius:3px;overflow:hidden}
+.rank-fill{height:100%;background:linear-gradient(90deg,var(--mb) 0%,var(--gold) 100%);border-radius:3px;transition:width .3s}
+.rank-lev{font-family:'DM Mono',monospace;font-size:14px;color:var(--gold);text-align:right;min-width:88px}
+.rank-lev small{display:block;font-size:8px;color:var(--dim);letter-spacing:.04em;margin-top:1px}
+</style>
+</head>
+<body>
+
+<!-- ============ TOP BAR ============ -->
+<div class="topbar">
+  <div class="tb-left">
+    <div class="tb-title"><small>Mục 7 — Giá trị mang lại cho MB</small>Từ điểm chất lượng dịch vụ đến con số kinh doanh</div>
+  </div>
+  <div class="tb-right">
+    <div class="rmini">
+      <div class="on"><b>01</b>Nhìn thấy</div>
+      <div><b>02</b>Nối được</div>
+      <div><b>03</b>Điều khiển được</div>
+      <div><b>04</b>Tự chạy</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TABS ============ -->
+<div class="tabs">
+  <button class="tab on" data-view="map" data-mode="impact"><span class="n">01</span> Sơ đồ ảnh hưởng</button>
+  <button class="tab" data-view="map" data-mode="cover"><span class="n">02</span> Sơ đồ can thiệp</button>
+  <button class="tab" data-view="model"><span class="n">03</span> Mô phỏng tác động</button>
+  <button class="tab" data-view="report"><span class="n">04</span> Bản đồ đòn bẩy</button>
+  <div class="spacer"></div>
+  <span class="tag">Hệ số truyền dẫn = giả định, chờ hiệu chỉnh</span>
+</div>
+
+<div class="stage">
+
+<!-- ======= VIEW 1: MAP ======= -->
+<div class="view on" id="view-map">
+  <div class="stage-inner">
+    <div class="rail" id="rail">
+      <!-- MODE: IMPACT -->
+      <div class="rail-blk" data-blk="impact">
+        <div class="rl-h">Điểm CLDV — Lớp A</div>
+        <div id="ctrlA"></div>
+        <div class="btn-row">
+          <button class="btn primary" id="resetBtn">Baseline</button>
+          <button class="btn" id="scenBtn">+5 điểm</button>
+        </div>
+        <div class="rl-h">Lọc theo tuyến giá trị</div>
+        <div id="routeFilter"></div>
+      </div>
+      <!-- MODE: COVER -->
+      <div class="rail-blk" data-blk="cover" hidden>
+        <div class="rl-h">Ai làm gì — lọc theo nguồn</div>
+        <div id="srcFilter"></div>
+        <div class="rl-h">Danh mục việc</div>
+        <div id="workList"></div>
+      </div>
+    </div>
+    <button class="rail-toggle" id="railTog" title="Ẩn/hiện bảng lọc">‹</button>
+
+    <div class="canvas">
+      <div class="canvas-head">
+        <div class="ch-t" id="chTitle">Cây nhân quả — điểm CLDV truyền dẫn tới LNTT</div>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="canvas-body">
+        <svg class="mindmap" id="mm" viewBox="0 0 1000 560" preserveAspectRatio="xMidYMid meet">
+          <g id="swimLayer"></g><g id="edgeLayer"></g><g id="nodeLayer"></g>
+        </svg>
+      </div>
+    </div>
+
+    <div class="detail" id="detail"></div>
+  </div>
+</div>
+
+<!-- ======= VIEW 2: MODEL ======= -->
+<div class="view" id="view-model">
+  <div class="stage-inner">
+    <div class="rail" id="rail2">
+      <div class="rl-h">Điểm CLDV — Lớp A <span class="rl-tag">tạo ra delta</span></div>
+      <div id="ctrlA2"></div>
+      <div class="btn-row">
+        <button class="btn primary" id="resetBtn2">Baseline</button>
+        <button class="btn" id="scenBtn2">+5 điểm</button>
+      </div>
+      <div class="rl-h">Đơn vị kinh tế — Lớp C <span class="rl-tag">quy đổi ra tiền</span></div>
+      <div id="ctrlEcon"></div>
+    </div>
+    <div class="canvas">
+      <div class="canvas-head"><div class="ch-t">Bốn cơ chế truyền dẫn — đóng góp vào LNTT</div></div>
+      <div class="mv-body">
+        <div class="two">
+          <div class="card">
+            <h2>Cơ chế &amp; đóng góp</h2>
+            <div id="mechList"></div>
+            <div class="total-box">
+              <div class="tb-l">Tác động ước tính / năm</div>
+              <div class="tb-v" id="totalVal">—</div>
+              <div class="tb-r" id="totalNote"></div>
+              <div class="range-row">
+                <div class="range-item"><div class="rl">Thấp (×0,5)</div><div class="rv" id="rLow">—</div></div>
+                <div class="range-item"><div class="rl">Cơ sở</div><div class="rv" id="rBase">—</div></div>
+                <div class="range-item"><div class="rl">Cao (×1,6)</div><div class="rv" id="rHigh">—</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <h2>Hệ số truyền dẫn — chỉnh trực tiếp</h2>
+            <table><thead><tr><th>Mắt xích</th><th>Nguồn</th><th style="text-align:right">Hệ số</th></tr></thead>
+            <tbody id="edgeTable"></tbody></table>
+            <div class="callout"><b>Ô trống trung tâm.</b> SOI.Pro không áp đặt hệ số này — MB đặt theo hiểu biết
+            vận hành, hoặc để dự án đo và hiệu chỉnh ở Chặng 2. Giá trị hiển thị đặt <i>thận trọng</i> để tránh phóng đại.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======= VIEW 3: REPORT ======= -->
+<div class="view" id="view-report">
+  <div class="stage-inner">
+    <div class="canvas">
+      <div class="canvas-head"><div class="ch-t">Bản đồ đòn bẩy — đầu ra dự kiến của kỳ khảo sát</div></div>
+      <div class="mv-body">
+        <div class="card">
+          <div class="strat">
+            <button class="on" data-strat="all">Toàn hệ thống</button>
+            <button data-strat="casa">Ưu tiên CASA</button>
+            <button data-strat="digital">Ưu tiên chuyển đổi số</button>
+            <button data-strat="priority">Ưu tiên KH Priority</button>
+          </div>
+          <div class="note" id="stratNote"></div>
+          <div id="rankList"></div>
+          <div class="callout"><b>Cách đọc.</b> Cột phải là <i>độ nhạy</i> — mỗi điểm CLDV cải thiện tại node đó
+          kéo theo bao nhiêu tỷ đồng. Node xếp trên không phải node điểm thấp nhất, mà là node
+          <b>đáng đầu tư nhất</b>.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+/* ===================== DỮ LIỆU ===================== */
+const A_DRIVERS=[
+  {id:'welcome',name:'Chào đón & nhận diện',base:91.0,min:75,max:100,step:0.5},
+  {id:'need',   name:'Khai thác nhu cầu',   base:76.0,min:55,max:100,step:0.5},
+  {id:'digital',name:'Hướng dẫn kênh số',   base:82.0,min:55,max:100,step:0.5},
+  {id:'cross',  name:'Chủ động bán chéo',   base:77.5,min:55,max:100,step:0.5},
+  {id:'prio',   name:'Nhận diện KH Priority',base:72.0,min:50,max:100,step:0.5},
+  {id:'after',  name:'Chăm sóc sau bán',    base:79.0,min:55,max:100,step:0.5},
+];
+const ECON=[
+  {id:'nKH', name:'Quy mô KHCN giao dịch quầy',val:2400,min:500,max:6000,step:50,unit:'nghìn KH/năm',fmt:v=>v.toLocaleString('vi')+'k'},
+  {id:'casa',name:'CASA bình quân / KH',       val:14,min:4,max:60,step:1,unit:'triệu đồng',fmt:v=>v+' tr'},
+  {id:'nim', name:'Biên CASA (NIM)',           val:3.2,min:1,max:6,step:0.1,unit:'%/năm',fmt:v=>v.toFixed(1)+'%'},
+  {id:'ptb', name:'Biên LN / SP bán chéo',     val:1.9,min:0.4,max:6,step:0.1,unit:'triệu đ/SP',fmt:v=>v.toFixed(1)+' tr'},
+  {id:'dGD', name:'Chênh chi phí GD quầy/app', val:22,min:5,max:60,step:1,unit:'nghìn đ/GD',fmt:v=>v+'k'},
+  {id:'nGD', name:'Số GD tại quầy',            val:38,min:8,max:120,step:1,unit:'triệu GD/năm',fmt:v=>v+' tr'},
+  {id:'vKH', name:'LN / KH giữ lại',           val:2.6,min:0.5,max:12,step:0.1,unit:'triệu đ/năm',fmt:v=>v.toFixed(1)+' tr'},
+  {id:'nPrio',name:'Quy mô KH Priority',       val:180,min:20,max:600,step:10,unit:'nghìn KH',fmt:v=>v+'k'},
+];
+const E={};ECON.forEach(e=>E[e.id]=e.val);
+let K={cross_need:0.09,cross_cross:0.12,defl_digital:0.15,casa_welcome:0.04,casa_need:0.07,ret_after:0.05,ret_prio:0.08};
+const K_META=[
+  {k:'cross_need',from:'Khai thác nhu cầu',to:'Attach rate',u:'pp/điểm',src:'đo được',cls:'do'},
+  {k:'cross_cross',from:'Chủ động bán chéo',to:'Attach rate',u:'pp/điểm',src:'đo được',cls:'do'},
+  {k:'defl_digital',from:'Hướng dẫn kênh số',to:'Tỷ lệ GD số',u:'pp/điểm',src:'đo được',cls:'do'},
+  {k:'casa_welcome',from:'Chào đón',to:'CASA bình quân',u:'%/điểm',src:'giả định',cls:'gd'},
+  {k:'casa_need',from:'Khai thác nhu cầu',to:'CASA bình quân',u:'%/điểm',src:'giả định',cls:'gd'},
+  {k:'ret_after',from:'Chăm sóc sau bán',to:'Churn (giảm)',u:'pp/điểm',src:'giả định',cls:'gd'},
+  {k:'ret_prio',from:'Nhận diện Priority',to:'Churn Priority',u:'pp/điểm',src:'benchmark',cls:'bm'},
+];
+
+/* ---- NGUỒN DỮ LIỆU (coverage overlay) ---- */
+const SRC={
+  do:{l:'Đo trực tiếp',c:'var(--src-do)',who:'SOI.Pro'},
+  kp:{l:'Khám phá — chuyên gia CX',c:'var(--src-kp)',who:'SOI.Pro'},
+  bm:{l:'Suy từ benchmark',c:'var(--src-bm)',who:'SOI.Pro'},
+  mb:{l:'MB cung cấp dữ liệu',c:'var(--src-mb)',who:'MB bank'},
+  ns:{l:'MB bố trí nhân sự',c:'#7A4FBF',who:'MB bank'},
+  qd:{l:'◆ Quyết định có deadline',c:'var(--src-qd)',who:'MB bank'},
+};
+const SRC_BADGE={do:'ĐO',kp:'KHÁM PHÁ',bm:'BENCHMARK',mb:'MB CẤP',ns:'NHÂN SỰ',qd:'◆ QUYẾT ĐỊNH'};
+
+/* ---- NODE: toạ độ + coverage + việc cụ thể ---- */
+const N={
+  welcome:{x:14,y:56,c:'cx',l:'Chào đón & nhận diện',src:'do',lay:'A',
+    work:[{n:'Đánh giá bảo vệ, lễ tân, điều phối viên',b:'do',d:'Quan sát trực tiếp hành vi đón tiếp tại điểm giao dịch',m:'1.294 mẫu CN/PGD · toàn quốc'},
+          {n:'Nhận diện thương hiệu & cơ sở vật chất',b:'do',d:'Cấu phần 2 — tuân thủ tiêu chuẩn không gian giao dịch',m:'toàn bộ CN/PGD + SmartBank'}]},
+  need:{x:14,y:136,c:'cx',l:'Khai thác nhu cầu',src:'do',lay:'A',
+    work:[{n:'Đánh giá năng lực tư vấn UB/GDV/RM',b:'do',d:'Cấu phần 4 — khả năng tạo giá trị thay vì chỉ xử lý giao dịch',m:'kịch bản theo 7 nhóm SPDV'},
+          {n:'Nguyên nhân gốc của điểm nghẽn tư vấn',b:'kp',d:'Chuyên gia CX trải nghiệm lại, tách con người / quy trình / công nghệ',m:'Giai đoạn 3 · 01–30/10/2026'}]},
+  digital:{x:14,y:216,c:'cx',l:'Hướng dẫn kênh số',src:'do',lay:'A',
+    work:[{n:'Đánh giá hướng dẫn App & chuyển dịch số',b:'do',d:'Cấu phần 3 — vai trò tuyến đầu thúc đẩy Digital Adoption',m:'quầy + 137 SmartBank + 250 ATM + 100 online'},
+          {n:'Rào cản chuyển đổi số',b:'kp',d:'Xác định vì sao khách không chuyển sang kênh số',m:'Giai đoạn 3'}]},
+  cross:{x:14,y:296,c:'cx',l:'Chủ động bán chéo',src:'do',lay:'A',
+    work:[{n:'Đánh giá năng lực bán chéo',b:'do',d:'Cấu phần 4 — có chủ động giới thiệu sản phẩm thứ 2 không',m:'1.294 mẫu · nền 2025: 22,7% còn bị động'}]},
+  prio:{x:14,y:376,c:'cx',l:'Nhận diện KH Priority',src:'do',lay:'A',
+    work:[{n:'Đánh giá phân luồng & phục vụ Priority',b:'do',d:'Cấu phần 5 — khoảng cách trải nghiệm Mass vs Priority',m:'20% mẫu · shopper dựng hồ sơ Priority'},
+          {n:'Dư địa so với chuẩn quốc tế',b:'bm',d:'So sánh mô hình Priority Banking của 2 NH quốc tế',m:'20 mẫu quốc tế'}]},
+  after:{x:14,y:456,c:'cx',l:'Chăm sóc sau bán',src:'do',lay:'A',
+    work:[{n:'Đánh giá chăm sóc sau giao dịch',b:'do',d:'Cấu phần 2 — MB247, App, RM chủ động liên hệ lại',m:'100 Call + 50 Chatbot + 50 kênh khác'},
+          {n:'Moment of Truth Index',b:'do',d:'Cấu phần 6 — chỉ số 5–7 khoảnh khắc quyết định, làm KPI vùng',m:'đầu ra bàn giao kỳ 2026'}]},
+
+  attach:{x:352,y:96,c:'beh',l:'Attach rate',src:'mb',lay:'B',
+    work:[{n:'Attach rate hiện tại theo phân khúc',b:'mb',d:'Số sản phẩm bình quân/KH — để quy đổi điểm bán chéo sang doanh thu',m:'Khối Bán lẻ / MIS'}]},
+  defl:{x:352,y:206,c:'beh',l:'Tỷ lệ GD số',src:'mb',lay:'B',
+    work:[{n:'Cost-to-serve: quầy vs app',b:'mb',d:'Chênh lệch chi phí một giao dịch — quy đổi deflection sang tiết kiệm',m:'Khối Vận hành'}]},
+  casaB:{x:352,y:316,c:'beh',l:'CASA bình quân',src:'mb',lay:'B',
+    work:[{n:'CASA bình quân & NIM theo phân khúc',b:'mb',d:'Mắt xích bắt buộc để Tầng 3 "Business Impact" có con số thật',m:'Khối Tài chính / ALM'}]},
+  churn:{x:352,y:426,c:'beh',l:'Churn',src:'mb',lay:'B',
+    work:[{n:'Churn / dormant rate 12 tháng',b:'mb',d:'Baseline giữ chân, tách riêng Mass và Priority',m:'MIS / CRM'},
+          {n:'Cơ chế gắn mã mẫu khảo sát',b:'qd',d:'Mỗi mẫu gắn mã đơn vị + thời điểm, để kỳ sau đối chiếu biến động Lớp B tại chính đơn vị đó',m:'PHẢI CHỐT TRONG GIAI ĐOẠN 1'}]},
+
+  rev:{x:672,y:126,c:'out',l:'Δ Thu nhập',src:'mb',lay:'C',
+    work:[{n:'Đầu mối phối hợp FP&A – MIS – CX',b:'ns',d:'Một người chịu trách nhiệm ghép dữ liệu vận hành với kết quả khảo sát',m:'chốt tại buổi khởi động'}]},
+  cost:{x:672,y:266,c:'out',l:'Δ Chi phí phục vụ',src:'mb',lay:'C',work:[]},
+  ltv:{x:672,y:406,c:'out',l:'Δ Giá trị KH',src:'mb',lay:'C',work:[]},
+  pbt:{x:856,y:266,c:'money',l:'Δ LNTT',src:'mb',lay:'C',
+    work:[{n:'Khung lượng hóa tác động',b:'qd',d:'Thống nhất khung + danh mục dữ liệu MB cung cấp',m:'Giai đoạn 1 · 15 ngày sau ký HĐ'}]},
+};
+const NW=148,NH=58;
+const LAYSUB={A:'điểm CLDV',B:'Δ so baseline',C:'đóng góp P&L'};
+const CC={cx:'#1F5FBF',beh:'#0E8A6E',out:'#B8860B',money:'#E4002B'};
+const EDGES=[
+  {a:'need',b:'attach',k:'cross_need',d:0,r:['casa','cross']},
+  {a:'cross',b:'attach',k:'cross_cross',d:0,r:['cross']},
+  {a:'digital',b:'defl',k:'defl_digital',d:0,r:['digital']},
+  {a:'welcome',b:'casaB',k:'casa_welcome',d:1,r:['casa']},
+  {a:'need',b:'casaB',k:'casa_need',d:1,r:['casa']},
+  {a:'after',b:'churn',k:'ret_after',d:1,r:['priority']},
+  {a:'prio',b:'churn',k:'ret_prio',d:1,r:['priority']},
+  {a:'attach',b:'rev',l:'×biên SP',r:['cross','casa']},
+  {a:'casaB',b:'rev',l:'×NIM',r:['casa']},
+  {a:'defl',b:'cost',l:'×chênh CP',r:['digital']},
+  {a:'churn',b:'ltv',l:'×giá trị KH',r:['priority']},
+  {a:'rev',b:'pbt',l:'+',r:['casa','cross','digital','priority']},
+  {a:'cost',b:'pbt',l:'+',r:['digital']},
+  {a:'ltv',b:'pbt',l:'+',r:['priority']},
+];
+const ROUTES={
+  all:{l:'Toàn bộ',s:'6 node · 4 cơ chế'},
+  casa:{l:'Tuyến CASA',s:'Chào đón + Nhu cầu → NIM'},
+  cross:{l:'Tuyến bán chéo',s:'Nhu cầu + Bán chéo → biên SP'},
+  digital:{l:'Tuyến chuyển đổi số',s:'Hướng dẫn số → chi phí phục vụ'},
+  priority:{l:'Tuyến giữ chân',s:'Priority + Sau bán → giá trị KH'},
+};
+
+/* ===================== TÍNH TOÁN ===================== */
+const $=id=>document.getElementById(id);
+function readA(){const o={};A_DRIVERS.forEach(d=>{const e=$('a_'+d.id);o[d.id]=e?+e.value:d.base});return o}
+function readE(){const o={};ECON.forEach(e=>{const el=$('e_'+e.id);o[e.id]=el?+el.value:e.val});return o}
+function compute(A,ec){
+  const d={};A_DRIVERS.forEach(x=>d[x.id]=A[x.id]-x.base);
+  const dAttach=d.need*K.cross_need+d.cross*K.cross_cross;
+  const m1=ec.nKH*1000*(dAttach/100)*ec.ptb/1000;
+  const dDefl=d.digital*K.defl_digital;
+  const m2=ec.nGD*1e6*(dDefl/100)*ec.dGD*1000/1e9;
+  const dCasa=d.welcome*K.casa_welcome+d.need*K.casa_need;
+  const m3=ec.nKH*1000*ec.casa*(dCasa/100)*(ec.nim/100)/1000;
+  const dChM=d.after*K.ret_after, dChP=d.prio*K.ret_prio+d.after*K.ret_after*0.6;
+  const m4=(ec.nKH*1000*(dChM/100)*ec.vKH+ec.nPrio*1000*(dChP/100)*ec.vKH*2.4)/1000;
+  return{d,dAttach,dDefl,dCasa,dChM,dChP,m:[m1,m2,m3,m4],total:m1+m2+m3+m4};
+}
+function fmtT(v){return (v>=0?'+':'−')+Math.abs(v).toFixed(1)+' tỷ đ'}
+
+/* ===================== STATE ===================== */
+let srcOn={do:1,kp:1,bm:1,mb:1,ns:1,qd:1};
+let mode='impact';
+let hlWork=null;
+let route='all';
+let selNode=null;
+
+/* ===================== CONTROLS ===================== */
+function buildCtrls(){
+  $('ctrlA').innerHTML=A_DRIVERS.map(d=>`
+    <div class="ctrl"><div class="ctrl-head"><span class="ctrl-name">${d.name}</span>
+      <span class="ctrl-val" id="v_${d.id}">${d.base.toFixed(1)}</span></div>
+      <input type="range" id="a_${d.id}" min="${d.min}" max="${d.max}" step="${d.step}" value="${d.base}"></div>`).join('');
+  $('ctrlEcon').innerHTML=ECON.map(e=>`
+    <div class="ctrl"><div class="ctrl-head"><span class="ctrl-name">${e.name}</span>
+      <span class="ctrl-val" id="ve_${e.id}" style="color:var(--gold)">${e.fmt(e.val)}</span></div>
+      <input type="range" id="e_${e.id}" min="${e.min}" max="${e.max}" step="${e.step}" value="${e.val}">
+      <div style="font-size:9.5px;color:var(--dim);margin-top:3px">${e.unit}</div></div>`).join('');
+  $('ctrlA2').innerHTML=A_DRIVERS.map(d=>`
+    <div class="ctrl"><div class="ctrl-head"><span class="ctrl-name">${d.name}</span>
+      <span class="ctrl-val" id="v2_${d.id}">${d.base.toFixed(1)}</span></div>
+      <input type="range" id="b_${d.id}" min="${d.min}" max="${d.max}" step="${d.step}" value="${d.base}"></div>`).join('');
+  A_DRIVERS.forEach(d=>{
+    $('a_'+d.id).addEventListener('input',e=>{$('b_'+d.id).value=e.target.value;renderAll()});
+    $('b_'+d.id).addEventListener('input',e=>{$('a_'+d.id).value=e.target.value;renderAll()});
+  });
+  ECON.forEach(e=>$('e_'+e.id).addEventListener('input',renderAll));
+
+  // đếm số việc theo nguồn
+  const cnt={};Object.keys(SRC).forEach(k=>cnt[k]=0);
+  Object.values(N).forEach(n=>n.work.forEach(w=>cnt[w.b]++));
+  $('srcFilter').innerHTML=Object.entries(SRC).map(([k,v])=>`
+    <label class="chk"><input type="checkbox" data-src="${k}" checked>
+      <span class="sw" style="background:${v.c}"></span>${v.l}<span class="ct">${cnt[k]}</span></label>`).join('');
+  document.querySelectorAll('[data-src]').forEach(c=>c.addEventListener('change',e=>{
+    srcOn[e.target.dataset.src]=e.target.checked?1:0;renderMap();renderLegend();buildWorkList();}));
+
+  $('routeFilter').innerHTML=Object.entries(ROUTES).map(([k,v])=>`
+    <button class="rt-btn${k==='all'?' on':''}" data-route="${k}">${v.l}<small>${v.s}</small></button>`).join('');
+  document.querySelectorAll('[data-route]').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('[data-route]').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');route=b.dataset.route;renderMap();}));
+  buildWorkList();
+}
+function buildWorkList(){
+  const rows=[];
+  Object.entries(N).forEach(([id,n])=>n.work.forEach((w,i)=>rows.push({nid:id,wi:i,...w,node:n.l})));
+  const order={qd:0,kp:1,do:2,bm:3,mb:4,ns:5};
+  rows.sort((a,b)=>(order[a.b]-order[b.b])||a.node.localeCompare(b.node));
+  $('workList').innerHTML=rows.filter(r=>srcOn[r.b]).map(r=>`
+    <div class="wk" data-nid="${r.nid}" data-wi="${r.wi}" style="border-left-color:${SRC[r.b].c}">
+      <span class="wd" style="background:${SRC[r.b].c}"></span>
+      <span><span class="wt">${r.n}</span><span class="wn">${r.node} · ${SRC_BADGE[r.b]}</span></span></div>`).join('');
+  document.querySelectorAll('.wk').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{hlWork=el.dataset.nid;markHL()});
+    el.addEventListener('mouseleave',()=>{hlWork=null;markHL()});
+    el.addEventListener('click',()=>{selNode=el.dataset.nid;renderMap();renderDetail()});
+  });
+}
+function markHL(){
+  document.querySelectorAll('.mnode').forEach(g=>g.classList.toggle('hl',hlWork===g.dataset.id));
+}
+function renderLegend(){
+  if(mode==='impact'){
+    $('legend').innerHTML=`
+      <div class="lg"><span class="d" style="background:var(--cx)"></span>Lớp A · điểm CLDV</div>
+      <div class="lg"><span class="d" style="background:var(--beh)"></span>Lớp B · cơ chế</div>
+      <div class="lg"><span class="d" style="background:var(--out)"></span>Lớp C · tài chính</div>
+      <div class="lg"><span style="width:14px;height:0;border-top:1.5px dashed var(--muted)"></span>mắt xích giả định</div>`;
+    return;
+  }
+  $('legend').innerHTML=Object.entries(SRC).map(([k,v])=>
+    `<div class="lg${srcOn[k]?'':' off'}" data-lg="${k}"><span class="d" style="background:${v.c}"></span>${v.l}</div>`).join('');
+  document.querySelectorAll('[data-lg]').forEach(x=>x.addEventListener('click',()=>{
+    const k=x.dataset.lg;srcOn[k]=srcOn[k]?0:1;
+    const cb=document.querySelector(`[data-src="${k}"]`);if(cb)cb.checked=!!srcOn[k];
+    renderMap();renderLegend();buildWorkList();}));
+}
+
+/* ===================== MINDMAP ===================== */
+function nodeVisible(id){
+  const n=N[id];
+  if(mode==='impact'){
+    if(route==='all')return true;
+    return EDGES.some(e=>(e.a===id||e.b===id)&&(!e.r||e.r.includes(route)));
+  }
+  if(n.work.length===0)return true;
+  return n.work.some(w=>srcOn[w.b]);
+}
+function anc(id,s){const n=N[id];return{x:s==='r'?n.x+NW:n.x,y:n.y+NH/2}}
+function renderMap(){
+  const A=readA(),ec=readE(),R=compute(A,ec);
+  const V={welcome:A.welcome.toFixed(1),need:A.need.toFixed(1),digital:A.digital.toFixed(1),
+    cross:A.cross.toFixed(1),prio:A.prio.toFixed(1),after:A.after.toFixed(1),
+    attach:(R.dAttach>=0?'+':'')+R.dAttach.toFixed(2)+'pp',
+    defl:(R.dDefl>=0?'+':'')+R.dDefl.toFixed(2)+'pp',
+    casaB:(R.dCasa>=0?'+':'')+R.dCasa.toFixed(2)+'%',
+    churn:(R.dChM>=0?'−':'+')+Math.abs(R.dChM).toFixed(2)+'pp',
+    rev:(R.m[0]+R.m[2]).toFixed(1)+' tỷ',cost:R.m[1].toFixed(1)+' tỷ',
+    ltv:R.m[3].toFixed(1)+' tỷ',pbt:(R.total>=0?'+':'')+R.total.toFixed(1)+' tỷ'};
+
+  // swimlane
+  $('swimLayer').innerHTML=`
+    <text class="col-title" x="14" y="20">Lớp A · SOI.Pro đo</text>
+    <text class="col-sub" x="14" y="34">hành vi tuyến đầu quan sát được</text>
+    <text class="col-title" x="352" y="20">Lớp B · cùng hiệu chỉnh</text>
+    <text class="col-sub" x="352" y="34">cơ chế trung gian — ô trống</text>
+    <text class="col-title" x="672" y="20">Lớp C · MB sở hữu</text>
+    <text class="col-sub" x="672" y="34">dữ liệu tài chính</text>
+    <path class="swim" d="M334,44 L334,540"/><path class="swim" d="M654,44 L654,540"/>`;
+
+  let e='';
+  EDGES.forEach(ed=>{
+    const vis=nodeVisible(ed.a)&&nodeVisible(ed.b)&&
+      (mode!=='impact'||route==='all'||!ed.r||ed.r.includes(route));
+    const p1=anc(ed.a,'r'),p2=anc(ed.b,'l'),mx=(p1.x+p2.x)/2,col=CC[N[ed.a].c];
+    let lbl=ed.l||'';if(ed.k){const v=K[ed.k];lbl=(v>=0?'+':'')+v.toFixed(2)}
+    e+=`<path class="medge${ed.d?' dashed':''}${vis?'':' off'}" data-a="${ed.a}" data-b="${ed.b}" fill="none"
+      d="M${p1.x},${p1.y} C${mx},${p1.y} ${mx},${p2.y} ${p2.x},${p2.y}" stroke="${col}"/>
+      <text class="medge-lbl${vis?'':' off'}" data-a="${ed.a}" data-b="${ed.b}" x="${mx}" y="${(p1.y+p2.y)/2-4}" text-anchor="middle">${lbl}</text>`;
+  });
+  $('edgeLayer').innerHTML=e;
+
+  let nh='';
+  Object.entries(N).forEach(([id,nd])=>{
+    const col=CC[nd.c],vis=nodeVisible(id);
+    // badge nguồn: gom các nguồn của việc trên node
+    const vw=nd.work.filter(w=>srcOn[w.b]);
+    const srcs=[...new Set(vw.map(w=>w.b))];
+    const bw=(mode==='cover'&&srcs.length)? srcs.map((b,i)=>
+      `<rect x="${nd.x+NW-8-(srcs.length-i)*11}" y="${nd.y-6}" width="9" height="9" rx="2" fill="${SRC[b].c}"/>`).join(''):'';
+    const qd=mode==='cover'&&vw.some(w=>w.b==='qd');
+    let sub;
+    if(mode==='cover'){
+      sub=vw.length?{t:SRC_BADGE[vw[0].b]+(vw.length>1?' +'+(vw.length-1):''),c:SRC[vw[0].b].c}
+                   :{t:'—',c:'var(--dim)'};
+    }else{
+      sub={t:LAYSUB[nd.lay],c:'var(--dim)'};
+    }
+    nh+=`<g class="mnode${vis?'':' off'}${selNode===id?' sel':''}" data-id="${id}">
+      <rect class="nbox" x="${nd.x}" y="${nd.y}" width="${NW}" height="${NH}" rx="7"
+        fill="#FFFFFF" stroke="${qd?'var(--mb)':col}" stroke-width="${qd?2.2:1.4}"/>
+      ${bw}
+      <text class="mn-title" x="${nd.x+11}" y="${nd.y+20}">${nd.l}</text>
+      <text class="mn-val" x="${nd.x+11}" y="${nd.y+39}" fill="${col}">${V[id]}</text>
+      <text class="mn-src" x="${nd.x+11}" y="${nd.y+51}" fill="${sub.c}">${sub.t}</text>
+    </g>`;
+  });
+  $('nodeLayer').innerHTML=nh;
+  document.querySelectorAll('.mnode').forEach(g=>{
+    g.addEventListener('mouseenter',()=>hi(g.dataset.id));
+    g.addEventListener('mouseleave',clr);
+    g.addEventListener('click',()=>{selNode=g.dataset.id;renderMap();renderDetail();});
+  });
+  if(selNode)renderDetail();
+}
+function hi(id){const s=new Set([id]);
+  document.querySelectorAll('.medge').forEach(p=>{const on=p.dataset.a===id||p.dataset.b===id;
+    p.classList.toggle('hot',on);if(p.dataset.a===id)s.add(p.dataset.b);if(p.dataset.b===id)s.add(p.dataset.a)});
+  document.querySelectorAll('.medge-lbl').forEach(t=>t.classList.toggle('hot',t.dataset.a===id||t.dataset.b===id));
+  document.querySelectorAll('.mnode').forEach(g=>{if(!g.classList.contains('off'))g.classList.toggle('dim',!s.has(g.dataset.id))});}
+function clr(){document.querySelectorAll('.medge,.medge-lbl').forEach(x=>x.classList.remove('hot'));
+  document.querySelectorAll('.mnode').forEach(g=>g.classList.remove('dim'))}
+
+/* ===================== DETAIL ===================== */
+const LAYL={A:['Lớp A — SOI.Pro đo','var(--cx)'],B:['Lớp B — cùng hiệu chỉnh','var(--beh)'],C:['Lớp C — MB sở hữu','var(--out)']};
+function renderDetail(){
+  if(!selNode){
+    $('detail').innerHTML = mode==='impact'
+    ? `<div class="dt-empty"><b style="color:var(--navy)">Chọn một node</b> để xem vai trò của nó
+       trong chuỗi truyền dẫn.<br><br>Kéo thanh điểm CLDV bên trái — giá trị lan từ
+       <b style="color:var(--cx)">Lớp A</b> qua <b style="color:var(--beh)">Lớp B</b>
+       tới <b style="color:var(--out)">Lớp C</b>.<br><br>
+       Nét đứt là mắt xích giả định — phần dự án đi lấp.</div>`
+    : `<div class="dt-empty"><b style="color:var(--navy)">Chọn một node</b> để xem chính xác
+       SOI.Pro làm gì và MB cần chuẩn bị gì tại mắt xích đó.<br><br>
+       Ô viền đỏ là mắt xích có <b style="color:var(--mb)">quyết định phải chốt trong Giai đoạn 1</b>.<br><br>
+       Danh mục việc bên trái — rê chuột để định vị trên sơ đồ.</div>`;
+    return}
+  const n=N[selNode],A=readA(),ec=readE(),R=compute(A,ec);
+  const V={welcome:A.welcome.toFixed(1)+' điểm',need:A.need.toFixed(1)+' điểm',digital:A.digital.toFixed(1)+' điểm',
+    cross:A.cross.toFixed(1)+' điểm',prio:A.prio.toFixed(1)+' điểm',after:A.after.toFixed(1)+' điểm',
+    attach:(R.dAttach>=0?'+':'')+R.dAttach.toFixed(2)+' pp',defl:(R.dDefl>=0?'+':'')+R.dDefl.toFixed(2)+' pp',
+    casaB:(R.dCasa>=0?'+':'')+R.dCasa.toFixed(2)+'%',churn:(R.dChM>=0?'−':'+')+Math.abs(R.dChM).toFixed(2)+' pp',
+    rev:(R.m[0]+R.m[2]).toFixed(1)+' tỷ đ',cost:R.m[1].toFixed(1)+' tỷ đ',ltv:R.m[3].toFixed(1)+' tỷ đ',
+    pbt:(R.total>=0?'+':'')+R.total.toFixed(1)+' tỷ đ'};
+  const VL={A:'điểm CLDV hiện tại',B:'biến động so với baseline',C:'đóng góp vào P&L'}[n.lay];
+  const work=n.work.filter(w=>srcOn[w.b]);
+  let h=`<div class="dt-h">${n.l}</div>
+    <div class="dt-layer" style="color:${LAYL[n.lay][1]}">${LAYL[n.lay][0]}</div>
+    <div class="dt-val" style="color:${CC[n.c]}">${V[selNode]}</div>
+    <div class="dt-vl">${VL}</div>`;
+  if(mode==='impact'){
+    // liệt kê mắt xích vào/ra
+    const inc=EDGES.filter(e=>e.b===selNode), out=EDGES.filter(e=>e.a===selNode);
+    if(inc.length){
+      h+=`<div class="dt-sec">Nhận ảnh hưởng từ</div>`;
+      inc.forEach(e=>{const kv=e.k?K[e.k]:null;
+        h+=`<div class="dt-card" style="border-left-color:${CC[N[e.a].c]}">
+          <div class="c1"><span class="cn">${N[e.a].l}</span>
+          ${kv!==null?`<span class="cb" style="color:${e.d?'var(--assume)':'var(--src-do)'};border:1px solid ${e.d?'var(--assume)':'var(--src-do)'}">${e.d?'GIẢ ĐỊNH':'ĐO ĐƯỢC'}</span>`:''}</div>
+          <div class="cd">${kv!==null?`hệ số truyền dẫn <b style="color:var(--navy)">${kv>=0?'+':''}${kv}</b>`:`quan hệ <b style="color:var(--navy)">${e.l}</b>`}</div></div>`});
+    }
+    if(out.length){
+      h+=`<div class="dt-sec">Truyền ảnh hưởng tới</div>`;
+      out.forEach(e=>{const kv=e.k?K[e.k]:null;
+        h+=`<div class="dt-card" style="border-left-color:${CC[N[e.b].c]}">
+          <div class="c1"><span class="cn">${N[e.b].l}</span>
+          ${kv!==null?`<span class="cb" style="color:${e.d?'var(--assume)':'var(--src-do)'};border:1px solid ${e.d?'var(--assume)':'var(--src-do)'}">${e.d?'GIẢ ĐỊNH':'ĐO ĐƯỢC'}</span>`:''}</div>
+          <div class="cd">${kv!==null?`hệ số truyền dẫn <b style="color:var(--navy)">${kv>=0?'+':''}${kv}</b>`:`quan hệ <b style="color:var(--navy)">${e.l}</b>`}</div></div>`});
+    }
+    if(n.lay==='A'){
+      const A2={...A};A2[selNode]=A[selNode]+1;
+      const dv=compute(A2,ec).total-R.total;
+      h+=`<div class="dt-note"><b>Độ nhạy.</b> Cải thiện 1 điểm CLDV tại node này
+      làm LNTT đổi <b style="color:var(--navy)">${dv>=0?'+':''}${dv.toFixed(2)} tỷ đ/năm</b>
+      — theo hệ số hiện tại.</div>`;
+    }
+    if(n.lay==='B'){
+      h+=`<div class="dt-note"><b>Ô trống trung tâm.</b> SOI.Pro đo được đầu vào (Lớp A) nhưng không quan sát
+      được node này — nó nằm trong core banking của MB. Đây chính là phần Chặng 2 đi lấp.</div>`;
+    }
+    $('detail').innerHTML=h;return;
+  }
+  if(work.length){
+    h+=`<div class="dt-sec">Việc tại mắt xích này</div>`;
+    work.forEach(w=>{const c=SRC[w.b].c;
+      h+=`<div class="dt-card" style="border-left-color:${c}">
+        <div class="c1"><span class="cn">${w.n}</span><span class="cb" style="color:${c};border:1px solid ${c}">${SRC_BADGE[w.b]}</span></div>
+        <div class="cd">${w.d}</div><div class="cm">${w.m}</div></div>`});
+  } else {
+    h+=`<div class="dt-sec">Việc tại mắt xích này</div>
+      <div class="dt-empty" style="padding:4px 2px">Node kết quả — không có hoạt động khảo sát trực tiếp,
+      giá trị suy ra từ các mắt xích thượng nguồn.</div>`;
+  }
+  if(n.work.some(w=>w.b==='qd')){
+    h+=`<div class="dt-warn"><b>◆ Mốc cứng — Giai đoạn 1.</b> Quyết định này phải chốt trong
+    <b>15 ngày sau ký HĐ</b>. Chốt sau khi khảo sát đã chạy thì mất khả năng đối chiếu biến động —
+    kỳ này chỉ đo được <i>mức</i>, không đo được <i>chiều</i>.</div>`;
+  }
+  if(n.lay==='B'){
+    h+=`<div class="dt-note"><b>Ô trống trung tâm.</b> SOI.Pro đo được đầu vào (Lớp A) nhưng không quan sát
+    được node này — nó nằm trong core banking của MB. Đây chính là phần Chặng 2 đi lấp.</div>`;
+  }
+  $('detail').innerHTML=h;
+}
+
+/* ===================== MODEL ===================== */
+const MECH=[
+  {n:'Cross-sell tại quầy',c:'var(--mb)',src:'Cấu phần 4',s:(a,e)=>`Attach rate ${a.dAttach>=0?'+':''}${a.dAttach.toFixed(2)} pp × ${e.nKH.toLocaleString('vi')}k KH × biên ${e.ptb} tr/SP`},
+  {n:'Chuyển dịch kênh số',c:'var(--cx)',src:'Cấu phần 3',s:(a,e)=>`${a.dDefl>=0?'+':''}${a.dDefl.toFixed(2)} pp GD sang app × chênh ${e.dGD}k đ/GD`},
+  {n:'CASA từ trải nghiệm',c:'var(--beh)',src:'Tầng 3',s:(a,e)=>`Số dư bình quân ${a.dCasa>=0?'+':''}${a.dCasa.toFixed(2)}% × NIM ${e.nim}%`},
+  {n:'Giữ chân & Priority',c:'var(--out)',src:'Cấu phần 5',s:a=>`Churn Mass ${a.dChM>=0?'−':'+'}${Math.abs(a.dChM).toFixed(2)} pp · Priority ${a.dChP>=0?'−':'+'}${Math.abs(a.dChP).toFixed(2)} pp`},
+];
+function renderModel(){
+  const A=readA(),ec=readE(),R=compute(A,ec);
+  A_DRIVERS.forEach(d=>{const e=$('v_'+d.id);if(e)e.textContent=A[d.id].toFixed(1);
+    const e2=$('v2_'+d.id);if(e2)e2.textContent=A[d.id].toFixed(1);});
+  ECON.forEach(e=>{const el=$('ve_'+e.id);if(el)el.textContent=e.fmt(ec[e.id])});
+  const mx=Math.max(...R.m.map(Math.abs),0.01);
+  $('mechList').innerHTML=MECH.map((m,i)=>`
+    <div class="mech"><div class="mech-head"><span class="mech-name">${m.n}<span class="src">${m.src}</span></span>
+      <span class="mech-val">${fmtT(R.m[i])}</span></div>
+      <div class="mech-track"><div class="mech-fill" style="width:${(Math.abs(R.m[i])/mx*100).toFixed(0)}%;background:${m.c}"></div></div>
+      <div class="mech-sub">${m.s(R,ec)}</div></div>`).join('');
+  $('totalVal').textContent=fmtT(R.total);
+  const isZero=Math.abs(R.total)<0.001;
+  $('totalNote').innerHTML=isZero
+    ? `<span style="color:var(--mb)"><b>Đang ở baseline — mọi delta = 0.</b></span>
+       Đơn vị kinh tế là số <i>nhân</i>; tác động chỉ sinh ra khi điểm CLDV lệch khỏi baseline.
+       Kéo thanh <b>Điểm CLDV</b> phía trên bảng bên trái, hoặc bấm <b>+5 điểm</b>.`
+    : `Cộng dồn 4 cơ chế, quy mô ${ec.nKH.toLocaleString('vi')}k KHCN. <b>Chỉ đúng nếu hệ số truyền dẫn đúng.</b>`;
+  $('rLow').textContent=fmtT(R.total*0.5);$('rBase').textContent=fmtT(R.total);$('rHigh').textContent=fmtT(R.total*1.6);
+  const SC={do:['var(--src-do)','đo được'],gd:['var(--assume)','giả định'],bm:['var(--src-bm)','benchmark']};
+  $('edgeTable').innerHTML=K_META.map(m=>{const s=SC[m.cls];
+    return `<tr><td class="edge">${m.from} → ${m.to}</td>
+      <td><span class="src-pill" style="color:${s[0]};border:1px solid ${s[0]}">${s[1]}</span></td>
+      <td style="text-align:right"><input class="coef-input" data-k="${m.k}" type="number" step="0.01" value="${K[m.k]}"><span class="unit">${m.u}</span></td></tr>`}).join('');
+  document.querySelectorAll('.coef-input').forEach(i=>i.addEventListener('input',ev=>{
+    K[ev.target.dataset.k]=parseFloat(ev.target.value)||0;renderAll();}));
+}
+
+/* ===================== REPORT ===================== */
+let strat='all';
+const SK={all:['welcome','need','digital','cross','prio','after'],casa:['welcome','need','after'],
+  digital:['digital','welcome','need'],priority:['prio','after','need']};
+const ST={all:'Xếp hạng 6 node hành vi theo <b>giá trị tiền trên mỗi điểm CLDV cải thiện</b>. Bản đồ để MB quyết định đầu tư đào tạo/quy trình vào đâu trước.',
+  casa:'Đường tác động: <b>Chào đón + Khai thác nhu cầu → số dư bình quân → NIM</b>. Chăm sóc sau bán giữ số dư khỏi rời đi.',
+  digital:'Đường tác động: <b>Hướng dẫn kênh số → deflection → chi phí phục vụ</b>. Cơ chế có unit economics rõ nhất, dễ chứng minh nhất.',
+  priority:'Đường tác động: <b>Nhận diện Priority + Chăm sóc → churn Priority → giá trị vòng đời</b>. Đòn bẩy lớn vì giá trị/KH cao gấp nhiều lần Mass.'};
+const DD={welcome:'Bảo vệ · lễ tân · điều phối viên',need:'UB/GDV/RM khai thác nhu cầu tài chính',
+  digital:'Hướng dẫn App & chuyển dịch số',cross:'Chủ động giới thiệu sản phẩm thứ 2',
+  prio:'Phân luồng & phục vụ khác biệt',after:'MB247 · App · RM sau giao dịch'};
+function renderReport(){
+  $('stratNote').innerHTML=ST[strat];
+  const A=readA(),ec=readE(),b=compute(A,ec).total,s={};
+  A_DRIVERS.forEach(d=>{const A2={...A};A2[d.id]=A[d.id]+1;s[d.id]=compute(A2,ec).total-b});
+  const rk=SK[strat].map(id=>({id,v:s[id]||0})).sort((x,y)=>y.v-x.v);
+  const mx=Math.max(...rk.map(x=>Math.abs(x.v)),0.001);
+  const NM={};A_DRIVERS.forEach(d=>NM[d.id]=d.name);
+  $('rankList').innerHTML=rk.map((x,i)=>`
+    <div class="rank-item ${i===0?'top':''}"><div class="rank-n">${String(i+1).padStart(2,'0')}</div>
+      <div class="rank-body"><div class="rank-name">${NM[x.id]}</div><div class="rank-desc">${DD[x.id]}</div>
+      <div class="rank-bar"><div class="rank-fill" style="width:${(Math.abs(x.v)/mx*100).toFixed(0)}%"></div></div></div>
+      <div class="rank-lev">${x.v.toFixed(2)}<small>tỷ đ / điểm</small></div></div>`).join('');
+}
+
+/* ===================== WIRE ===================== */
+function setMode(m){
+  mode=m;
+  document.querySelectorAll('.rail-blk').forEach(b=>b.hidden=(b.dataset.blk!==m));
+  $('chTitle').textContent = m==='impact'
+    ? 'Cây nhân quả — điểm CLDV truyền dẫn tới LNTT'
+    : 'Cùng cây nhân quả — ai làm gì trên từng mắt xích';
+  renderLegend();renderMap();renderDetail();
+}
+function renderAll(){renderMap();renderModel();renderReport()}
+buildCtrls();renderLegend();
+function setAll(fn){A_DRIVERS.forEach(d=>{const v=fn(d);$('a_'+d.id).value=v;$('b_'+d.id).value=v});renderAll()}
+$('resetBtn').addEventListener('click',()=>setAll(d=>d.base));
+$('scenBtn').addEventListener('click',()=>setAll(d=>Math.min(d.max,d.base+5)));
+$('resetBtn2').addEventListener('click',()=>setAll(d=>d.base));
+$('scenBtn2').addEventListener('click',()=>setAll(d=>Math.min(d.max,d.base+5)));
+$('railTog').addEventListener('click',()=>{
+  const r=$('rail'),t=$('railTog');r.classList.toggle('hide');
+  t.textContent=r.classList.contains('hide')?'›':'‹';});
+document.querySelectorAll('.strat button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.strat button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');strat=b.dataset.strat;renderReport();}));
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));
+  t.classList.add('on');$('view-'+t.dataset.view).classList.add('on');
+  if(t.dataset.mode)setMode(t.dataset.mode);}));
+setMode('impact');renderAll();
+</script>
+</body>
+</html>
