@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI for Finance — Kế hoạch kinh doanh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap&subset=latin,latin-ext,vietnamese" rel="stylesheet">
+<style>
+:root{
+  --cream:#F7F5EF; --cream-2:#EFEBE1; --ink:#1E3932; --green:#00704A;
+  --line:#D8D2C4; --muted:#6B6759; --warn:#8C5A2B;
+  --serif:'Noto Serif Display',Georgia,serif;
+  --sans:'Outfit',system-ui,sans-serif;
+  --mono:'DM Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--sans);font-weight:300;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px 96px}
+
+/* masthead */
+header.mast{padding:64px 0 40px;border-bottom:2px solid var(--ink)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--green);margin:0 0 18px}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(34px,6vw,58px);line-height:1.08;margin:0 0 16px;letter-spacing:-.01em}
+.lede{font-size:clamp(16px,2.2vw,19px);max-width:60ch;color:var(--muted);margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:8px 28px;margin-top:28px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.meta b{font-weight:500;color:var(--ink)}
+
+/* sections */
+section{padding:52px 0;border-bottom:1px solid var(--line)}
+section:last-of-type{border-bottom:none}
+.snum{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--green);text-transform:uppercase;margin:0 0 10px}
+h2{font-family:var(--serif);font-weight:600;font-size:clamp(24px,3.6vw,33px);line-height:1.2;margin:0 0 8px;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0 0 26px;max-width:62ch}
+h3{font-family:var(--sans);font-weight:600;font-size:16px;margin:32px 0 10px;letter-spacing:.01em}
+p{margin:0 0 14px;max-width:66ch}
+strong{font-weight:600}
+a{color:var(--green)}
+
+/* tables */
+table{width:100%;border-collapse:collapse;margin:8px 0 18px;font-size:14.5px}
+th{text-align:left;font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);font-weight:400;padding:0 10px 9px 0;border-bottom:1px solid var(--ink);vertical-align:bottom}
+td{padding:11px 10px 11px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th:last-child,td:last-child{padding-right:0}
+.num{font-family:var(--mono);text-align:right;white-space:nowrap;font-size:14px}
+tr.total td{border-top:1px solid var(--ink);border-bottom:none;font-weight:600;padding-top:13px}
+tr.sub-line td{color:var(--muted)}
+.star{color:var(--green)}
+
+/* scenario switcher — signature */
+.scn{background:var(--cream-2);border:1px solid var(--line);padding:26px;margin:0 0 26px}
+.scn-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:14px;margin-bottom:18px}
+.scn-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.btns{display:flex;gap:0;border:1px solid var(--ink)}
+.btns button{font-family:var(--mono);font-size:12px;letter-spacing:.06em;background:transparent;color:var(--ink);border:none;border-right:1px solid var(--ink);padding:9px 16px;cursor:pointer;transition:background .15s,color .15s}
+.btns button:last-child{border-right:none}
+.btns button[aria-pressed="true"]{background:var(--ink);color:var(--cream)}
+.btns button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.headline{display:flex;flex-wrap:wrap;gap:26px 44px;margin-top:20px;padding-top:20px;border-top:1px solid var(--line)}
+.kpi .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.kpi .v{font-family:var(--serif);font-size:29px;font-weight:600;line-height:1}
+.kpi .v small{font-family:var(--sans);font-size:13px;font-weight:400;color:var(--muted);margin-left:5px}
+
+/* callouts */
+.note{border-left:2px solid var(--green);padding:2px 0 2px 18px;margin:20px 0;color:var(--muted)}
+.note strong{color:var(--ink)}
+.flag{border-left:2px solid var(--warn);padding:2px 0 2px 18px;margin:20px 0}
+.flag .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--warn);display:block;margin-bottom:5px}
+
+ul{margin:0 0 16px;padding-left:20px;max-width:66ch}
+li{margin-bottom:8px}
+li::marker{color:var(--green)}
+
+/* roles */
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin:16px 0 8px}
+.role{background:var(--cream);padding:20px}
+.role h4{font-family:var(--sans);font-size:14px;font-weight:600;margin:0 0 7px}
+.role p{font-size:13.5px;color:var(--muted);margin:0}
+
+footer{padding:44px 0 0;font-size:13px;color:var(--muted)}
+footer .v{font-family:var(--mono);font-size:11px;letter-spacing:.1em;margin-top:26px;color:var(--line)}
+
+@media (max-width:620px){
+  .headline{gap:20px 30px}
+  .kpi .v{font-size:24px}
+  td,th{font-size:13.5px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{body{background:#fff}.btns{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="mast">
+  <p class="eyebrow">Kế hoạch kinh doanh · nội bộ</p>
+  <h1>AI for Finance</h1>
+  <p class="lede">Khóa applied AI 12 giờ cho dân tài chính — kế toán, FP&amp;A, analyst. Bản mẫu kỳ 1 tháng 9/2026, thiết kế để lặp lại hàng tháng.</p>
+  <div class="meta">
+    <span>Kỳ 1 · <b>8 – 17/9/2026</b></span>
+    <span>Mục tiêu <b>50 học viên</b></span>
+    <span>Học phí <b>5.000.000₫</b> (gồm VAT)</span>
+    <span>100% online</span>
+  </div>
+</header>
+
+<section>
+  <p class="snum">01</p>
+  <h2>Ba tầng sản phẩm</h2>
+  <p class="sub">Chỉ tầng 1 tạo lợi nhuận. Tầng 0 tồn tại để nuôi tầng 1. Tầng 2 chưa mở bán.</p>
+  <table>
+    <thead><tr><th style="width:44px">Tầng</th><th>Sản phẩm</th><th style="width:130px">Giá</th><th style="width:38%">Vai trò</th></tr></thead>
+    <tbody>
+      <tr><td class="num">0</td><td>Workshop 1,5h online</td><td>Miễn phí</td><td>Phễu. Chỉ mở vấn đề, không dạy phương pháp</td></tr>
+      <tr><td class="num">1</td><td><strong>Khóa 12h · 4 buổi tối</strong></td><td><strong>5.000.000₫</strong></td><td>Sản phẩm lõi. Toàn bộ doanh thu nằm ở đây</td></tr>
+      <tr><td class="num">2</td><td>In-house cho doanh nghiệp</td><td>Báo giá riêng</td><td>Kéo từ học viên cấp CFO/KTT. Biên cao, chưa mở</td></tr>
+    </tbody>
+  </table>
+  <div class="note"><strong>Kỳ 1–2 không chào tầng 2.</strong> Chỉ ghi nhận tín hiệu: học viên tự nói ra pain của cả team và chủ động hỏi. Chào sớm sẽ phá vị thế người dạy.</div>
+</section>
+
+<section>
+  <p class="snum">02</p>
+  <h2>Khách hàng</h2>
+  <p class="sub">Bốn nhóm, nhưng truyền thông kỳ 1–2 chỉ nhắm hai nhóm đầu — cũng chính là 70% danh sách khóa cũ.</p>
+  <table>
+    <thead><tr><th style="width:30%">Nhóm</th><th>Vì sao mua</th><th style="width:26%">Ưu tiên</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Kế toán trưởng / KT tổng hợp</strong></td><td>Sợ bị thay rõ nhất, tự quyết chi tiền</td><td><span class="star">★</span> Mua trước nhất</td></tr>
+      <tr><td><strong>FP&amp;A / Analyst</strong></td><td>Muốn nhanh hơn, ứng dụng được ngay</td><td><span class="star">★</span> Nguồn bài dự thi tốt nhất</td></tr>
+      <tr><td>CFO / GĐTC doanh nghiệp vừa</td><td>Học để dẫn team, không để tự làm</td><td>Cửa vào in-house</td></tr>
+      <tr><td>Kế toán dịch vụ, chủ DN nhỏ</td><td>Biên ứng dụng rộng</td><td>Đông nhưng nhạy giá</td></tr>
+    </tbody>
+  </table>
+  <h3>Lời hứa bán hàng</h3>
+  <p>Giữ lại phần việc AI không làm được, giao đi phần việc AI làm nhanh hơn mình mười lần. Vai trò dịch từ <em>người làm</em> sang <em>người ra đề và kiểm định</em>.</p>
+  <div class="flag">
+    <span class="tag">Không dùng trong copy</span>
+    Không hứa “tăng thu nhập” — không chứng minh được và làm mòn uy tín người dạy. Thứ chứng minh được: học viên rời khóa với <strong>một quy trình đã tự động hóa và con số giờ tiết kiệm mỗi tháng</strong>.
+  </div>
+</section>
+
+<section>
+  <p class="snum">03</p>
+  <h2>P&amp;L một lớp</h2>
+  <p class="sub">Bấm để đổi kịch bản sĩ số. Mọi con số phía dưới tính lại theo cùng công thức.</p>
+
+  <div class="scn">
+    <div class="scn-head">
+      <span class="scn-label">Kịch bản sĩ số</span>
+      <div class="btns" role="group" aria-label="Chọn kịch bản sĩ số">
+        <button data-n="25" aria-pressed="false">25 — thận trọng</button>
+        <button data-n="35" aria-pressed="false">35 — cơ sở</button>
+        <button data-n="50" aria-pressed="true">50 — mục tiêu</button>
+      </div>
+    </div>
+    <table>
+      <thead><tr><th>Khoản mục</th><th class="num" style="width:170px">Số tiền</th></tr></thead>
+      <tbody>
+        <tr class="sub-line"><td>Giá niêm yết (gồm VAT 8%)</td><td class="num">5.000.000</td></tr>
+        <tr class="sub-line"><td>Thực thu bình quân sau 10% discount mix</td><td class="num">4.500.000</td></tr>
+        <tr><td>Doanh thu <span id="lbl-n">50</span> học viên (gồm VAT)</td><td class="num" id="v-gross"></td></tr>
+        <tr class="sub-line"><td>VAT đầu ra 8%</td><td class="num" id="v-vat"></td></tr>
+        <tr><td><strong>Doanh thu thuần</strong></td><td class="num" id="v-net"></td></tr>
+        <tr><td>Marketing — 20% doanh thu thuần</td><td class="num" id="v-mkt"></td></tr>
+        <tr><td>Vận hành — nền tảng, trợ giảng, tài liệu</td><td class="num" id="v-ops"></td></tr>
+        <tr><td>Giải thưởng — 6tr/quý phân bổ cho 3 lớp</td><td class="num" id="v-prize"></td></tr>
+        <tr><td>Lợi nhuận trước thuế TNDN</td><td class="num" id="v-pre"></td></tr>
+        <tr><td>Thuế TNDN 20%</td><td class="num" id="v-cit"></td></tr>
+        <tr class="total"><td>Lợi nhuận sau thuế</td><td class="num" id="v-aft"></td></tr>
+      </tbody>
+    </table>
+    <div class="headline">
+      <div class="kpi"><div class="k">Biên sau thuế</div><div class="v" id="k-margin"></div></div>
+      <div class="kpi"><div class="k">Điểm hòa vốn</div><div class="v" id="k-be">4<small>học viên</small></div></div>
+      <div class="kpi"><div class="k">Ngân sách CAC</div><div class="v" id="k-cac"></div></div>
+    </div>
+  </div>
+
+  <p><strong>Chưa tính công giảng của anh</strong> (chủ sở hữu) và chưa trừ VAT đầu vào của chi phí marketing.</p>
+  <p>Hòa vốn ở 4 học viên vì mô hình gần như không có chi phí cố định. Nghĩa là <strong>rủi ro không nằm ở tuyển sinh</strong> — nó nằm ở quỹ thời gian của người đứng lớp.</p>
+  <p><strong>Cả năm — 10 lớp</strong> (trừ Tết và cao điểm): doanh thu thuần ~2,08 tỷ · lợi nhuận sau thuế ~1,24 tỷ ở kịch bản 50 học viên.</p>
+</section>
+
+<section>
+  <p class="snum">04</p>
+  <h2>Toán tuyển sinh</h2>
+  <p class="sub">Ngược từ mục tiêu sĩ số. Đây là bảng marketing bám hàng tuần.</p>
+  <table>
+    <thead><tr><th>Bước phễu</th><th style="width:24%">Tỷ lệ giả định</th><th class="num" style="width:24%">Cần đạt</th></tr></thead>
+    <tbody>
+      <tr><td>Dự workshop → đóng tiền</td><td>20%</td><td class="num" id="f-attend"></td></tr>
+      <tr><td>Đăng ký workshop → dự thật</td><td>45%</td><td class="num" id="f-reg"></td></tr>
+      <tr><td>Vào landing → đăng ký workshop</td><td>25%</td><td class="num" id="f-visit"></td></tr>
+    </tbody>
+  </table>
+  <div class="note">Kỳ 1–2 sẽ tiêu ít hơn ngân sách vì chạy trên danh sách ấm. <strong>Phần dư không bỏ túi — đổ vào sản xuất nội dung.</strong> Lý do ở mục 08.</div>
+</section>
+
+<section>
+  <p class="snum">05</p>
+  <h2>Chu kỳ 4 tuần</h2>
+  <p class="sub">Bản lặp. Workshop kỳ sau rơi vào tuần ngay sau buổi 4 — hai kỳ gối nhau, không có tháng chết.</p>
+  <table>
+    <thead><tr><th style="width:70px">Tuần</th><th>Việc</th><th style="width:30%">Chịu trách nhiệm</th></tr></thead>
+    <tbody>
+      <tr><td class="num">T‑2</td><td>Mở landing · email danh sách · đẩy social · mời workshop</td><td>Marketing</td></tr>
+      <tr><td class="num">T‑1</td><td><strong>Workshop tối thứ Năm</strong> · chốt đơn trong 5 ngày sau</td><td>Trainer dẫn · Ops thu tiền</td></tr>
+      <tr><td class="num">T0</td><td>Chốt sĩ số · gửi hướng dẫn cài đặt · mở nhóm lớp</td><td>Ops</td></tr>
+      <tr><td class="num">T1</td><td>Buổi 1 (thứ Ba) · Buổi 2 (thứ Năm)</td><td>Trainer · Trợ giảng</td></tr>
+      <tr><td class="num">T2</td><td>Buổi 3 (thứ Ba) · Buổi 4 (thứ Năm) + phát động thi</td><td>Trainer · Trợ giảng</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Bốn vai tối thiểu</h3>
+  <div class="roles">
+    <div class="role"><h4>Trainer</h4><p>Nội dung, đứng lớp, chấm thi. Không làm gì khác — đây là nguồn lực khan hiếm nhất của mô hình.</p></div>
+    <div class="role"><h4>Marketing</h4><p>Landing, ads, email, nội dung. Kể lại case đoạt giải thành chất liệu bán kỳ sau.</p></div>
+    <div class="role"><h4>Ops / học vụ</h4><p>Đăng ký, thu tiền, nhắc lịch, Zoom, xử lý sự cố cài đặt trước buổi 1.</p></div>
+    <div class="role"><h4>Trợ giảng</h4><p>Quản chat và <strong>đếm số người dán kết quả mỗi vòng thực hành</strong>. Chỉ số sống còn, không phải việc phụ.</p></div>
+  </div>
+
+  <h3>Lịch kỳ 1</h3>
+  <table>
+    <thead><tr><th style="width:130px">Ngày</th><th>Mốc</th></tr></thead>
+    <tbody>
+      <tr><td class="num">26/8</td><td>Hạn chót: xong 2 bộ số cho bẫy mở màn — hạng mục sản xuất duy nhất bắt buộc trong tháng 8</td></tr>
+      <tr><td class="num">27/8 · T5</td><td><strong>Workshop phễu</strong></td></tr>
+      <tr><td class="num">3 – 7/9</td><td>Cửa sổ chốt đăng ký sau lễ</td></tr>
+      <tr><td class="num">8/9 · T3</td><td>Buổi 1 — Ranh giới &amp; giao việc <em>(mở phòng 18:30 xử lý cài đặt)</em></td></tr>
+      <tr><td class="num">10/9 · T5</td><td>Buổi 2 — Dữ liệu bẩn → sạch</td></tr>
+      <tr><td class="num">15/9 · T3</td><td>Buổi 3 — Số → câu chuyện</td></tr>
+      <tr><td class="num">17/9 · T5</td><td>Buổi 4 — Quy trình của mình + phát động thi</td></tr>
+      <tr><td class="num">20/9</td><td>Hạn Ops nộp đủ tài sản kỳ 1 (mục 06)</td></tr>
+      <tr><td class="num">28/9</td><td>Hạn nộp bài thi</td></tr>
+      <tr><td class="num">1/10 · T5</td><td>Workshop kỳ 2 + trao giải kỳ 1</td></tr>
+      <tr><td class="num">6/10</td><td>Kỳ 2 khai giảng</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <p class="snum">06</p>
+  <h2>Kỳ 1 là bản mẫu</h2>
+  <p class="sub">Kỳ 1 chỉ đáng giá nếu để lại tài sản dùng lại được. Ops chịu trách nhiệm gom, hạn 20/9.</p>
+  <ul>
+    <li>Ghi hình đủ 4 buổi — dùng dựng nội dung marketing, chưa bán lại</li>
+    <li>Bộ số A và B đã kiểm chứng qua lớp thật → đóng gói cố định</li>
+    <li>3–5 bản brief tốt nhất của học viên → thành tài liệu mẫu kỳ sau</li>
+    <li><strong>Log câu hỏi trong chat</strong> — nguồn nội dung marketing giá trị nhất, vì đó là từ ngữ thật của khách</li>
+    <li>Form phản hồi cuối buổi 4 và xin testimonial ngay khi nhiệt còn cao</li>
+    <li>Tỷ lệ dán kết quả từng vòng thực hành</li>
+  </ul>
+  <p>Sau kỳ 1, khối lượng sản xuất mỗi kỳ chỉ còn khoảng 30%.</p>
+</section>
+
+<section>
+  <p class="snum">07</p>
+  <h2>Cuộc thi theo quý</h2>
+  <p class="sub">Gom 3 kỳ lớp vào một mùa thi: nhiều bài hơn, giải đáng kể hơn, lễ trao giải đủ sức làm nội dung.</p>
+  <ul>
+    <li><strong>Nộp gì:</strong> quy trình + trước/sau + số giờ tiết kiệm mỗi tháng</li>
+    <li><strong>Chấm theo mức độ áp dụng thật</strong>, không theo độ phức tạp kỹ thuật — nếu không, giải về tay người rành công cụ nhất chứ không phải người thay đổi được công việc, và thông điệp khóa học bị bẻ ngược</li>
+    <li><strong>Trao giải mở màn workshop phễu đầu quý sau.</strong> Người đoạt giải kể chuyện của họ trước phòng người lạ đang cân nhắc đăng ký — bằng chứng mạnh nhất, lại không phải người dạy tự nói</li>
+    <li>Giải thưởng hiện vật nhỏ. Giá trị thật là được nêu tên và case được dùng làm ví dụ chính thức</li>
+  </ul>
+  <div class="flag">
+    <span class="tag">Dừng lại nếu</span>
+    Có ý định thưởng bằng suất coaching hoặc tư vấn. Việc đó đổi mô hình kinh doanh chứ không phải đổi giải thưởng — cần bàn ở tầng chiến lược portfolio trước khi công bố thể lệ.
+  </div>
+</section>
+
+<section>
+  <p class="snum">08</p>
+  <h2>Rủi ro &amp; chỉ số</h2>
+
+  <h3>Danh sách ấm sẽ cạn sau 2–3 kỳ</h3>
+  <p>Bằng chứng “rất đông dù chưa quảng cáo” đến từ danh sách sẵn có, không phải từ khả năng tuyển sinh nguội. Kỳ 3–4 là lúc lộ. Chữa từ kỳ 1: chạy máy nội dung và cơ chế giới thiệu từ học viên cũ ngay, đừng đợi đến khi hụt số.</p>
+
+  <h3>Trần công suất là người đứng lớp</h3>
+  <p>Mỗi kỳ ngốn 12 giờ dạy, 1,5 giờ workshop và toàn bộ thời gian chuẩn bị. Đây mới là thứ giới hạn doanh thu — không phải nhu cầu thị trường.</p>
+
+  <h3>Nội dung lạc hậu theo quý</h3>
+  <p>Công cụ đổi mỗi quý. Giữ 70% là phương pháp — giao việc, kiểm định, ranh giới — và 30% gắn công cụ cụ thể. Mỗi kỳ chỉ refresh phần 30%.</p>
+
+  <h3>Bốn chỉ số theo dõi mỗi kỳ</h3>
+  <table>
+    <thead><tr><th>Chỉ số</th><th style="width:40%">Ngưỡng cảnh báo</th></tr></thead>
+    <tbody>
+      <tr><td>Tỷ lệ dự workshop → đóng tiền</td><td>Dưới 15%</td></tr>
+      <tr><td>CAC thực tế</td><td>Vượt 834.000₫/học viên</td></tr>
+      <tr><td>Tỷ lệ dán kết quả trong giờ thực hành</td><td>Dưới 60%</td></tr>
+      <tr><td>Tỷ lệ nộp bài thi</td><td>Dưới 25% — <strong>lỗi thiết kế lớp, không phải học viên lười</strong></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <p class="snum">09</p>
+  <h2>Giả định đã dùng</h2>
+  <ul>
+    <li>Discount mix: thực thu bình quân bằng 90% giá niêm yết</li>
+    <li>Marketing 20% tính trên doanh thu thuần, không phải doanh thu gồm VAT</li>
+    <li>Vận hành 10tr/lớp đã gồm nền tảng, trợ giảng, tài liệu</li>
+    <li>Thuế TNDN 20%; chưa tính thuế TNCN khi rút lợi nhuận</li>
+    <li>10 lớp mỗi năm; công giảng của chủ sở hữu tính bằng 0</li>
+    <li>Dịch vụ xếp loại tổ chức sự kiện, chịu VAT — theo xác nhận nội bộ</li>
+  </ul>
+  <div class="flag">
+    <span class="tag">Kiểm với kế toán trước khi lên giá 2027</span>
+    Mức 8% là thuế suất <strong>giảm tạm thời, hiệu lực đến hết 31/12/2026</strong>. Từ 1/1/2027, nếu không có nghị quyết gia hạn, dịch vụ trở lại 10% — doanh thu thuần mỗi lớp giảm khoảng 3,8tr và lợi nhuận sau thuế giảm khoảng 2,4tr ở kịch bản 50 học viên. Kỳ 9–12/2026 không ảnh hưởng. Nhờ kế toán xác nhận nhóm ngành trước khi xuất hóa đơn kỳ 1.
+  </div>
+</section>
+
+<footer>
+  <p>Phần con số trong tài liệu này là mô hình chỉ đường, không phải bản chốt kế toán. Hợp đồng, hóa đơn, dòng tiền thật xử lý ở tuyến Admin &amp; Finance.</p>
+  <p class="v">v1.0 · 06/08/2026</p>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  var VERSION = "1.0";
+  var CFG = {
+    price: 5000000, discount: 0.10, vatRate: 0.08,
+    marketingPct: 0.20, opsCost: 10000000, prizeCost: 2000000, citRate: 0.20,
+    funnel: { close: 0.20, show: 0.45, signup: 0.25 }
+  };
+
+  function money(v){ return Math.round(v).toLocaleString('vi-VN'); }
+  function tr(v){ return (v/1000000).toFixed(1).replace('.',',') + 'tr'; }
+  function set(id,txt){ var e=document.getElementById(id); if(e) e.textContent=txt; }
+
+  function calc(n){
+    var net_per = CFG.price * (1 - CFG.discount);
+    var gross = net_per * n;
+    var vat = gross * CFG.vatRate / (1 + CFG.vatRate);
+    var net = gross - vat;
+    var mkt = net * CFG.marketingPct;
+    var pre = net - mkt - CFG.opsCost - CFG.prizeCost;
+    var cit = pre > 0 ? pre * CFG.citRate : 0;
+    return { gross:gross, vat:vat, net:net, mkt:mkt, pre:pre, cit:cit, aft:pre-cit };
+  }
+
+  function render(n){
+    var r = calc(n);
+    set('lbl-n', n);
+    set('v-gross', money(r.gross));
+    set('v-vat', '(' + money(r.vat) + ')');
+    set('v-net', money(r.net));
+    set('v-mkt', '(' + money(r.mkt) + ')');
+    set('v-ops', '(' + money(CFG.opsCost) + ')');
+    set('v-prize', '(' + money(CFG.prizeCost) + ')');
+    set('v-pre', money(r.pre));
+    set('v-cit', '(' + money(r.cit) + ')');
+    set('v-aft', money(r.aft));
+
+    document.getElementById('k-margin').innerHTML =
+      Math.round(r.aft / r.net * 100) + '%';
+    document.getElementById('k-cac').innerHTML =
+      money(r.mkt / n) + '<small>/ học viên</small>';
+
+    var attend = Math.ceil(n / CFG.funnel.close);
+    var reg = Math.ceil(attend / CFG.funnel.show);
+    var visit = Math.ceil(reg / CFG.funnel.signup);
+    set('f-attend', attend.toLocaleString('vi-VN') + ' người dự thật');
+    set('f-reg', reg.toLocaleString('vi-VN') + ' lượt đăng ký');
+    set('f-visit', '~' + visit.toLocaleString('vi-VN') + ' lượt truy cập');
+  }
+
+  var btns = document.querySelectorAll('.btns button');
+  btns.forEach(function(b){
+    b.addEventListener('click', function(){
+      btns.forEach(function(x){ x.setAttribute('aria-pressed','false'); });
+      b.setAttribute('aria-pressed','true');
+      render(parseInt(b.dataset.n,10));
+    });
+  });
+
+  document.querySelector('footer .v').textContent = 'v' + VERSION + ' · 06/08/2026';
+  render(50);
+})();
+</script>
+</body>
+</html>
