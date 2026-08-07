@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BHXH Base Simulator — Genemart 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap&subset=latin,latin-ext,vietnamese" rel="stylesheet">
+<style>
+:root{
+  --bg0:#080b14; --bg1:#0d1220; --bg2:#121a2e; --bg3:#18213a;
+  --card:rgba(255,255,255,.035); --card2:rgba(255,255,255,.06);
+  --line:rgba(255,255,255,.10); --line2:rgba(255,255,255,.18);
+  --ink:#eef2f8; --sub:#93a0b8; --dim:#65728c;
+  --gold:#d4af6a; --gold2:#f0d9a8; --teal:#4fd1c5; --rose:#e08a9e; --red:#ff6b6b; --amber:#f6c453;
+  --fh:'Noto Serif Display',Georgia,serif; --fb:'Outfit',system-ui,sans-serif; --fm:'DM Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:linear-gradient(160deg,#080b14 0%,#0d1220 45%,#121a2e 100%);background-attachment:fixed;color:var(--ink);font-family:var(--fb);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1420px;margin:0 auto;padding:0 22px 70px}
+
+/* HEADER */
+header{position:sticky;top:0;z-index:60;background:rgba(8,11,20,.93);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding:12px 22px}
+.hrow{max-width:1420px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{font-family:var(--fh);font-size:19px;font-weight:700;color:var(--gold2);letter-spacing:.2px}
+.vbadge{font-family:var(--fm);font-size:10.5px;padding:3px 8px;border-radius:20px;background:rgba(212,175,106,.14);color:var(--gold);border:1px solid rgba(212,175,106,.32)}
+.stamp{font-family:var(--fm);font-size:10px;color:var(--dim)}
+.spacer{flex:1}
+.pill{font-size:11.5px;padding:5px 12px;border-radius:20px;font-weight:500;opacity:0;transition:opacity .3s;white-space:nowrap}
+.pill.on{opacity:1}
+.pill.ok{background:rgba(79,209,197,.15);color:var(--teal);border:1px solid rgba(79,209,197,.35)}
+.pill.warn{background:rgba(246,196,83,.15);color:var(--amber);border:1px solid rgba(246,196,83,.35)}
+.pill.err{background:rgba(255,107,107,.15);color:var(--red);border:1px solid rgba(255,107,107,.35)}
+
+/* TABS */
+.tabs{display:flex;gap:6px;margin:20px 0 22px;flex-wrap:wrap}
+.tab{font-family:var(--fb);font-size:13px;font-weight:500;padding:9px 17px;border-radius:22px;border:1px solid var(--line);background:var(--card);color:var(--sub);cursor:pointer;transition:.18s}
+.tab:hover{border-color:var(--line2);color:var(--ink)}
+.tab.active{background:linear-gradient(135deg,rgba(212,175,106,.22),rgba(212,175,106,.10));border-color:rgba(212,175,106,.45);color:var(--gold2)}
+.panel{display:none}.panel.active{display:block}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;box-shadow:0 6px 26px rgba(0,0,0,.28)}
+.card+.card{margin-top:16px}
+.ct{font-family:var(--fh);font-size:16px;font-weight:600;color:var(--gold2);margin-bottom:4px}
+.cs{font-size:12px;color:var(--dim);margin-bottom:16px;line-height:1.55}
+.grid2{display:grid;grid-template-columns:400px 1fr;gap:16px;align-items:start}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+
+/* KPI */
+.kpi{background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:14px 15px}
+.kpi .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.7px;color:var(--dim);margin-bottom:7px;line-height:1.35;min-height:28px}
+.kpi .v{font-family:var(--fm);font-size:20px;font-weight:500;color:var(--ink);letter-spacing:-.4px}
+.kpi .v.gold{color:var(--gold2)} .kpi .v.teal{color:var(--teal)} .kpi .v.red{color:var(--red)} .kpi .v.rose{color:var(--rose)} .kpi .v.amber{color:var(--amber)}
+.kpi .d{font-family:var(--fm);font-size:11px;margin-top:6px;color:var(--sub)}
+.kpi .d.up{color:var(--red)} .kpi .d.down{color:var(--teal)}
+
+/* CONTROLS */
+.ctl{margin-bottom:16px}
+.ctl label{display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;color:var(--sub);margin-bottom:7px;gap:10px}
+.ctl label b{font-family:var(--fm);font-size:13px;color:var(--gold2);font-weight:500}
+input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:4px;border-radius:4px;background:rgba(255,255,255,.14);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;background:var(--gold);cursor:pointer;border:2px solid #0d1220;box-shadow:0 0 0 0 rgba(212,175,106,.25);transition:box-shadow .15s}
+input[type=range]:focus::-webkit-slider-thumb{box-shadow:0 0 0 6px rgba(212,175,106,.22)}
+input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--gold);cursor:pointer;border:2px solid #0d1220}
+select,input[type=number]{background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--ink);border-radius:9px;padding:7px 10px;font-family:var(--fb);font-size:12.5px;outline:none;transition:.15s}
+select:focus,input[type=number]:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,106,.20)}
+.seg{display:flex;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:16px}
+.seg button{flex:1;background:transparent;border:none;color:var(--sub);font-family:var(--fb);font-size:12px;padding:9px 6px;cursor:pointer;transition:.15s;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:none}
+.seg button:hover{background:rgba(255,255,255,.05);color:var(--ink)}
+.seg button.on{background:rgba(212,175,106,.18);color:var(--gold2);font-weight:600}
+.tog{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:.15s}
+.tog:hover{border-color:var(--line2)}
+.tog span{font-size:12.5px;color:var(--sub)}
+.tog .sw{width:36px;height:19px;border-radius:20px;background:rgba(255,255,255,.13);position:relative;transition:.2s;flex:none}
+.tog .sw::after{content:'';position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#8896ad;transition:.2s}
+.tog.on .sw{background:rgba(212,175,106,.42)} .tog.on .sw::after{left:19px;background:var(--gold2)}
+.tog.on span{color:var(--ink)}
+.hint{font-size:11px;color:var(--dim);line-height:1.5;padding:9px 11px;background:rgba(79,209,197,.06);border-left:2px solid rgba(79,209,197,.4);border-radius:0 8px 8px 0;margin:12px 0}
+.hint.w{background:rgba(246,196,83,.07);border-left-color:rgba(246,196,83,.5)}
+.hint.r{background:rgba(255,107,107,.08);border-left-color:rgba(255,107,107,.5)}
+
+/* TABLE */
+.tw{overflow:auto;max-height:600px;border:1px solid var(--line);border-radius:12px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{position:sticky;top:0;background:#111a2c;color:var(--dim);font-weight:500;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;padding:10px 9px;text-align:right;border-bottom:1px solid var(--line2);white-space:nowrap;z-index:2}
+th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:#111a2c;z-index:1}
+th:first-child{z-index:3}
+td{padding:8px 9px;text-align:right;border-bottom:1px solid rgba(255,255,255,.05);font-family:var(--fm);font-size:11.5px;color:var(--sub);white-space:nowrap}
+td:first-child{font-family:var(--fb);color:var(--ink);font-size:12px;background:#0e1626}
+tr:hover td{background:rgba(255,255,255,.04)}
+tr:hover td:first-child{background:rgba(255,255,255,.07)}
+tr.tot td{background:rgba(212,175,106,.10)!important;color:var(--gold2);font-weight:600;border-top:1px solid rgba(212,175,106,.3)}
+.tag{display:inline-block;font-family:var(--fm);font-size:9.5px;padding:2px 6px;border-radius:5px;margin-left:6px}
+.tag.r{background:rgba(255,107,107,.16);color:var(--red)}
+.tag.a{background:rgba(246,196,83,.16);color:var(--amber)}
+.tag.t{background:rgba(79,209,197,.16);color:var(--teal)}
+
+/* BARS */
+.bar{height:9px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;border-radius:6px;transition:width .35s ease}
+.leg{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--dim);margin-top:9px}
+.leg s{width:9px;height:9px;border-radius:3px;display:inline-block;margin-right:5px;text-decoration:none}
+
+.mono{font-family:var(--fm)}
+.big{font-family:var(--fm);font-size:28px;font-weight:500;letter-spacing:-.8px}
+h4{font-family:var(--fb);font-size:12.5px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.7px;margin:20px 0 11px}
+h4:first-child{margin-top:0}
+.rowline{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:12.5px}
+.rowline:last-child{border-bottom:none}
+.rowline span{color:var(--sub)} .rowline b{font-family:var(--fm);font-weight:500;color:var(--ink)}
+.rowline.hl b{color:var(--gold2);font-size:14px}
+@media(max-width:1100px){.grid2{grid-template-columns:1fr}.grid4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){.grid3{grid-template-columns:1fr}.grid4{grid-template-columns:repeat(2,1fr)}.wrap{padding:0 12px 60px}header{padding:10px 12px}.brand{font-size:16px}}
+</style>
+</head>
+<body>
+<header><div class="hrow">
+  <div class="brand">BHXH Base Simulator</div>
+  <span class="vbadge" id="vb"></span>
+  <span class="stamp" id="stamp"></span>
+  <div class="spacer"></div>
+  <span class="pill" id="pill"></span>
+  <select id="mSel" title="Kỳ dữ liệu"></select>
+</div></header>
+
+<div class="wrap">
+<div class="tabs">
+  <button class="tab active" data-p="p1">① Hiện trạng</button>
+  <button class="tab" data-p="p2">② Mô phỏng</button>
+  <button class="tab" data-p="p3">③ Rủi ro</button>
+  <button class="tab" data-p="p4">④ Chi tiết NV</button>
+</div>
+
+<!-- ① HIỆN TRẠNG -->
+<div class="panel active" id="p1">
+  <div class="card">
+    <div class="ct">Chẩn đoán bảng lương thực tế</div>
+    <div class="cs">Dữ liệu gốc từ <span class="mono">BANG_LUONG_HONG_QUAN_2026.xlsx</span> · Vùng I (Hà Nội) · Số liệu chưa qua chỉnh sửa. Tỷ lệ nền = tiền lương đang khai đóng BHXH ÷ tổng thu nhập thực trả.</div>
+    <div class="grid4" id="k1"></div>
+    <div id="diag1"></div>
+  </div>
+  <div class="card">
+    <div class="ct">Cấu trúc thu nhập — 5 kỳ</div>
+    <div class="cs">Chỉ tính nhân sự đang tham gia BHXH. Phần vàng là phần đang chịu BHXH; phần xám là phần thu nhập nằm ngoài căn cứ đóng.</div>
+    <div id="mchart"></div>
+  </div>
+</div>
+
+<!-- ② MÔ PHỎNG -->
+<div class="panel" id="p2">
+  <div class="grid2">
+    <div>
+      <div class="card">
+        <div class="ct">Cần gạt</div>
+        <div class="cs">Chọn cách xác định tiền lương làm căn cứ đóng, rồi kéo.</div>
+        <div class="seg" id="modeSeg">
+          <button data-m="comp" class="on">Theo cấu phần</button>
+          <button data-m="pct">Theo % thu nhập</button>
+        </div>
+        <div id="cComp">
+          <div class="ctl"><label>Hệ số lương chính <b id="vMult">100%</b></label>
+            <input type="range" id="sMult" min="100" max="250" step="5" value="100"></div>
+          <div class="tog" data-t="incAT"><span>Đưa <b>tiền ăn trưa</b> vào căn cứ đóng</span><i class="sw"></i></div>
+          <div class="tog" data-t="incDT"><span>Đưa <b>phụ cấp điện thoại</b> vào căn cứ đóng</span><i class="sw"></i></div>
+          <div class="tog" data-t="incXX"><span>Đưa <b>hỗ trợ xăng xe</b> vào căn cứ đóng</span><i class="sw"></i></div>
+          <div class="tog" data-t="incTDS"><span>Đưa <b>thưởng doanh số</b> vào căn cứ đóng</span><i class="sw"></i></div>
+        </div>
+        <div id="cPct" style="display:none">
+          <div class="ctl"><label>Căn cứ đóng = % tổng thu nhập <b id="vPct">60%</b></label>
+            <input type="range" id="sPct" min="30" max="100" step="2.5" value="60"></div>
+        </div>
+        <h4>Tham số</h4>
+        <div class="ctl"><label>Lương tối thiểu vùng (sàn đóng)</label>
+          <select id="selVung" style="width:100%">
+            <option value="5310000">Vùng I — 5.310.000</option>
+            <option value="4730000">Vùng II — 4.730.000</option>
+            <option value="4140000">Vùng III — 4.140.000</option>
+            <option value="3700000">Vùng IV — 3.700.000</option>
+          </select></div>
+        <div class="tog on" data-t="kpcd"><span>Tính <b>kinh phí công đoàn 2%</b> (DN)</span><i class="sw"></i></div>
+        <div class="tog" data-t="coverNon"><span>Đưa <b>nhân sự chưa tham gia</b> vào diện đóng</span><i class="sw"></i></div>
+        <div class="hint">Tỷ lệ áp dụng: DN 21,5% (BHXH 17% + TNLĐ-BNN 0,5% + BHYT 3% + BHTN 1%) · NLĐ 10,5% (8% + 1,5% + 1%). Thuế TNCN giữ nguyên cách tính của bảng lương gốc: TNCT = tổng thu nhập − ăn trưa − xăng xe; giảm trừ 15,5tr + 6,2tr/NPT.</div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="ct">A · Chi phí doanh nghiệp</div>
+        <div class="cs">So với hiện trạng của kỳ đang chọn. Chi phí sử dụng lao động = tổng thu nhập trả NLĐ + phần DN đóng + KPCĐ.</div>
+        <div class="grid3" id="kA"></div>
+        <div id="barA"></div>
+      </div>
+      <div class="card">
+        <div class="ct">B · Người lao động — tiền mặt đổi lấy quyền lợi</div>
+        <div class="cs">Bình quân 1 người tham gia BHXH. Quyền lợi tính trên căn cứ đóng mới.</div>
+        <div class="grid3" id="kB"></div>
+        <div id="benef"></div>
+      </div>
+      <div class="card">
+        <div class="ct">C · Nộp ngân sách &amp; các quỹ</div>
+        <div class="cs">Quỹ BHXH/BHYT/BHTN không phải NSNN, nhưng là nghĩa vụ luật định. Thuế TNDN giảm vì phần DN đóng là chi phí được trừ.</div>
+        <div class="grid3" id="kC"></div>
+        <div id="budget"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ③ RỦI RO -->
+<div class="panel" id="p3">
+  <div class="grid2">
+    <div class="card">
+      <div class="ct">Giả định truy thu</div>
+      <div class="cs">Kịch bản: cơ quan BHXH/thanh tra kết luận mức lương khai đóng thấp hơn quy định.</div>
+      <div class="ctl"><label>Căn cứ đóng bị quy kết = % thu nhập <b id="vRB">75%</b></label>
+        <input type="range" id="sRB" min="40" max="100" step="5" value="75"></div>
+      <div class="ctl"><label>Số tháng bị truy <b id="vRM">24 tháng</b></label>
+        <input type="range" id="sRM" min="6" max="60" step="6" value="24"></div>
+      <div class="ctl"><label>Xác suất bị thanh tra / phát hiện <b id="vRP">25%</b></label>
+        <input type="range" id="sRP" min="0" max="100" step="5" value="25"></div>
+      <h4>Định danh hành vi</h4>
+      <div class="seg" id="scSeg">
+        <button data-s="cham" class="on">Chậm đóng (12–15%)</button>
+        <button data-s="tron">Trốn đóng (18–20%)</button>
+      </div>
+      <div class="hint r"><b>Lưu ý pháp lý quan trọng:</b> Khoản 1 Điều 39 Luật BHXH 2024 liệt kê <b>“đăng ký mức tiền lương thấp hơn quy định để làm căn cứ đóng”</b> là hành vi <b>trốn đóng</b> — không phải chậm đóng. Kịch bản “chậm đóng” chỉ nên dùng làm cận dưới lạc quan.</div>
+      <div class="hint w">Cơ sở tính phạt hành chính theo NĐ 12/2022 là “tổng số tiền phải đóng tại thời điểm lập biên bản” — thực tế áp dụng không thống nhất. Tool lấy trên số truy thu và áp trần 150 triệu (tổ chức) để ra cận trên thận trọng.</div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="ct">Lượng hoá thiệt hại</div>
+        <div class="cs">Tính trên chênh lệch căn cứ đóng của kỳ đang chọn, nhân số tháng.</div>
+        <div class="grid3" id="kR"></div>
+        <div id="riskBreak"></div>
+      </div>
+      <div class="card">
+        <div class="ct">Ngưỡng hình sự &amp; cờ đỏ</div>
+        <div id="crim"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ④ CHI TIẾT -->
+<div class="panel" id="p4">
+  <div class="card">
+    <div class="ct">Chi tiết từng nhân sự</div>
+    <div class="cs">Kỳ đang chọn · kịch bản mô phỏng hiện tại ở tab ②. <span class="tag r">sàn</span> = đang khai đúng bằng lương tối thiểu vùng.</div>
+    <div class="tw"><table id="tbl"></table></div>
+  </div>
+</div>
+</div>
+
+<script>
+const VERSION='v1.0';
+const RELEASE='Released 07/08/2026 · Scope: 4 lens (chi phí DN · quyền lợi NLĐ · ngân sách · rủi ro truy thu) trên dữ liệu lương thực T01–T05/2026';
+const SEED=[{"m":1,"rows":[["Nguyễn Thị Hồng",0,0,0,0,0,11194439,0,0],["Nguyễn Thị Đua",0,0,0,0,0,12966059,0,0],["Chị Liễu",0,0,0,0,0,3851569,0,0],["Vũ Hồng Quân",6500000,700000,1000000,1000000,11482500,20682500,1,25],["Vũ Quang",5681700,672000,960000,960000,7322878,15596578,0,24],["Cao Minh Thu",5681700,728000,1040000,1040000,7306878,15796578,1,26],["Lê Thị Trường Giang",5681700,728000,1040000,1040000,7206878,15696578,0,26],["Nguyễn Mai Phương",5310000,728000,1040000,1040000,6150650,14268650,0,26],["Lê Thị Hoãn",5310000,728000,1040000,1040000,1607031,9725031,0,26],["Bùi Thị Thắm",5310000,728000,1040000,1040000,2157880,10275880,0,26],["Nguyễn Thị Minh",5310000,728000,1040000,1040000,6129510,14247510,0,26],["Nguyễn Thị Hương (1988 )",5310000,728000,1040000,1040000,4171465,12289465,0,26],["Phạm Thị Hồng Thuận",5310000,728000,1040000,1040000,2109231,10227231,0,26],["Đan Thị Hương",5310000,728000,1040000,1040000,2803635,10921635,0,26],["Hà Thị Cúc",5310000,728000,1040000,1040000,4828460,12946460,0,26],["Phạm Thái Thái",5310000,728000,1040000,1040000,159550,8277550,0,26],["Nguyễn Thị Hương ( 1991 )",5310000,728000,1040000,1040000,4874415,12992415,0,26],["Nguyễn Thị Thực",5310000,728000,1040000,1040000,820980,8938980,0,26],["Nguyễn Thị Sợi",5310000,476000,680000,680000,210568,7356568,0,17],["Nguyễn Thị sen",5310000,560000,800000,800000,263065,7733065,0,20],["Mạc Thị Đào",5310000,728000,1040000,1040000,3671800,11789800,0,26],["Trần Thị Thu Hà",5310000,728000,1040000,1040000,7556430,15674430,0,26],["Hoàng Thị Thái (A)",5310000,728000,1040000,1040000,1948850,10066850,0,26],["Phạm Thị Đức Hạnh",5310000,728000,1040000,1040000,2453295,10571295,0,26]]},{"m":2,"rows":[["Nguyễn Thị Hồng",0,0,0,0,0,8000000,0,0],["Vũ Hồng Quân",6500000,476000,680000,680000,7746500,16082500,1,17],["Vũ Quang",5681700,476000,680000,680000,5078878,12596578,0,17],["Cao Minh Thu",5681700,476000,680000,680000,6454240,13971940,1,17],["Lê Thị Trường Giang",5681700,476000,680000,680000,6078878,13596578,0,17],["Nguyễn Mai Phương",5310000,392000,560000,560000,234521,7056521,0,14],["Lê Thị Hoãn",5310000,392000,560000,560000,0,6822000,0,14],["Bùi Thị Thắm",5310000,392000,560000,560000,0,6822000,0,14],["Nguyễn Thị Minh",5310000,392000,560000,560000,0,6822000,0,14],["Nguyễn Thị Hương (1988 )",5310000,392000,560000,560000,0,6822000,0,14],["Phạm Thị Hồng Thuận",5310000,392000,560000,560000,0,6822000,0,14],["Đan Thị Hương",5310000,392000,560000,560000,0,6822000,0,14],["Hà Thị Cúc",5310000,392000,560000,560000,0,6822000,0,14],["Phạm Thị Thái",5310000,392000,560000,560000,0,6822000,0,14],["Nguyễn Thị Hương ( 1991 )",5310000,392000,560000,560000,0,6822000,0,14],["Nguyễn Thị Thực",5310000,392000,560000,560000,0,6822000,0,14],["Nguyễn Thị Sợi",5310000,392000,560000,560000,0,6822000,0,14],["Nguyễn Thị sen",5310000,392000,560000,560000,0,6822000,0,14],["Mạc Thị Đào",5310000,392000,560000,560000,0,6822000,0,14],["Trần Thị Thu Hà",5310000,392000,560000,560000,0,6822000,0,14],["Hoàng Thị Thái",5310000,392000,560000,560000,0,6822000,0,14],["Phạm Thị Đức Hạnh",5310000,392000,560000,560000,0,6822000,0,14]]},{"m":3,"rows":[["Nguyễn Thị Tuyết Nhung",0,0,0,0,0,9401709,0,0],["Phùng Thị Sức",0,0,0,0,0,5629630,0,0],["Nguyễn Thị Hồng",0,0,0,0,0,5527778,0,0],["Vũ Hồng Quân",6500000,728000,1040000,1040000,12374500,21682500,1,26],["Vũ Quang",5681700,728000,1040000,1040000,6606878,15096578,0,26],["Cao Minh Thu",5681700,728000,1040000,1040000,3802570,12292270,1,26],["Lê Thị Trường Giang",5681700,728000,1040000,1040000,7106878,15596578,0,26],["Nguyễn Mai Phương",5310000,0,0,0,0,5310000,0,14],["Lê Thị Hoãn",5310000,0,0,0,0,5310000,0,14],["Bùi Thị Thắm",5310000,560000,800000,800000,149330,7619330,0,20],["Nguyễn Thị Minh",5310000,728000,1040000,1040000,1273600,9391600,0,26],["Nguyễn Thị Hương (1988 )",5310000,728000,1040000,1040000,2162700,10280700,0,26],["Phạm Thị Hồng Thuận",5310000,0,0,0,0,5310000,0,14],["Đan Thị Hương",5310000,532000,760000,760000,361980,7723980,0,19],["Hà Thị Cúc",5310000,728000,1040000,1040000,1355695,9473695,0,26],["Phạm Thị Thái",5310000,420000,600000,600000,50883,6980883,0,15],["Nguyễn Thị Hương ( 1991 )",5310000,700000,1000000,1000000,505890,8515890,0,25],["Nguyễn Thị Thực",5310000,560000,800000,800000,270150,7740150,0,20],["Nguyễn Thị Sợi",5310000,560000,800000,800000,182826,7652826,0,20],["Nguyễn Thị sen",5310000,420000,600000,600000,51590,6981590,0,15],["Mạc Thị Đào",5310000,0,0,0,0,5310000,0,14],["Trần Thị Thu Hà",5310000,0,0,0,0,5310000,0,14],["Hoàng Thị Thái",5310000,0,0,0,0,5310000,0,14],["Phạm Thị Đức Hạnh",5310000,0,0,0,0,5310000,0,14]]},{"m":4,"rows":[["Nguyễn Thị Tuyết Nhung",0,0,0,0,0,12222222,0,0],["Vũ Hồng Quân",6500000,672000,960000,960000,11890500,20982500,1,24],["Vũ Quang",5681700,672000,960000,960000,7322878,15596578,0,24],["Cao Minh Thu",5681700,672000,960000,960000,13337878,21611578,1,24],["Lê Thị Trường Giang",5681700,672000,960000,960000,6822878,15096578,0,24],["Bùi Thị Thắm",5310000,672000,960000,960000,1263500,9165500,0,24],["Nguyễn Thị Minh",5310000,672000,960000,960000,4457495,12359495,0,24],["Nguyễn Thị Hương (1988 )",5310000,672000,960000,960000,2974510,10876510,0,24],["Đan Thị Hương",5310000,672000,960000,960000,1316685,9218685,0,24],["Hà Thị Cúc",5310000,672000,960000,960000,3022620,10924620,0,24],["Phạm Thị Thái",5310000,476000,680000,680000,3926707,11072707,0,17],["Nguyễn Thị Hương ( 1991 )",5310000,672000,960000,960000,3881445,11783445,0,24],["Nguyễn Thị Thực",5310000,616000,880000,880000,148815,7834815,0,22],["Nguyễn Thị Sợi",5310000,392000,560000,0,455465,6717465,0,14],["Nguyễn Thị sen",5310000,616000,880000,880000,249165,7935165,0,22]]},{"m":5,"rows":[["Vũ Hồng Quân",6500000,700000,1000000,1000000,8482500,17682500,1,25],["Vũ Quang",5681700,700000,1000000,1000000,5814878,14196578,0,25],["Cao Minh Thu",5681700,700000,1000000,1000000,8716694,17098394,1,25],["Lê Thị Trường Giang",5681700,700000,1000000,1000000,6214878,14596578,0,25],["Bùi Thị Thắm",5310000,700000,1000000,1000000,1442245,9452245,0,25],["Nguyễn Thị Minh",5310000,700000,1000000,1000000,4501780,12511780,0,25],["Nguyễn Thị Hương (1988 )",5310000,700000,1000000,1000000,4120855,12130855,0,25],["Đan Thị Hương",5310000,700000,1000000,1000000,1621725,9631725,0,25],["Hà Thị Cúc",5310000,700000,1000000,1000000,4748185,12758185,0,25],["Phạm Thị Thái",5310000,420000,600000,600000,232550,7162550,0,15],["Nguyễn Thị Hương ( 1991 )",5310000,700000,1000000,1000000,4837170,12847170,0,25],["Nguyễn Thị Thực",5310000,700000,1000000,1000000,831725,8841725,0,25],["Nguyễn Thị Sợi",5310000,392000,560000,0,591232,6853232,0,14],["Nguyễn Thị sen",5310000,700000,1000000,1000000,628025,8638025,0,25],["Nguyễn Thị Tuyết Nhung",5310000,700000,1000000,1000000,1720769,9730769,0,25],["Phương",0,0,0,0,0,5983978,0,0]]}];
+
+const R={dn:0.215, nv:0.105, kpcd:0.02, huu:0.22, bhtn_huong:0.60, thamChieu:2340000};
+const GT_SELF=15500000, GT_NPT=6200000;
+const cfg={mode:'comp',mult:1.0,pct:0.60,incAT:false,incDT:false,incXX:false,incTDS:false,
+           kpcd:true,coverNon:false,vung:5310000,
+           rb:0.75,rm:24,rp:0.25,sc:'cham',mi:0};
+
+const fmt=n=>Math.round(n).toLocaleString('vi-VN');
+const tr=n=>(n/1e6).toFixed(1)+' tr';
+const ty=n=>Math.abs(n)>=1e9?(n/1e9).toFixed(2)+' tỷ':(n/1e6).toFixed(0)+' tr';
+const pc=n=>(n*100).toFixed(1)+'%';
+
+function pit(t){ if(t<=0) return 0;
+  const b=[[5e6,.05],[5e6,.10],[8e6,.15],[14e6,.20],[20e6,.25],[28e6,.30],[Infinity,.35]];
+  let r=0,x=t; for(const [w,rt] of b){const s=Math.min(x,w); r+=s*rt; x-=s; if(x<=0)break;} return r;}
+
+function emps(){ return SEED[cfg.mi].rows.map(r=>({name:r[0],lc:r[1],at:r[2],dt:r[3],xx:r[4],tds:r[5],tn:r[6],npt:r[7],nc:r[8]})); }
+
+function baseOf(e,scenario){
+  if(scenario==='now') return e.lc;
+  const part = e.lc>0 || cfg.coverNon;
+  if(!part) return 0;
+  let b;
+  if(cfg.mode==='pct'){ b = e.tn*cfg.pct; }
+  else { const lc = e.lc>0? e.lc*cfg.mult : e.tn*0.5*cfg.mult;
+         b = lc + (cfg.incAT?e.at:0)+(cfg.incDT?e.dt:0)+(cfg.incXX?e.xx:0)+(cfg.incTDS?e.tds:0); }
+  b=Math.max(b,cfg.vung); b=Math.min(b,20*R.thamChieu);
+  return b;
+}
+
+function calc(scenario){
+  const list=emps(); let o={n:0,nPart:0,base:0,tn:0,tnPart:0,dn:0,nv:0,kpcd:0,pit:0,net:0,tnBase:0,rows:[]};
+  for(const e of list){
+    const b=baseOf(e,scenario);
+    const dn=b*R.dn, nv=b*R.nv, kp=(cfg.kpcd&&scenario!=='now')?b*R.kpcd:(cfg.kpcd&&scenario==='now'?b*R.kpcd:0);
+    const tnct=e.tn-e.at-e.xx;
+    const tntt=Math.max(0,tnct-nv-GT_SELF-GT_NPT*e.npt);
+    const t=b>0?pit(tntt):(e.lc>0?0:e.tn*0.10);
+    const net=e.tn-nv-t;
+    o.n++; if(b>0){o.nPart++; o.tnPart+=e.tn;}
+    o.base+=b; o.tn+=e.tn; o.dn+=dn; o.nv+=nv; o.kpcd+=kp; o.pit+=t; o.net+=net;
+    o.rows.push({e,b,dn,nv,pit:t,net,tntt});
+  }
+  o.cost=o.tn+o.dn+o.kpcd;
+  o.fund=o.dn+o.nv;
+  return o;
+}
+
+/* ---------- RENDER ---------- */
+function kpi(l,v,cls,d,dc){return `<div class="kpi"><div class="l">${l}</div><div class="v ${cls||''}">${v}</div>${d?`<div class="d ${dc||''}">${d}</div>`:''}</div>`;}
+
+function render(){
+  const now=calc('now'), sim=calc('sim');
+  renderP1(now);
+  renderP2(now,sim);
+  renderP3(now);
+  renderP4(now,sim);
+}
+
+function renderP1(now){
+  const ratio=now.base/(now.tnPart||now.tn);
+  const atFloor=now.rows.filter(r=>r.e.lc>0 && r.e.lc===cfg.vung).length;
+  const nonPart=now.rows.filter(r=>r.e.lc===0).length;
+  document.getElementById('k1').innerHTML=
+    kpi('Nhân sự trong kỳ',now.n+' người','gold',now.nPart+' tham gia BHXH · '+nonPart+' ngoài')+
+    kpi('Tổng thu nhập trả',ty(now.tn),'','Người tham gia BHXH: '+ty(now.tnPart))+
+    kpi('Căn cứ đóng đang khai',ty(now.base),'amber',pc(ratio)+' tổng thu nhập',ratio<0.6?'up':'')+
+    kpi('Chi phí BHXH DN đang chịu',ty(now.dn+now.base*R.kpcd),'','21,5% + KPCĐ 2%');
+  let flags='';
+  if(ratio<0.6) flags+=`<div class="hint r"><b>Cờ đỏ 1 — tỷ lệ nền ${pc(ratio)}.</b> Căn cứ đóng chỉ bằng ${pc(ratio)} thu nhập thực trả. Đây là ngưỡng mà cơ quan BHXH thường đặt câu hỏi đầu tiên.</div>`;
+  if(atFloor>0) flags+=`<div class="hint r"><b>Cờ đỏ 2 — ${atFloor}/${now.nPart} người khai đúng bằng sàn ${fmt(cfg.vung)}đ.</b> Nhiều người cùng một mức bằng chính xác lương tối thiểu vùng là dấu hiệu nhận diện rõ nhất, vì thang bảng lương thật khó có chuyện ${atFloor} vị trí khác nhau cùng một bậc.</div>`;
+  if(nonPart>0) flags+=`<div class="hint w"><b>Cờ vàng — ${nonPart} người nhận thu nhập đều nhưng không có dòng BHXH.</b> Nếu thực chất là HĐLĐ từ 1 tháng trở lên, sau 60 ngày không đăng ký sẽ bị xác định là trốn đóng theo khoản 1 Điều 39 Luật BHXH 2024, độc lập với chuyện khai thấp.</div>`;
+  const dtTot=now.rows.reduce((s,r)=>s+r.e.dt,0);
+  if(dtTot>0) flags+=`<div class="hint"><b>Điểm đang thiệt:</b> phụ cấp điện thoại ${ty(dtTot)}/tháng đang bị tính vào thu nhập chịu thuế TNCN trong bảng lương gốc. Nếu có quy chế khoán chi rõ mức, khoản này được miễn TNCN — đang nộp thừa mà không cần thiết.</div>`;
+  document.getElementById('diag1').innerHTML=flags;
+
+  let h='<div style="display:flex;gap:14px;align-items:flex-end;height:210px;padding:26px 0 12px">';
+  const mx=Math.max(...SEED.map(m=>m.rows.filter(r=>r[1]>0).reduce((s,r)=>s+r[6],0)));
+  SEED.forEach((m,i)=>{
+    const pr=m.rows.filter(r=>r[1]>0);
+    const t=pr.reduce((s,r)=>s+r[6],0), b=pr.reduce((s,r)=>s+r[1],0);
+    const hT=t/mx*160, hB=b/mx*160;
+    h+=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer" onclick="setM(${i})">
+      <div style="font-family:var(--fm);font-size:10.5px;color:var(--dim)">${pc(b/t)}</div>
+      <div style="width:100%;height:${hT}px;background:rgba(255,255,255,.09);border-radius:6px 6px 0 0;position:relative;display:flex;align-items:flex-end">
+        <div style="width:100%;height:${hB/hT*100}%;background:linear-gradient(180deg,var(--gold),rgba(212,175,106,.55));border-radius:${hB>=hT?'6px 6px':'0 0'} 0 0"></div></div>
+      <div style="font-size:11px;color:${i===cfg.mi?'var(--gold2)':'var(--sub)'};font-weight:${i===cfg.mi?600:400}">T0${m.m}</div>
+      <div style="font-family:var(--fm);font-size:10px;color:var(--dim)">${ty(t)}</div></div>`;
+  });
+  h+='</div><div class="leg"><span><s style="background:var(--gold)"></s>Phần chịu BHXH</span><span><s style="background:rgba(255,255,255,.15)"></s>Phần ngoài căn cứ đóng</span><span style="color:var(--dim)">Bấm cột để đổi kỳ</span></div>';
+  document.getElementById('mchart').innerHTML=h;
+}
+
+function renderP2(now,sim){
+  const dCost=sim.cost-now.cost, dDn=(sim.dn+sim.kpcd)-(now.dn+now.kpcd);
+  document.getElementById('kA').innerHTML=
+    kpi('Căn cứ đóng mới',ty(sim.base),'gold',pc(sim.base/(sim.tnPart||1))+' thu nhập (người tham gia) · trước: '+pc(now.base/(now.tnPart||1)))+
+    kpi('DN đóng thêm / tháng',(dDn>=0?'+':'')+ty(dDn),dDn>0?'red':'teal',(dDn>=0?'+':'')+ty(dDn*12)+' / năm',dDn>0?'up':'down')+
+    kpi('Chi phí lao động / tháng',ty(sim.cost),'',(dCost>=0?'+':'')+pc(dCost/now.cost)+' vs hiện trạng',dCost>0?'up':'down');
+  const mx=Math.max(now.cost,sim.cost);
+  document.getElementById('barA').innerHTML=`
+    <div style="margin-top:16px">
+      <div style="font-size:11.5px;color:var(--sub);display:flex;justify-content:space-between"><span>Hiện trạng</span><span class="mono">${ty(now.cost)}</span></div>
+      <div class="bar"><i style="width:${now.cost/mx*100}%;background:rgba(255,255,255,.25)"></i></div>
+      <div style="font-size:11.5px;color:var(--sub);display:flex;justify-content:space-between;margin-top:12px"><span>Kịch bản mô phỏng</span><span class="mono">${ty(sim.cost)}</span></div>
+      <div class="bar"><i style="width:${sim.cost/mx*100}%;background:linear-gradient(90deg,var(--gold),var(--gold2))"></i></div>
+      <div class="leg"><span>Chênh lệch cả năm: <b class="mono" style="color:${dCost>0?'var(--red)':'var(--teal)'}">${(dCost>=0?'+':'')+ty(dCost*12)}</b></span></div>
+    </div>`;
+
+  const np=Math.max(1,sim.nPart);
+  const bAvg=sim.base/np, bAvgNow=now.base/Math.max(1,now.nPart);
+  const dNet=(sim.net-now.net)/np;
+  document.getElementById('kB').innerHTML=
+    kpi('Thực lĩnh BQ / tháng',tr(sim.net/np),'',(dNet>=0?'+':'')+fmt(dNet)+'đ vs hiện trạng',dNet<0?'up':'down')+
+    kpi('Căn cứ đóng BQ',tr(bAvg),'gold','trước: '+tr(bAvgNow))+
+    kpi('Tích luỹ quỹ hưu trí / năm',tr(bAvg*R.huu*12),'teal','22% × căn cứ × 12 tháng');
+  const ts=6*bAvg+2*R.thamChieu, tsNow=6*bAvgNow+2*R.thamChieu;
+  const tn6=Math.min(bAvg*R.bhtn_huong,5*cfg.vung), tn6Now=Math.min(bAvgNow*R.bhtn_huong,5*cfg.vung);
+  document.getElementById('benef').innerHTML=`
+    <h4>Quyền lợi thay đổi (bình quân 1 người)</h4>
+    <div class="rowline"><span>Trợ cấp thai sản trọn gói (6 tháng + trợ cấp 1 lần)</span><b>${fmt(tsNow)} → <span style="color:var(--gold2)">${fmt(ts)}</span> <span style="color:${ts>tsNow?'var(--teal)':'var(--red)'}">(${ts>=tsNow?'+':''}${fmt(ts-tsNow)})</span></b></div>
+    <div class="rowline"><span>Trợ cấp thất nghiệp / tháng (60%, trần 5× LTTV)</span><b>${fmt(tn6Now)} → <span style="color:var(--gold2)">${fmt(tn6)}</span></b></div>
+    <div class="rowline"><span>Chế độ ốm đau / ngày (75% ÷ 24)</span><b>${fmt(0.75*bAvgNow/24)} → <span style="color:var(--gold2)">${fmt(0.75*bAvg/24)}</span></b></div>
+    <div class="rowline hl"><span>Tiền mặt NLĐ mất/được mỗi tháng</span><b style="color:${dNet<0?'var(--red)':'var(--teal)'}">${(dNet>=0?'+':'')+fmt(dNet)}đ</b></div>
+    <div class="hint">Đây là chỗ đàm phán: NLĐ mất <b>${fmt(Math.abs(dNet))}đ tiền mặt/tháng</b> nhưng đổi lấy <b>${fmt(Math.abs(ts-tsNow))}đ</b> quyền lợi thai sản và ${fmt(Math.abs(bAvg-bAvgNow)*R.huu*12)}đ tích luỹ hưu trí mỗi năm. Với lực lượng ${Math.round(100*sim.rows.filter(r=>/^(Nguyễn Thị|Lê Thị|Phạm Thị|Trần Thị|Hoàng Thị|Đan Thị|Hà Thị|Mạc Thị|Bùi Thị)/.test(r.e.name)).length/sim.n)}% là lao động nữ, quyền lợi thai sản là lập luận có sức nặng nhất.</div>`;
+
+  const dFund=sim.fund-now.fund, dPit=sim.pit-now.pit, dTndn=-0.20*((sim.dn+sim.kpcd)-(now.dn+now.kpcd));
+  document.getElementById('kC').innerHTML=
+    kpi('Nộp quỹ BHXH/BHYT/BHTN',ty(sim.fund),'gold',(dFund>=0?'+':'')+ty(dFund)+' / tháng')+
+    kpi('Thuế TNCN nộp NSNN',ty(sim.pit),'',(dPit>=0?'+':'')+fmt(dPit)+'đ / tháng')+
+    kpi('Tác động thuế TNDN',ty(dTndn),dTndn<0?'teal':'red','20% × chi phí được trừ tăng thêm');
+  document.getElementById('budget').innerHTML=`
+    <h4>Bảng cân đối nghĩa vụ (mỗi tháng)</h4>
+    <div class="rowline"><span>Quỹ BHXH/BHYT/BHTN — phần DN (21,5%)</span><b>${fmt(sim.dn)}</b></div>
+    <div class="rowline"><span>Quỹ BHXH/BHYT/BHTN — phần NLĐ (10,5%)</span><b>${fmt(sim.nv)}</b></div>
+    <div class="rowline"><span>Kinh phí công đoàn (2%)${cfg.kpcd?'':' — <i style="color:var(--dim)">đang tắt</i>'}</span><b>${fmt(sim.kpcd)}</b></div>
+    <div class="rowline"><span>Thuế TNCN</span><b>${fmt(sim.pit)}</b></div>
+    <div class="rowline"><span>Giảm thuế TNDN do chi phí được trừ tăng</span><b style="color:var(--teal)">${fmt(dTndn)}</b></div>
+    <div class="rowline hl"><span>Tổng nghĩa vụ ròng / tháng</span><b>${fmt(sim.fund+sim.kpcd+sim.pit+dTndn)}</b></div>
+    <div class="hint w">Bảng lương gốc <b>không có dòng kinh phí công đoàn 2%</b>. Đây là nghĩa vụ riêng theo Luật Công đoàn, tính trên cùng quỹ lương làm căn cứ đóng BHXH — nếu chưa nộp thì đây là một khoản nợ tiềm ẩn thứ hai, tách khỏi bài toán BHXH.</div>`;
+}
+
+function renderP3(now){
+  const list=emps();
+  let gap=0, nAff=0;
+  for(const e of list){
+    if(e.lc<=0) continue;
+    const bt=Math.max(e.tn*cfg.rb,cfg.vung);
+    const g=Math.max(0,bt-e.lc); if(g>0)nAff++;
+    gap+=g;
+  }
+  const N=cfg.rm;
+  const truy=gap*0.32*N;
+  // lãi 0,03%/ngày: tháng thứ k chậm (N-k+0.5)*30 ngày
+  let lai=0; for(let k=1;k<=N;k++) lai += gap*0.32*0.0003*((N-k+0.5)*30);
+  const rate=cfg.sc==='cham'?0.15:0.20;
+  const phat=Math.min(truy*rate,150e6);
+  const tndn=0.20*(truy*(R.dn/0.32));
+  const tot=truy+lai+phat-tndn;
+  const exp=tot*cfg.rp;
+  document.getElementById('kR').innerHTML=
+    kpi('Tổng thiệt hại nếu bị truy',ty(tot),'red',N+' tháng · '+nAff+' người bị ảnh hưởng')+
+    kpi('Tổn thất kỳ vọng',ty(exp),'amber','× xác suất '+pc(cfg.rp))+
+    kpi('So với số đã "tiết kiệm"',pc(tot/(gap*R.dn*N||1)),'','tiết kiệm '+ty(gap*R.dn*N)+' → mất '+ty(tot));
+  document.getElementById('riskBreak').innerHTML=`
+    <h4>Bóc tách</h4>
+    <div class="rowline"><span>Truy thu BHXH/BHYT/BHTN (32% × chênh lệch × ${N} tháng)</span><b>${fmt(truy)}</b></div>
+    <div class="rowline"><span>Tiền chậm nộp 0,03%/ngày (NĐ 274/2025)</span><b>${fmt(lai)}</b></div>
+    <div class="rowline"><span>Phạt hành chính ${cfg.sc==='cham'?'12–15%':'18–20%'} (trần 150tr, tổ chức)</span><b>${fmt(phat)}</b></div>
+    <div class="rowline"><span>Bù trừ: truy thu phần DN được trừ thuế TNDN 20%</span><b style="color:var(--teal)">−${fmt(tndn)}</b></div>
+    <div class="rowline hl"><span>Thiệt hại ròng</span><b style="color:var(--red)">${fmt(tot)}</b></div>
+    <div class="hint w">Tiền phạt và tiền chậm nộp <b>không được trừ khi tính thuế TNDN</b>. Phần truy thu thuộc nghĩa vụ NLĐ (10,5%) mà DN nộp thay cũng khó được ghi nhận là chi phí hợp lý — mô hình đang tính bù trừ ở mức lạc quan.</div>`;
+
+  const nPart=list.filter(e=>e.lc>0).length;
+  const hitMoney=truy>=50e6, hitPeople=nPart>=10;
+  document.getElementById('crim').innerHTML=`
+    <div class="rowline"><span>Số tiền trốn đóng ≥ 50 triệu?</span><b style="color:${hitMoney?'var(--red)':'var(--teal)'}">${hitMoney?'ĐẠT NGƯỠNG — '+ty(truy):'Chưa — '+ty(truy)}</b></div>
+    <div class="rowline"><span>Số NLĐ liên quan ≥ 10 người?</span><b style="color:${hitPeople?'var(--red)':'var(--teal)'}">${hitPeople?'ĐẠT NGƯỠNG — '+nPart+' người':'Chưa — '+nPart+' người'}</b></div>
+    <div class="hint ${(hitMoney||hitPeople)?'r':''}">${(hitMoney||hitPeople)
+      ? '<b>Đã chạm ngưỡng cấu thành tội Trốn đóng BHXH (Điều 216 BLHS).</b> Chỉ cần <i>một trong hai</i> điều kiện — số tiền từ 50 triệu <i>hoặc</i> từ 10 người lao động — là đủ. Với '+nPart+' người tham gia, doanh nghiệp chạm điều kiện số người ngay cả khi số tiền nhỏ. Đây không còn là bài toán chi phí, mà là bài toán trách nhiệm cá nhân của người đại diện pháp luật.'
+      : 'Chưa chạm ngưỡng hình sự với tham số hiện tại. Kéo thanh số tháng hoặc % quy kết lên để xem điểm vượt ngưỡng.'}</div>
+    <div class="hint"><b>Đọc con số này thế nào.</b> Tổn thất kỳ vọng ${ty(exp)} so với khoản tiết kiệm ${ty(gap*R.dn*N)} trong ${N} tháng cho ra tỷ lệ hoà vốn rủi ro là <b>${pc(Math.min(1,(gap*R.dn*N)/(tot||1)))}</b> — tức nếu xác suất bị phát hiện cao hơn mức này thì việc khai thấp đã lỗ về mặt kỳ vọng thuần tuý, chưa tính rủi ro hình sự và uy tín.</div>`;
+}
+
+function renderP4(now,sim){
+  let h=`<thead><tr><th>Nhân sự</th><th>Thu nhập</th><th>Căn cứ nay</th><th>Căn cứ mới</th><th>%TN</th><th>DN đóng</th><th>NLĐ trừ</th><th>TNCN</th><th>Thực lĩnh</th><th>Δ thực lĩnh</th></tr></thead><tbody>`;
+  now.rows.forEach((r,i)=>{
+    const s=sim.rows[i], e=r.e;
+    const floor=e.lc>0&&e.lc===cfg.vung?'<span class="tag r">sàn</span>':'';
+    const non=e.lc===0?'<span class="tag a">ngoài BHXH</span>':'';
+    const d=s.net-r.net;
+    h+=`<tr><td>${e.name}${floor}${non}</td><td>${fmt(e.tn)}</td><td>${fmt(r.b)}</td>
+      <td style="color:var(--gold2)">${fmt(s.b)}</td><td>${s.b?pc(s.b/e.tn):'—'}</td>
+      <td>${fmt(s.dn)}</td><td>${fmt(s.nv)}</td><td>${fmt(s.pit)}</td><td>${fmt(s.net)}</td>
+      <td style="color:${d<0?'var(--red)':d>0?'var(--teal)':'var(--dim)'}">${d?(d>0?'+':'')+fmt(d):'—'}</td></tr>`;
+  });
+  h+=`<tr class="tot"><td>TỔNG ${now.n} người</td><td>${fmt(now.tn)}</td><td>${fmt(now.base)}</td><td>${fmt(sim.base)}</td>
+    <td>${pc(sim.base/(sim.tnPart||1))}</td><td>${fmt(sim.dn)}</td><td>${fmt(sim.nv)}</td><td>${fmt(sim.pit)}</td><td>${fmt(sim.net)}</td>
+    <td>${fmt(sim.net-now.net)}</td></tr></tbody>`;
+  document.getElementById('tbl').innerHTML=h;
+}
+
+/* ---------- WIRING ---------- */
+let pt;
+function say(m,k){const p=document.getElementById('pill');p.className='pill on '+(k||'ok');p.textContent=m;clearTimeout(pt);pt=setTimeout(()=>p.classList.remove('on'),4000);}
+function setM(i){cfg.mi=i;document.getElementById('mSel').value=i;render();say('Đã chuyển sang kỳ T0'+SEED[i].m+'/2026');}
+
+document.getElementById('vb').textContent=VERSION;
+document.getElementById('stamp').textContent=RELEASE;
+const ms=document.getElementById('mSel');
+SEED.forEach((m,i)=>{const o=document.createElement('option');o.value=i;o.textContent='Kỳ T0'+m.m+'/2026 · '+m.rows.length+' người';ms.appendChild(o);});
+ms.onchange=e=>{cfg.mi=+e.target.value;render();say('Đã chuyển kỳ dữ liệu');};
+
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');document.getElementById(t.dataset.p).classList.add('active');});
+
+document.querySelectorAll('#modeSeg button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#modeSeg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  cfg.mode=b.dataset.m;
+  document.getElementById('cComp').style.display=cfg.mode==='comp'?'':'none';
+  document.getElementById('cPct').style.display=cfg.mode==='pct'?'':'none';
+  render();say('Chế độ: '+(cfg.mode==='comp'?'theo cấu phần':'theo % thu nhập'));});
+
+document.querySelectorAll('#scSeg button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#scSeg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  cfg.sc=b.dataset.s;render();say(cfg.sc==='tron'?'Kịch bản trốn đóng — mức phạt cao hơn':'Kịch bản chậm đóng','warn');});
+
+document.querySelectorAll('.tog').forEach(t=>t.onclick=()=>{
+  t.classList.toggle('on');cfg[t.dataset.t]=t.classList.contains('on');render();});
+
+const bind=(id,vid,f,key,fmtf)=>{const s=document.getElementById(id);
+  s.oninput=()=>{cfg[key]=f(+s.value);document.getElementById(vid).textContent=fmtf(+s.value);render();};};
+bind('sMult','vMult',v=>v/100,'mult',v=>v+'%');
+bind('sPct','vPct',v=>v/100,'pct',v=>v+'%');
+bind('sRB','vRB',v=>v/100,'rb',v=>v+'%');
+bind('sRM','vRM',v=>v,'rm',v=>v+' tháng');
+bind('sRP','vRP',v=>v/100,'rp',v=>v+'%');
+document.getElementById('selVung').onchange=e=>{cfg.vung=+e.target.value;render();say('Sàn đóng: '+fmt(cfg.vung)+'đ');};
+
+render();
+say('Nạp '+SEED.length+' kỳ lương thực · '+SEED[0].rows.length+' nhân sự');
+window.__calc=calc; window.__cfg=cfg;
+</script>
+</body>
+</html>
