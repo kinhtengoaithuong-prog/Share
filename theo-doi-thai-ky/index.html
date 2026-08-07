@@ -247,7 +247,13 @@ table.dt td.n{font-weight:500}
   .card{break-inside:avoid;box-shadow:none}
 }
 </style></head>
-<body><div class="app">
+<body>
+<noscript><div style="background:#E8705C;color:#fff;padding:16px 18px;font-family:system-ui,sans-serif;line-height:1.55">
+<b style="font-size:16px">Trình xem này không chạy được tool</b><br>
+Toàn bộ dữ liệu nằm trong file, nhưng cần trình duyệt thật để hiển thị. Hãy <b>tải file về máy</b>, mở app <b>Files / Quản lý tệp</b>, nhấn giữ file rồi chọn <b>Mở bằng → Chrome</b> hoặc <b>Safari</b>.<br>
+<span style="opacity:.9;font-size:13px">Mở trực tiếp trong Zalo, Messenger hay Gmail sẽ ra màn hình trống như thế này.</span>
+</div></noscript>
+<div class="app">
 
 <div class="topbar">
   <div class="brand">
@@ -456,6 +462,10 @@ table.dt td.n{font-weight:500}
       <div class="field"><label for="vExtraK">Số đo khác — tên</label><input id="vExtraK" placeholder="VD: túi thai"></div>
       <div class="field s4"><label for="vNote">Kết luận trên phiếu / ghi chú</label><textarea id="vNote" rows="3"></textarea></div>
     </div>
+    <div id="vExcludeWrap" class="mt" style="display:none">
+      <label>Loại khỏi đồ thị — số vẫn được giữ trong hồ sơ và vẫn xuất ra báo cáo</label>
+      <div class="chips" id="vExclude" style="margin-top:7px"></div>
+    </div>
     <div class="actions"><button class="primary" id="vSave">Lưu lần khám</button><button class="ghost" id="vClear">Xoá form</button></div>
   </div>
 
@@ -547,7 +557,7 @@ const DAY=86400000, KEY='preg_health_v5', OLDKEY='preg_health_dashboard_v43';
 let storageOK=true;
 try{localStorage.setItem('__t','1');localStorage.removeItem('__t')}catch(e){storageOK=false}
 
-const SEED={"schemaVersion": "5.0", "edd": "2027-01-17", "visits": [{"id": 20260519090000, "date": "2026-05-19", "gaDays": 37, "reportedGA": "4w5d", "efw": null, "fhr": null, "crl": null, "bpd": null, "hc": null, "ac": null, "fl": null, "afi": null, "placenta": "", "bp": "", "fluidCord": "", "details": {"gestationalSac": "6.7 mm", "scarDistance": "43.7 mm"}, "note": "Siêu âm Tâm Anh. 01 túi thai trong buồng tử cung, GS 6.7 mm. Chưa có túi noãn hoàng; chưa có phôi thai và hoạt động tim thai. Khoảng cách từ túi thai đến sẹo mổ cũ 43.7 mm. Không có tụ dịch màng nuôi. Hai buồng trứng không thấy khối bất thường; túi cùng Douglas không có dịch. Kết luận trên phiếu: thai tương đương 04 tuần 05 ngày."}, {"id": 20260524090000, "date": "2026-05-24", "gaDays": 42, "reportedGA": "4w6d", "efw": null, "fhr": null, "crl": null, "bpd": null, "hc": null, "ac": null, "fl": null, "afi": null, "placenta": "", "bp": "", "fluidCord": "", "details": {"sacLength": "14.8 mm"}, "note": "Siêu âm Phòng khám Phụ sản Vinhomes Ocean Park. Tử cung kích thước to theo tuổi thai, tư thế ngả trước. Phôi thai: chưa có. Chiều dài túi ối/túi thai ghi trên phiếu: 14.8 mm. Túi noãn hoàng: chưa rõ. Không có tụ dịch màng nuôi. Hai buồng trứng không thấy khối bất thường; Douglas không có dịch. Kết luận: thai 04 tuần 06 ngày. Phiếu ghi dự kiến sinh 25/01/2027; tool giữ EDD chuẩn 17/01/2027."}, {"id": 20260612090000, "date": "2026-06-12", "gaDays": 61, "reportedGA": "8w4d", "efw": null, "fhr": 173, "crl": 20, "bpd": null, "hc": null, "ac": null, "fl": null, "afi": null, "placenta": "", "bp": "", "fluidCord": "", "details": {"gestationalSac": "47x27 mm", "yolkSac": "5 mm"}, "note": "Siêu âm Tâm Anh. 01 túi thai trong buồng tử cung, GS 47x27 mm; túi noãn hoàng 5 mm. CRL 20 mm; tim thai 173 bpm. Không có tụ dịch màng nuôi. Hai buồng trứng bình thường; tiểu khung không thấy bất thường; Douglas không có dịch. Kết luận: thai tương đương 08 tuần 04 ngày."}, {"id": 20260624090000, "date": "2026-06-24", "gaDays": 73, "reportedGA": "10w4d", "efw": null, "fhr": 158, "crl": 36.8, "bpd": null, "hc": null, "ac": null, "fl": null, "afi": null, "placenta": "", "bp": "", "fluidCord": "", "details": {"subchorionicCollection": "6x16 mm"}, "note": "Siêu âm Tâm Anh. CRL 36.8 mm; tim thai 158 bpm. Tụ dịch mép dưới bánh rau kích thước 6x16 mm. Hai buồng trứng không thấy khối bất thường; tiểu khung không thấy bất thường; Douglas không có dịch. Kết luận: 01 thai tương đương 10 tuần 04 ngày, tụ dịch mép dưới bánh rau."}, {"id": 20260708090000, "date": "2026-07-08", "gaDays": 87, "reportedGA": "12w3d", "efw": 56, "fhr": 171, "crl": 59.26, "bpd": 19, "hc": 71, "ac": 56, "fl": 6.4, "afi": null, "placenta": "Mặt trước", "bp": "", "fluidCord": "Thể tích ối bình thường; gốc dây rốn cắm trung tâm bánh rau; mặt cắt 3 mạch máu quan sát thấy", "details": {"nb": 1.77, "nt": 1.28, "uterineArteryRightPI": 2.6, "uterineArteryLeftPI": 1.2, "hadlockPercentile": 16}, "note": "Ngày khám 08/07/2026 được suy ra từ tuổi thai 12w3d và EDD 17/01/2027 vì ngày khám không nằm trong khung ảnh. 01 thai, cử động (+). EFW 56 g ±10%, tương đương percentile 16 theo Hadlock. NT 1.28 mm; xương mũi 1.77 mm. Đầu và cấu trúc não bình thường; tim 4 buồng bình thường; mặt cắt 3 mạch máu quan sát thấy; dạ dày quan sát thấy; thành bụng nguyên vẹn; bàng quang bình thường; thể tích ối bình thường; có đầy đủ bốn chi. PI động mạch tử cung phải 2.6, trái 1.2. Kết luận ghi tăng sức cản động mạch tử cung bên phải. Phiếu in EDD 17/01/2026, nhiều khả năng sai năm; file sử dụng EDD 17/01/2027."}, {"id": 20260716181910, "date": "2026-07-16", "gaDays": 95, "reportedGA": "13w4d", "efw": 38, "fhr": 152, "crl": null, "bpd": 22, "hc": null, "ac": 74, "fl": 14, "afi": null, "placenta": "Rau bám đáy mặt trước", "bp": "", "fluidCord": "Dịch ối trong, ối bình thường; dây rốn 2 động mạch, 1 tĩnh mạch", "details": {"nb": 3.6, "tcd": 13.5, "lateralVentricle": 3.5, "cisternaMagna": 3, "humerus": 12, "foot": 10, "interorbital": 13.5}, "note": "01 thai; ngôi thai chưa cố định. Xương hộp sọ và hàm mặt: hiện không thấy bất thường. Cột sống – hệ xương: hiện không thấy bất thường. Tim thai: cấu trúc tim thai 4 buồng. Ổ bụng kín; cơ hoành bình thường; dạ dày trong ổ bụng; hai bể thận bình thường; bàng quang trong hố chậu; lồng ngực/cấu trúc phổi đồng nhất, không có nang tuyến. Mép bánh rau bình thường. Lưu ý trên phiếu: tụ dịch màng nuôi 5×9 mm (5%). Tuổi thai theo kết quả khám trên phiếu: 13 tuần 04 ngày; kết luận hình thái ghi thai tương đương 13 tuần 06 ngày. EDD trên bản in có vẻ ghi nhầm năm 2026; file sử dụng EDD 17/01/2027 theo EDD đã xác nhận trước đó. Huyết áp viết tay trên ảnh không đủ rõ nên chưa nhập."}], "labs": [{"id": "lab-20260709-bp", "date": "2026-07-09", "group": "Sàng lọc tiền sản giật", "code": "BP_SCREEN_SUMMARY", "name": "Huyết áp khi sàng lọc tiền sản giật", "value": "Tay trái 95/60, 96/60; tay phải 99/60, 91/62", "unit": "mmHg", "reference": "Đọc theo thai kỳ và bối cảnh lâm sàng", "flag": "normal", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Bốn lần đo trên phiếu sàng lọc tiền sản giật."}, {"id": "lab-20260709-plgf", "date": "2026-07-09", "group": "Sàng lọc tiền sản giật", "code": "PLGF", "name": "Yếu tố tăng trưởng nhau thai (PlGF)", "value": 51.7, "unit": "pg/mL", "reference": "Diễn giải theo MoM và mô hình FMF", "flag": "normal", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Kết quả kèm 0.872 MoM."}, {"id": "lab-20260709-plgf-mom", "date": "2026-07-09", "group": "Sàng lọc tiền sản giật", "code": "PLGF_MOM", "name": "PlGF quy đổi theo trung vị (MoM)", "value": 0.872, "unit": "MoM", "reference": "Mô hình sàng lọc của labo", "flag": "normal", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "MoM = multiple of median, dùng để chuẩn hóa theo tuổi thai."}, {"id": "lab-20260709-pi-l", "date": "2026-07-09", "group": "Sàng lọc tiền sản giật", "code": "UTERINE_PI_LEFT", "name": "Chỉ số xung động mạch tử cung trái (PI)", "value": 1.2, "unit": "", "reference": "Đọc theo tuổi thai / mô hình sàng lọc", "flag": "normal", "facility": "Bệnh viện Đa khoa Tâm Anh"}, {"id": "lab-20260709-pi-r", "date": "2026-07-09", "group": "Sàng lọc tiền sản giật", "code": "UTERINE_PI_RIGHT", "name": "Chỉ số xung động mạch tử cung phải (PI)", "value": 2.6, "unit": "", "reference": "Đọc theo tuổi thai / mô hình sàng lọc", "flag": "abnormal", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Trên siêu âm cùng giai đoạn có ghi tăng sức cản động mạch tử cung bên phải."}, {"id": "lab-20260709-pe34", "date": "2026-07-09", "group": "Sàng lọc tiền sản giật", "code": "PE_RISK_34", "name": "Nguy cơ tiền sản giật trước 34 tuần", "value": "1:19.847", "unit": "", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Phiếu kết luận: nguy cơ thấp."}, {"id": "lab-20260709-pe37", "date": "2026-07-09", "group": "Sàng lọc tiền sản giật", "code": "PE_RISK_37", "name": "Nguy cơ tiền sản giật trước 37 tuần", "value": "1:2.987", "unit": "", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Phiếu kết luận: nguy cơ thấp."}, {"id": "lab-20260708-t21", "date": "2026-07-08", "group": "Sàng lọc thai", "code": "NIPT_T21", "name": "NIPT – Tam nhiễm sắc thể 21 (Down)", "value": -1.48, "unit": "Z-score", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Nguy cơ thấp."}, {"id": "lab-20260708-t18", "date": "2026-07-08", "group": "Sàng lọc thai", "code": "NIPT_T18", "name": "NIPT – Tam nhiễm sắc thể 18 (Edwards)", "value": 0.28, "unit": "Z-score", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Nguy cơ thấp."}, {"id": "lab-20260708-t13", "date": "2026-07-08", "group": "Sàng lọc thai", "code": "NIPT_T13", "name": "NIPT – Tam nhiễm sắc thể 13 (Patau)", "value": -0.48, "unit": "Z-score", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Nguy cơ thấp."}, {"id": "lab-20260708-sexchr", "date": "2026-07-08", "group": "Sàng lọc thai", "code": "NIPT_SEX_CHR", "name": "NIPT – Lệch bội nhiễm sắc thể giới tính", "value": "Nguy cơ thấp", "unit": "", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh"}, {"id": "lab-20260708-otherchr", "date": "2026-07-08", "group": "Sàng lọc thai", "code": "NIPT_OTHER_CHR", "name": "NIPT – Các nhiễm sắc thể khác được khảo sát", "value": "Nguy cơ thấp", "unit": "", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh"}, {"id": "lab-20260708-microdel", "date": "2026-07-08", "group": "Sàng lọc thai", "code": "NIPT_MICRODEL", "name": "NIPT – 5 hội chứng vi mất đoạn", "value": "Nguy cơ thấp", "unit": "", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Phạm vi ghi trên phiếu gồm 22q11.2, Angelman, Prader-Willi, Cri-du-Chat, 1p36."}, {"id": "lab-20260708-dominant", "date": "2026-07-08", "group": "Sàng lọc thai", "code": "NIPT_DOMINANT_PANEL", "name": "NIPT – 25 bệnh đơn gen trội / 30 gen", "value": "Chưa phát hiện biến thể gây bệnh / có khả năng gây bệnh", "unit": "", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh"}, {"id": "lab-20260708-cfdna", "date": "2026-07-08", "group": "Sàng lọc thai", "code": "CFDNA_FRACTION", "name": "Tỷ lệ DNA tự do của thai (fetal fraction)", "value": 7.97, "unit": "%", "reference": "Thông tin kỹ thuật trên phiếu", "flag": "normal", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Tỷ lệ cfDNA thai trong mẫu dùng cho xét nghiệm NIPT đơn gen."}, {"id": "lab-20260708-pah", "date": "2026-07-08", "group": "Di truyền của mẹ", "code": "CARRIER_PAH", "name": "Sàng lọc người mang gen – PAH", "value": "c.516G>T (p.Gln172His), dị hợp tử", "unit": "", "reference": "Kết luận xét nghiệm 18 bệnh di truyền lặn phổ biến", "flag": "carrier", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Phát hiện 1 biến thể gây bệnh trên gen PAH ở trạng thái dị hợp tử. Kết quả người mang gen không đồng nghĩa mẹ mắc bệnh; cần đánh giá nguy cơ cho con theo tư vấn di truyền và xét nghiệm người bố khi phù hợp."}, {"id": "lab-20260708-carrier-other", "date": "2026-07-08", "group": "Di truyền của mẹ", "code": "CARRIER_PANEL_OTHER", "name": "Các gen còn lại trong panel người mang gen", "value": "Chưa phát hiện biến thể được phân lớp gây bệnh", "unit": "", "reference": "Trong phạm vi panel 18 bệnh", "flag": "normal", "facility": "Bệnh viện Đa khoa Tâm Anh"}, {"id": "lab-20260708-sma", "date": "2026-07-08", "group": "Di truyền của mẹ", "code": "SMA_SMN1", "name": "Sàng lọc người mang gen teo cơ tủy sống (SMA / SMN1)", "value": "Không phát hiện biến thể được phân lớp gây bệnh", "unit": "", "reference": "Khảo sát mất exon 7 trên SMN1 theo phiếu xét nghiệm", "flag": "normal", "facility": "Bệnh viện Đa khoa Tâm Anh"}], "source": "Ultrasound history through 2026-07-16; lab schema prepared for structured import", "maternal": [{"date": "2026-07-09", "type": "anthropometry", "name": "Cân nặng mẹ", "value": 60.9, "unit": "kg", "source": "Phiếu sàng lọc tiền sản giật"}, {"date": "2026-07-09", "type": "anthropometry", "name": "Chiều cao mẹ", "value": 165.0, "unit": "cm", "source": "Phiếu sàng lọc tiền sản giật"}, {"date": "2026-07-09", "type": "pregnancy", "name": "Phương pháp thụ thai", "value": "Tự nhiên", "unit": "", "source": "Phiếu sàng lọc tiền sản giật"}], "sourceNote": "Tổng hợp từ các phiếu siêu âm, NIPT, sàng lọc tiền sản giật và sàng lọc gen người mang bệnh do người dùng cung cấp."};
+const SEED={"schemaVersion": "5.0", "edd": "2027-01-17", "visits": [{"id": 20260519090000, "date": "2026-05-19", "gaDays": 37, "reportedGA": "4w5d", "efw": null, "fhr": null, "crl": null, "bpd": null, "hc": null, "ac": null, "fl": null, "afi": null, "placenta": "", "bp": "", "fluidCord": "", "details": {"gestationalSac": "6.7 mm", "scarDistance": "43.7 mm"}, "note": "Siêu âm Tâm Anh. 01 túi thai trong buồng tử cung, GS 6.7 mm. Chưa có túi noãn hoàng; chưa có phôi thai và hoạt động tim thai. Khoảng cách từ túi thai đến sẹo mổ cũ 43.7 mm. Không có tụ dịch màng nuôi. Hai buồng trứng không thấy khối bất thường; túi cùng Douglas không có dịch. Kết luận trên phiếu: thai tương đương 04 tuần 05 ngày."}, {"id": 20260524090000, "date": "2026-05-24", "gaDays": 42, "reportedGA": "4w6d", "efw": null, "fhr": null, "crl": null, "bpd": null, "hc": null, "ac": null, "fl": null, "afi": null, "placenta": "", "bp": "", "fluidCord": "", "details": {"sacLength": "14.8 mm"}, "note": "Siêu âm Phòng khám Phụ sản Vinhomes Ocean Park. Tử cung kích thước to theo tuổi thai, tư thế ngả trước. Phôi thai: chưa có. Chiều dài túi ối/túi thai ghi trên phiếu: 14.8 mm. Túi noãn hoàng: chưa rõ. Không có tụ dịch màng nuôi. Hai buồng trứng không thấy khối bất thường; Douglas không có dịch. Kết luận: thai 04 tuần 06 ngày. Phiếu ghi dự kiến sinh 25/01/2027; tool giữ EDD chuẩn 17/01/2027."}, {"id": 20260612090000, "date": "2026-06-12", "gaDays": 61, "reportedGA": "8w4d", "efw": null, "fhr": 173, "crl": 20, "bpd": null, "hc": null, "ac": null, "fl": null, "afi": null, "placenta": "", "bp": "", "fluidCord": "", "details": {"gestationalSac": "47x27 mm", "yolkSac": "5 mm"}, "note": "Siêu âm Tâm Anh. 01 túi thai trong buồng tử cung, GS 47x27 mm; túi noãn hoàng 5 mm. CRL 20 mm; tim thai 173 bpm. Không có tụ dịch màng nuôi. Hai buồng trứng bình thường; tiểu khung không thấy bất thường; Douglas không có dịch. Kết luận: thai tương đương 08 tuần 04 ngày."}, {"id": 20260624090000, "date": "2026-06-24", "gaDays": 73, "reportedGA": "10w4d", "efw": null, "fhr": 158, "crl": 36.8, "bpd": null, "hc": null, "ac": null, "fl": null, "afi": null, "placenta": "", "bp": "", "fluidCord": "", "details": {"subchorionicCollection": "6x16 mm"}, "note": "Siêu âm Tâm Anh. CRL 36.8 mm; tim thai 158 bpm. Tụ dịch mép dưới bánh rau kích thước 6x16 mm. Hai buồng trứng không thấy khối bất thường; tiểu khung không thấy bất thường; Douglas không có dịch. Kết luận: 01 thai tương đương 10 tuần 04 ngày, tụ dịch mép dưới bánh rau."}, {"id": 20260708090000, "date": "2026-07-08", "gaDays": 87, "reportedGA": "12w3d", "efw": 56, "fhr": 171, "crl": 59.26, "bpd": 19, "hc": 71, "ac": 56, "fl": 6.4, "afi": null, "placenta": "Mặt trước", "bp": "", "fluidCord": "Thể tích ối bình thường; gốc dây rốn cắm trung tâm bánh rau; mặt cắt 3 mạch máu quan sát thấy", "details": {"nb": 1.77, "nt": 1.28, "uterineArteryRightPI": 2.6, "uterineArteryLeftPI": 1.2, "hadlockPercentile": 16}, "note": "Ngày khám 08/07/2026 được suy ra từ tuổi thai 12w3d và EDD 17/01/2027 vì ngày khám không nằm trong khung ảnh. 01 thai, cử động (+). EFW 56 g ±10%, tương đương percentile 16 theo Hadlock. NT 1.28 mm; xương mũi 1.77 mm. Đầu và cấu trúc não bình thường; tim 4 buồng bình thường; mặt cắt 3 mạch máu quan sát thấy; dạ dày quan sát thấy; thành bụng nguyên vẹn; bàng quang bình thường; thể tích ối bình thường; có đầy đủ bốn chi. PI động mạch tử cung phải 2.6, trái 1.2. Kết luận ghi tăng sức cản động mạch tử cung bên phải. Phiếu in EDD 17/01/2026, nhiều khả năng sai năm; file sử dụng EDD 17/01/2027."}, {"id": 20260716181910, "date": "2026-07-16", "gaDays": 95, "reportedGA": "13w4d", "efw": 38, "fhr": 152, "crl": null, "bpd": 22, "hc": null, "ac": 74, "fl": 14, "afi": null, "placenta": "Rau bám đáy mặt trước", "bp": "", "fluidCord": "Dịch ối trong, ối bình thường; dây rốn 2 động mạch, 1 tĩnh mạch", "details": {"nb": 3.6, "tcd": 13.5, "lateralVentricle": 3.5, "cisternaMagna": 3, "humerus": 12, "foot": 10, "interorbital": 13.5}, "note": "01 thai; ngôi thai chưa cố định. Xương hộp sọ và hàm mặt: hiện không thấy bất thường. Cột sống – hệ xương: hiện không thấy bất thường. Tim thai: cấu trúc tim thai 4 buồng. Ổ bụng kín; cơ hoành bình thường; dạ dày trong ổ bụng; hai bể thận bình thường; bàng quang trong hố chậu; lồng ngực/cấu trúc phổi đồng nhất, không có nang tuyến. Mép bánh rau bình thường. Lưu ý trên phiếu: tụ dịch màng nuôi 5×9 mm (5%). Tuổi thai theo kết quả khám trên phiếu: 13 tuần 04 ngày; kết luận hình thái ghi thai tương đương 13 tuần 06 ngày. EDD trên bản in có vẻ ghi nhầm năm 2026; file sử dụng EDD 17/01/2027 theo EDD đã xác nhận trước đó. Huyết áp viết tay trên ảnh không đủ rõ nên chưa nhập."}, {"id": "v-20260805", "date": "2026-08-05", "gaDays": 115, "reportedGA": "16w3d", "facility": "Bệnh viện Đa khoa Tâm Anh", "bp": "", "efw": 166, "fhr": 145, "crl": null, "bpd": 35.9, "hc": 129.2, "ac": 108.7, "fl": 22.2, "afi": null, "placenta": "", "fluidCord": "", "details": {"hadlockPercentile": 59.2, "efwRange": "±24 g", "efwAge": "16w4d", "gaAUA": "16w5d", "eddAUA": "15/01/2027", "ofd": "44.0 mm", "hcStar": "126.1 mm", "fhrMethod": "Umb-HR (Doppler động mạch rốn)", "ci": "82% (70–86%)", "flBpd": "62% (GA: OOR)", "flAc": "20% (20–24%)", "hcAc": "1.19 (1.06–1.35)", "flHc": "0.17 (0.14–0.17)"}, "note": "Siêu âm Tâm Anh, máy GE Voluson, ca lúc 17:47. EFW theo Hadlock 166 g ±24 g, percentile 59.2%, tuổi thai theo EFW 16w4d. Nhịp tim thai 145 bpm, đo bằng Doppler động mạch rốn (Umb-HR); phổ Doppler ghi ở độ sâu 57.7 mm, SV angle 0, PRF 4.4 kHz. Số đo trên phiếu ghi bằng cm, đã đổi sang mm: BPD 3.59 cm, OFD 4.40 cm, HC 12.92 cm, HC* 12.61 cm, AC 10.87 cm, FL 2.22 cm. GA theo EDD 16w3d, GA theo siêu âm (AUA) 16w5d; EDD trên phiếu 17/01/2027, EDD(AUA) 15/01/2027 — file giữ EDD 17/01/2027. Các tỷ lệ nằm trong khoảng in kèm, riêng FL/BPD phiếu ghi GA: OOR. Chưa nhập: huyết áp mẹ, chỉ số ối, vị trí bánh nhau và kết luận hình thái — cần các trang còn lại của phiếu."}], "labs": [{"id": "lab-20260709-bp", "date": "2026-07-09", "group": "Sàng lọc tiền sản giật", "code": "BP_SCREEN_SUMMARY", "name": "Huyết áp khi sàng lọc tiền sản giật", "value": "Tay trái 95/60, 96/60; tay phải 99/60, 91/62", "unit": "mmHg", "reference": "Đọc theo thai kỳ và bối cảnh lâm sàng", "flag": "normal", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Bốn lần đo trên phiếu sàng lọc tiền sản giật."}, {"id": "lab-20260709-plgf", "date": "2026-07-09", "group": "Sàng lọc tiền sản giật", "code": "PLGF", "name": "Yếu tố tăng trưởng nhau thai (PlGF)", "value": 51.7, "unit": "pg/mL", "reference": "Diễn giải theo MoM và mô hình FMF", "flag": "normal", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Kết quả kèm 0.872 MoM."}, {"id": "lab-20260709-plgf-mom", "date": "2026-07-09", "group": "Sàng lọc tiền sản giật", "code": "PLGF_MOM", "name": "PlGF quy đổi theo trung vị (MoM)", "value": 0.872, "unit": "MoM", "reference": "Mô hình sàng lọc của labo", "flag": "normal", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "MoM = multiple of median, dùng để chuẩn hóa theo tuổi thai."}, {"id": "lab-20260709-pi-l", "date": "2026-07-09", "group": "Sàng lọc tiền sản giật", "code": "UTERINE_PI_LEFT", "name": "Chỉ số xung động mạch tử cung trái (PI)", "value": 1.2, "unit": "", "reference": "Đọc theo tuổi thai / mô hình sàng lọc", "flag": "normal", "facility": "Bệnh viện Đa khoa Tâm Anh"}, {"id": "lab-20260709-pi-r", "date": "2026-07-09", "group": "Sàng lọc tiền sản giật", "code": "UTERINE_PI_RIGHT", "name": "Chỉ số xung động mạch tử cung phải (PI)", "value": 2.6, "unit": "", "reference": "Đọc theo tuổi thai / mô hình sàng lọc", "flag": "abnormal", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Trên siêu âm cùng giai đoạn có ghi tăng sức cản động mạch tử cung bên phải."}, {"id": "lab-20260709-pe34", "date": "2026-07-09", "group": "Sàng lọc tiền sản giật", "code": "PE_RISK_34", "name": "Nguy cơ tiền sản giật trước 34 tuần", "value": "1:19.847", "unit": "", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Phiếu kết luận: nguy cơ thấp."}, {"id": "lab-20260709-pe37", "date": "2026-07-09", "group": "Sàng lọc tiền sản giật", "code": "PE_RISK_37", "name": "Nguy cơ tiền sản giật trước 37 tuần", "value": "1:2.987", "unit": "", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Phiếu kết luận: nguy cơ thấp."}, {"id": "lab-20260708-t21", "date": "2026-07-08", "group": "Sàng lọc thai", "code": "NIPT_T21", "name": "NIPT – Tam nhiễm sắc thể 21 (Down)", "value": -1.48, "unit": "Z-score", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Nguy cơ thấp."}, {"id": "lab-20260708-t18", "date": "2026-07-08", "group": "Sàng lọc thai", "code": "NIPT_T18", "name": "NIPT – Tam nhiễm sắc thể 18 (Edwards)", "value": 0.28, "unit": "Z-score", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Nguy cơ thấp."}, {"id": "lab-20260708-t13", "date": "2026-07-08", "group": "Sàng lọc thai", "code": "NIPT_T13", "name": "NIPT – Tam nhiễm sắc thể 13 (Patau)", "value": -0.48, "unit": "Z-score", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Nguy cơ thấp."}, {"id": "lab-20260708-sexchr", "date": "2026-07-08", "group": "Sàng lọc thai", "code": "NIPT_SEX_CHR", "name": "NIPT – Lệch bội nhiễm sắc thể giới tính", "value": "Nguy cơ thấp", "unit": "", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh"}, {"id": "lab-20260708-otherchr", "date": "2026-07-08", "group": "Sàng lọc thai", "code": "NIPT_OTHER_CHR", "name": "NIPT – Các nhiễm sắc thể khác được khảo sát", "value": "Nguy cơ thấp", "unit": "", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh"}, {"id": "lab-20260708-microdel", "date": "2026-07-08", "group": "Sàng lọc thai", "code": "NIPT_MICRODEL", "name": "NIPT – 5 hội chứng vi mất đoạn", "value": "Nguy cơ thấp", "unit": "", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Phạm vi ghi trên phiếu gồm 22q11.2, Angelman, Prader-Willi, Cri-du-Chat, 1p36."}, {"id": "lab-20260708-dominant", "date": "2026-07-08", "group": "Sàng lọc thai", "code": "NIPT_DOMINANT_PANEL", "name": "NIPT – 25 bệnh đơn gen trội / 30 gen", "value": "Chưa phát hiện biến thể gây bệnh / có khả năng gây bệnh", "unit": "", "reference": "Kết luận labo", "flag": "low-risk", "facility": "Bệnh viện Đa khoa Tâm Anh"}, {"id": "lab-20260708-cfdna", "date": "2026-07-08", "group": "Sàng lọc thai", "code": "CFDNA_FRACTION", "name": "Tỷ lệ DNA tự do của thai (fetal fraction)", "value": 7.97, "unit": "%", "reference": "Thông tin kỹ thuật trên phiếu", "flag": "normal", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Tỷ lệ cfDNA thai trong mẫu dùng cho xét nghiệm NIPT đơn gen."}, {"id": "lab-20260708-pah", "date": "2026-07-08", "group": "Di truyền của mẹ", "code": "CARRIER_PAH", "name": "Sàng lọc người mang gen – PAH", "value": "c.516G>T (p.Gln172His), dị hợp tử", "unit": "", "reference": "Kết luận xét nghiệm 18 bệnh di truyền lặn phổ biến", "flag": "carrier", "facility": "Bệnh viện Đa khoa Tâm Anh", "note": "Phát hiện 1 biến thể gây bệnh trên gen PAH ở trạng thái dị hợp tử. Kết quả người mang gen không đồng nghĩa mẹ mắc bệnh; cần đánh giá nguy cơ cho con theo tư vấn di truyền và xét nghiệm người bố khi phù hợp."}, {"id": "lab-20260708-carrier-other", "date": "2026-07-08", "group": "Di truyền của mẹ", "code": "CARRIER_PANEL_OTHER", "name": "Các gen còn lại trong panel người mang gen", "value": "Chưa phát hiện biến thể được phân lớp gây bệnh", "unit": "", "reference": "Trong phạm vi panel 18 bệnh", "flag": "normal", "facility": "Bệnh viện Đa khoa Tâm Anh"}, {"id": "lab-20260708-sma", "date": "2026-07-08", "group": "Di truyền của mẹ", "code": "SMA_SMN1", "name": "Sàng lọc người mang gen teo cơ tủy sống (SMA / SMN1)", "value": "Không phát hiện biến thể được phân lớp gây bệnh", "unit": "", "reference": "Khảo sát mất exon 7 trên SMN1 theo phiếu xét nghiệm", "flag": "normal", "facility": "Bệnh viện Đa khoa Tâm Anh"}], "source": "Ultrasound history through 2026-07-16; lab schema prepared for structured import", "maternal": [{"date": "2026-07-09", "type": "anthropometry", "name": "Cân nặng mẹ", "value": 60.9, "unit": "kg", "source": "Phiếu sàng lọc tiền sản giật"}, {"date": "2026-07-09", "type": "anthropometry", "name": "Chiều cao mẹ", "value": 165.0, "unit": "cm", "source": "Phiếu sàng lọc tiền sản giật"}, {"date": "2026-07-09", "type": "pregnancy", "name": "Phương pháp thụ thai", "value": "Tự nhiên", "unit": "", "source": "Phiếu sàng lọc tiền sản giật"}], "sourceNote": "Tổng hợp từ các phiếu siêu âm, NIPT, sàng lọc tiền sản giật và sàng lọc gen người mang bệnh do người dùng cung cấp."};
 
 function blankState(){return{schemaVersion:'5.0',edd:'',visits:[],labs:[],weights:[],background:{},savedAt:null}}
 function normalize(s){
@@ -592,6 +602,14 @@ function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show')
 function num(id){const x=parseFloat($(id).value);return Number.isFinite(x)?x:null}
 function val(id){return $(id).value.trim()}
 function numOf(o,k){const x=o?o[k]:null;if(x==null||x==='')return null;const n=+x;return Number.isFinite(n)?n:null}
+function isExcluded(o,k){return !!(o&&o.excluded&&o.excluded[k])}
+function usable(o,k){return isExcluded(o,k)?null:numOf(o,k)}
+const EXKEYS=[['efw','EFW','g'],['fhr','Tim thai','bpm'],['crl','CRL','mm'],['bpd','BPD','mm'],['hc','HC','mm'],['ac','AC','mm'],['fl','FL','mm'],['afi','AFI','mm']];
+function excludedList(){
+  const out=[];
+  sortedVisits().forEach(v=>EXKEYS.forEach(([k,lbl,u])=>{if(isExcluded(v,k)&&numOf(v,k)!=null)out.push({v,k,lbl,u,val:numOf(v,k)})}));
+  return out;
+}
 function fmt(n,d){return n==null||!isFinite(n)?'—':(Math.round(n*Math.pow(10,d||0))/Math.pow(10,d||0)).toLocaleString('vi-VN')}
 
 /* ---------- tuổi thai ---------- */
@@ -621,7 +639,7 @@ function findLab(names){
 }
 function sortedVisits(){return state.visits.slice().sort((a,b)=>a.date.localeCompare(b.date))}
 function latestVisit(){return sortedVisits().pop()||null}
-function lastWith(k){return sortedVisits().filter(v=>v[k]!=null&&v[k]!=='').pop()||null}
+function lastWith(k){return sortedVisits().filter(v=>v[k]!=null&&v[k]!==''&&!isExcluded(v,k)).pop()||null}
 
 /* ---------- cửa sổ khám ---------- */
 const MILESTONES=[
@@ -675,11 +693,13 @@ function dataIssues(){
   if(!state.edd) out.push({level:'coral',title:'Chưa có ngày dự sinh',text:'Mọi tính toán tuổi thai và cửa sổ khám đều dựa trên EDD. Nhập ở ô đầu trang.'});
   // 1. chỉ số sinh trắc đi lùi
   BIOM.forEach(([k,label,unit])=>{
-    const pts=sortedVisits().filter(v=>numOf(v,k)!=null);
+    const pts=sortedVisits().filter(v=>usable(v,k)!=null);
     for(let i=1;i<pts.length;i++){
-      if(numOf(pts[i],k) < numOf(pts[i-1],k)){
+      if(usable(pts[i],k) < usable(pts[i-1],k)){
         out.push({level:'coral',title:`${label} giảm giữa hai lần đo`,
-          text:`${vn(pts[i-1].date)}: ${fmt(numOf(pts[i-1],k),2)} ${unit} → ${vn(pts[i].date)}: ${fmt(numOf(pts[i],k),2)} ${unit}. Chỉ số này không giảm theo thời gian, nên nhiều khả năng một trong hai số bị gõ nhầm hoặc ô trên phiếu bị map sai. Đối chiếu lại phiếu gốc trước khi dùng số này.`});
+          text:`${vn(pts[i-1].date)}: ${fmt(usable(pts[i-1],k),2)} ${unit} → ${vn(pts[i].date)}: ${fmt(usable(pts[i],k),2)} ${unit}. Chỉ số này không giảm theo thời gian, nên nhiều khả năng một trong hai số bị gõ nhầm hoặc ô trên phiếu bị map sai.`,
+          fix:[{id:pts[i].id,k,label:`Loại ${fmt(usable(pts[i],k),2)} ${unit} ngày ${vn(pts[i].date)}`},
+               {id:pts[i-1].id,k,label:`Loại ${fmt(usable(pts[i-1],k),2)} ${unit} ngày ${vn(pts[i-1].date)}`}]});
       }
     }
   });
@@ -701,6 +721,11 @@ function dataIssues(){
   const ws=state.weights.slice().sort((a,b)=>a.date.localeCompare(b.date));
   for(let i=1;i<ws.length;i++) if(ws[i-1].kg-ws[i].kg>2)
     out.push({level:'amber',title:'Cân nặng mẹ giảm trên 2 kg',text:`${vn(ws[i-1].date)}: ${ws[i-1].kg} kg → ${vn(ws[i].date)}: ${ws[i].kg} kg. Nếu số đúng thì đây là điều nên nói với bác sĩ ở lần khám tới.`});
+  const ex=excludedList();
+  if(ex.length)out.push({level:'info',title:`Đang loại ${ex.length} số đo khỏi đồ thị`,
+    text:'Các số này vẫn nằm trong hồ sơ và vẫn xuất ra báo cáo, chỉ không tính vào đồ thị, xu hướng và ngoại suy: '+
+      ex.map(e=>`${e.lbl} ${fmt(e.val,2)} ${e.u} (${vn(e.v.date)})`).join('; ')+'.',
+    restore:ex.map(e=>({id:e.v.id,k:e.k,label:`Dùng lại ${e.lbl} ${vn(e.v.date)}`}))});
   return out;
 }
 
@@ -794,12 +819,16 @@ function renderRibbon(){
   });
 }
 
+function excludedText(v){
+  const b=EXKEYS.filter(([k])=>isExcluded(v,k)&&numOf(v,k)!=null).map(([k,lbl,u])=>`${lbl} ${numOf(v,k)} ${u}`);
+  return b.length?'Đã loại khỏi đồ thị (vẫn giữ trong hồ sơ): '+b.join(' · '):'';
+}
 function visitSummary(v){
   const bits=[];
-  if(v.efw!=null)bits.push(`EFW ${v.efw} g`);
-  if(v.fhr!=null)bits.push(`tim thai ${v.fhr} bpm`);
-  if(v.crl!=null)bits.push(`CRL ${v.crl} mm`);
-  ['bpd','hc','ac','fl'].forEach(k=>{if(v[k]!=null)bits.push(`${k.toUpperCase()} ${v[k]} mm`)});
+  if(usable(v,'efw')!=null)bits.push(`EFW ${v.efw} g`);
+  if(usable(v,'fhr')!=null)bits.push(`tim thai ${v.fhr} bpm`);
+  if(usable(v,'crl')!=null)bits.push(`CRL ${v.crl} mm`);
+  ['bpd','hc','ac','fl'].forEach(k=>{if(usable(v,k)!=null)bits.push(`${k.toUpperCase()} ${v[k]} mm`)});
   const d=v.details||{};
   if(d.nt!=null)bits.push(`NT ${d.nt} mm`);
   if(d.nb!=null)bits.push(`NB ${d.nb} mm`);
@@ -807,7 +836,7 @@ function visitSummary(v){
   return bits.join(' · ');
 }
 function detailChips(v){
-  const NAMES={gestationalSac:'Túi thai',sacLength:'Chiều dài túi',yolkSac:'Túi noãn hoàng',scarDistance:'Cách sẹo mổ cũ',subchorionicCollection:'Tụ dịch dưới màng nuôi',nt:'NT',nb:'Xương mũi',hadlockPercentile:'Percentile (phiếu)',tcd:'Đường kính ngang tiểu não',lateralVentricle:'Não thất bên',cisternaMagna:'Hố sau',humerus:'Xương cánh tay',foot:'Bàn chân',interorbital:'Khoảng cách hai hốc mắt',uterineArteryRightPI:'PI ĐM tử cung phải',uterineArteryLeftPI:'PI ĐM tử cung trái'};
+  const NAMES={gestationalSac:'Túi thai',sacLength:'Chiều dài túi',yolkSac:'Túi noãn hoàng',scarDistance:'Cách sẹo mổ cũ',subchorionicCollection:'Tụ dịch dưới màng nuôi',nt:'NT',nb:'Xương mũi',hadlockPercentile:'Percentile (phiếu)',tcd:'Đường kính ngang tiểu não',lateralVentricle:'Não thất bên',cisternaMagna:'Hố sau',humerus:'Xương cánh tay',foot:'Bàn chân',interorbital:'Khoảng cách hai hốc mắt',ofd:'Đường kính chẩm–trán (OFD)',hcStar:'HC* (Hadlock)',fhrMethod:'Cách đo nhịp tim thai',efwRange:'Sai số EFW',efwAge:'Tuổi thai theo EFW',gaAUA:'Tuổi thai theo siêu âm (AUA)',eddAUA:'EDD theo siêu âm (AUA)',ci:'Chỉ số đầu CI (BPD/OFD)',flBpd:'FL/BPD',flAc:'FL/AC',hcAc:'HC/AC (Campbell)',flHc:'FL/HC (Hadlock)',uterineArteryRightPI:'PI ĐM tử cung phải',uterineArteryLeftPI:'PI ĐM tử cung trái'};
   const d=v.details||{};
   return Object.keys(d).filter(k=>d[k]!=null&&d[k]!=='').map(k=>`<span class="chip">${esc(NAMES[k]||k)}: ${esc(d[k])}</span>`).join('');
 }
@@ -815,7 +844,12 @@ function detailChips(v){
 function renderIssues(){
   const it=dataIssues();
   $('issueCard').style.display=it.length?'':'none';
-  $('issues').innerHTML=it.map(i=>`<div class="note ${i.level}"><b>${esc(i.title)}</b>${esc(i.text)}</div>`).join('');
+  $('issues').innerHTML=it.map(i=>{
+    const btns=(i.fix||[]).map(f=>`<button class="ghost tiny" data-ex="1" data-id="${esc(f.id)}" data-k="${esc(f.k)}">${esc(f.label)}</button>`)
+      .concat((i.restore||[]).map(f=>`<button class="soft tiny" data-ex="0" data-id="${esc(f.id)}" data-k="${esc(f.k)}">${esc(f.label)}</button>`)).join('');
+    return `<div class="note ${i.level}"><b>${esc(i.title)}</b>${esc(i.text)}${btns?`<div class="actions">${btns}</div>`:''}</div>`;
+  }).join('');
+  $('issues').querySelectorAll('[data-ex]').forEach(b=>b.onclick=()=>setExcluded(b.dataset.id,b.dataset.k,b.dataset.ex==='1'));
   const tab=document.querySelector('[data-tab="pOverview"]');
   tab.innerHTML='Tổng quan'+(it.some(x=>x.level==='coral')?'<span class="dot"></span>':'');
 }
@@ -955,7 +989,8 @@ function renderWindows(){
 function allEvents(){
   const ev=[];
   state.visits.forEach(v=>ev.push({date:v.date,kind:'visit',id:v.id,type:'Siêu âm / khám'+(v.facility?' · '+v.facility:''),
-    title:gaLabel(visitGA(v))+(visitSummary(v)?' · '+visitSummary(v):''),text:v.note||v.placenta||'',chips:detailChips(v)}));
+    title:gaLabel(visitGA(v))+(visitSummary(v)?' · '+visitSummary(v):''),text:v.note||v.placenta||'',
+    excl:excludedText(v),chips:detailChips(v)}));
   const byKey={};
   state.labs.forEach(l=>{const k=l.date+'|'+(l.group||'Khác');(byKey[k]=byKey[k]||[]).push(l)});
   Object.keys(byKey).forEach(k=>{
@@ -979,6 +1014,7 @@ function renderTimeline(){
     return `<div class="ev ${x.kind} ${warn?'warn':''}">
       <div class="d"><b>${vn(x.date)}</b>${gaLabel(g)}</div>
       <div><div class="t">${esc(x.type)}</div><div class="body">${esc(x.title)}</div>
+        ${x.excl?`<div class="body" style="color:var(--coral)">${esc(x.excl)}</div>`:''}
         ${x.text?`<div class="body">${esc(x.text)}</div>`:''}
         ${x.chips?`<div class="row2">${x.chips}</div>`:''}</div>
       <div class="rowbtns">${btns}</div></div>`;
@@ -1008,7 +1044,7 @@ const METRICS={
 let activeMetric='efw', zoomMode='data';
 function metricData(k){
   const m=METRICS[k];
-  if(m.src==='visit')return sortedVisits().filter(v=>numOf(v,k)!=null).map(v=>{const g=visitGA(v);return g?{date:v.date,x:g.days/7,y:numOf(v,k)}:null}).filter(Boolean);
+  if(m.src==='visit')return sortedVisits().filter(v=>usable(v,k)!=null).map(v=>{const g=visitGA(v);return g?{date:v.date,x:g.days/7,y:usable(v,k)}:null}).filter(Boolean);
   const ns=m.match.map(s=>s.toLowerCase());
   return state.labs.filter(l=>ns.some(n=>(l.code||'').toLowerCase()===n||(l.name||'').toLowerCase().includes(n))&&Number.isFinite(parseFloat(l.value)))
     .map(l=>{const g=gaOn(parseDate(l.date));return g?{date:l.date,x:g.days/7,y:parseFloat(l.value),unit:l.unit}:null}).filter(Boolean)
@@ -1079,10 +1115,10 @@ function renderTrend(){
   $('trend').innerHTML=h;renderForecast();
 }
 function renderForecast(){
-  const xs=sortedVisits().filter(v=>v.efw!=null&&visitGA(v)&&visitGA(v).days>=140);
+  const xs=sortedVisits().filter(v=>usable(v,'efw')!=null&&visitGA(v)&&visitGA(v).days>=140);
   if(!xs.length){$('forecast').innerHTML='Chỉ ngoại suy khi đã có EFW từ 20 tuần trở đi. Hiện chưa đủ dữ liệu.';return}
   const use=xs.slice(-3);
-  const rs=use.map(v=>v.efw/refAt('efw',visitGA(v).days/7));
+  const rs=use.map(v=>usable(v,'efw')/refAt('efw',visitGA(v).days/7));
   const wts=rs.map((_,i)=>i+1);
   const gi=rs.reduce((s,r,i)=>s+r*wts[i],0)/wts.reduce((a,b)=>a+b,0);
   const f=REF.efw[40]*gi;
@@ -1244,9 +1280,25 @@ function openMetric(id){
 const LAB_GROUPS=['Huyết học','Sinh hóa','Tuyến giáp','Nước tiểu','Nhiễm trùng & miễn dịch','Đông máu','Sàng lọc thai','Sàng lọc tiền sản giật','Di truyền của mẹ','Nhóm máu','Khác'];
 let editingVisit=null, editingLab=null;
 
+function setExcluded(id,k,on){
+  const v=state.visits.find(x=>x.id===id); if(!v)return;
+  v.excluded=v.excluded||{};
+  if(on)v.excluded[k]=true; else delete v.excluded[k];
+  persist();renderAll();
+  toast(on?'Đã loại số này khỏi đồ thị':'Đã dùng lại số này');
+}
+function renderExcludeBox(v){
+  const rows=EXKEYS.filter(([k])=>numOf(v,k)!=null);
+  $('vExcludeWrap').style.display=rows.length?'':'none';
+  $('vExclude').innerHTML=rows.map(([k,lbl,u])=>
+    `<label class="chip ${isExcluded(v,k)?'on':''}" style="cursor:pointer;display:inline-flex;gap:6px;align-items:center">
+      <input type="checkbox" data-exk="${k}" ${isExcluded(v,k)?'checked':''} style="width:auto;margin:0">
+      ${lbl} ${numOf(v,k)} ${u}</label>`).join('');
+  $('vExclude').querySelectorAll('input[data-exk]').forEach(c=>c.onchange=()=>c.parentElement.classList.toggle('on',c.checked));
+}
 function clearVisitForm(){
   ['vDate','vReported','vFacility','vBP','vEFW','vFHR','vCRL','vPct','vBPD','vHC','vAC','vFL','vNT','vNB','vRPI','vLPI','vAFI','vPlacenta','vExtraK','vNote'].forEach(i=>$(i).value='');
-  $('vDate').value=iso(today());editingVisit=null;$('vEditing').style.display='none';
+  $('vDate').value=iso(today());editingVisit=null;$('vEditing').style.display='none';$('vExcludeWrap').style.display='none';
 }
 function editVisit(id){
   const v=state.visits.find(x=>x.id===id);if(!v)return;
@@ -1258,6 +1310,7 @@ function editVisit(id){
   set('vPct',d.hadlockPercentile);set('vNT',d.nt);set('vNB',d.nb);set('vRPI',d.uterineArteryRightPI);set('vLPI',d.uterineArteryLeftPI);
   $('vPlacenta').value=v.placenta||'';$('vNote').value=v.note||'';
   $('vEditingTxt').textContent=`Đang sửa lần khám ngày ${vn(v.date)}`;$('vEditing').style.display='';
+  renderExcludeBox(v);
   switchTab('pEntry');window.scrollTo({top:0,behavior:'smooth'});
 }
 function saveVisit(){
@@ -1267,7 +1320,9 @@ function saveVisit(){
   const details=Object.assign({},old?old.details:{},{
     nt:num('vNT'),nb:num('vNB'),uterineArteryRightPI:num('vRPI'),uterineArteryLeftPI:num('vLPI'),hadlockPercentile:num('vPct')});
   Object.keys(details).forEach(k=>{if(details[k]==null)delete details[k]});
-  const rec={id:editingVisit||('v-'+Date.now()),date:d,gaDays:g?g.days:null,reportedGA:val('vReported')||null,
+  const excluded={};
+  if(editingVisit)$('vExclude').querySelectorAll('input[data-exk]:checked').forEach(c=>excluded[c.dataset.exk]=true);
+  const rec={id:editingVisit||('v-'+Date.now()),excluded,date:d,gaDays:g?g.days:null,reportedGA:val('vReported')||null,
     facility:val('vFacility'),bp:val('vBP'),efw:num('vEFW'),fhr:num('vFHR'),crl:num('vCRL'),bpd:num('vBPD'),
     hc:num('vHC'),ac:num('vAC'),fl:num('vFL'),afi:num('vAFI'),placenta:val('vPlacenta'),
     fluidCord:old?old.fluidCord:'',details,note:val('vNote')};
@@ -1325,7 +1380,8 @@ function exportCSV(){
   sortedVisits().forEach(v=>{
     const ga=gaLabel(visitGA(v));
     [['EFW',v.efw,'g'],['FHR',v.fhr,'bpm'],['CRL',v.crl,'mm'],['BPD',v.bpd,'mm'],['HC',v.hc,'mm'],['AC',v.ac,'mm'],['FL',v.fl,'mm'],['AFI',v.afi,'mm']]
-      .filter(x=>x[1]!=null).forEach(x=>rows.push(['sieu_am',v.date,ga,'Sinh trắc',x[0],x[1],x[2],'','',v.facility||'']));
+      .filter(x=>x[1]!=null).forEach(x=>rows.push(['sieu_am',v.date,ga,'Sinh trắc',x[0],x[1],x[2],'',
+        isExcluded(v,x[0].toLowerCase())?'LOAI KHOI DO THI':'',v.facility||'']));
     Object.keys(v.details||{}).forEach(k=>rows.push(['sieu_am',v.date,ga,'Chi tiết',k,v.details[k],'','','','']));
     if(v.note)rows.push(['sieu_am',v.date,ga,'Kết luận','Ghi chú','','','','',v.note]);
   });
@@ -1372,6 +1428,7 @@ function exportVisitSheet(){
   issues.forEach(i=>qs.push(`${i.title} — cần đối chiếu lại phiếu gốc.`));
   flagged.forEach(l=>qs.push(`${l.name} = ${l.value} ${l.unit||''} có cờ trên phiếu ngày ${vn(l.date)} — có cần theo dõi tiếp không?`));
   up.forEach(r=>qs.push(`${r.m.name}: cửa sổ ${vn(iso(r.s.from))} → ${vn(iso(r.s.to))} — đặt lịch khi nào?`));
+  excludedList().forEach(e=>qs.push(`${e.lbl} ngày ${vn(e.v.date)} ghi ${e.val} ${e.u} — con số này có đúng trên phiếu không?`));
   if(byCode('CARRIER_PAH'))qs.push('Mẹ mang biến thể PAH dị hợp tử — bố có cần làm xét nghiệm người mang gen không?');
   const inner=`<h1>Phiếu mang đi khám</h1>
 <p class="m">In ngày ${vn(iso(today()))} · EDD ${vn(state.edd)}</p>
