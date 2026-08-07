@@ -129,8 +129,43 @@ td.hi{color:var(--gold2);font-weight:500}
 .pgb.p{background:var(--gold);border-color:var(--gold);color:#0c1120;font-weight:600}
 footer{max-width:1180px;margin:0 auto;padding:0 24px 60px;font-family:var(--fb);font-size:11.5px;color:var(--dim);line-height:1.75}
 
+
+/* ---- PHỤ LỤC ---- */
+.ref{display:inline-flex;align-items:center;gap:5px;font-family:var(--fb);font-size:11.5px;font-weight:600;letter-spacing:.3px;padding:2px 9px;border-radius:20px;background:rgba(79,209,197,.11);color:var(--teal);border:1px solid rgba(79,209,197,.28);cursor:pointer;white-space:nowrap;vertical-align:baseline;transition:.16s;margin:0 2px}
+.ref:hover{background:rgba(79,209,197,.22);border-color:rgba(79,209,197,.55)}
+.ref:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.refrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:13px;border-top:1px dashed rgba(255,255,255,.10)}
+.refrow .lbl{font-size:11.5px;color:var(--dim);align-self:center;letter-spacing:.4px}
+.apx{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px 26px;margin-bottom:20px;scroll-margin-top:88px;transition:border-color .5s,box-shadow .5s}
+.apx.flash{border-color:rgba(79,209,197,.65);box-shadow:0 0 0 4px rgba(79,209,197,.10)}
+.apxh{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:5px}
+.apxid{display:inline-block;font-family:var(--fm);font-size:11px;padding:3px 9px;border-radius:7px;background:rgba(212,175,106,.16);color:var(--gold);margin-right:11px;vertical-align:middle}
+.apxt{font-family:var(--fh);font-size:18px;font-weight:600;color:var(--gold2)}
+.apxs{font-size:12.5px;color:var(--dim);margin-bottom:16px;line-height:1.5}
+.tw::-webkit-scrollbar{height:7px}.tw::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16);border-radius:6px}
+.apxn{font-size:13px;color:var(--sub);margin:15px 0 0;padding:13px 16px;background:rgba(79,209,197,.055);border-left:2px solid rgba(79,209,197,.4);border-radius:0 10px 10px 0;max-width:none}
+.back{padding:7px 15px;border-radius:20px;border:1px solid var(--line);background:transparent;color:var(--sub);font-family:var(--fb);font-size:12px;cursor:pointer;transition:.16s;flex:none}
+.back:hover{border-color:var(--gold);color:var(--gold2)}
+.back:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+.tw table{width:100%}
+.tw th{background:rgba(255,255,255,.03);position:sticky;top:0;white-space:nowrap;padding:10px 11px;font-size:10.5px}
+.tw td{padding:10px 11px;font-size:12.5px;white-space:nowrap;vertical-align:top;line-height:1.5}
+.tw td.l,.tw th.l{text-align:left;white-space:normal;min-width:150px;max-width:330px}
+.tw tbody td:first-child{font-weight:500;color:var(--ink)}
+.tw td.r,.tw th.r{text-align:right}
+.tw tr:hover td{background:rgba(255,255,255,.035)}
+.tw tr.tot td{background:rgba(212,175,106,.09);color:var(--gold2);font-weight:600;border-top:1px solid rgba(212,175,106,.3)}
+.tw td.tag-r{color:var(--red)}.tw td.tag-a{color:var(--amber)}
+.tw td.ok{color:var(--teal)}.tw td.no{color:var(--sub)}
+.apxtoc{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:26px}
+.apxtoc button{padding:8px 14px;border-radius:20px;border:1px solid var(--line);background:transparent;color:var(--sub);font-family:var(--fb);font-size:12.5px;cursor:pointer;transition:.16s}
+.apxtoc button:hover{border-color:var(--gold);color:var(--gold2)}
+.nstep.apxbtn{width:auto;padding:0 14px;border-radius:16px;font-family:var(--fb);font-size:12px}
+
 @media(max-width:900px){
  .g2,.g3,.picker{grid-template-columns:1fr}
+ .apx{padding:18px 14px}.apxh{flex-direction:column}
  .page{padding:30px 16px 24px}.nin{padding:10px 16px}
  .ratio{font-size:40px}.card{padding:20px 18px}
  .ctrack{height:180px}
@@ -167,14 +202,14 @@ footer{max-width:1180px;margin:0 auto;padding:0 24px 60px;font-family:var(--fb);
       <div class="kp"><div class="l">Chênh lệch ròng</div><div class="v red" id="rNet"></div><div class="n">Tiền thật doanh nghiệp mất đi</div></div>
       <div class="kp"><div class="l">Nếu xác suất bị soi là 25%</div><div class="v amber" id="rExp"></div><div class="n">Tổn thất kỳ vọng — con số nên trích dự phòng</div></div>
     </div>
-    <p style="margin-top:22px;font-size:13.5px" id="clockNote"></p>
+    <p style="margin-top:22px;font-size:13.5px" id="clockNote"></p><div class="refrow"><span class="lbl">Số liệu chi tiết:</span><button class="ref" data-ref="B4">B4 ↗</button><button class="ref" data-ref="B2">B2 ↗</button></div>
   </div>
 
   <div class="card d" style="margin-top:20px">
     <h2 style="margin-top:0;color:#ffb0b0">Một điều phải nói trước mọi con số</h2>
     <p>Điều 216 Bộ luật Hình sự quy định ngưỡng cấu thành tội Trốn đóng bảo hiểm xã hội là <b>số tiền từ 50 triệu</b> <i>hoặc</i> <b>từ 10 người lao động</b> — chỉ cần một trong hai.</p>
     <p>Doanh nghiệp hiện có <b>21 người tham gia BHXH</b>. Điều kiện thứ hai đã thoả, bất kể số tiền là bao nhiêu.</p>
-    <p style="margin-bottom:0">Rủi ro này không nằm trên báo cáo kết quả kinh doanh và không trích dự phòng được. Nó thuộc về cá nhân người đại diện theo pháp luật. Đó là lý do trang này đứng trước trang chi phí.</p>
+    <p>Rủi ro này không nằm trên báo cáo kết quả kinh doanh và không trích dự phòng được. Nó thuộc về cá nhân người đại diện theo pháp luật. Đó là lý do trang này đứng trước trang chi phí.</p><div class="refrow"><span class="lbl">Số người tham gia:</span><button class="ref" data-ref="B1">B1 ↗</button></div>
   </div>
   <div class="pager"><span></span><button class="pgb p" onclick="go(2)">Xem hiện trạng →</button></div>
 </section>
@@ -191,14 +226,14 @@ footer{max-width:1180px;margin:0 auto;padding:0 24px 60px;font-family:var(--fb);
     <div class="kp"><div class="l">Kinh phí công đoàn 2%</div><div class="v red">Không có</div><div class="n">Không xuất hiện dòng nào trên bảng lương</div></div>
   </div>
 
-  <div class="flag r"><div class="m">01</div><div><p><b>Mười bảy người cùng một bậc lương.</b> Không phải tỷ lệ 52% là vấn đề lớn nhất — mà là việc kỹ thuật viên, kế toán và kinh doanh cùng rơi đúng vào con số 5.310.000đ. Một hệ thống thang bảng lương thật không thể tạo ra kết quả đó. Đây là dấu hiệu dễ nhận diện nhất khi hồ sơ được mở ra.</p></div></div>
-  <div class="flag a"><div class="m">02</div><div><p><b>Ba người nhận thu nhập đều đặn nhưng không có dòng bảo hiểm.</b> Nếu bản chất là hợp đồng lao động từ một tháng trở lên, sau 60 ngày không đăng ký đã cấu thành hành vi trốn đóng theo khoản 1 Điều 39 Luật BHXH 2024 — một rủi ro riêng, độc lập với chuyện khai thấp, và để lại dấu vết rõ trên sổ quỹ.</p></div></div>
-  <div class="flag a"><div class="m">03</div><div><p><b>Thiếu kinh phí công đoàn.</b> Nghĩa vụ theo Luật Công đoàn, tính trên cùng quỹ lương làm căn cứ đóng BHXH. Nếu chưa nộp thật thì đây là khoản nợ thứ hai, cơ chế riêng, khoảng 35 triệu mỗi năm ở mức căn cứ đóng đã chuẩn hoá.</p></div></div>
-  <div class="flag t"><div class="m">04</div><div><p><b>Một chỗ đang nộp thừa.</b> Phụ cấp điện thoại đang bị tính vào thu nhập chịu thuế thu nhập cá nhân. Nếu có quy chế khoán chi ghi rõ định mức, khoản này được miễn thuế. Đây là điểm duy nhất trong hồ sơ đang chảy tiền theo hướng ngược lại — sửa được ngay, không cần đánh đổi gì.</p></div></div>
+  <div class="flag r"><div class="m">01</div><div><p><b>Mười bảy người cùng một bậc lương.</b> Không phải tỷ lệ 52% là vấn đề lớn nhất — mà là việc kỹ thuật viên, kế toán và kinh doanh cùng rơi đúng vào con số 5.310.000đ. Một hệ thống thang bảng lương thật không thể tạo ra kết quả đó. Đây là dấu hiệu dễ nhận diện nhất khi hồ sơ được mở ra. <button class="ref" data-ref="B1">B1 ↗</button> <button class="ref" data-ref="B2">B2 ↗</button></p></div></div>
+  <div class="flag a"><div class="m">02</div><div><p><b>Ba người nhận thu nhập đều đặn nhưng không có dòng bảo hiểm.</b> Nếu bản chất là hợp đồng lao động từ một tháng trở lên, sau 60 ngày không đăng ký đã cấu thành hành vi trốn đóng theo khoản 1 Điều 39 Luật BHXH 2024 — một rủi ro riêng, độc lập với chuyện khai thấp, và để lại dấu vết rõ trên sổ quỹ. <button class="ref" data-ref="B3">B3 ↗</button></p></div></div>
+  <div class="flag a"><div class="m">03</div><div><p><b>Thiếu kinh phí công đoàn.</b> Nghĩa vụ theo Luật Công đoàn, tính trên cùng quỹ lương làm căn cứ đóng BHXH. Nếu chưa nộp thật thì đây là khoản nợ thứ hai, cơ chế riêng, khoảng 35 triệu mỗi năm ở mức căn cứ đóng đã chuẩn hoá. <button class="ref" data-ref="B2">B2 ↗</button></p></div></div>
+  <div class="flag t"><div class="m">04</div><div><p><b>Một chỗ đang nộp thừa.</b> Phụ cấp điện thoại đang bị tính vào thu nhập chịu thuế thu nhập cá nhân. Nếu có quy chế khoán chi ghi rõ định mức, khoản này được miễn thuế. Đây là điểm duy nhất trong hồ sơ đang chảy tiền theo hướng ngược lại — sửa được ngay, không cần đánh đổi gì. <button class="ref" data-ref="B5">B5 ↗</button></p></div></div>
 
   <h2>Luật nói gì về phần thu nhập nằm ngoài</h2>
   <p>Điều 7 Nghị định 158/2025/NĐ-CP loại trừ khỏi căn cứ đóng những khoản <b>phụ thuộc hoặc biến động theo năng suất, quá trình làm việc và chất lượng thực hiện công việc</b>. Thưởng doanh số của doanh nghiệp thuộc đúng nhóm này — phần đó nằm ngoài là hợp pháp.</p>
-  <p>Vấn đề không nằm ở thưởng doanh số. Vấn đề nằm ở <b>mức lương theo chức danh</b>: 5.310.000đ không phải là mức lương thật của một kỹ thuật viên xét nghiệm tại Hà Nội, và đó là chỗ hồ sơ không đứng được.</p>
+  <p>Vấn đề không nằm ở thưởng doanh số. Vấn đề nằm ở <b>mức lương theo chức danh</b>: 5.310.000đ không phải là mức lương thật của một kỹ thuật viên xét nghiệm tại Hà Nội, và đó là chỗ hồ sơ không đứng được.</p><div class="refrow"><span class="lbl">Đối chiếu từng khoản mục và mức đề xuất:</span><button class="ref" data-ref="B5">B5 ↗</button><button class="ref" data-ref="B7">B7 ↗</button></div>
   <div class="pager"><button class="pgb" onclick="go(1)">← Quay lại</button><button class="pgb p" onclick="go(3)">Xem ba phương án →</button></div>
 </section>
 
@@ -210,7 +245,7 @@ footer{max-width:1180px;margin:0 auto;padding:0 24px 60px;font-family:var(--fb);
 
   <div class="picker" id="picker"></div>
   <div class="card"><div id="detail"></div></div>
-  <div id="verdict"></div>
+  <div id="verdict"></div><div class="refrow"><span class="lbl">Bảng chi tiết đứng sau ba phương án:</span><button class="ref" data-ref="B6">B6 ↗</button><button class="ref" data-ref="B9">B9 ↗</button><button class="ref" data-ref="B7">B7 ↗</button></div>
 
   <div class="card" style="margin-top:18px">
     <h3 style="margin-top:0">Điểm chung của cả ba</h3>
@@ -229,12 +264,12 @@ footer{max-width:1180px;margin:0 auto;padding:0 24px 60px;font-family:var(--fb);
     <div class="card">
       <h2 style="margin-top:0">Vấn đề thứ nhất: trả cho nghĩa vụ không tồn tại</h2>
       <p>Đóng bảo hiểm trên toàn bộ thu nhập nghĩa là đóng cả phần thưởng doanh số — khoản mà Nghị định 158/2025 đã loại trừ vì biến động theo kết quả công việc.</p>
-      <p style="margin-bottom:0">Chi phí tăng thêm so với phương án chuẩn hoá: <b style="color:var(--red)">125,5 triệu mỗi năm</b>, cho một nghĩa vụ pháp luật không yêu cầu. Không cơ quan nào ghi nhận việc nộp thừa như một tình tiết giảm nhẹ.</p>
+      <p style="margin-bottom:0">Chi phí tăng thêm so với phương án chuẩn hoá: <b style="color:var(--red)">125,5 triệu mỗi năm</b>, cho một nghĩa vụ pháp luật không yêu cầu. Không cơ quan nào ghi nhận việc nộp thừa như một tình tiết giảm nhẹ.</p><div class="refrow"><span class="lbl"></span><button class="ref" data-ref="B5">B5 ↗</button><button class="ref" data-ref="B9">B9 ↗</button></div>
     </div>
     <div class="card d">
       <h2 style="margin-top:0;color:#ffb0b0">Vấn đề thứ hai: tự bật đèn vào hồ sơ cũ</h2>
       <p>Căn cứ đóng nhảy từ 52% lên 100% trong một kỳ lương. Không tăng lương, không đổi cơ cấu tổ chức, không sự kiện nào giải thích.</p>
-      <p style="margin-bottom:0">Câu hỏi đầu tiên của bất kỳ ai nhìn biểu đồ đó: <b><i>"Vậy hai mươi bốn tháng trước khai đúng chưa?"</i></b> Doanh nghiệp vừa trả thêm 258 triệu mỗi năm, vừa tạo ra chính cái tín hiệu mà mình muốn tránh.</p>
+      <p style="margin-bottom:0">Câu hỏi đầu tiên của bất kỳ ai nhìn biểu đồ đó: <b><i>"Vậy hai mươi bốn tháng trước khai đúng chưa?"</i></b> Doanh nghiệp vừa trả thêm 258 triệu mỗi năm, vừa tạo ra chính cái tín hiệu mà mình muốn tránh.</p><div class="refrow"><span class="lbl"></span><button class="ref" data-ref="B2">B2 ↗</button><button class="ref" data-ref="B4">B4 ↗</button></div>
     </div>
   </div>
 
@@ -244,7 +279,7 @@ footer{max-width:1180px;margin:0 auto;padding:0 24px 60px;font-family:var(--fb);
     <div class="kp"><div class="l">Mức đến là con số thị trường</div><div class="v gold" style="font-size:17px;line-height:1.35">8,5 triệu</div><div class="n">Mức lương kỹ thuật viên xét nghiệm tại Hà Nội — kiểm chứng được, giải trình được, không phải con số thoả hiệp giữa hai thái cực.</div></div>
     <div class="kp"><div class="l">Phần còn lại có hồ sơ bảo vệ</div><div class="v gold" style="font-size:17px;line-height:1.35">Quy chế thưởng</div><div class="n">Quy chế thưởng doanh số ghi rõ tính biến động theo kết quả chính là căn cứ giữ 23% thu nhập nằm ngoài đúng luật. Thiếu nó thì phương án chuẩn hoá cũng không đứng vững.</div></div>
   </div>
-  <div class="pager"><button class="pgb" onclick="go(3)">← Quay lại</button><button class="pgb p" onclick="go(5)">Xem lộ trình triển khai →</button></div>
+  <div class="refrow"><span class="lbl">Chi tiết ba luận điểm trên:</span><button class="ref" data-ref="B7">B7 ↗</button><button class="ref" data-ref="B5">B5 ↗</button><button class="ref" data-ref="B6">B6 ↗</button></div><div class="pager"><button class="pgb" onclick="go(3)">← Quay lại</button><button class="pgb p" onclick="go(5)">Xem lộ trình triển khai →</button></div>
 </section>
 
 <!-- 5 -->
@@ -257,8 +292,8 @@ footer{max-width:1180px;margin:0 auto;padding:0 24px 60px;font-family:var(--fb);
     <div class="card">
       <h3 style="margin-top:0">Luồng A — Chuẩn hoá cấu trúc lương</h3>
       <div class="tl">
-        <div class="ti"><div class="w">TUẦN 1–3</div><h4>Dựng hệ thống thang bảng lương</h4><p>Mô tả công việc cho từng chức danh, khảo sát mức thị trường, định giá bậc lương. Đây là hồ sơ nền — không có nó thì mọi bước sau đều rỗng.</p><div class="own">Chủ DN + HR + tư vấn</div></div>
-        <div class="ti"><div class="w">TUẦN 3–4</div><h4>Ban hành quy chế trả lương và quy chế thưởng doanh số</h4><p>Quy chế thưởng phải ghi rõ căn cứ tính biến động theo doanh thu và kết quả cá nhân. Đây là văn bản giữ phần thu nhập ngoài căn cứ đóng.</p><div class="own">Kế toán trưởng + luật sư lao động</div></div>
+        <div class="ti"><div class="w">TUẦN 1–3</div><h4>Dựng hệ thống thang bảng lương</h4><p>Mô tả công việc cho từng chức danh, khảo sát mức thị trường, định giá bậc lương. Đây là hồ sơ nền — không có nó thì mọi bước sau đều rỗng. <button class="ref" data-ref="B7">B7 ↗</button></p><div class="own">Chủ DN + HR + tư vấn</div></div>
+        <div class="ti"><div class="w">TUẦN 3–4</div><h4>Ban hành quy chế trả lương và quy chế thưởng doanh số</h4><p>Quy chế thưởng phải ghi rõ căn cứ tính biến động theo doanh thu và kết quả cá nhân. Đây là văn bản giữ phần thu nhập ngoài căn cứ đóng. <button class="ref" data-ref="B5">B5 ↗</button></p><div class="own">Kế toán trưởng + luật sư lao động</div></div>
         <div class="ti"><div class="w">TUẦN 4–6</div><h4>Tham vấn tập thể và ký phụ lục hợp đồng</h4><p>Thay đổi cấu trúc lương phải thoả thuận với từng người, không được đơn phương. Đây là bước dễ vỡ nhất nếu không chuẩn bị thông điệp trước.</p><div class="own">Chủ DN trực tiếp</div></div>
         <div class="ti"><div class="w">TỪ KỲ LƯƠNG KẾ TIẾP</div><h4>Áp dụng — một nhịp, không chia hai bước</h4><p>Chia nhỏ để đỡ sốc dòng tiền sẽ tạo hai sự kiện điều chỉnh thay vì một, kéo dài thời gian phơi nhiễm mà không giảm được gì.</p><div class="own">Kế toán</div></div>
       </div>
@@ -267,7 +302,7 @@ footer{max-width:1180px;margin:0 auto;padding:0 24px 60px;font-family:var(--fb);
       <div class="card">
         <h3 style="margin-top:0">Luồng B — Ba người ngoài diện đóng</h3>
         <p>Xác định bản chất quan hệ: hợp đồng dịch vụ thật hay hợp đồng lao động trá hình. Nếu là loại thứ hai, đăng ký tham gia ngay. Đây là loại rủi ro dễ bị phát hiện nhất vì dòng tiền ra đều đặn hằng tháng nằm rõ trên sổ kế toán.</p>
-        <p style="margin-bottom:0"><span class="own">Kế toán trưởng · tuần 1–2</span></p>
+        <p><span class="own">Kế toán trưởng · tuần 1–2</span></p><div class="refrow"><span class="lbl"></span><button class="ref" data-ref="B3">B3 ↗</button></div>
       </div>
       <div class="card">
         <h3 style="margin-top:0">Luồng C — Kinh phí công đoàn</h3>
@@ -277,7 +312,7 @@ footer{max-width:1180px;margin:0 auto;padding:0 24px 60px;font-family:var(--fb);
       <div class="card q">
         <h3 style="margin-top:0;color:var(--gold)">Bù cho người lao động — làm ngay, không thương lượng</h3>
         <p>Thực lĩnh bình quân giảm 268.666đ mỗi tháng. Bù đủ cho toàn bộ nhân sự tốn khoảng <b>59 triệu mỗi năm</b> — bằng 45% phần chi phí tăng thêm.</p>
-        <p style="margin-bottom:0">Đổi lại, mỗi người được thêm 15,4 triệu quyền lợi thai sản và 6,8 triệu tích luỹ hưu trí mỗi năm. Với lực lượng chủ yếu là lao động nữ, đây là thông điệp bán được — nhưng chỉ khi nói trước, không phải khi bị hỏi.</p>
+        <p style="margin-bottom:0">Đổi lại, mỗi người được thêm 15,4 triệu quyền lợi thai sản và 6,8 triệu tích luỹ hưu trí mỗi năm. Với lực lượng chủ yếu là lao động nữ, đây là thông điệp bán được — nhưng chỉ khi nói trước, không phải khi bị hỏi.</p><div class="refrow"><span class="lbl">Mức bù từng người:</span><button class="ref" data-ref="B6">B6 ↗</button><button class="ref" data-ref="B9">B9 ↗</button></div>
       </div>
     </div>
   </div>
@@ -297,20 +332,57 @@ footer{max-width:1180px;margin:0 auto;padding:0 24px 60px;font-family:var(--fb);
   </div>
   <div class="card">
     <h2 style="margin-top:0">2 — Trích dự phòng trên sổ quản trị</h2>
-    <p style="margin-bottom:0">Con số <b style="color:var(--amber)">417 triệu</b> phải hiện diện trong báo cáo nội bộ, dù chưa ai đòi. Nguyên tắc đơn giản: cái gì không nhìn thấy thì không ai xử lý. Đây là khuyến nghị duy nhất trong trang này mình đưa ra dứt khoát.</p>
+    <p style="margin-bottom:0">Con số <b style="color:var(--amber)">417 triệu</b> phải hiện diện trong báo cáo nội bộ, dù chưa ai đòi. Nguyên tắc đơn giản: cái gì không nhìn thấy thì không ai xử lý. Đây là khuyến nghị duy nhất trong trang này mình đưa ra dứt khoát.</p><div class="refrow"><span class="lbl"></span><button class="ref" data-ref="B4">B4 ↗</button></div>
   </div>
   <div class="card">
     <h2 style="margin-top:0">3 — Ngân sách chi phí tăng thêm</h2>
-    <p style="margin-bottom:0">Phương án chuẩn hoá cần <b style="color:var(--gold2)">132,8 triệu</b> chi phí bảo hiểm tăng thêm cộng <b style="color:var(--gold2)">59 triệu</b> bù thực lĩnh cho người lao động, tổng khoảng <b style="color:var(--gold2)">192 triệu mỗi năm</b> — tương đương 16 triệu mỗi tháng. Cần xác nhận dòng tiền chịu được trước khi ký phụ lục hợp đồng, vì đã ký thì không lùi được.</p>
+    <p style="margin-bottom:0">Phương án chuẩn hoá cần <b style="color:var(--gold2)">132,8 triệu</b> chi phí bảo hiểm tăng thêm cộng <b style="color:var(--gold2)">59 triệu</b> bù thực lĩnh cho người lao động, tổng khoảng <b style="color:var(--gold2)">192 triệu mỗi năm</b> — tương đương 16 triệu mỗi tháng. Cần xác nhận dòng tiền chịu được trước khi ký phụ lục hợp đồng, vì đã ký thì không lùi được.</p><div class="refrow"><span class="lbl"></span><button class="ref" data-ref="B6">B6 ↗</button><button class="ref" data-ref="B7">B7 ↗</button></div>
   </div>
 
   <div class="card q">
     <h2 style="margin-top:0;color:var(--gold)">Tóm lại trong ba câu</h2>
     <p>Cấu trúc hiện tại giữ lại 130,6 triệu mỗi năm nhưng tích một khoản nợ lớn hơn 60% số đó, và ngưỡng hình sự đã chạm qua tiêu chí số người lao động.</p>
     <p>Phương án chuẩn hoá đưa căn cứ đóng lên 76,8% thu nhập bằng một hệ thống thang bảng lương thật — dừng khoản nợ lại mà không trả thừa cho phần thưởng doanh số vốn được luật loại trừ.</p>
-    <p style="margin-bottom:0">Đóng đủ 100% thu nhập không an toàn hơn: tốn thêm 125,5 triệu mỗi năm cho nghĩa vụ không tồn tại, và chính cú nhảy đó là thứ kéo sự chú ý về hồ sơ cũ.</p>
+    <p style="margin-bottom:0">Đóng đủ 100% thu nhập không an toàn hơn: tốn thêm 125,5 triệu mỗi năm cho nghĩa vụ không tồn tại, và chính cú nhảy đó là thứ kéo sự chú ý về hồ sơ cũ.</p><div class="refrow"><span class="lbl">Toàn bộ tám bảng chi tiết:</span><button class="ref" data-ref="B1">B1 ↗</button><button class="ref" data-ref="B2">B2 ↗</button><button class="ref" data-ref="B3">B3 ↗</button><button class="ref" data-ref="B4">B4 ↗</button><button class="ref" data-ref="B5">B5 ↗</button><button class="ref" data-ref="B6">B6 ↗</button><button class="ref" data-ref="B7">B7 ↗</button><button class="ref" data-ref="B9">B9 ↗</button></div>
   </div>
   <div class="pager"><button class="pgb" onclick="go(5)">← Quay lại</button><button class="pgb" onclick="go(1)">Về đầu ↑</button></div>
+</section>
+
+
+<section class="page" id="pg7">
+  <div class="eyebrow">Phụ lục — Báo cáo chi tiết</div>
+  <h1>Tám bảng số<br><i>đứng sau mọi kết luận</i></h1>
+  <p class="lede">Mọi con số trong sáu trang trước đều truy được về một trong tám bảng dưới đây. Không có bảng nào dùng số ước lượng ngoài phần đã ghi rõ giả định.</p>
+  <div class="apxtoc" id="toc"></div>
+  <div class="apx" id="B1"><div class="apxh"><div><span class="apxid">B1</span><span class="apxt">Bảng lương chi tiết — kỳ tháng 01/2026</span></div><button class="back" data-back="B1">← Quay lại điểm phân tích</button></div><div class="apxs">Nguồn: sheet BẢNG LƯƠNG, khối tháng 01/2026 · 24 dòng, không lược bỏ</div><div class="tw"><table><thead><tr><th class="l">Nhân sự</th><th class="r">Lương chính (căn cứ đóng)</th><th class="r">Hỗ trợ (ăn trưa + ĐT + xăng xe)</th><th class="r">Thưởng doanh số</th><th class="r">Tổng thu nhập</th><th class="r">Căn cứ / thu nhập</th><th class="r">Ghi chú</th></tr></thead><tbody><tr><td class="l">Nguyễn Thị Hồng</td><td class="r">—</td><td class="r">—</td><td class="r">—</td><td class="r">11.194.439</td><td class="r">—</td><td class="r tag-a">ngoài BHXH</td></tr><tr><td class="l">Nguyễn Thị Đua</td><td class="r">—</td><td class="r">—</td><td class="r">—</td><td class="r">12.966.059</td><td class="r">—</td><td class="r tag-a">ngoài BHXH</td></tr><tr><td class="l">Chị Liễu</td><td class="r">—</td><td class="r">—</td><td class="r">—</td><td class="r">3.851.569</td><td class="r">—</td><td class="r tag-a">ngoài BHXH</td></tr><tr><td class="l">Vũ Hồng Quân</td><td class="r">6.500.000</td><td class="r">2.700.000</td><td class="r">11.482.500</td><td class="r">20.682.500</td><td class="r">31.4%</td><td class="r"></td></tr><tr><td class="l">Vũ Quang</td><td class="r">5.681.700</td><td class="r">2.592.000</td><td class="r">7.322.878</td><td class="r">15.596.578</td><td class="r">36.4%</td><td class="r"></td></tr><tr><td class="l">Cao Minh Thu</td><td class="r">5.681.700</td><td class="r">2.808.000</td><td class="r">7.306.878</td><td class="r">15.796.578</td><td class="r">36.0%</td><td class="r"></td></tr><tr><td class="l">Lê Thị Trường Giang</td><td class="r">5.681.700</td><td class="r">2.808.000</td><td class="r">7.206.878</td><td class="r">15.696.578</td><td class="r">36.2%</td><td class="r"></td></tr><tr><td class="l">Nguyễn Mai Phương</td><td class="r">5.310.000</td><td class="r">2.808.000</td><td class="r">6.150.650</td><td class="r">14.268.650</td><td class="r">37.2%</td><td class="r tag-r">sàn</td></tr><tr><td class="l">Lê Thị Hoãn</td><td class="r">5.310.000</td><td class="r">2.808.000</td><td class="r">1.607.031</td><td class="r">9.725.031</td><td class="r">54.6%</td><td class="r tag-r">sàn</td></tr><tr><td class="l">Bùi Thị Thắm</td><td class="r">5.310.000</td><td class="r">2.808.000</td><td class="r">2.157.880</td><td class="r">10.275.880</td><td class="r">51.7%</td><td class="r tag-r">sàn</td></tr><tr><td class="l">Nguyễn Thị Minh</td><td class="r">5.310.000</td><td class="r">2.808.000</td><td class="r">6.129.510</td><td class="r">14.247.510</td><td class="r">37.3%</td><td class="r tag-r">sàn</td></tr><tr><td class="l">Nguyễn Thị Hương (1988 )</td><td class="r">5.310.000</td><td class="r">2.808.000</td><td class="r">4.171.465</td><td class="r">12.289.465</td><td class="r">43.2%</td><td class="r tag-r">sàn</td></tr><tr><td class="l">Phạm Thị Hồng Thuận</td><td class="r">5.310.000</td><td class="r">2.808.000</td><td class="r">2.109.231</td><td class="r">10.227.231</td><td class="r">51.9%</td><td class="r tag-r">sàn</td></tr><tr><td class="l">Đan Thị Hương</td><td class="r">5.310.000</td><td class="r">2.808.000</td><td class="r">2.803.635</td><td class="r">10.921.635</td><td class="r">48.6%</td><td class="r tag-r">sàn</td></tr><tr><td class="l">Hà Thị Cúc</td><td class="r">5.310.000</td><td class="r">2.808.000</td><td class="r">4.828.460</td><td class="r">12.946.460</td><td class="r">41.0%</td><td class="r tag-r">sàn</td></tr><tr><td class="l">Phạm Thái Thái</td><td class="r">5.310.000</td><td class="r">2.808.000</td><td class="r">159.550</td><td class="r">8.277.550</td><td class="r">64.1%</td><td class="r tag-r">sàn</td></tr><tr><td class="l">Nguyễn Thị Hương ( 1991 )</td><td class="r">5.310.000</td><td class="r">2.808.000</td><td class="r">4.874.415</td><td class="r">12.992.415</td><td class="r">40.9%</td><td class="r tag-r">sàn</td></tr><tr><td class="l">Nguyễn Thị Thực</td><td class="r">5.310.000</td><td class="r">2.808.000</td><td class="r">820.980</td><td class="r">8.938.980</td><td class="r">59.4%</td><td class="r tag-r">sàn</td></tr><tr><td class="l">Nguyễn Thị Sợi</td><td class="r">5.310.000</td><td class="r">1.836.000</td><td class="r">210.568</td><td class="r">7.356.568</td><td class="r">72.2%</td><td class="r tag-r">sàn</td></tr><tr><td class="l">Nguyễn Thị sen</td><td class="r">5.310.000</td><td class="r">2.160.000</td><td class="r">263.065</td><td class="r">7.733.065</td><td class="r">68.7%</td><td class="r tag-r">sàn</td></tr><tr><td class="l">Mạc Thị Đào</td><td class="r">5.310.000</td><td class="r">2.808.000</td><td class="r">3.671.800</td><td class="r">11.789.800</td><td class="r">45.0%</td><td class="r tag-r">sàn</td></tr><tr><td class="l">Trần Thị Thu Hà</td><td class="r">5.310.000</td><td class="r">2.808.000</td><td class="r">7.556.430</td><td class="r">15.674.430</td><td class="r">33.9%</td><td class="r tag-r">sàn</td></tr><tr><td class="l">Hoàng Thị Thái (A)</td><td class="r">5.310.000</td><td class="r">2.808.000</td><td class="r">1.948.850</td><td class="r">10.066.850</td><td class="r">52.7%</td><td class="r tag-r">sàn</td></tr><tr><td class="l">Phạm Thị Đức Hạnh</td><td class="r">5.310.000</td><td class="r">2.808.000</td><td class="r">2.453.295</td><td class="r">10.571.295</td><td class="r">50.2%</td><td class="r tag-r">sàn</td></tr><tr class="tot"><td class="l">TỔNG 24 người</td><td class="r">113.815.100</td><td class="r">57.024.000</td><td class="r">85.235.949</td><td class="r">284.087.116</td><td class="r">44.4%</td><td class="r">21 tham gia</td></tr></tbody></table></div><p class="apxn">Mười bảy dòng cùng mức 5.310.000đ — đúng bằng lương tối thiểu vùng I áp dụng từ 01/01/2026. Ba dòng đầu không có lương chính, không có dòng bảo hiểm nào.</p></div>
+<div class="apx" id="B2"><div class="apxh"><div><span class="apxid">B2</span><span class="apxt">Diễn biến năm kỳ lương</span></div><button class="back" data-back="B2">← Quay lại điểm phân tích</button></div><div class="apxs">Nguồn: năm khối tháng T01–T05/2026 · chỉ tính nhân sự đang tham gia BHXH</div><div class="tw"><table><thead><tr><th class="l">Kỳ lương</th><th class="r">Người tham gia</th><th class="r">Ngoài diện đóng</th><th class="r">Tổng thu nhập</th><th class="r">Căn cứ đóng</th><th class="r">Tỷ lệ</th><th class="r">DN đóng 21,5%</th><th class="r">KPCĐ 2% (chưa nộp)</th></tr></thead><tbody><tr><td class="l">Tháng 01/2026</td><td class="r">21</td><td class="r">3</td><td class="r">256.075.049</td><td class="r">113.815.100</td><td class="r">44.4%</td><td class="r">24.470.246</td><td class="r">2.276.302</td></tr><tr><td class="l">Tháng 02/2026</td><td class="r">21</td><td class="r">1</td><td class="r">172.456.117</td><td class="r">113.815.100</td><td class="r">66.0%</td><td class="r">24.470.246</td><td class="r">2.276.302</td></tr><tr><td class="l">Tháng 03/2026</td><td class="r">21</td><td class="r">3</td><td class="r">184.198.570</td><td class="r">113.815.100</td><td class="r">61.8%</td><td class="r">24.470.246</td><td class="r">2.276.302</td></tr><tr><td class="l">Tháng 04/2026</td><td class="r">14</td><td class="r">1</td><td class="r">171.175.641</td><td class="r">76.645.100</td><td class="r">44.8%</td><td class="r">16.478.696</td><td class="r">1.532.902</td></tr><tr><td class="l">Tháng 05/2026</td><td class="r">15</td><td class="r">1</td><td class="r">174.132.311</td><td class="r">81.955.100</td><td class="r">47.1%</td><td class="r">17.620.346</td><td class="r">1.639.102</td></tr><tr class="tot"><td class="l">Bình quân</td><td class="r">18,4</td><td class="r">1,8</td><td class="r">191.607.538</td><td class="r">100.009.100</td><td class="r">52.2%</td><td class="r">21.501.956</td><td class="r">2.000.182</td></tr></tbody></table></div><p class="apxn">Căn cứ đóng đứng yên ở 113.815.100đ suốt ba kỳ đầu dù thu nhập biến động mạnh — dấu hiệu căn cứ đóng được ấn định độc lập với thu nhập thật, không phản ánh một hệ thống thang bảng lương nào.</p></div>
+<div class="apx" id="B3"><div class="apxh"><div><span class="apxid">B3</span><span class="apxt">Ba nhân sự ngoài diện đóng bảo hiểm</span></div><button class="back" data-back="B3">← Quay lại điểm phân tích</button></div><div class="apxs">Nguồn: các dòng có tổng thu nhập nhưng không có lương chính và không có dòng BHXH</div><div class="tw"><table><thead><tr><th class="l">Nhân sự</th><th class="r">T01</th><th class="r">T02</th><th class="r">T03</th><th class="r">T04</th><th class="r">T05</th><th class="r">Cộng 5 kỳ</th></tr></thead><tbody><tr><td class="l">Nguyễn Thị Hồng</td><td class="r">11.194.439</td><td class="r">8.000.000</td><td class="r">5.527.778</td><td class="r">—</td><td class="r">—</td><td class="r">24.722.217</td></tr><tr><td class="l">Nguyễn Thị Đua</td><td class="r">12.966.059</td><td class="r">—</td><td class="r">—</td><td class="r">—</td><td class="r">—</td><td class="r">12.966.059</td></tr><tr><td class="l">Chị Liễu</td><td class="r">3.851.569</td><td class="r">—</td><td class="r">—</td><td class="r">—</td><td class="r">—</td><td class="r">3.851.569</td></tr><tr><td class="l">Nguyễn Thị Tuyết Nhung</td><td class="r">—</td><td class="r">—</td><td class="r">9.401.709</td><td class="r">12.222.222</td><td class="r">—</td><td class="r">21.623.931</td></tr><tr><td class="l">Phùng Thị Sức</td><td class="r">—</td><td class="r">—</td><td class="r">5.629.630</td><td class="r">—</td><td class="r">—</td><td class="r">5.629.630</td></tr><tr><td class="l">Phương</td><td class="r">—</td><td class="r">—</td><td class="r">—</td><td class="r">—</td><td class="r">5.983.978</td><td class="r">5.983.978</td></tr><tr class="tot"><td class="l">TỔNG</td><td class="r">28.012.067</td><td class="r">8.000.000</td><td class="r">20.559.117</td><td class="r">12.222.222</td><td class="r">5.983.978</td><td class="r">74.777.384</td></tr></tbody></table></div><p class="apxn">Dòng tiền ra đều đặn, ghi nhận trên sổ, không kèm hồ sơ tham gia bảo hiểm. Nếu bản chất là hợp đồng lao động từ một tháng trở lên thì sau 60 ngày không đăng ký đã cấu thành hành vi trốn đóng theo khoản 1 Điều 39 Luật BHXH 2024 — hoàn toàn tách biệt với vấn đề khai thấp căn cứ đóng.</p></div>
+<div class="apx" id="B4"><div class="apxh"><div><span class="apxid">B4</span><span class="apxt">Bóc tách nghĩa vụ tiềm ẩn theo số tháng</span></div><button class="back" data-back="B4">← Quay lại điểm phân tích</button></div><div class="apxs">Giả định: căn cứ đóng bị quy kết ở mức 75% thu nhập · hành vi trốn đóng · phạt 20% trần 150 triệu · chênh lệch bình quân 46.295.800đ mỗi tháng</div><div class="tw"><table><thead><tr><th class="l">Số tháng</th><th class="r">Truy thu 32%</th><th class="r">Tiền chậm nộp 0,03%/ngày</th><th class="r">Phạt hành chính</th><th class="r">Khấu trừ thuế TNDN</th><th class="r">Tổng phải trả</th><th class="r">Đã giữ lại được</th><th class="r">Tỷ lệ</th></tr></thead><tbody><tr><td class="l">6 tháng</td><td class="r">88.887.935</td><td class="r">2.399.974</td><td class="r">17.777.587</td><td class="r">−11.944.316</td><td class="r">97.121.180</td><td class="r">65.277.077</td><td class="r">149%</td></tr><tr><td class="l">12 tháng</td><td class="r">177.775.870</td><td class="r">9.599.897</td><td class="r">35.555.174</td><td class="r">−23.888.633</td><td class="r">199.042.309</td><td class="r">130.554.155</td><td class="r">152%</td></tr><tr><td class="l">24 tháng</td><td class="r">355.551.741</td><td class="r">38.399.588</td><td class="r">71.110.348</td><td class="r">−47.777.265</td><td class="r">417.284.411</td><td class="r">261.108.309</td><td class="r">160%</td></tr><tr><td class="l">36 tháng</td><td class="r">533.327.611</td><td class="r">86.399.073</td><td class="r">106.665.522</td><td class="r">−71.665.898</td><td class="r">654.726.308</td><td class="r">391.662.464</td><td class="r">167%</td></tr><tr><td class="l">60 tháng</td><td class="r">888.879.351</td><td class="r">239.997.425</td><td class="r">150.000.000</td><td class="r">−119.443.163</td><td class="r">1.159.433.613</td><td class="r">652.770.774</td><td class="r">178%</td></tr></tbody></table></div><p class="apxn">Truy thu tăng tuyến tính theo số tháng, nhưng tiền chậm nộp tăng theo bình phương vì mỗi tháng nợ lại chịu lãi cho toàn bộ quãng thời gian còn lại. Đó là lý do tỷ lệ xấu dần: 152% ở 12 tháng lên 178% ở 60 tháng. Phạt hành chính chạm trần 150 triệu từ mốc 24 tháng nên không còn tăng — phần tăng thêm sau đó hoàn toàn là truy thu và lãi.</p></div>
+<div class="apx" id="B5"><div class="apxh"><div><span class="apxid">B5</span><span class="apxt">Khoản nào vào căn cứ đóng, khoản nào không</span></div><button class="back" data-back="B5">← Quay lại điểm phân tích</button></div>
+<div class="apxs">Đối chiếu từng khoản mục đang có trên bảng lương với Điều 7 Nghị định 158/2025/NĐ-CP</div>
+<div class="tw"><table><thead><tr><th class="l">Khoản mục trên bảng lương</th><th class="l">Vào căn cứ đóng?</th><th class="l">Căn cứ pháp lý</th><th class="l">Hồ sơ cần có</th></tr></thead><tbody>
+<tr><td class="l">Lương chính theo chức danh</td><td class="l ok">Có — bắt buộc</td><td class="l">Điểm a khoản 1 Điều 7 NĐ 158/2025: mức lương tính theo thời gian của công việc hoặc chức danh theo thang bảng lương xây dựng theo Điều 93 Bộ luật Lao động</td><td class="l">Hệ thống thang bảng lương, mô tả công việc, hợp đồng lao động</td></tr>
+<tr><td class="l">Thưởng doanh số</td><td class="l no">Không</td><td class="l">Điểm b khoản 1 Điều 7: loại trừ khoản phụ thuộc hoặc biến động theo năng suất lao động, quá trình làm việc và chất lượng thực hiện công việc</td><td class="l"><b>Quy chế thưởng doanh số</b> ghi rõ công thức tính và tính biến động — đây là văn bản then chốt</td></tr>
+<tr><td class="l">Tiền ăn giữa ca</td><td class="l no">Không</td><td class="l">Thuộc nhóm chế độ và phúc lợi khác, ghi thành mục riêng trong hợp đồng lao động theo Thông tư 10/2020/TT-BLĐTBXH</td><td class="l">Ghi thành mục riêng trong HĐLĐ, quy chế tài chính có định mức</td></tr>
+<tr><td class="l">Hỗ trợ xăng xe, đi lại</td><td class="l no">Không</td><td class="l">Cùng nhóm trên</td><td class="l">Ghi mục riêng trong HĐLĐ; nên đặt dưới dạng khoán chi công tác phí có định mức</td></tr>
+<tr><td class="l">Phụ cấp điện thoại</td><td class="l no">Không</td><td class="l">Cùng nhóm trên</td><td class="l">Quy chế khoán chi ghi rõ định mức — có văn bản này thì còn được miễn cả thuế thu nhập cá nhân</td></tr>
+<tr><td class="l">Phụ cấp độc hại, môi trường phòng xét nghiệm</td><td class="l ok">Có nếu đặt ra</td><td class="l">Điểm b khoản 1 Điều 7: phụ cấp bù đắp yếu tố điều kiện lao động thuộc nhóm phải tính đóng</td><td class="l">Nếu đặt khoản này thì phải cộng vào căn cứ đóng, không được để ngoài</td></tr>
+<tr><td class="l">Phụ cấp chuyên cần</td><td class="l no">Không</td><td class="l">Gắn với mức độ hoàn thành công việc nên thuộc nhóm loại trừ</td><td class="l">Quy chế ghi rõ điều kiện hưởng gắn với kết quả</td></tr>
+</tbody></table></div>
+<p class="apxn">Đọc bảng này theo một nguyên tắc duy nhất: khoản nào <b>xác định được mức tiền cụ thể và trả thường xuyên, ổn định</b> thì vào căn cứ đóng; khoản nào <b>biến động theo kết quả làm việc</b> thì nằm ngoài. Toàn bộ phần thu nhập giữ ngoài căn cứ đóng chỉ đứng vững khi có văn bản chứng minh tính biến động đó — không có quy chế thì khoản tiền tự nó không nói được gì.</p></div>
+
+<div class="apx" id="B6"><div class="apxh"><div><span class="apxid">B6</span><span class="apxt">Tác động từng người khi chuẩn hoá — kỳ tháng 01/2026</span></div><button class="back" data-back="B6">← Quay lại điểm phân tích</button></div><div class="apxs">Phương án 2 · lương chính nâng theo thang bảng lương đề xuất · thưởng doanh số và các khoản hỗ trợ giữ ngoài căn cứ đóng</div><div class="tw"><table><thead><tr><th class="l">Nhân sự</th><th class="r">Căn cứ hiện tại</th><th class="r">Căn cứ chuẩn hoá</th><th class="r">DN đóng 21,5%</th><th class="r">NLĐ trừ 10,5%</th><th class="r">Thực lĩnh hiện tại</th><th class="r">Thực lĩnh sau</th><th class="r">Chênh lệch</th></tr></thead><tbody><tr><td class="l">Vũ Hồng Quân</td><td class="r">6.500.000</td><td class="r">10.400.000</td><td class="r">2.236.000</td><td class="r">1.092.000</td><td class="r">20.000.000</td><td class="r">19.590.500</td><td class="r">−409.500</td></tr><tr><td class="l">Vũ Quang</td><td class="r">5.681.700</td><td class="r">9.100.000</td><td class="r">1.956.500</td><td class="r">955.500</td><td class="r">15.000.000</td><td class="r">14.641.078</td><td class="r">−358.922</td></tr><tr><td class="l">Cao Minh Thu</td><td class="r">5.681.700</td><td class="r">9.100.000</td><td class="r">1.956.500</td><td class="r">955.500</td><td class="r">15.200.000</td><td class="r">14.841.078</td><td class="r">−358.922</td></tr><tr><td class="l">Lê Thị Trường Giang</td><td class="r">5.681.700</td><td class="r">9.100.000</td><td class="r">1.956.500</td><td class="r">955.500</td><td class="r">15.100.000</td><td class="r">14.741.078</td><td class="r">−358.922</td></tr><tr><td class="l">Nguyễn Mai Phương</td><td class="r">5.310.000</td><td class="r">8.500.000</td><td class="r">1.827.500</td><td class="r">892.500</td><td class="r">13.711.100</td><td class="r">13.376.150</td><td class="r">−334.950</td></tr><tr><td class="l">Lê Thị Hoãn</td><td class="r">5.310.000</td><td class="r">8.500.000</td><td class="r">1.827.500</td><td class="r">892.500</td><td class="r">9.167.481</td><td class="r">8.832.531</td><td class="r">−334.950</td></tr><tr><td class="l">Bùi Thị Thắm</td><td class="r">5.310.000</td><td class="r">8.500.000</td><td class="r">1.827.500</td><td class="r">892.500</td><td class="r">9.718.330</td><td class="r">9.383.380</td><td class="r">−334.950</td></tr><tr><td class="l">Nguyễn Thị Minh</td><td class="r">5.310.000</td><td class="r">8.500.000</td><td class="r">1.827.500</td><td class="r">892.500</td><td class="r">13.689.960</td><td class="r">13.355.010</td><td class="r">−334.950</td></tr><tr><td class="l">Nguyễn Thị Hương (1988 )</td><td class="r">5.310.000</td><td class="r">8.500.000</td><td class="r">1.827.500</td><td class="r">892.500</td><td class="r">11.731.915</td><td class="r">11.396.965</td><td class="r">−334.950</td></tr><tr><td class="l">Phạm Thị Hồng Thuận</td><td class="r">5.310.000</td><td class="r">8.500.000</td><td class="r">1.827.500</td><td class="r">892.500</td><td class="r">9.669.681</td><td class="r">9.334.731</td><td class="r">−334.950</td></tr><tr><td class="l">Đan Thị Hương</td><td class="r">5.310.000</td><td class="r">8.500.000</td><td class="r">1.827.500</td><td class="r">892.500</td><td class="r">10.364.085</td><td class="r">10.029.135</td><td class="r">−334.950</td></tr><tr><td class="l">Hà Thị Cúc</td><td class="r">5.310.000</td><td class="r">8.500.000</td><td class="r">1.827.500</td><td class="r">892.500</td><td class="r">12.388.910</td><td class="r">12.053.960</td><td class="r">−334.950</td></tr><tr><td class="l">Phạm Thái Thái</td><td class="r">5.310.000</td><td class="r">8.277.550</td><td class="r">1.779.673</td><td class="r">869.143</td><td class="r">7.720.000</td><td class="r">7.408.407</td><td class="r">−311.593</td></tr><tr><td class="l">Nguyễn Thị Hương ( 1991 )</td><td class="r">5.310.000</td><td class="r">8.500.000</td><td class="r">1.827.500</td><td class="r">892.500</td><td class="r">12.434.865</td><td class="r">12.099.915</td><td class="r">−334.950</td></tr><tr><td class="l">Nguyễn Thị Thực</td><td class="r">5.310.000</td><td class="r">8.500.000</td><td class="r">1.827.500</td><td class="r">892.500</td><td class="r">8.381.430</td><td class="r">8.046.480</td><td class="r">−334.950</td></tr><tr><td class="l">Nguyễn Thị Sợi</td><td class="r">5.310.000</td><td class="r">7.356.568</td><td class="r">1.581.662</td><td class="r">772.440</td><td class="r">6.799.018</td><td class="r">6.584.128</td><td class="r">−214.890</td></tr><tr><td class="l">Nguyễn Thị sen</td><td class="r">5.310.000</td><td class="r">7.733.065</td><td class="r">1.662.609</td><td class="r">811.972</td><td class="r">7.175.515</td><td class="r">6.921.093</td><td class="r">−254.422</td></tr><tr><td class="l">Mạc Thị Đào</td><td class="r">5.310.000</td><td class="r">8.500.000</td><td class="r">1.827.500</td><td class="r">892.500</td><td class="r">11.232.250</td><td class="r">10.897.300</td><td class="r">−334.950</td></tr><tr><td class="l">Trần Thị Thu Hà</td><td class="r">5.310.000</td><td class="r">8.500.000</td><td class="r">1.827.500</td><td class="r">892.500</td><td class="r">15.116.880</td><td class="r">14.781.930</td><td class="r">−334.950</td></tr><tr><td class="l">Hoàng Thị Thái (A)</td><td class="r">5.310.000</td><td class="r">8.500.000</td><td class="r">1.827.500</td><td class="r">892.500</td><td class="r">9.509.300</td><td class="r">9.174.350</td><td class="r">−334.950</td></tr><tr><td class="l">Phạm Thị Đức Hạnh</td><td class="r">5.310.000</td><td class="r">8.500.000</td><td class="r">1.827.500</td><td class="r">892.500</td><td class="r">10.013.745</td><td class="r">9.678.795</td><td class="r">−334.950</td></tr><tr class="tot"><td class="l">TỔNG 21 người</td><td class="r">113.815.100</td><td class="r">180.067.183</td><td class="r">38.714.444</td><td class="r">18.907.054</td><td class="r">244.124.464</td><td class="r">237.167.995</td><td class="r">−6.956.469</td></tr></tbody></table></div><p class="apxn">Không ai bị giảm quá 350.000đ mỗi tháng. Tổng phần giảm của cả 21 người là con số cần bù — nhỏ hơn nhiều so với phần chi phí bảo hiểm doanh nghiệp gánh thêm, nên nên bù đủ ngay từ đầu thay vì để thành điểm tranh chấp.</p></div>
+<div class="apx" id="B7"><div class="apxh"><div><span class="apxid">B7</span><span class="apxt">Thang bảng lương đề xuất</span></div><button class="back" data-back="B7">← Quay lại điểm phân tích</button></div>
+<div class="apxs">Ba nhóm chức danh hiện có trên bảng lương · mức đề xuất theo khảo sát thị trường Hà Nội, cần xác nhận lại trước khi ban hành</div>
+<div class="tw"><table><thead><tr><th class="l">Nhóm chức danh</th><th class="r">Số người</th><th class="r">Mức hiện tại</th><th class="r">Mức đề xuất</th><th class="r">Chênh lệch</th><th class="l">Căn cứ định giá</th></tr></thead><tbody>
+<tr><td class="l">Nhân viên kỹ thuật, thu mẫu, hành chính</td><td class="r">17</td><td class="r">5.310.000</td><td class="r">8.500.000</td><td class="r">+3.190.000</td><td class="l">Mức lương kỹ thuật viên xét nghiệm tại Hà Nội — kiểm chứng được qua tin tuyển dụng cùng ngành</td></tr>
+<tr><td class="l">Chuyên viên, phụ trách mảng</td><td class="r">3</td><td class="r">5.681.700</td><td class="r">9.100.000</td><td class="r">+3.418.300</td><td class="l">Bậc trên nhóm nhân viên, giữ khoảng cách bậc khoảng 7%</td></tr>
+<tr><td class="l">Trưởng nhóm, quản lý</td><td class="r">1</td><td class="r">6.500.000</td><td class="r">10.400.000</td><td class="r">+3.900.000</td><td class="l">Bậc quản lý, giữ khoảng cách với bậc chuyên viên</td></tr>
+<tr class="tot"><td class="l">TỔNG 21 người</td><td class="r">21</td><td class="r">113.815.100</td><td class="r">182.100.000</td><td class="r">+68.284.900</td><td class="l">Căn cứ đóng lên 76,8% thu nhập bình quân</td></tr>
+</tbody></table></div>
+<p class="apxn">Ba con số ở cột đề xuất là phần cần bạn xác nhận lại trước khi ban hành, vì toàn bộ phương án chuẩn hoá đứng trên chúng. Nếu mức thị trường thật là 7,5 triệu hay 9,5 triệu thì mọi con số chi phí và quyền lợi trong bản trình bày này đều dịch chuyển theo. Khoảng cách giữa các bậc phải từ 5% trở lên theo Điều 93 Bộ luật Lao động.</p></div>
+<div class="apx" id="B9"><div class="apxh"><div><span class="apxid">B9</span><span class="apxt">Quyền lợi bảo hiểm theo ba phương án</span></div><button class="back" data-back="B9">← Quay lại điểm phân tích</button></div><div class="apxs">Tính trên căn cứ đóng bình quân một người · mức tham chiếu 2.340.000đ · trần trợ cấp thất nghiệp 5 lần lương tối thiểu vùng</div><div class="tw"><table><thead><tr><th class="l">Phương án</th><th class="r">Căn cứ đóng bình quân</th><th class="r">Thai sản trọn gói (6 tháng + trợ cấp 1 lần)</th><th class="r">Trợ cấp thất nghiệp mỗi tháng</th><th class="r">Ốm đau mỗi ngày</th><th class="r">Tích luỹ hưu trí mỗi năm</th></tr></thead><tbody><tr><td class="l">Phương án 1 — Giữ nguyên</td><td class="r">5.435.277</td><td class="r">37.291.662</td><td class="r">3.261.166</td><td class="r">169.852</td><td class="r">14.349.131</td></tr><tr><td class="l">Phương án 2 — Chuẩn hoá</td><td class="r">7.993.997</td><td class="r">52.643.982</td><td class="r">4.796.398</td><td class="r">249.812</td><td class="r">21.104.152</td></tr><tr><td class="l">Phương án 3 — Đóng đủ 100%</td><td class="r">10.413.453</td><td class="r">67.160.718</td><td class="r">6.248.072</td><td class="r">325.420</td><td class="r">27.491.516</td></tr></tbody></table></div><p class="apxn">Chênh lệch quyền lợi thai sản giữa phương án 1 và phương án 2 là 15,4 triệu cho mỗi lần sinh. Với lực lượng lao động chủ yếu là nữ, đây là con số có sức thuyết phục lớn hơn mọi lập luận về tuân thủ.</p></div>
+  <div class="pager"><button class="pgb" onclick="go(1)">← Về trang 1</button><button class="pgb" onclick="go(6)">Trang quyết định →</button></div>
 </section>
 
 <footer>
@@ -320,13 +392,13 @@ footer{max-width:1180px;margin:0 auto;padding:0 24px 60px;font-family:var(--fb);
 </footer>
 
 <script>
-const PAGES=6;
+const PAGES=7;
 let cur=1;
 const steps=document.getElementById('steps');
 for(let i=1;i<=PAGES;i++){
   const b=document.createElement('button');
-  b.className='nstep'+(i===1?' on':''); b.textContent=i; b.dataset.i=i;
-  b.setAttribute('aria-label','Trang '+i);
+  b.className='nstep'+(i===1?' on':'')+(i===7?' apxbtn':''); b.textContent=i===7?'Phụ lục':i; b.dataset.i=i;
+  b.setAttribute('aria-label',i===7?'Phụ lục':'Trang '+i);
   b.onclick=()=>go(i); steps.appendChild(b);
 }
 function go(i){
@@ -419,6 +491,30 @@ function draw(){
   document.getElementById('verdict').innerHTML='<div class="verdict '+k.vc+'">'+k.v+'</div>';
 }
 draw();
+
+
+/* ---- LIÊN KẾT PHỤ LỤC ---- */
+const APX=[['B1','Bảng lương chi tiết T01'],['B2','Diễn biến 5 kỳ'],['B3','Ba người ngoài diện đóng'],
+           ['B4','Bóc tách nghĩa vụ tiềm ẩn'],['B5','Khoản nào vào căn cứ đóng'],['B6','Tác động từng người'],
+           ['B7','Thang bảng lương đề xuất'],['B9','Quyền lợi ba phương án']];
+let originPage=1;
+const toc=document.getElementById('toc');
+APX.forEach(([id,name])=>{const b=document.createElement('button');b.textContent=id+' · '+name;b.onclick=()=>jump(id,false);toc.appendChild(b);});
+function jump(id,remember){
+  if(remember) originPage=cur;
+  go(7);
+  setTimeout(()=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    el.scrollIntoView({behavior:'smooth',block:'start'});
+    el.classList.add('flash'); setTimeout(()=>el.classList.remove('flash'),2200);
+  },160);
+}
+document.querySelectorAll('.back').forEach(b=>b.onclick=()=>go(originPage));
+document.addEventListener('click',e=>{
+  const r=e.target.closest('.ref'); if(!r)return;
+  jump(r.dataset.ref,true);
+});
 
 document.addEventListener('keydown',e=>{
   if(e.key==='ArrowRight'&&cur<PAGES)go(cur+1);
