@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hành trình hợp đồng — 9 chặng</title>
+<style>
+:root{
+  --bg:#faf9f7; --card:#ffffff; --ink:#1a1a19; --ink2:#5f5e5a; --ink3:#8b8a85;
+  --line:#e3e1db; --line2:#c9c7c0; --danger:#A32D2D;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#141413; --card:#1e1e1c; --ink:#f0efec; --ink2:#b3b1a9; --ink3:#8b8a85;
+         --line:#2f2f2c; --line2:#44443f; --danger:#E88585; }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+     line-height:1.6;-webkit-text-size-adjust:100%}
+.wrap{max-width:1000px;margin:0 auto;padding:20px 16px 60px}
+header{padding:8px 0 18px;border-bottom:1px solid var(--line);margin-bottom:20px}
+h1{font-size:21px;font-weight:600;margin:0 0 4px}
+.sub{font-size:14px;color:var(--ink2);margin:0}
+.grid{display:grid;grid-template-columns:250px 1fr;gap:18px;align-items:start}
+@media (max-width:760px){ .grid{grid-template-columns:1fr} }
+nav{display:flex;flex-direction:column;gap:3px}
+.ph{font-size:12px;color:var(--ink3);margin:12px 0 3px;padding-left:2px;
+    text-transform:uppercase;letter-spacing:.04em}
+.ph:first-child{margin-top:0}
+button.nv{display:flex;align-items:center;gap:10px;width:100%;padding:9px 11px;
+  font-size:14px;border-radius:8px;cursor:pointer;text-align:left;
+  border:1px solid transparent;background:transparent;color:var(--ink);
+  font-family:inherit;line-height:1.35}
+button.nv:hover{background:var(--card)}
+button.nv.on{background:var(--card);border-color:var(--line2)}
+.num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;
+  border-radius:50%;color:#fff;font-size:12px;flex:none;font-weight:600}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 22px}
+.ptitle{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+.ptitle .num{width:28px;height:28px;font-size:14px}
+.ptitle span.tx{font-size:18px;font-weight:600}
+.tools{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
+.tool{font-size:12px;padding:4px 11px;border-radius:8px;background:var(--bg);color:var(--ink2);
+      border:1px solid var(--line)}
+.lbl{font-size:13px;font-weight:600;margin-bottom:7px}
+.lbl.dg{color:var(--danger)}
+ul{margin:0 0 22px;padding-left:19px;font-size:14.5px}
+li{margin-bottom:6px}
+ul.risk li{color:var(--ink2)}
+footer{margin-top:32px;padding-top:16px;border-top:1px solid var(--line);
+       font-size:12.5px;color:var(--ink3)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Hành trình hợp đồng — 9 chặng</h1>
+  <p class="sub">Từ gặp khách đến bàn giao · Tài liệu vận hành cho đại lý mới</p>
+</header>
+<div class="grid">
+  <nav id="nav"></nav>
+  <div class="panel" id="panel"></div>
+</div>
+<footer>
+  Tài liệu nội bộ, đối chiếu Sổ tay Thẩm định &amp; Phát hành Hợp đồng VS.27 (hiệu lực 03/07/2026).
+  Quy định có thể thay đổi — luôn kiểm tra bản mới nhất trên AWS trước khi áp dụng.
+</footer>
+</div>
+
+<script>
+var S=[
+{n:1,t:"Gặp khách & khơi gợi nhu cầu",ph:"Tiếp cận",c:"#1D9E75",
+tool:["ePOS web","Form chẩn đoán","Bản khảo sát nhu cầu (mẫu A / B / C)"],
+"do":["Chẩn đoán theo thứ tự: chân dung → dòng tiền → ma trận rủi ro → tháp tài sản → mảnh ghép thiếu",
+"Chọn mẫu khảo sát theo tình trạng gia đình — hỏi trước rồi chọn, đừng đoán từ tuổi",
+"Khách thích giấy thì dùng form in, thích máy tính thì làm trên ePOS, có thể kết hợp cả hai",
+"Đọc lại bức tranh cho khách nghe, chờ khách gật đầu mới sang chặng 2"],
+risk:["Nhắc tên sản phẩm trước khi khách xác nhận bức tranh → khách vào thế phòng thủ",
+"Chẩn đoán hụt → về sau phải nhờ quản lý chốt hộ"]},
+
+{n:2,t:"Trình bày giải pháp",ph:"Tiếp cận",c:"#1D9E75",
+tool:["ePOS web / M-PA","File Excel tóm tắt so sánh"],
+"do":["Lên thử vài phương án trên ePOS, tóm tắt sang Excel để khách dễ so sánh",
+"Kiểm ngưỡng phí: bảo vệ thuần ≤ 15% thu nhập (thiết kế thực tế dưới 10%) · có tích lũy đầu tư ≤ 30%",
+"Đi từ mảnh ghép thiếu sang công cụ lấp mảnh ghép, không đi từ sản phẩm",
+"Nói rõ điểm yếu, điều kiện loại trừ, thời gian chờ TRƯỚC khi khách đồng ý",
+"Lãi suất minh họa là giả định, không phải cam kết — nói thành lời"],
+risk:["Tô hồng → khách đặt sai kỳ vọng, vỡ đúng lúc cần dùng quyền lợi",
+"eFNA sai lệch với bảng minh họa → không tạo tiếp được minh họa"]},
+
+{n:3,t:"Khai thông tin & upload hồ sơ",ph:"Lập hồ sơ",c:"#7F77DD",
+tool:["ePOS","Checklist chuẩn bị trước khi ký","Sổ tay thẩm định — mục khai thông tin"],
+"do":["Gửi checklist cho khách trước 1–2 ngày, rà đủ giấy tờ trước buổi ký",
+"Tra sổ tay cho từng tình trạng sức khỏe khách kê khai — khai đủ, không khai hộ",
+"Ghi âm tư vấn: bắt buộc với sản phẩm UL và ILP, làm trước khi nộp hồ sơ",
+"OTP gửi về số của khách — khách tự đọc mã, tư vấn viên không cầm điện thoại khách",
+"Chụp chứng từ từ bản gốc, không dùng camera trước, toàn bộ kê khai bằng tiếng Việt"],
+risk:["Khai thiếu sức khỏe → khách bị từ chối chi trả nhiều năm sau",
+"Đọc OTP thay khách hoặc dùng số điện thoại / email của mình → vi phạm nghiêm trọng",
+"Nộp hồ sơ quá 3 ngày làm việc kể từ khi xác thực OTP → phải làm lại"]},
+
+{n:4,t:"Thanh toán",ph:"Lập hồ sơ",c:"#7F77DD",
+tool:["ePOS","dongphi.manulife.com"],
+"do":["Kiểm kỹ số hợp đồng / mã hồ sơ trước khi chuyển",
+"Giữ biên lai, gửi khách một bản",
+"Xác nhận tiền đã vào hệ thống rồi mới báo khách là xong"],
+risk:["Nhận tiền mặt hộ khách → rủi ro kỷ luật nghề nghiệp lớn nhất, không có ngoại lệ kể cả với người thân",
+"Hồ sơ không có phí hoặc thiếu phí → hệ thống tự đóng sau 7 ngày"]},
+
+{n:5,t:"Theo dõi thẩm định",ph:"Thẩm định",c:"#378ADD",
+tool:["App M-PA","AWS","Email"],
+"do":["Kiểm tra trạng thái hồ sơ hàng ngày trong tuần đầu",
+"Chủ động nhắn tin cập nhật cho khách kể cả khi chưa có tiến triển",
+"Phản hồi yêu cầu bổ sung trong 24 giờ"],
+risk:["Im lặng → khách nghĩ mình bị bỏ quên, đây là giai đoạn khách lo nhất",
+"Để đến nhắc lần 3 (T+21) mới xử lý → hồ sơ gần chạm mốc tự đóng T+30"]},
+
+{n:6,t:"Xử lý yêu cầu thẩm định",ph:"Thẩm định",c:"#378ADD",
+tool:["Synergy Portal 2.0","Bản lưu ý khi đi khám thẩm định"],
+"do":["Bổ sung giấy tờ và điền biểu mẫu trực tuyến, không nộp bản cứng",
+"Khách được mời khám: gửi bản lưu ý TRƯỚC ngày khám, không gửi sát giờ",
+"Liên hệ phòng khám trước ít nhất 1 ngày, đi cùng khách khi khám",
+"Nhắc khách nhịn ăn 4–6 tiếng nếu có xét nghiệm máu, mang giấy tờ nhân thân bản gốc"],
+risk:["Chậm bổ sung → hệ thống tự đóng hồ sơ và hoàn phí ở mốc T+30",
+"Khách tưởng được mời khám là dấu hiệu xấu → cần giải thích ngay"]},
+
+{n:7,t:"Kết quả & thư thỏa thuận",ph:"Thẩm định",c:"#378ADD",
+tool:["App M-PA"],
+"do":["Đọc kỹ điều kiện: loại trừ cái gì, tăng phí bao nhiêu",
+"Giải thích bằng ngôn ngữ đời thường kèm ví dụ tình huống cụ thể",
+"Hỏi lại: “anh/chị hiểu là trong trường hợp… thì hợp đồng sẽ không chi trả, đúng không ạ?”",
+"Nếu bị từ chối: báo sớm, rà lại xem có công cụ khác phù hợp không"],
+risk:["Để khách ký thư thỏa thuận mà chưa hiểu → kỳ vọng sai ngay từ đầu, vỡ đúng lúc cần quyền lợi"]},
+
+{n:8,t:"Xác thực M-Pro",ph:"Thẩm định",c:"#378ADD",
+tool:["Điện thoại của khách có micro và camera"],
+"do":["Kiểm tra máy khách: đã cấp quyền camera và micro, mạng ổn định, pin đủ",
+"Hướng dẫn khách tự làm — đủ sáng, không đeo kính, không đội mũ",
+"Khách có 5 ngày theo lịch để hoàn tất, hệ thống nhắc sau 2 ngày"],
+risk:["Ngày hoàn tất M-Pro trùng hoặc sau sinh nhật khách → phí đổi, phải làm lại BCTT và M-Pro",
+"Xác thực khuôn mặt thất bại hoặc khách bấm “Cần hỗ trợ?” → link mất hiệu lực"]},
+
+{n:9,t:"Bàn giao & xác nhận bàn giao",ph:"Bàn giao",c:"#D85A30",
+tool:["eACK online hoặc giấy xác nhận","Checklist bàn giao 1 trang"],
+"do":["Nhận thông báo hợp đồng được cấp → đặt nhắc lịch ngày thứ 14 ngay",
+"Buổi bàn giao 70 phút theo checklist, mốc cứng phút 47 chuyển sang feedback và xin giới thiệu",
+"Khuyến khích khách dùng eACK thay xác nhận bằng giấy — nhanh hơn nhiều",
+"Xác nhận bàn giao ngay sau buổi, không để sang hôm sau"],
+risk:["Quá 21 ngày kể từ ngày cấp → khấu trừ 300.000đ",
+"Quá 30 ngày → mất 100% hoa hồng của hợp đồng đó, không có cách cứu",
+"Làm qua loa và ngại xin giới thiệu — hai sai lầm phổ biến nhất ở bước này"]}];
+
+var cur=1;
+function esc(s){return s;}
+function render(){
+  var nav=document.getElementById('nav'), panel=document.getElementById('panel');
+  nav.innerHTML=''; var lastPh='';
+  S.forEach(function(s){
+    if(s.ph!==lastPh){
+      var h=document.createElement('div'); h.className='ph'; h.textContent=s.ph;
+      nav.appendChild(h); lastPh=s.ph;
+    }
+    var b=document.createElement('button');
+    b.className='nv'+(s.n===cur?' on':'');
+    b.innerHTML='<span class="num" style="background:'+s.c+'">'+s.n+'</span><span>'+s.t+'</span>';
+    b.onclick=function(){cur=s.n;render();
+      if(window.innerWidth<=760){panel.scrollIntoView({behavior:'smooth',block:'start'});}};
+    nav.appendChild(b);
+  });
+  var s=S.filter(function(x){return x.n===cur;})[0];
+  panel.innerHTML=
+    '<div class="ptitle"><span class="num" style="background:'+s.c+'">'+s.n+'</span>'
+    +'<span class="tx">'+s.t+'</span></div>'
+    +'<div class="tools">'+s.tool.map(function(t){return '<span class="tool">'+t+'</span>';}).join('')+'</div>'
+    +'<div class="lbl">Việc cần làm</div>'
+    +'<ul>'+s["do"].map(function(d){return '<li>'+d+'</li>';}).join('')+'</ul>'
+    +'<div class="lbl dg">Rủi ro của chặng này</div>'
+    +'<ul class="risk">'+s.risk.map(function(d){return '<li>'+d+'</li>';}).join('')+'</ul>';
+}
+render();
+</script>
+</body>
+</html>
