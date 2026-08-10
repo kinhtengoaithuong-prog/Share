@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Kiến trúc hệ thống Basic & Logic: Discord, Hermes Agent, Notion, Honcho, host, Cloudflare và phương án tích hợp Claude Code.">
+<title>Kiến trúc hệ thống Basic & Logic</title>
+<style>
+:root{
+  --bg:#08100f;--surface:#101a18;--surface-2:#15211e;--surface-3:#1a2925;
+  --ink:#f2f0e8;--muted:#a6b2ab;--line:#2a3a35;--accent:#e5b95c;
+  --cyan:#5cc8d7;--green:#65c795;--violet:#ac91df;--rose:#e4828c;
+  --orange:#e99a5b;--blue:#77a8dc;--shadow:0 18px 50px rgba(0,0,0,.28);
+  --radius:16px;--nav-w:272px;--content:1120px;
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 "Segoe UI",Roboto,Arial,sans-serif}button,input{font:inherit}a{color:var(--cyan)}
+.skip{position:fixed;left:12px;top:-60px;z-index:100;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:8px}.skip:focus{top:12px}
+.shell{min-height:100vh}.sidebar{position:fixed;inset:0 auto 0 0;width:var(--nav-w);background:#0b1513;border-right:1px solid var(--line);padding:24px 16px;overflow:auto;z-index:20}.brand{padding:0 10px 22px;border-bottom:1px solid var(--line)}.brand-kicker{color:var(--accent);font:700 11px/1.2 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.13em;text-transform:uppercase}.brand h1{margin:8px 0 4px;font:600 23px/1.17 Georgia,serif;letter-spacing:-.02em}.brand p{margin:0;color:var(--muted);font-size:12px}.nav-label{margin:22px 10px 8px;color:#7e8c85;font:700 10px/1.2 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase}.tabs{display:grid;gap:4px}.tab-btn{width:100%;min-height:44px;border:0;background:transparent;color:var(--muted);text-align:left;padding:10px 12px;border-radius:10px;cursor:pointer;display:flex;gap:10px;align-items:center}.tab-btn:hover{background:var(--surface);color:var(--ink)}.tab-btn.active{background:var(--surface-2);color:var(--ink);box-shadow:inset 3px 0 var(--accent)}.tab-num{font:700 10px ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--accent)}.sidebar-note{margin:22px 10px 0;padding-top:18px;border-top:1px solid var(--line);font-size:11px;color:#79877f}.main{margin-left:var(--nav-w);min-height:100vh}.topbar{position:sticky;top:0;z-index:15;background:rgba(8,16,15,.91);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding:11px clamp(20px,4vw,54px);display:flex;align-items:center;gap:12px}.menu-btn{display:none}.search{position:relative;flex:1;max-width:620px}.search input{width:100%;height:42px;border:1px solid var(--line);border-radius:11px;background:var(--surface);color:var(--ink);padding:0 44px 0 14px;outline:none}.search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(229,185,92,.12)}.shortcut{position:absolute;right:10px;top:9px;border:1px solid var(--line);border-radius:6px;padding:2px 7px;font:11px ui-monospace,SFMono-Regular,Consolas,monospace;color:#7c8982}.print-btn,.menu-btn{height:42px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);padding:0 13px;cursor:pointer}.content{max-width:calc(var(--content) + 108px);padding:48px 54px 80px;margin:0 auto}.tab-panel{display:none}.tab-panel.active{display:block;animation:fade .2s ease}@keyframes fade{from{opacity:.2;transform:translateY(4px)}to{opacity:1;transform:none}}
+.eyebrow{font:700 11px/1.2 ui-monospace,SFMono-Regular,Consolas,monospace;text-transform:uppercase;letter-spacing:.14em;color:var(--accent)}h2{font:600 clamp(34px,5vw,62px)/1.04 Georgia,serif;letter-spacing:-.04em;margin:13px 0 18px;max-width:920px}.lede{font-size:18px;line-height:1.65;color:#c7d0ca;max-width:860px;margin:0 0 30px}.meta-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:34px}.chip{border:1px solid var(--line);border-radius:999px;padding:5px 10px;color:var(--muted);font-size:12px;background:var(--surface)}.chip.live{color:var(--green);border-color:rgba(101,199,149,.35)}
+.section{margin-top:44px;scroll-margin-top:80px}.section h3{font:600 27px/1.2 Georgia,serif;margin:0 0 14px;letter-spacing:-.02em}.section h4{font-size:16px;margin:24px 0 8px}.section p{max-width:900px;color:#c7d0ca}.section-intro{color:var(--muted)!important}.rule{height:1px;background:var(--line);margin:38px 0}.grid{display:grid;gap:14px}.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:0 1px 0 rgba(255,255,255,.02)}.card h4{margin:0 0 8px}.card p{margin:0;color:var(--muted)}.card .tag{display:inline-block;margin-bottom:12px;font:700 10px/1 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.card.accent{border-color:rgba(229,185,92,.45);background:linear-gradient(135deg,rgba(229,185,92,.07),var(--surface) 42%)}
+.callout{border:1px solid rgba(229,185,92,.3);background:#171c17;border-radius:14px;padding:17px 19px;color:#d8d5c8}.callout strong{color:var(--accent)}.warning{border-color:rgba(228,130,140,.35);background:rgba(228,130,140,.06)}.warning strong{color:var(--rose)}
+ul,ol{padding-left:22px}li{margin:6px 0;color:#c7d0ca}.plain{list-style:none;padding:0}.plain li{padding:9px 0;border-bottom:1px solid var(--line)}
+.arch-wrap{background:#07110f;border:1px solid var(--line);border-radius:18px;padding:16px;overflow:auto;box-shadow:var(--shadow)}svg{display:block;min-width:920px;width:100%;height:auto}.node rect{stroke-width:1.4}.node text{fill:var(--ink);font-family:"Segoe UI",Arial,sans-serif}.node .sub{fill:#a9b7af;font-size:11px}.node .title{font-size:14px;font-weight:700}.flow-line{fill:none;stroke:#60736a;stroke-width:1.6;marker-end:url(#arrow)}.flow-dash{stroke-dasharray:6 5}.lane-label{fill:#6f8178;font:700 10px ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.12em}.diagram-caption{font-size:12px;color:var(--muted);margin:10px 4px 0}
+.flow{display:grid;grid-template-columns:repeat(7,minmax(120px,1fr));gap:8px;align-items:stretch;overflow:auto;padding-bottom:6px}.flow-step{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:15px;min-width:130px}.flow-step:not(:last-child)::after{content:"→";position:absolute;right:-13px;top:50%;z-index:2;color:var(--accent);font-weight:800}.flow-step b{display:block;font-size:13px}.flow-step small{color:var(--muted)}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px}table{width:100%;border-collapse:collapse;min-width:700px;background:var(--surface)}th,td{text-align:left;vertical-align:top;padding:13px 15px;border-bottom:1px solid var(--line)}th{font:700 11px ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:#0d1715}td{color:#c5cec8}tr:last-child td{border-bottom:0}code,.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;color:#d9e3dd;background:#09120f;border:1px solid #22312c;border-radius:5px;padding:1px 5px}pre{white-space:pre-wrap;word-break:break-word;background:#07100e;border:1px solid var(--line);border-radius:14px;padding:18px;color:#d7e1db;overflow:auto;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.copy-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:18px 0 8px}.copy-btn{border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:9px;padding:8px 12px;cursor:pointer}.copy-btn:hover{border-color:var(--accent)}
+.layer{display:grid;grid-template-columns:170px 1fr;gap:22px;padding:24px 0;border-bottom:1px solid var(--line)}.layer:last-child{border-bottom:0}.layer-name{font:600 22px/1.15 Georgia,serif}.layer-role{color:var(--accent);font:700 10px/1.2 ui-monospace,SFMono-Regular,Consolas,monospace;text-transform:uppercase;letter-spacing:.1em;margin-top:7px}.layer-body p:first-child{margin-top:0}.facts{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.fact{font-size:11px;border:1px solid var(--line);border-radius:7px;padding:4px 7px;color:var(--muted)}
+.glossary-tools{display:flex;gap:10px;margin-bottom:18px}.glossary-tools input{height:44px;flex:1;background:var(--surface);border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:0 14px}.glossary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.term{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:16px}.term dt{font-weight:750;color:var(--ink);margin-bottom:5px}.term dd{margin:0;color:var(--muted)}.term[hidden]{display:none}.alpha{color:var(--accent);font:700 11px ui-monospace,SFMono-Regular,Consolas,monospace;margin-right:7px}
+.search-results{display:none;position:fixed;z-index:30;top:62px;left:calc(var(--nav-w) + 54px);width:min(620px,calc(100vw - var(--nav-w) - 108px));max-height:65vh;overflow:auto;background:#101a18;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:8px}.search-results.open{display:block}.result{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);padding:11px;border-radius:7px;cursor:pointer}.result:last-child{border:0}.result:hover{background:var(--surface-3)}.result small{display:block;color:var(--muted);margin-top:3px}.empty{padding:20px;color:var(--muted)}mark{background:rgba(229,185,92,.28);color:var(--ink)}
+.status-list{display:grid;gap:9px}.status{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start}.dot{width:9px;height:9px;border-radius:50%;background:var(--green);margin-top:8px;box-shadow:0 0 0 4px rgba(101,199,149,.08)}.dot.warn{background:var(--orange)}.dot.todo{background:var(--muted)}
+.footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:#78867f;font-size:12px;display:flex;justify-content:space-between;gap:20px}
+@media(max-width:920px){:root{--nav-w:0px}.sidebar{transform:translateX(-100%);width:286px;transition:.2s}.sidebar.open{transform:none;box-shadow:var(--shadow)}.main{margin-left:0}.menu-btn{display:block}.content{padding:34px 22px 65px}.topbar{padding:10px 14px}.search-results{left:14px;width:calc(100vw - 28px)}.grid.two,.grid.three,.glossary{grid-template-columns:1fr}.layer{grid-template-columns:1fr;gap:8px}.shortcut{display:none}}
+@media(max-width:560px){h2{font-size:36px}.print-btn{display:none}.flow{grid-template-columns:repeat(7,150px)}.content{padding-left:16px;padding-right:16px}.card{padding:17px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+@media print{body{background:#fff;color:#111;font-size:12pt}.sidebar,.topbar,.copy-btn{display:none!important}.main{margin:0}.content{max-width:none;padding:0}.tab-panel{display:block!important;page-break-before:always}.tab-panel:first-child{page-break-before:auto}h2,h3,h4,.layer-name{color:#111}.lede,.section p,.card p,li,td,.term dd{color:#333}.card,.term,.table-wrap,.arch-wrap,pre,.callout{background:#fff;border-color:#bbb;box-shadow:none;color:#111}.chip,.fact{border-color:#bbb;color:#333}.arch-wrap{page-break-inside:avoid}svg{min-width:0}.footer{color:#555}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Bỏ qua điều hướng</a>
+<div class="shell">
+<aside class="sidebar" id="sidebar" aria-label="Điều hướng tài liệu">
+  <div class="brand"><div class="brand-kicker">Basic &amp; Logic</div><h1>Kiến trúc hệ thống</h1><p>As-is architecture · 09/08/2026</p></div>
+  <div class="nav-label">Nội dung</div>
+  <nav class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="overview" role="tab"><span class="tab-num">01</span>Tổng thể</button>
+    <button class="tab-btn" data-tab="flows" role="tab"><span class="tab-num">02</span>Luồng hoạt động</button>
+    <button class="tab-btn" data-tab="layers" role="tab"><span class="tab-num">03</span>Chi tiết từng lớp</button>
+    <button class="tab-btn" data-tab="memory" role="tab"><span class="tab-num">04</span>Memory &amp; bảo mật</button>
+    <button class="tab-btn" data-tab="integration" role="tab"><span class="tab-num">05</span>Tích hợp Claude Code</button>
+    <button class="tab-btn" data-tab="glossary" role="tab"><span class="tab-num">06</span>Glossary</button>
+    <button class="tab-btn" data-tab="prompt" role="tab"><span class="tab-num">07</span>Prompt chuyển giao</button>
+    <button class="tab-btn" data-tab="operations" role="tab"><span class="tab-num">08</span>Trạng thái &amp; backlog</button>
+  </nav>
+  <div class="sidebar-note">Tài liệu tự chứa, mở trực tiếp trong trình duyệt. Dùng <b>Ctrl/⌘ + K</b> để tìm kiếm toàn bộ nội dung.</div>
+</aside>
+<main class="main" id="main">
+  <header class="topbar">
+    <button class="menu-btn" id="menuBtn" aria-label="Mở menu">☰</button>
+    <div class="search"><input id="globalSearch" type="search" placeholder="Tìm Discord, Honcho, MCP, PostgreSQL…" aria-label="Tìm toàn tài liệu"><span class="shortcut">⌘K</span></div>
+    <button class="print-btn" onclick="window.print()">In / PDF</button>
+  </header>
+  <div class="search-results" id="searchResults" aria-live="polite"></div>
+  <div class="content">
+
+<section class="tab-panel active" id="overview" role="tabpanel">
+  <div class="eyebrow">Bản đồ hệ thống hiện tại</div>
+  <h2>Một trợ lý AI nhiều lớp, không phải chỉ là một chatbot</h2>
+  <p class="lede">Discord là cửa giao tiếp; Hermes là bộ điều phối; Notion là kho tri thức có kiểm duyệt; Honcho là trí nhớ dài hạn về người dùng; host là nơi mọi dịch vụ thật sự chạy; Cloudflare đưa các dịch vụ được chọn ra Internet; Claude Code có thể tham gia như một coding worker.</p>
+  <div class="meta-row"><span class="chip live">Đã đối chiếu dịch vụ đang chạy</span><span class="chip">Linux host</span><span class="chip">Discord gateway</span><span class="chip">MCP-enabled</span><span class="chip">Balanced security</span></div>
+
+  <div class="arch-wrap" aria-label="Sơ đồ kiến trúc tổng thể">
+  <svg viewBox="0 0 1120 700" role="img" aria-labelledby="archTitle archDesc">
+    <title id="archTitle">Kiến trúc tổng thể hệ thống Basic & Logic</title><desc id="archDesc">Người dùng qua Discord tới Hermes, rồi Hermes kết nối tới LLM, Notion, Honcho, host tools và CFMan Cloudflare.</desc>
+    <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#60736a"/></marker></defs>
+    <text class="lane-label" x="24" y="38">INTERACTION</text><text class="lane-label" x="24" y="186">ORCHESTRATION</text><text class="lane-label" x="24" y="394">KNOWLEDGE · MEMORY · EXECUTION</text><text class="lane-label" x="24" y="622">PUBLICATION</text>
+    <path class="flow-line" d="M208 98 H345"/><path class="flow-line" d="M500 126 V196"/><path class="flow-line" d="M625 255 H775"/><path class="flow-line" d="M500 310 V416"/><path class="flow-line" d="M500 310 C500 355 220 350 220 416"/><path class="flow-line" d="M500 310 C500 355 792 350 792 416"/><path class="flow-line" d="M500 310 C500 355 980 350 980 416"/><path class="flow-line" d="M980 526 V606"/><path class="flow-line" d="M792 526 C792 576 930 565 930 606"/><path class="flow-line flow-dash" d="M345 255 H250"/>
+    <g class="node"><rect x="40" y="62" width="168" height="72" rx="10" fill="rgba(30,41,59,.72)" stroke="#94a3b8"/><text class="title" x="124" y="91" text-anchor="middle">Trung / Người dùng</text><text class="sub" x="124" y="113" text-anchor="middle">ra yêu cầu · duyệt quyết định</text></g>
+    <g class="node"><rect x="345" y="62" width="310" height="72" rx="10" fill="rgba(8,51,68,.5)" stroke="#5cc8d7"/><text class="title" x="500" y="91" text-anchor="middle">Discord</text><text class="sub" x="500" y="113" text-anchor="middle">giao diện chat · channel · thread · transport</text></g>
+    <g class="node"><rect x="345" y="196" width="310" height="114" rx="10" fill="rgba(6,78,59,.45)" stroke="#65c795"/><text class="title" x="500" y="225" text-anchor="middle">Hermes Agent</text><text class="sub" x="500" y="248" text-anchor="middle">Gateway · Agent loop · Routing · Tools</text><text class="sub" x="500" y="268" text-anchor="middle">Sessions · Skills · Delegation · Cron · MCP client</text><text class="sub" x="500" y="288" text-anchor="middle">trợ lý hiển thị: Basic &amp; Logic</text></g>
+    <g class="node"><rect x="775" y="211" width="286" height="88" rx="10" fill="rgba(120,53,15,.36)" stroke="#e5b95c"/><text class="title" x="918" y="242" text-anchor="middle">LLM Provider / Model</text><text class="sub" x="918" y="265" text-anchor="middle">reasoning · sinh nội dung · quyết định tool call</text><text class="sub" x="918" y="282" text-anchor="middle">hiện kiểm tra: Claude Opus 4.8 / Anthropic</text></g>
+    <g class="node"><rect x="50" y="416" width="340" height="110" rx="10" fill="rgba(76,29,149,.42)" stroke="#ac91df"/><text class="title" x="220" y="446" text-anchor="middle">Notion</text><text class="sub" x="220" y="469" text-anchor="middle">Projects · Decisions · Knowledge · Processes</text><text class="sub" x="220" y="489" text-anchor="middle">Conversation Archive · Memory Inbox</text><text class="sub" x="220" y="509" text-anchor="middle">tri thức có human review / Approved</text></g>
+    <g class="node"><rect x="420" y="416" width="300" height="110" rx="10" fill="rgba(76,29,149,.34)" stroke="#8871be"/><text class="title" x="570" y="446" text-anchor="middle">Hermes local state</text><text class="sub" x="570" y="469" text-anchor="middle">state.db · sessions · transcripts</text><text class="sub" x="570" y="489" text-anchor="middle">persistent memory · user profile · skills</text><text class="sub" x="570" y="509" text-anchor="middle">conversation history, không phải KB duyệt</text></g>
+    <g class="node"><rect x="752" y="416" width="192" height="110" rx="10" fill="rgba(76,29,149,.42)" stroke="#ac91df"/><text class="title" x="848" y="446" text-anchor="middle">Honcho</text><text class="sub" x="848" y="469" text-anchor="middle">API · MCP · Deriver</text><text class="sub" x="848" y="489" text-anchor="middle">PostgreSQL · Redis</text><text class="sub" x="848" y="509" text-anchor="middle">stable user memory</text></g>
+    <g class="node"><rect x="968" y="416" width="128" height="110" rx="10" fill="rgba(6,78,59,.36)" stroke="#65c795"/><text class="title" x="1032" y="446" text-anchor="middle">Host</text><text class="sub" x="1032" y="469" text-anchor="middle">files · git</text><text class="sub" x="1032" y="489" text-anchor="middle">terminal</text><text class="sub" x="1032" y="509" text-anchor="middle">services</text></g>
+    <g class="node"><rect x="680" y="606" width="250" height="70" rx="10" fill="rgba(120,53,15,.36)" stroke="#e99a5b"/><text class="title" x="805" y="635" text-anchor="middle">CFMan MCP</text><text class="sub" x="805" y="656" text-anchor="middle">quản lý tunnel · route · publication</text></g>
+    <g class="node"><rect x="950" y="606" width="146" height="70" rx="10" fill="rgba(120,53,15,.36)" stroke="#e5b95c"/><text class="title" x="1023" y="635" text-anchor="middle">Cloudflare</text><text class="sub" x="1023" y="656" text-anchor="middle">public HTTPS edge</text></g>
+    <g class="node"><rect x="40" y="216" width="210" height="78" rx="10" fill="rgba(30,41,59,.62)" stroke="#77a8dc"/><text class="title" x="145" y="245" text-anchor="middle">Claude Code (tùy chọn)</text><text class="sub" x="145" y="267" text-anchor="middle">coding worker · git worktree · tests</text><text class="sub" x="145" y="284" text-anchor="middle">nhận task / trả handoff</text></g>
+  </svg></div>
+  <p class="diagram-caption">Mũi tên nét đứt biểu thị tích hợp Claude Code được đề xuất; các kết nối còn lại mô tả kiến trúc đang vận hành hoặc năng lực đã cấu hình.</p>
+
+  <div class="section"><h3>Mỗi lớp trả lời một câu hỏi khác nhau</h3>
+    <div class="grid three">
+      <article class="card"><span class="tag">Giao tiếp</span><h4>Discord</h4><p>Trung đang yêu cầu gì, trong channel/thread nào?</p></article>
+      <article class="card accent"><span class="tag">Điều phối</span><h4>Hermes</h4><p>Nên suy luận, gọi công cụ và phối hợp hệ thống thế nào?</p></article>
+      <article class="card"><span class="tag">Code truth</span><h4>Git repository</h4><p>Code và artifact hiện tại thực sự ở trạng thái nào?</p></article>
+      <article class="card"><span class="tag">Knowledge truth</span><h4>Notion</h4><p>Quyết định và knowledge nào đã được review, chấp thuận?</p></article>
+      <article class="card"><span class="tag">Long-term context</span><h4>Honcho</h4><p>Preference và facts ổn định nào về người dùng cần nhớ?</p></article>
+      <article class="card"><span class="tag">Execution</span><h4>Host</h4><p>Process, file, database và dịch vụ thật sự chạy ở đâu?</p></article>
+    </div>
+  </div>
+  <div class="section"><div class="callout"><strong>Kết luận kiến trúc:</strong> giữ Hermes làm orchestrator, Claude Code làm coding worker, Git làm source of truth cho code, Notion làm source of truth cho knowledge đã duyệt, và Honcho chỉ giữ facts ngắn, ổn định, đã được phê duyệt.</div></div>
+</section>
+
+<section class="tab-panel" id="flows" role="tabpanel">
+  <div class="eyebrow">Từ tin nhắn đến hành động</div><h2>Các luồng chính của hệ thống</h2><p class="lede">Một yêu cầu có thể chỉ cần LLM trả lời, hoặc đi xa hơn: đọc memory, sửa code, cập nhật Notion, chạy dịch vụ trên host hay công khai artifact qua Cloudflare.</p>
+  <div class="section"><h3>1. Luồng hội thoại chuẩn</h3><div class="flow">
+    <div class="flow-step"><b>Discord</b><small>Nhận message</small></div><div class="flow-step"><b>Gateway</b><small>Nhận diện user, thread</small></div><div class="flow-step"><b>Context</b><small>Session + memory</small></div><div class="flow-step"><b>LLM</b><small>Reasoning</small></div><div class="flow-step"><b>Tools</b><small>Nếu cần hành động</small></div><div class="flow-step"><b>Verify</b><small>Đọc kết quả thật</small></div><div class="flow-step"><b>Discord</b><small>Trả kết quả</small></div>
+  </div></div>
+  <div class="section"><h3>2. Luồng knowledge có kiểm duyệt</h3><div class="flow">
+    <div class="flow-step"><b>Raw source</b><small>Chat, tài liệu, export</small></div><div class="flow-step"><b>Filter</b><small>Loại dữ liệu nhạy cảm</small></div><div class="flow-step"><b>Candidate</b><small>Memory Inbox</small></div><div class="flow-step"><b>Human review</b><small>Trung duyệt</small></div><div class="flow-step"><b>Notion</b><small>Approved record</small></div><div class="flow-step"><b>Stable fact</b><small>Rút gọn</small></div><div class="flow-step"><b>Honcho</b><small>Long-term memory</small></div>
+  </div><p>Nguyên tắc: <b>không đồng bộ thẳng raw transcript vào Honcho</b>. Notion đóng vai trò cổng review; Honcho chỉ nhận phần ngắn, ổn định và có ích qua nhiều phiên.</p></div>
+  <div class="section"><h3>3. Luồng coding được đề xuất</h3><div class="flow">
+    <div class="flow-step"><b>Yêu cầu</b><small>Trung qua Discord</small></div><div class="flow-step"><b>Hermes</b><small>Chuẩn hóa task</small></div><div class="flow-step"><b>Worktree</b><small>Cô lập thay đổi</small></div><div class="flow-step"><b>Claude Code</b><small>Sửa code + test</small></div><div class="flow-step"><b>Handoff</b><small>Diff, test, caveat</small></div><div class="flow-step"><b>Hermes review</b><small>Kiểm chứng</small></div><div class="flow-step"><b>Discord</b><small>Báo cáo + next step</small></div>
+  </div><div class="callout"><strong>Điểm kiểm soát:</strong> Claude Code chỉ được quyền trên repository/worktree của task; publish public, thay route Cloudflare hoặc gọi command-agent cần approval riêng.</div></div>
+  <div class="section"><h3>4. Luồng công khai một dịch vụ local</h3><div class="flow">
+    <div class="flow-step"><b>Local app</b><small>127.0.0.1:88xx</small></div><div class="flow-step"><b>Health check</b><small>Kiểm tra local</small></div><div class="flow-step"><b>CFMan MCP</b><small>Cấu hình publication</small></div><div class="flow-step"><b>cloudflared</b><small>Tunnel trên host</small></div><div class="flow-step"><b>Cloudflare</b><small>HTTPS edge</small></div><div class="flow-step"><b>Verify</b><small>curl --resolve</small></div><div class="flow-step"><b>Người xem</b><small>Truy cập subdomain</small></div>
+  </div><p>CFMan quản lý publication nhưng không thay thế authentication của ứng dụng. Tài liệu nhạy cảm phải dùng cơ chế bảo vệ ở application/server hoặc policy truy cập phù hợp.</p></div>
+</section>
+
+<section class="tab-panel" id="layers" role="tabpanel">
+  <div class="eyebrow">Vai trò và ranh giới</div><h2>Chi tiết từng lớp</h2><p class="lede">Mỗi lớp được mô tả theo ba phần: vai trò, những gì nó không nên làm, và tình trạng thực tế đã quan sát trên host.</p>
+  <div class="section">
+    <article class="layer"><div><div class="layer-name">Discord</div><div class="layer-role">Presentation & transport</div></div><div class="layer-body"><p>Là giao diện Trung sử dụng để trò chuyện với Basic &amp; Logic. Discord giữ channel, thread và message ở cấp nền tảng, rồi chuyển sự kiện tới Hermes Gateway.</p><ul><li>Nhận yêu cầu và hiển thị câu trả lời, file, ảnh, audio.</li><li>Phân tách ngữ cảnh qua server/channel/thread.</li><li>Không phải knowledge base, runtime hay source of truth của code.</li></ul><div class="facts"><span class="fact">Discord configured</span><span class="fact">Home channel 1534158580742357085</span></div></div></article>
+    <article class="layer"><div><div class="layer-name">Hermes Agent</div><div class="layer-role">Orchestrator & runtime</div></div><div class="layer-body"><p>Là trung tâm điều phối: nhận message, ghép context, gọi model, quyết định công cụ, thực thi vòng lặp và gửi kết quả về Discord. “Basic &amp; Logic” là tên trợ lý; Hermes là nền tảng bên dưới.</p><ul><li>Gateway và session routing.</li><li>Agent/tool-calling loop, context compression và verification.</li><li>Terminal, file, code execution, web, vision, memory, cron, delegation.</li><li>Native MCP client kết nối dịch vụ ngoài.</li><li>Skills lưu quy trình tái sử dụng.</li></ul><div class="facts"><span class="fact">systemd user service</span><span class="fact">/root/tools/hermes-agent</span><span class="fact">/root/.hermes</span></div></div></article>
+    <article class="layer"><div><div class="layer-name">LLM</div><div class="layer-role">Reasoning engine</div></div><div class="layer-body"><p>Model phân tích yêu cầu, tạo nội dung và đề xuất tool call. Hermes tách agent logic khỏi provider để có thể thay model hoặc thiết lập fallback mà không đổi toàn bộ kiến trúc.</p><ul><li>Không tự có quyền host; quyền đến từ tool Hermes cung cấp.</li><li>Không phải kho lưu trữ dài hạn.</li><li>Kết quả quan trọng phải được kiểm chứng bằng tool output.</li></ul><div class="facts"><span class="fact">Observed: claude-opus-4-8</span><span class="fact">Provider: Anthropic</span></div></div></article>
+    <article class="layer"><div><div class="layer-name">MCP</div><div class="layer-role">Integration protocol</div></div><div class="layer-body"><p>Model Context Protocol là chuẩn adapter giữa Hermes và các dịch vụ. Hermes kết nối MCP server lúc khởi động, discovery tools, rồi đăng ký chúng như công cụ hạng nhất.</p><ul><li>Notion MCP dùng stdio qua <code>npx</code>.</li><li>CFMan MCP dùng remote HTTP.</li><li>Tool thường có tên <code>mcp_&lt;server&gt;_&lt;tool&gt;</code>.</li><li>MCP là giao thức kết nối, không phải database.</li></ul><div class="facts"><span class="fact">notion ✓ enabled</span><span class="fact">cfman ✓ enabled</span></div></div></article>
+    <article class="layer"><div><div class="layer-name">Notion</div><div class="layer-role">Curated project knowledge</div></div><div class="layer-body"><p>Là kho project memory và knowledge có human review. Notion phù hợp với quyết định, quy trình, summary đã lọc và facts đang chờ phê duyệt.</p><ul><li>Databases: Projects, Decisions, Knowledge, Processes, Conversation Archive, Memory Inbox.</li><li>Chỉ record Approved mới đủ điều kiện đi tiếp sang Honcho.</li><li>Không nên chứa raw export, bí mật hoặc dữ liệu nghiệp vụ chi tiết theo mặc định.</li></ul></div></article>
+    <article class="layer"><div><div class="layer-name">Honcho</div><div class="layer-role">Long-term user memory</div></div><div class="layer-body"><p>Lưu và suy diễn representation dài hạn về user/peer: preference, cách xưng hô, constraint ổn định, patterns có ích xuyên phiên.</p><ul><li>API nhận và truy vấn memory.</li><li>Deriver xử lý observations/conclusions/representation.</li><li>PostgreSQL lưu dữ liệu bền vững; Redis hỗ trợ runtime.</li><li>Không thay Notion, Git hay kho tài liệu gốc.</li></ul><div class="facts"><span class="fact">API 127.0.0.1:8000</span><span class="fact">MCP 127.0.0.1:8787</span><span class="fact">health: ok</span></div></div></article>
+    <article class="layer"><div><div class="layer-name">Host</div><div class="layer-role">Execution infrastructure</div></div><div class="layer-body"><p>Máy Linux là nơi code, services, databases, artifacts và tunnel chạy thật. Hermes thao tác với host qua terminal/file/process tools.</p><ul><li>Chứa Hermes, Honcho, repositories, artifacts, PostgreSQL, Redis, cloudflared.</li><li>Dịch vụ backend nên bind localhost khi không cần truy cập trực tiếp từ mạng.</li><li>Filesystem/repository mới phản ánh artifact và code hiện tại.</li></ul><div class="facts"><span class="fact">/root/artifacts</span><span class="fact">Linux</span><span class="fact">local terminal backend</span></div></div></article>
+    <article class="layer"><div><div class="layer-name">PostgreSQL</div><div class="layer-role">Durable structured data</div></div><div class="layer-body"><p>Cơ sở dữ liệu quan hệ phục vụ Honcho và các dữ liệu có cấu trúc cần persistence. Agent coding không nên dùng credential production đầy đủ; nếu cần debug nên cấp user read-only.</p><div class="facts"><span class="fact">PostgreSQL 18</span><span class="fact">127.0.0.1:5432</span></div></div></article>
+    <article class="layer"><div><div class="layer-name">Redis</div><div class="layer-role">Cache & transient state</div></div><div class="layer-body"><p>Dùng cho cache, queue hoặc trạng thái tạm hỗ trợ runtime. Không nên là source of truth cho knowledge hoặc quyết định cần tồn tại lâu dài.</p><div class="facts"><span class="fact">127.0.0.1:6379</span></div></div></article>
+    <article class="layer"><div><div class="layer-name">CFMan</div><div class="layer-role">Cloudflare control plane</div></div><div class="layer-body"><p>Quản lý account, zone, tunnel, ingress route, publication, verification và command execution có kiểm soát. Hermes truy cập CFMan qua MCP.</p><ul><li>Tunnel: Trung Truong's AI Agent.</li><li>Zone: basicnlogic.com.</li><li>Giữ publication hiện hữu khi cập nhật.</li><li>WAF route hỗ trợ IP allow-list, không thay Basic Auth.</li></ul><div class="facts"><span class="fact">Tunnel id a60659cf</span><span class="fact">MCP remote</span></div></div></article>
+    <article class="layer"><div><div class="layer-name">Cloudflare</div><div class="layer-role">Public HTTPS edge</div></div><div class="layer-body"><p>Nhận request public, kết thúc HTTPS và chuyển qua Cloudflare Tunnel đến service local. Cloudflare không tự tạo authentication nghiệp vụ nếu ứng dụng không cấu hình.</p><div class="facts"><span class="fact">cloudflared active</span><span class="fact">basicnlogic.com</span></div></div></article>
+    <article class="layer"><div><div class="layer-name">Command Agent</div><div class="layer-role">Privileged execution</div></div><div class="layer-body"><p>Agent trên host cho phép CFMan chạy command/script đã lập lịch. Đây là bề mặt đặc quyền cao và phải tách khỏi luồng coding bình thường.</p><ul><li>Cần allowlist, timeout, audit và approval.</li><li>Không expose thành public HTTP API.</li><li>Claude Code không được tự gọi nếu chưa có quyền rõ ràng.</li></ul><div class="facts"><span class="fact">127.0.0.1:47831</span></div></div></article>
+    <article class="layer"><div><div class="layer-name">Claude Code</div><div class="layer-role">Proposed coding worker</div></div><div class="layer-body"><p>Có thể tham gia như worker chuyên trách đọc code, sửa repository, chạy test và trả handoff. Không nên trở thành orchestrator thứ hai cùng quyền trên mọi hệ thống.</p><ul><li>Làm việc trong git worktree/task scope riêng.</li><li>Đọc <code>CLAUDE.md</code>, <code>AGENTS.md</code>, project state.</li><li>Trả diff, test results, caveats và next action cho Hermes.</li></ul></div></article>
+  </div>
+</section>
+
+<section class="tab-panel" id="memory" role="tabpanel">
+  <div class="eyebrow">Không trộn lẫn các loại trí nhớ</div><h2>Memory, source of truth và bảo mật</h2><p class="lede">Điểm dễ thiết kế sai nhất là gọi mọi thứ là “memory”. Hệ thống hiện tại có nhiều kho, mỗi kho phục vụ một mục tiêu và có độ tin cậy khác nhau.</p>
+  <div class="section"><h3>Bản đồ các kho dữ liệu</h3><div class="table-wrap"><table><thead><tr><th>Kho/lớp</th><th>Trả lời câu hỏi</th><th>Nên lưu</th><th>Không nên lưu</th></tr></thead><tbody>
+    <tr><td><b>Discord</b></td><td>Người dùng đang nói gì?</td><td>Message ở cấp nền tảng</td><td>Project truth, secrets, database nghiệp vụ</td></tr>
+    <tr><td><b>Hermes sessions</b></td><td>Phiên trước đã trao đổi gì?</td><td>Conversation, metadata, routing context</td><td>Quyết định chính thức nếu chưa được duyệt</td></tr>
+    <tr><td><b>Git repository</b></td><td>Code hiện tại là gì?</td><td>Source, tests, config mẫu, docs versioned</td><td>Production secrets, raw private data</td></tr>
+    <tr><td><b>Notion</b></td><td>Knowledge/decision nào đã được duyệt?</td><td>Projects, decisions, summaries, processes</td><td>Raw sensitive exports, passwords, dữ liệu chi tiết</td></tr>
+    <tr><td><b>Honcho</b></td><td>Fact ổn định nào về user cần nhớ?</td><td>Preference và constraint ngắn, ổn định</td><td>Transcript dài, code, hợp đồng, task tạm thời</td></tr>
+    <tr><td><b>PostgreSQL</b></td><td>Dữ liệu backend có cấu trúc ở đâu?</td><td>Honcho entities, observations, conclusions</td><td>Truy cập tùy tiện từ coding agent</td></tr>
+    <tr><td><b>Host filesystem</b></td><td>File gốc/artifact nằm ở đâu?</td><td>Raw export, artifact, tài liệu local</td><td>Public exposure không chủ đích</td></tr>
+  </tbody></table></div></div>
+  <div class="section"><h3>Chính sách Cân bằng</h3><div class="grid two">
+    <article class="card"><span class="tag">Giữ local / server</span><h4>Dữ liệu gốc hoặc nhạy cảm</h4><ul><li>Raw Claude export và transcript.</li><li>User/login history.</li><li>Hợp đồng và tài liệu pháp lý gốc.</li><li>Dữ liệu nhân sự/khách hàng.</li><li>Số liệu tài chính chi tiết.</li></ul></article>
+    <article class="card"><span class="tag">Cho phép lên Notion</span><h4>Dữ liệu đã lọc, có chủ đích</h4><ul><li>Metadata và project summary.</li><li>Decisions và knowledge.</li><li>Processes.</li><li>Memory candidates.</li><li>Approved records.</li></ul></article>
+    <article class="card"><span class="tag">Cho phép vào Honcho</span><h4>Facts ngắn, ổn định</h4><ul><li>Tên, cách xưng hô.</li><li>Ngôn ngữ và phong cách trả lời.</li><li>Constraint dài hạn.</li><li>Preference được Trung duyệt.</li></ul></article>
+    <article class="card"><span class="tag">Google Drive</span><h4>Kênh truyền/backup kiểm soát</h4><p>Không mặc định trở thành project memory hay nơi nhân bản toàn bộ dữ liệu nhạy cảm.</p></article>
+  </div></div>
+  <div class="section"><h3>Bốn cấp quyền</h3><div class="table-wrap"><table><thead><tr><th>Cấp</th><th>Phạm vi</th><th>Ví dụ</th><th>Kiểm soát</th></tr></thead><tbody>
+    <tr><td>1 · Read-only</td><td>Đọc context</td><td>Đọc repo, Approved Notion, memory đã lọc</td><td>Cho phép mặc định theo task</td></tr>
+    <tr><td>2 · Local reversible</td><td>Sửa trong workspace</td><td>Tạo file, sửa code, chạy test</td><td>Worktree, diff, test, rollback Git</td></tr>
+    <tr><td>3 · External write</td><td>Thay đổi hệ thống ngoài</td><td>Ghi Notion, publish artifact, đổi route</td><td>Controlled tool + explicit scope</td></tr>
+    <tr><td>4 · Privileged/destructive</td><td>Hạ tầng và dữ liệu quan trọng</td><td>DB migration, service control, command-agent</td><td>Approval, audit, preflight, backup</td></tr>
+  </tbody></table></div></div>
+  <div class="section"><div class="callout warning"><strong>Quy tắc cho Claude Code:</strong> mặc định chỉ cấp quyền 1–2. Quyền 3 phải đi qua controlled write; quyền 4 không được suy ra từ yêu cầu “sửa code” và luôn cần thẩm quyền riêng.</div></div>
+</section>
+
+<section class="tab-panel" id="integration" role="tabpanel">
+  <div class="eyebrow">Claude Code trong hệ thống</div><h2>Bốn mô hình tích hợp và phương án khuyến nghị</h2><p class="lede">Mục tiêu là tận dụng năng lực coding của Claude Code mà không tạo một orchestrator thứ hai có thể đồng thời sửa code, memory, Notion và hạ tầng.</p>
+  <div class="section"><h3>So sánh bốn mô hình</h3><div class="table-wrap"><table><thead><tr><th>Mô hình</th><th>Cách vận hành</th><th>Ưu điểm</th><th>Rủi ro</th><th>Đánh giá</th></tr></thead><tbody>
+    <tr><td><b>A · Coding worker</b></td><td>Hermes gọi Claude Code CLI cho một task cụ thể.</td><td>Rõ ownership; dễ cô lập; tận dụng tốt coding agent.</td><td>Cần handoff chuẩn và timeout/process control.</td><td><b>Khuyến nghị ngay</b></td></tr>
+    <tr><td><b>B · Shared repo contract</b></td><td>Cả hai đọc AGENTS.md, CLAUDE.md, PROJECT_STATE.md, DECISIONS.md.</td><td>Audit bằng Git; ít coupling; sống qua session.</td><td>Phải duy trì tài liệu current và tránh mâu thuẫn.</td><td><b>Nên kết hợp với A</b></td></tr>
+    <tr><td><b>C · Hermes context MCP</b></td><td>Claude Code gọi một MCP nội bộ do Hermes kiểm soát.</td><td>Context có cấu trúc; policy tập trung.</td><td>Tăng bề mặt bảo mật; cần build/maintain server.</td><td>Giai đoạn sau, read-only trước</td></tr>
+    <tr><td><b>D · Truy cập trực tiếp</b></td><td>Claude Code tự gọi Notion/Honcho/host.</td><td>Triển khai nhanh, ít trung gian.</td><td>Hai agent cùng ghi; quyền quá rộng; khó audit.</td><td>Không khuyến nghị mặc định</td></tr>
+  </tbody></table></div></div>
+  <div class="section"><h3>Kiến trúc mục tiêu</h3><div class="arch-wrap"><svg viewBox="0 0 1120 520" role="img" aria-label="Kiến trúc tích hợp Claude Code được khuyến nghị">
+    <defs><marker id="arrow2" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#60736a"/></marker></defs>
+    <path d="M190 110 H330" stroke="#60736a" stroke-width="1.6" marker-end="url(#arrow2)"/><path d="M510 160 V238" stroke="#60736a" stroke-width="1.6" marker-end="url(#arrow2)"/><path d="M690 300 H840" stroke="#60736a" stroke-width="1.6" marker-end="url(#arrow2)"/><path d="M840 350 H690" stroke="#60736a" stroke-width="1.6" marker-end="url(#arrow2)"/><path d="M510 362 V434" stroke="#60736a" stroke-width="1.6" marker-end="url(#arrow2)"/><path d="M330 300 H190" stroke="#60736a" stroke-width="1.6" marker-end="url(#arrow2)"/>
+    <g class="node"><rect x="40" y="70" width="150" height="80" rx="10" fill="rgba(30,41,59,.72)" stroke="#94a3b8"/><text class="title" x="115" y="102" text-anchor="middle">Trung</text><text class="sub" x="115" y="124" text-anchor="middle">request · approval</text></g>
+    <g class="node"><rect x="330" y="52" width="360" height="108" rx="10" fill="rgba(6,78,59,.45)" stroke="#65c795"/><text class="title" x="510" y="86" text-anchor="middle">Hermes Orchestrator</text><text class="sub" x="510" y="110" text-anchor="middle">context · task contract · permission boundary</text><text class="sub" x="510" y="132" text-anchor="middle">review · verification · report</text></g>
+    <g class="node"><rect x="330" y="238" width="360" height="124" rx="10" fill="rgba(8,51,68,.5)" stroke="#5cc8d7"/><text class="title" x="510" y="273" text-anchor="middle">Task Workspace</text><text class="sub" x="510" y="297" text-anchor="middle">Git worktree · CLAUDE.md · AGENTS.md</text><text class="sub" x="510" y="319" text-anchor="middle">TASK.json · HANDOFF.md · test results</text><text class="sub" x="510" y="341" text-anchor="middle">scope và rollback rõ ràng</text></g>
+    <g class="node"><rect x="840" y="238" width="238" height="124" rx="10" fill="rgba(76,29,149,.38)" stroke="#ac91df"/><text class="title" x="959" y="273" text-anchor="middle">Claude Code Worker</text><text class="sub" x="959" y="297" text-anchor="middle">inspect · implement · test</text><text class="sub" x="959" y="319" text-anchor="middle">không publish / infra write</text><text class="sub" x="959" y="341" text-anchor="middle">trả diff + evidence</text></g>
+    <g class="node"><rect x="330" y="434" width="360" height="68" rx="10" fill="rgba(120,53,15,.35)" stroke="#e5b95c"/><text class="title" x="510" y="463" text-anchor="middle">Controlled External Actions</text><text class="sub" x="510" y="484" text-anchor="middle">Notion candidate · CFMan publish · deployment (approval)</text></g>
+    <g class="node"><rect x="40" y="250" width="150" height="100" rx="10" fill="rgba(76,29,149,.32)" stroke="#8871be"/><text class="title" x="115" y="282" text-anchor="middle">Context sources</text><text class="sub" x="115" y="306" text-anchor="middle">Notion Approved</text><text class="sub" x="115" y="326" text-anchor="middle">Honcho · sessions</text></g>
+  </svg></div></div>
+  <div class="section"><h3>Ownership contract</h3><div class="table-wrap"><table><thead><tr><th>Tài nguyên</th><th>Owner chính</th><th>Claude Code</th><th>Hermes</th></tr></thead><tbody>
+    <tr><td>Discord conversation</td><td>Hermes Gateway</td><td>Không truy cập trực tiếp</td><td>Nhận, route, trả lời</td></tr>
+    <tr><td>Source code</td><td>Git repository</td><td>Sửa trong worktree</td><td>Giao task và verify</td></tr>
+    <tr><td>Approved decisions</td><td>Notion</td><td>Read hoặc đề xuất candidate</td><td>Controlled write/review flow</td></tr>
+    <tr><td>Stable user facts</td><td>Honcho</td><td>Nhận context đã lọc</td><td>Đọc/ghi theo approval policy</td></tr>
+    <tr><td>Public publication</td><td>CFMan workflow</td><td>Không tự gọi</td><td>Thực thi khi có scope/approval</td></tr>
+    <tr><td>Runtime services</td><td>Host/systemd</td><td>Read diagnostics theo task</td><td>Kiểm soát mutation</td></tr>
+  </tbody></table></div></div>
+  <div class="section"><h3>Handoff contract tối thiểu</h3><div class="grid two">
+    <article class="card"><span class="tag">Input · TASK.json</span><ul><li>Task ID và mục tiêu.</li><li>Repository + worktree path.</li><li>Allowed files/systems.</li><li>Acceptance criteria.</li><li>Required tests.</li><li>Forbidden actions.</li><li>Context links và timeout.</li></ul></article>
+    <article class="card"><span class="tag">Output · HANDOFF.md</span><ul><li>Kết quả đạt được.</li><li>Files và diff summary.</li><li>Lệnh test đã chạy + output thật.</li><li>Known caveats.</li><li>External actions chưa thực hiện.</li><li>Backlog và next action.</li></ul></article>
+  </div></div>
+  <div class="section"><h3>MCP tools tối thiểu ở giai đoạn sau</h3><div class="grid three">
+    <article class="card"><span class="tag">Read-only</span><h4>get_project_context</h4><p>Trả context đã lọc theo project/task.</p></article>
+    <article class="card"><span class="tag">Read-only</span><h4>get_approved_decisions</h4><p>Chỉ đọc record Notion trạng thái Approved.</p></article>
+    <article class="card"><span class="tag">Read-only</span><h4>get_user_preferences</h4><p>Trả subset Honcho phù hợp task.</p></article>
+    <article class="card"><span class="tag">Controlled write</span><h4>create_memory_candidate</h4><p>Ghi candidate, không ghi thẳng Honcho.</p></article>
+    <article class="card"><span class="tag">Controlled write</span><h4>submit_task_handoff</h4><p>Gửi kết quả có cấu trúc về Hermes.</p></article>
+    <article class="card"><span class="tag">Không expose</span><h4>publish / command</h4><p>CFMan, deployment và command-agent ở ngoài MCP coding worker.</p></article>
+  </div></div>
+  <div class="section"><h3>Lộ trình triển khai</h3><ol><li><b>Giai đoạn 1:</b> Shared repo contract + Claude Code CLI worker trong worktree.</li><li><b>Giai đoạn 2:</b> Chuẩn hóa TASK.json/HANDOFF.md, timeout, logs và review gate.</li><li><b>Giai đoạn 3:</b> Cấp context read-only từ Notion Approved/Honcho qua adapter.</li><li><b>Giai đoạn 4:</b> MCP read-only; đo hiệu quả trước khi thêm controlled writes.</li><li><b>Giai đoạn 5:</b> Chỉ thêm automation publish/deploy nếu audit và approval đã đủ.</li></ol></div>
+</section>
+
+<section class="tab-panel" id="glossary" role="tabpanel">
+  <div class="eyebrow">Thuật ngữ bằng ngôn ngữ đơn giản</div><h2>Glossary</h2><p class="lede">Tìm theo tiếng Anh hoặc tiếng Việt. Mỗi thuật ngữ giải thích theo vai trò cụ thể trong hệ thống này.</p>
+  <div class="glossary-tools"><input id="glossarySearch" type="search" placeholder="Lọc thuật ngữ…" aria-label="Lọc glossary"></div>
+  <dl class="glossary" id="glossaryList">
+    <div class="term"><dt><span class="alpha">A</span>Agent</dt><dd>Chương trình dùng LLM để suy luận theo vòng lặp, gọi công cụ và theo đuổi một mục tiêu; không chỉ sinh một câu trả lời.</dd></div>
+    <div class="term"><dt><span class="alpha">A</span>API</dt><dd>Giao diện lập trình để hai hệ thống trao đổi dữ liệu hoặc yêu cầu. Honcho API tại localhost là một ví dụ.</dd></div>
+    <div class="term"><dt><span class="alpha">A</span>Approval</dt><dd>Điểm cần con người hoặc policy cho phép trước khi thực hiện hành động có rủi ro.</dd></div>
+    <div class="term"><dt><span class="alpha">A</span>Artifact</dt><dd>Sản phẩm đầu ra có thể bàn giao: file HTML, báo cáo, tài liệu, build hoặc dataset.</dd></div>
+    <div class="term"><dt><span class="alpha">A</span>Audit log</dt><dd>Nhật ký ai/agent đã làm gì, lúc nào, với mục tiêu và kết quả nào.</dd></div>
+    <div class="term"><dt><span class="alpha">B</span>Bind address</dt><dd>Địa chỉ mạng mà một service lắng nghe. 127.0.0.1 chỉ cho phép truy cập từ chính host; 0.0.0.0 lắng nghe trên mọi interface.</dd></div>
+    <div class="term"><dt><span class="alpha">C</span>Cache</dt><dd>Dữ liệu tạm để tăng tốc; có thể tái tạo và không nên là nguồn chân lý duy nhất.</dd></div>
+    <div class="term"><dt><span class="alpha">C</span>CFMan</dt><dd>Control plane quản lý Cloudflare account, zone, tunnel, route, publication và command execution cho hệ thống này.</dd></div>
+    <div class="term"><dt><span class="alpha">C</span>Claude Code</dt><dd>Coding agent chạy trong terminal, phù hợp đọc repository, sửa code và chạy test. Trong thiết kế này nó là worker dưới Hermes.</dd></div>
+    <div class="term"><dt><span class="alpha">C</span>Cloudflare Edge</dt><dd>Hạ tầng public nhận HTTPS request từ Internet trước khi chuyển qua tunnel về host.</dd></div>
+    <div class="term"><dt><span class="alpha">C</span>Cloudflare Tunnel</dt><dd>Kết nối outbound từ host tới Cloudflare, cho phép public service local mà không cần mở trực tiếp cổng inbound.</dd></div>
+    <div class="term"><dt><span class="alpha">C</span>Command Agent</dt><dd>Thành phần đặc quyền nhận yêu cầu thực thi script/command có kiểm soát trên host từ CFMan.</dd></div>
+    <div class="term"><dt><span class="alpha">C</span>Context</dt><dd>Thông tin model nhận cho lượt xử lý hiện tại: message, lịch sử, memory, project rules và tool results.</dd></div>
+    <div class="term"><dt><span class="alpha">C</span>Controlled write</dt><dd>Quyền ghi chỉ thông qua tool/policy có scope, validation và audit; không phải quyền sửa tùy ý.</dd></div>
+    <div class="term"><dt><span class="alpha">C</span>Cron job</dt><dd>Tác vụ chạy theo lịch và có thể tồn tại độc lập với phiên chat hiện tại.</dd></div>
+    <div class="term"><dt><span class="alpha">D</span>Database</dt><dd>Hệ thống lưu và truy vấn dữ liệu có cấu trúc. PostgreSQL là database bền vững; Redis chủ yếu là cache/transient state.</dd></div>
+    <div class="term"><dt><span class="alpha">D</span>Delegation</dt><dd>Hermes giao một phần việc cho subagent hoặc coding worker với context và scope riêng.</dd></div>
+    <div class="term"><dt><span class="alpha">D</span>Deriver</dt><dd>Process Honcho phân tích observations để tạo conclusions hoặc representation dài hạn về peer.</dd></div>
+    <div class="term"><dt><span class="alpha">G</span>Gateway</dt><dd>Lớp kết nối nền tảng nhắn tin với agent runtime: nhận Discord message, route session và gửi phản hồi.</dd></div>
+    <div class="term"><dt><span class="alpha">G</span>Git</dt><dd>Hệ thống version control lưu lịch sử code/diff và hỗ trợ rollback, review, branch, worktree.</dd></div>
+    <div class="term"><dt><span class="alpha">G</span>Glossary</dt><dd>Danh mục thuật ngữ và định nghĩa dùng chung để tránh hiểu khác nhau giữa người, Hermes và Claude Code.</dd></div>
+    <div class="term"><dt><span class="alpha">H</span>Handoff</dt><dd>Gói chuyển giao task/result giữa hai agent: mục tiêu, scope, diff, test evidence, caveats và next steps.</dd></div>
+    <div class="term"><dt><span class="alpha">H</span>Hermes Agent</dt><dd>Runtime/orchestrator kết nối model, tools, sessions, memory, skills và messaging platforms. Không phải tên hiển thị của trợ lý.</dd></div>
+    <div class="term"><dt><span class="alpha">H</span>Honcho</dt><dd>Hệ thống long-term memory và user representation; lưu facts ổn định, không thay knowledge base hay repository.</dd></div>
+    <div class="term"><dt><span class="alpha">H</span>Host</dt><dd>Máy Linux thực sự chạy Hermes, Honcho, database, files, services và cloudflared.</dd></div>
+    <div class="term"><dt><span class="alpha">H</span>Human review</dt><dd>Bước Trung xem và duyệt nội dung trước khi nó trở thành decision/knowledge chính thức hoặc memory dài hạn.</dd></div>
+    <div class="term"><dt><span class="alpha">I</span>Ingress route</dt><dd>Quy tắc ánh xạ hostname/path public qua tunnel tới một local service.</dd></div>
+    <div class="term"><dt><span class="alpha">L</span>LLM</dt><dd>Large Language Model; engine suy luận và sinh ngôn ngữ, nhưng chỉ có quyền hành động qua tools mà runtime cấp.</dd></div>
+    <div class="term"><dt><span class="alpha">L</span>Localhost / 127.0.0.1</dt><dd>Địa chỉ loopback chỉ truy cập được từ chính máy, dùng để giữ backend services không public trực tiếp.</dd></div>
+    <div class="term"><dt><span class="alpha">M</span>MCP</dt><dd>Model Context Protocol; chuẩn để agent kết nối và discovery tools từ một server tích hợp như Notion hoặc CFMan.</dd></div>
+    <div class="term"><dt><span class="alpha">M</span>Memory candidate</dt><dd>Một fact/summary được đề xuất nhưng chưa đủ điều kiện thành knowledge hoặc Honcho memory cho tới khi review.</dd></div>
+    <div class="term"><dt><span class="alpha">N</span>Notion MCP</dt><dd>Adapter chạy qua npx cho phép Hermes dùng Notion API thông qua MCP tools.</dd></div>
+    <div class="term"><dt><span class="alpha">O</span>Orchestrator</dt><dd>Thành phần phân rã yêu cầu, chọn worker/tool, quản lý quyền, theo dõi kết quả và tổng hợp phản hồi. Ở đây là Hermes.</dd></div>
+    <div class="term"><dt><span class="alpha">P</span>PostgreSQL</dt><dd>Cơ sở dữ liệu quan hệ bền vững chạy local, hiện phục vụ dữ liệu có cấu trúc của Honcho.</dd></div>
+    <div class="term"><dt><span class="alpha">P</span>Profile</dt><dd>Một cấu hình Hermes độc lập với skills, sessions, credentials và memory riêng.</dd></div>
+    <div class="term"><dt><span class="alpha">P</span>Provider</dt><dd>Dịch vụ cung cấp quyền truy cập model, ví dụ Anthropic. Hermes có thể tách provider khỏi agent logic.</dd></div>
+    <div class="term"><dt><span class="alpha">P</span>Publication</dt><dd>Cấu hình đưa một local HTTP service ra hostname public qua CFMan/Cloudflare Tunnel.</dd></div>
+    <div class="term"><dt><span class="alpha">R</span>Redis</dt><dd>Kho dữ liệu in-memory nhanh, phù hợp cache/queue/trạng thái tạm, không phải project source of truth.</dd></div>
+    <div class="term"><dt><span class="alpha">R</span>Repository</dt><dd>Thư mục dự án được Git quản lý; nguồn chân lý của source code, tests và tài liệu versioned.</dd></div>
+    <div class="term"><dt><span class="alpha">R</span>Rollback</dt><dd>Khả năng quay lại trạng thái trước khi thay đổi, thường bằng Git, backup hoặc reverse migration.</dd></div>
+    <div class="term"><dt><span class="alpha">R</span>Runtime</dt><dd>Môi trường và process thực thi agent/tool/service khi hệ thống đang chạy.</dd></div>
+    <div class="term"><dt><span class="alpha">S</span>Session</dt><dd>Đơn vị hội thoại có lịch sử và metadata riêng; một Discord thread thường ánh xạ vào context phiên tương ứng.</dd></div>
+    <div class="term"><dt><span class="alpha">S</span>Skill</dt><dd>Quy trình tái sử dụng cho agent: trigger, bước làm, lệnh, pitfalls và verification. Skill khác fact memory.</dd></div>
+    <div class="term"><dt><span class="alpha">S</span>Source of truth</dt><dd>Nguồn được coi là có thẩm quyền cho một loại dữ liệu: Git cho code, Notion Approved cho decisions, v.v.</dd></div>
+    <div class="term"><dt><span class="alpha">S</span>Systemd</dt><dd>Trình quản lý service trên Linux, dùng để giữ Hermes Gateway chạy và tự khởi động lại.</dd></div>
+    <div class="term"><dt><span class="alpha">T</span>Tool call</dt><dd>Yêu cầu có cấu trúc từ model tới một công cụ như terminal, file, Notion hoặc CFMan.</dd></div>
+    <div class="term"><dt><span class="alpha">T</span>Transient state</dt><dd>Trạng thái tạm, mất đi hoặc tái tạo được; không nên dùng làm bằng chứng lâu dài.</dd></div>
+    <div class="term"><dt><span class="alpha">W</span>WAF</dt><dd>Web Application Firewall. Trong workflow CFMan hiện tại route WAF hỗ trợ IP allow-list, không phải HTTP Basic Auth.</dd></div>
+    <div class="term"><dt><span class="alpha">W</span>Worker</dt><dd>Agent/process nhận task đã giới hạn từ orchestrator và trả kết quả; Claude Code được đề xuất ở vai trò này.</dd></div>
+    <div class="term"><dt><span class="alpha">W</span>Worktree</dt><dd>Bản checkout Git độc lập cho một task/agent, giúp tránh hai agent sửa cùng working directory.</dd></div>
+  </dl>
+</section>
+
+<section class="tab-panel" id="prompt" role="tabpanel">
+  <div class="eyebrow">Copy & gửi cho coding agent</div><h2>Prompt chuyển giao cho Claude Code</h2><p class="lede">Prompt này yêu cầu Claude Code đánh giá kiến trúc trước khi viết code, không nhầm vai trò của Notion/Honcho và không tự suy ra quyền publish hay hạ tầng.</p>
+  <div class="copy-row"><span class="mono">CLAUDE_CODE_ARCHITECTURE_REVIEW.md</span><button class="copy-btn" id="copyPrompt">Sao chép prompt</button></div>
+  <pre id="promptText">Bạn đang đánh giá khả năng tích hợp Claude Code vào một hệ thống AI agent hiện có trên Linux host.
+
+KIẾN TRÚC HIỆN TẠI
+
+1. Discord
+- Là giao diện chat và message transport.
+- Người dùng gửi yêu cầu qua Discord.
+- Discord không phải source of truth cho code, knowledge hoặc memory.
+
+2. Hermes Agent
+- Là runtime/orchestrator trung tâm.
+- Chạy Gateway dưới systemd user service.
+- Nhận message từ Discord, quản lý session/thread/user context.
+- Chọn model/provider; gọi terminal, filesystem, code execution, memory, session search, cron, delegation và MCP tools.
+- Model/provider quan sát tại thời điểm kiểm tra: claude-opus-4-8 / Anthropic.
+- Hermes có skills dạng SKILL.md.
+- Session store nằm trong /root/.hermes; source tại /root/tools/hermes-agent.
+
+3. MCP
+- Hermes kết nối Notion MCP qua npx -y @notionhq/notion-mcp-server.
+- Hermes kết nối CFMan MCP qua remote HTTP endpoint.
+- MCP tools được discovery và đăng ký với prefix mcp_&lt;server&gt;_&lt;tool&gt;.
+
+4. Notion
+- Là project/knowledge repository có human review.
+- Các database: Projects, Decisions, Knowledge, Processes, Conversation Archive và Memory Inbox.
+- Nhận metadata, summaries, decisions, knowledge và candidates đã lọc.
+- Raw transcript/export, tài liệu pháp lý gốc, dữ liệu HR/customer và detailed financial data giữ local/server.
+- Chỉ facts có trạng thái Approved mới được đồng bộ sang Honcho.
+
+5. Honcho
+- Là long-term memory và user representation layer.
+- Chỉ lưu facts ngắn, ổn định và đã được phê duyệt.
+- Không lưu toàn bộ transcript, source code hoặc tài liệu gốc.
+- API: 127.0.0.1:8000; MCP/worker: 127.0.0.1:8787.
+- PostgreSQL: 127.0.0.1:5432; Redis: 127.0.0.1:6379.
+- Deriver process xử lý/suy diễn memory.
+
+6. Host
+- Là execution and persistence infrastructure.
+- Chứa Hermes, Honcho, repositories, artifacts, PostgreSQL, Redis, cloudflared và services nội bộ.
+- Backend services nên bind localhost.
+- Không expose PostgreSQL, Redis, Honcho API hoặc command-agent trực tiếp ra Internet.
+
+7. CFMan / Cloudflare
+- Tunnel “Trung Truong's AI Agent”, ID a60659cf, zone basicnlogic.com.
+- cloudflared chạy trên host; CFMan publish HTTP service localhost ra subdomain HTTPS.
+- CFMan không thay thế application authentication.
+- Command-agent tại 127.0.0.1:47831 là privileged execution surface.
+- Publication, tunnel changes và command-agent phải được kiểm soát/audit.
+
+Hãy đánh giá bốn mô hình:
+A. Hermes gọi Claude Code CLI như coding worker.
+B. Hermes và Claude Code dùng chung repository contract qua AGENTS.md, CLAUDE.md, PROJECT_STATE.md, DECISIONS.md và handoff files.
+C. Claude Code gọi Hermes qua MCP server nội bộ.
+D. Claude Code truy cập trực tiếp Notion/Honcho/host.
+
+HÃY ĐƯA RA
+1. Kiến trúc tích hợp được khuyến nghị.
+2. Ranh giới ownership giữa Hermes, Claude Code, Notion, Honcho, Git repository và CFMan.
+3. Cơ chế handoff task/result cụ thể.
+4. Cơ chế chống concurrent edits và Git conflict.
+5. Thiết kế quyền read-only, controlled write và privileged write.
+6. MCP tools tối thiểu cần expose cho Claude Code.
+7. Cách bảo đảm chỉ Notion records Approved mới đi vào Honcho.
+8. Cách ngăn Claude Code tự ý publish service hoặc gọi command-agent.
+9. Health checks, dependencies, observability và audit logs.
+10. Cách xử lý Hermes Gateway nếu có restart loop.
+11. Kế hoạch triển khai theo giai đoạn, từ ít rủi ro đến đầy đủ.
+12. Các điểm cần kiểm tra trực tiếp trên repository/config trước khi viết code.
+
+RÀNG BUỘC
+- Không giả định Honcho là project database.
+- Không giả định Notion là raw transcript store.
+- Git repository là source of truth cho code.
+- Hermes là orchestrator; Claude Code mặc định là coding worker.
+- Không suy ra quyền external/privileged write từ yêu cầu sửa code.
+- Ưu tiên ownership rõ, audit được, test được và rollback được.</pre>
+</section>
+
+<section class="tab-panel" id="operations" role="tabpanel">
+  <div class="eyebrow">Bằng chứng quan sát & việc còn lại</div><h2>Trạng thái vận hành và backlog</h2><p class="lede">Các mục “đã xác nhận” dựa trên kiểm tra read-only trên host tại thời điểm lập tài liệu. Chúng là snapshot vận hành, không phải cam kết sẽ không thay đổi.</p>
+  <div class="section"><h3>Đã xác nhận</h3><div class="status-list">
+    <div class="status"><span class="dot"></span><div><b>Hermes Gateway</b><br><span class="section-intro">Đang active dưới systemd user service.</span></div></div>
+    <div class="status"><span class="dot"></span><div><b>Discord</b><br><span class="section-intro">Đã cấu hình, có Home channel.</span></div></div>
+    <div class="status"><span class="dot"></span><div><b>MCP</b><br><span class="section-intro">Notion và CFMan đều enabled.</span></div></div>
+    <div class="status"><span class="dot"></span><div><b>Honcho API</b><br><span class="section-intro">Health check trả {"status":"ok"}; bind 127.0.0.1:8000.</span></div></div>
+    <div class="status"><span class="dot"></span><div><b>Honcho MCP / PostgreSQL / Redis</b><br><span class="section-intro">Đang lắng nghe lần lượt tại 127.0.0.1:8787, :5432 và :6379.</span></div></div>
+    <div class="status"><span class="dot"></span><div><b>Cloudflare Tunnel</b><br><span class="section-intro">Process cloudflared đang chạy trên host.</span></div></div>
+    <div class="status"><span class="dot"></span><div><b>Command Agent</b><br><span class="section-intro">Bind local tại 127.0.0.1:47831.</span></div></div>
+  </div></div>
+  <div class="section"><h3>Rủi ro / cần kiểm tra</h3><div class="status-list">
+    <div class="status"><span class="dot warn"></span><div><b>Gateway restart counter cao</b><br><span class="section-intro">Systemd đã ghi nhận số lần restart rất lớn; cần đọc journal và xác định crash loop, duplicate process hay restart do cấu hình.</span></div></div>
+    <div class="status"><span class="dot warn"></span><div><b>Port 8891 và 8892 bind 0.0.0.0</b><br><span class="section-intro">Rà lại nhu cầu network exposure; nếu không cần, chuyển về 127.0.0.1.</span></div></div>
+    <div class="status"><span class="dot warn"></span><div><b>Repository Hermes phía sau upstream</b><br><span class="section-intro">Snapshot Git cho thấy main behind upstream; chưa nên update trước khi review local changes, compatibility và backup.</span></div></div>
+  </div></div>
+  <div class="section"><h3>Backlog tích hợp Claude Code</h3><div class="status-list">
+    <div class="status"><span class="dot todo"></span><div>Chọn chính thức mô hình A+B làm baseline.</div></div>
+    <div class="status"><span class="dot todo"></span><div>Định nghĩa TASK.json, HANDOFF.md và ownership contract.</div></div>
+    <div class="status"><span class="dot todo"></span><div>Thiết lập git worktree isolation và concurrency guard.</div></div>
+    <div class="status"><span class="dot todo"></span><div>Thiết kế adapter chỉ đọc Notion Approved và Honcho subset.</div></div>
+    <div class="status"><span class="dot todo"></span><div>Thiết kế approval/audit riêng cho Notion writes, CFMan publish và command-agent.</div></div>
+    <div class="status"><span class="dot todo"></span><div>Chạy một pilot task end-to-end trước khi xây MCP integration đầy đủ.</div></div>
+  </div></div>
+  <div class="section"><div class="callout"><strong>Bước tiếp theo hợp lý:</strong> đưa file này cho Claude Code để review; yêu cầu nó chỉ phân tích và đề xuất kiến trúc trước, chưa thay đổi config/service/repository cho đến khi Trung chọn phương án.</div></div>
+</section>
+
+<footer class="footer"><span>Basic &amp; Logic · System Architecture Handoff</span><span>Snapshot: 09/08/2026</span></footer>
+  </div>
+</main>
+</div>
+<script>
+const tabs=[...document.querySelectorAll('.tab-btn')];
+const panels=[...document.querySelectorAll('.tab-panel')];
+const sidebar=document.getElementById('sidebar');
+function openTab(id,push=true){
+  if(!document.getElementById(id)) id='overview';
+  tabs.forEach(b=>{const on=b.dataset.tab===id;b.classList.toggle('active',on);b.setAttribute('aria-selected',on)});
+  panels.forEach(p=>p.classList.toggle('active',p.id===id));
+  if(push) history.replaceState(null,'','#'+id);
+  sidebar.classList.remove('open'); window.scrollTo({top:0,behavior:'instant'});
+}
+tabs.forEach(b=>b.addEventListener('click',()=>openTab(b.dataset.tab)));
+document.getElementById('menuBtn').addEventListener('click',()=>sidebar.classList.toggle('open'));
+document.addEventListener('click',e=>{if(innerWidth<=920&&!sidebar.contains(e.target)&&!e.target.closest('#menuBtn'))sidebar.classList.remove('open')});
+if(location.hash) openTab(location.hash.slice(1),false);
+
+const globalSearch=document.getElementById('globalSearch');
+const searchResults=document.getElementById('searchResults');
+const index=panels.flatMap(panel=>[...panel.querySelectorAll('h2,h3,h4,p,li,td,dt,dd')].map(el=>({tab:panel.id,title:(el.closest('.section')?.querySelector('h3')?.textContent||panel.querySelector('h2')?.textContent||panel.id).trim(),text:el.textContent.trim()}))).filter(x=>x.text.length>18);
+function esc(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function search(q){
+ q=q.trim().toLocaleLowerCase('vi'); if(q.length<2){searchResults.classList.remove('open');return}
+ const terms=q.split(/\s+/); const hits=index.filter(x=>terms.every(t=>x.text.toLocaleLowerCase('vi').includes(t))).slice(0,12);
+ searchResults.innerHTML=hits.length?hits.map((x,i)=>`<button class="result" data-i="${i}"><b>${esc(x.title)}</b><small>${esc(x.text.slice(0,170))}${x.text.length>170?'…':''}</small></button>`).join(''):'<div class="empty">Không tìm thấy nội dung phù hợp.</div>';
+ searchResults.classList.add('open');
+ [...searchResults.querySelectorAll('.result')].forEach((b,i)=>b.onclick=()=>{openTab(hits[i].tab);globalSearch.value='';searchResults.classList.remove('open')});
+}
+globalSearch.addEventListener('input',e=>search(e.target.value));
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();globalSearch.focus();globalSearch.select()}if(e.key==='Escape'){searchResults.classList.remove('open');globalSearch.blur()}});
+document.addEventListener('click',e=>{if(!e.target.closest('.search')&&!e.target.closest('.search-results'))searchResults.classList.remove('open')});
+
+const glossarySearch=document.getElementById('glossarySearch');
+glossarySearch.addEventListener('input',()=>{const q=glossarySearch.value.trim().toLocaleLowerCase('vi');document.querySelectorAll('.term').forEach(t=>t.hidden=q&&!t.textContent.toLocaleLowerCase('vi').includes(q))});
+
+document.getElementById('copyPrompt').addEventListener('click',async e=>{const text=document.getElementById('promptText').innerText;try{await navigator.clipboard.writeText(text);e.currentTarget.textContent='Đã sao chép';setTimeout(()=>e.currentTarget.textContent='Sao chép prompt',1600)}catch{e.currentTarget.textContent='Không thể sao chép'}});
+</script>
+</body>
+</html>
