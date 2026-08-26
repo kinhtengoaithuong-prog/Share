@@ -239,7 +239,19 @@ section{padding:66px 0}
 .cta h2{margin-bottom:12px}
 .cta .lede{max-width:560px;margin:0 auto 26px}
 .cta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-.apply-note{margin-top:24px;font-size:14.5px;color:var(--muted)}
+.apply-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+  margin:32px auto 0;max-width:790px;text-align:left;
+}
+.ai{
+  background:var(--paper);border:1px solid var(--line);border-radius:13px;
+  padding:15px 17px;display:flex;flex-direction:column;gap:3px;
+}
+.ai-k{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.ai-v{font-size:15.5px;font-weight:600;color:var(--rose-deep);text-decoration:none;line-height:1.4}
+a.ai-v:hover{text-decoration:underline}
+.ai-sub{font-size:13.5px;color:var(--muted);line-height:1.45;font-weight:400}
+.apply-note{margin-top:22px;font-size:14.5px;color:var(--plum-soft)}
 .ph{background:rgba(246,196,69,.26);padding:1px 7px;border-radius:5px;font-weight:600;color:#8A6200}
 
 /* ============ FOOTER ============ */
@@ -253,7 +265,7 @@ footer{padding:36px 0 52px;border-top:1px solid var(--line);margin-top:60px;font
 /* ============ RESPONSIVE ============ */
 @media(max-width:900px){
   .hero-grid{grid-template-columns:1fr;gap:36px}
-  .c3,.c2,.dark-grid,.tl{grid-template-columns:1fr}
+  .c3,.c2,.dark-grid,.tl,.apply-grid{grid-template-columns:1fr}
   .job{grid-template-columns:1fr;gap:12px}
   .dark{padding:38px 26px;border-radius:20px}
   section{padding:50px 0}
@@ -306,7 +318,7 @@ footer{padding:36px 0 52px;border-top:1px solid var(--line);margin-top:60px;font
         <span class="fact">Báo cáo trực tiếp <b>CFO</b></span>
         <span class="fact">Có <b>ngân sách riêng</b></span>
         <span class="fact"><b>31</b> cửa hàng + online</span>
-        <span class="fact">Toàn thời gian</span>
+        <span class="fact">Toàn thời gian · <b>TP.HCM</b></span>
       </div>
       <a class="btn btn-pri" href="#ung-tuyen">Xem cách ứng tuyển</a>
     </div>
@@ -519,15 +531,27 @@ footer{padding:36px 0 52px;border-top:1px solid var(--line);margin-top:60px;font
       <h2 style="margin-top:14px">Gia nhập đại gia đình Rabity</h2>
       <p class="lede">Gửi CV kèm một đoạn ngắn về chương trình khách hàng bạn tâm đắc nhất từng làm — bạn đã làm gì, và kết quả ra sao.</p>
       <div class="cta-row">
-        <a class="btn btn-pri" href="mailto:PLACEHOLDER_EMAIL?subject=Ứng%20tuyển%20Customer%20Experience%20Lead">Gửi CV qua email</a>
-        <a class="btn" href="#top">Xem lại mô tả</a>
+        <a class="btn btn-pri" href="mailto:hr-hcmc@rabity.vn?subject=Ứng%20tuyển%20Customer%20Experience%20Lead">Gửi CV qua email</a>
+        <a class="btn" href="tel:0369375165">Gọi 0369 375 165 · Ms. Hạnh</a>
       </div>
-      <p class="apply-note">
-        Email nhận hồ sơ: <span class="ph">[HR bổ sung]</span> &nbsp;·&nbsp;
-        Nơi làm việc: <span class="ph">[HR bổ sung]</span> &nbsp;·&nbsp;
-        Mức lương: <span class="ph">[HR bổ sung]</span><br>
-        Chúng tôi phản hồi mọi hồ sơ trong vòng <span class="ph">[X]</span> ngày làm việc.
-      </p>
+
+      <div class="apply-grid">
+        <div class="ai">
+          <span class="ai-k">Email nhận hồ sơ</span>
+          <a class="ai-v" href="mailto:hr-hcmc@rabity.vn">hr-hcmc@rabity.vn</a>
+        </div>
+        <div class="ai">
+          <span class="ai-k">Liên hệ trực tiếp</span>
+          <a class="ai-v" href="tel:0369375165">0369 375 165 — Ms. Hạnh</a>
+        </div>
+        <div class="ai">
+          <span class="ai-k">Nơi làm việc</span>
+          <span class="ai-v">VP Rabity chi nhánh phía Nam</span>
+          <span class="ai-sub">Khu đô thị Lakeview City, P. Bình Trưng, TP.HCM</span>
+        </div>
+      </div>
+
+      <p class="apply-note"><strong>Chúng tôi phản hồi mọi hồ sơ trong vòng 01 ngày làm việc.</strong></p>
     </div>
   </div>
 </section>
